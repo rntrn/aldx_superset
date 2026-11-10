@@ -37,7 +37,7 @@ $kode = 0
 if ($MulaiBaru) {
     Write-Host "==> Mencadangkan data pemasangan sebelumnya" -ForegroundColor Cyan
     Wait-Container @("metadb", "engine") 120
-    & powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\cadangkan.ps1" -Engine
+    & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\cadangkan.ps1" -Engine
     if ($LASTEXITCODE -ne 0) { Write-Host "Cadangan GAGAL: data lama TIDAK dihapus." -ForegroundColor Red; exit 3 }
     docker compose down --remove-orphans
     docker volume rm sps_metadb_pg sps_engine
@@ -48,7 +48,7 @@ if ($MulaiBaru) {
 if ($Data) {
     Write-Host "==> Membuat cadangan sebelum menghapus data" -ForegroundColor Cyan
     Wait-Container @("metadb", "engine") 120
-    & powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\cadangkan.ps1" -Engine
+    & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\cadangkan.ps1" -Engine
     if ($LASTEXITCODE -eq 0) {
         if (Test-Path ".env") { Copy-Item ".env" "backup\env-$(Get-Date -Format 'yyyyMMdd-HHmm').txt" }   # SECRET_KEY untuk pemulihan
     } else {

@@ -36,8 +36,8 @@ if not exist "%~dp0installer\pasang.ps1" (
 
 rem --- 3 & 4. Buka blokir & pilih PowerShell --------------------------------
 set "PSH="
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0installer\cek-powershell.ps1" "%~dp0." >nul 2>&1
-if not errorlevel 1 set "PSH=powershell.exe"
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0installer\cek-powershell.ps1" "%~dp0." >nul 2>&1
+if not errorlevel 1 set "PSH=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 if not defined PSH (
   where pwsh.exe >nul 2>&1
   if not errorlevel 1 (

@@ -121,7 +121,7 @@ if (-not $TanpaCadangan) {
     if ($adaContainer) {
         docker compose up -d metadb engine *> $null
         Wait-Container @("metadb", "engine") 120
-        & powershell -NoProfile -ExecutionPolicy Bypass -File "$AKAR\scripts\cadangkan.ps1" -Engine -Salin $SimpanCadangan
+        & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$AKAR\scripts\cadangkan.ps1" -Engine -Salin $SimpanCadangan
         if ($LASTEXITCODE -ne 0) { Keluar 3 "Cadangan GAGAL: demi keamanan TIDAK ada yang dihapus." "Red" }
     }
     if (Test-Path ".env") { Copy-Item ".env" (Join-Path $SimpanCadangan "env-RAHASIA.env") }

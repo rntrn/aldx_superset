@@ -28,7 +28,7 @@ foreach ($n in $nama) {
 if ($Hapus) { Write-Host "Jadwal cadangan dilepas." -ForegroundColor Green; exit 0 }
 
 function Aksi([string]$argumen) {
-    New-ScheduledTaskAction -Execute "powershell.exe" -WorkingDirectory $folder `
+    New-ScheduledTaskAction -Execute "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -WorkingDirectory $folder `
         -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$folder\scripts\cadangkan.ps1`" $argumen"
 }
 $argCadangan = "-Engine" + $(if ($Salin) { " -Salin `"$Salin`"" } else { "" })
