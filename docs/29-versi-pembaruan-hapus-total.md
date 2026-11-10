@@ -23,6 +23,9 @@ pwsh -File installer\setup\buat-installer.ps1 -Offline                # PowerShe
 # atau Windows PowerShell: powershell -ExecutionPolicy Bypass -File installer\setup\buat-installer.ps1 -Offline
 ```
 
+Setelah setiap perbaikan, pengembang menjalankan `pwsh -File installer\setup\terbitkan.ps1`, sehingga installer online
+**dan** offline di Releases selalu sama dengan versi terbaru di git.
+
 Hasil di `installer\setup\Output\`: `ALDx-Setup.exe` (online), `ALDx-HapusTotal.exe` (pembersih total), dan
 `ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-*.bin`
 (semua berkas offline harus berada di **satu folder**). Setiap berkas dipindai Windows Defender; Docker Desktop Installer
