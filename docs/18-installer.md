@@ -33,7 +33,7 @@ dilewati otomatis.
 
 | Hal | Keterangan |
 |---|---|
-| Diterbitkan | `installer\setup\terbitkan.ps1`: memastikan semua perubahan sudah di-commit & di-push, membangun installer online, pembersih total & offline, lalu mengunggahnya ke GitHub Releases (*ALDx terbaru* & *ALDx offline*) dengan pencocokan ukuran. Dijalankan **setiap kali ada perbaikan** |
+| Diterbitkan | `installer\setup\terbitkan.ps1`: memastikan semua perubahan sudah di-commit & di-push, membangun installer online, pembersih total & offline, lalu mengunggahnya ke GitHub Releases **kedua repo** (*ALDx terbaru* & *ALDx offline*) dengan pencocokan ukuran. Dijalankan **setiap kali ada perbaikan** |
 | Dibangun | **lokal (disarankan):** `installer\setup\buat-installer.ps1` (online) atau `... -Offline` (+ paket offline) → `installer\setup\Output\`; butuh Inno Setup 6 (`winget install JRSoftware.InnoSetup`). Setiap hasil dipindai **Windows Defender**, dan **isinya diperiksa** dari manifest Inno Setup (berkas fitur AI, panduan & hapus bersih wajib ada; catatan AI, log, `.env`, `unins*` tidak boleh ikut). Gagal bila salah satu tidak terpenuhi. Otomatis: GitHub Actions (`setup.yml`) di setiap push ke `main` → Releases › **ALDx terbaru** (hanya bila Actions berjalan) |
 | Skrip | `installer/setup/aldx-setup.iss` (teks Indonesia, ikon `aldx.ico`); bangun manual: `iscc /DVersi=2026.11.05 installer\setup\aldx-setup.iss` |
 | Hak admin | tidak perlu (`PrivilegesRequired=lowest`); berkas hasil salin tidak bertanda "dari internet", jadi tidak diblokir PowerShell |
