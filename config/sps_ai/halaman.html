@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asisten AI · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F2F5F);--navy2:var(--sps-utama-terang,#2B4A8F);--emas:var(--sps-aksen,#F2B705);--bg:var(--sps-latar,#F4F6F9);--garis:#D5DCE4;--teks:#1F2933;--redup:#5F6B7A;--merah:#C0392B;--hijau:#1E8E5A}
+*{box-sizing:border-box}body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);font-variant-numeric:tabular-nums;background:var(--bg);color:var(--teks);font-size:14px}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 20px;border-bottom:4px solid var(--emas)}
+header img{height:30px}header .judul{font-weight:700;font-size:17px}header a{color:#fff;opacity:.8;margin-left:auto;text-decoration:none;font-size:13px;border-bottom:1px solid transparent}header a:hover{opacity:1;border-color:var(--emas)}
+nav.tab{display:flex;gap:28px;padding:0 24px;background:#fff;border-bottom:1px solid var(--garis)}
+nav.tab button{border:0;background:none;padding:14px 0 12px;font:inherit;font-size:13.5px;font-weight:500;letter-spacing:.01em;cursor:pointer;color:var(--redup);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}nav.tab button:hover{color:var(--navy)}
+nav.tab button.aktif{color:var(--navy);font-weight:700;border-color:var(--emas)}
+main{max-width:1200px;margin:0 auto;padding:18px 20px}section{display:none}section.aktif{display:block}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.baris{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select,input,textarea{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:6px;background:#fff}
+textarea{width:100%;resize:vertical}
+button.utama,button.kedua,button.kecil{font:inherit;border-radius:6px;cursor:pointer;padding:8px 14px;border:1px solid var(--navy)}
+button.utama{background:var(--navy);color:#fff}button.kedua{background:#fff;color:var(--navy)}
+button.kecil{padding:3px 8px;font-size:12px;background:#fff;color:var(--navy)}
+button:disabled{opacity:.5;cursor:wait}
+.lencana{font-size:11px;padding:2px 8px;border-radius:10px;background:#EAF2FB;color:var(--navy)}
+.lencana.kuning{background:#FFF6DB;color:#8A6D00}
+#obrolan{height:58vh;overflow:auto;padding:4px}
+.pesan{max-width:85%;margin:8px 0;padding:10px 13px;border-radius:10px;line-height:1.5;white-space:normal}
+.pesan.user{margin-left:auto;background:var(--navy);color:#fff}
+.pesan.ai{background:#fff;border:1px solid var(--garis)}
+.langkah{font-size:12px;color:var(--redup);margin:3px 0}.langkah:before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--emas);margin:0 8px 2px 2px;vertical-align:middle}
+.contoh button{margin:3px}
+table.data{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:6px}
+table.data th{background:var(--navy);color:#fff;text-align:left;padding:5px 7px;position:sticky;top:0}
+table.data td{border-bottom:1px solid var(--garis);padding:4px 7px}td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tabelbox{max-height:300px;overflow:auto;border:1px solid var(--garis);border-radius:6px;margin:6px 0}
+.tautan{display:inline-block;margin:6px 16px 0 0;padding:2px 0;color:var(--navy);text-decoration:none;font-weight:600;border-bottom:2px solid var(--emas)}.tautan:hover{color:var(--navy2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.saran{border-left:5px solid var(--navy)}.saran.pilih{border-left-color:var(--emas);box-shadow:0 0 0 2px var(--emas)}
+.skor{height:5px;background:#E6EBF1;border-radius:3px;margin:6px 0}.skor div{height:5px;background:var(--emas);border-radius:3px}
+.mini div.bar{height:12px;background:var(--navy2);border-radius:2px;margin:2px 0}
+.mini .lbl{font-size:11px;color:var(--redup);display:flex;justify-content:space-between}
+.pieMini{display:flex;gap:10px;align-items:center}.pieMini svg{width:92px;height:92px;flex:none}
+.titikWarna{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.mini table{width:100%;font-size:11px}.mini td{padding:2px 4px;border-bottom:1px solid #EEF1F5}.mini td.n{text-align:right}
+.angkaBesar{font-size:28px;font-weight:700;color:var(--navy);padding:6px 0}
+.alasan{font-size:12px;color:var(--redup)}.wawasan{list-style:none;padding:0;margin:8px 0 0}.wawasan li{margin:4px 0;padding-left:10px;border-left:3px solid var(--emas)}
+.galat{color:var(--merah)}.sukses{color:var(--hijau)}
+.langkahstory{border:1px dashed var(--garis);border-radius:8px;padding:10px;margin:8px 0;background:#FBFCFD}
+small.ket{color:var(--redup)}
+</style>
+</head>
+<body>
+<header class="sps-hiasan">
+  <img src="/identitas/berkas/logo_putih" alt="{{ app_name }}">
+  <div><div class="judul">Asisten AI</div><div style="font-size:12px;opacity:.85">{{ app_name }} · tanya data &amp; auto chart</div></div>
+  <a href="/">Kembali ke dashboard</a>
+</header>
+<nav class="tab">
+  <button data-tab="tanya" class="aktif">Tanya AI</button>
+  <button data-tab="auto">Auto Chart &amp; Dashboard</button>
+  <button data-tab="story">Story</button>
+</nav>
+<main>
+<!-- ===================== TANYA AI ===================== -->
+<section id="tanya" class="aktif">
+  <div class="kartu baris">
+    <label>Model AI <select id="pilihModel"></select></label>
+    <span id="infoModel" class="lencana"></span>
+    <button class="kecil" id="bersihkan" style="margin-left:auto">Percakapan baru</button>
+  </div>
+  <div class="kartu"><div id="obrolan"></div></div>
+  <div class="kartu">
+    <div class="contoh" id="contoh"></div>
+    <textarea id="masukan" rows="2" placeholder="Tanyakan sesuatu tentang data, mis. &quot;Berapa penjualan per kategori tahun ini?&quot; (Enter = kirim, Shift+Enter = baris baru)"></textarea>
+    <div class="baris" style="margin-top:8px"><button class="utama" id="kirim">Kirim</button>
+      <small class="ket">Jawaban AI bisa keliru. Angka resmi tetap merujuk ke dashboard.</small></div>
+  </div>
+</section>
+<!-- ===================== AUTO ===================== -->
+<section id="auto">
+  <div class="kartu">
+    <div class="baris">
+      <label>Dataset <select id="autoDataset"></select></label>
+      <label>Fokus angka <select id="autoFokus"><option value="">(otomatis)</option></select></label>
+      <label>Jumlah saran <select id="autoJumlah"><option>6</option><option selected>8</option><option>12</option></select></label>
+      <button class="utama" id="autoAnalisis">Analisis dataset</button>
+    </div>
+    <small class="ket">Sistem mempelajari sampel data (maks. 5.000 baris, sesuai hak akses Anda) lalu memberi skor calon chart:
+      tren (regresi), konsentrasi, pencilan, korelasi, dan segmentasi (k-means).</small>
+  </div>
+  <div id="autoHasil"></div>
+</section>
+<!-- ===================== STORY ===================== -->
+<section id="story">
+  <div class="kartu baris"><b>Story saya &amp; story publik</b>
+    <button class="utama" id="storyBaru" style="margin-left:auto">Story baru</button></div>
+  <div id="storyDaftar" class="grid"></div>
+  <div id="storyEditor" class="kartu" style="display:none"></div>
+</section>
+</main>
+
+<script nonce="{{ csp_nonce() }}">
+const CSRF = "{{ csrf }}";
+const fmt = new Intl.NumberFormat("id-ID", {maximumFractionDigits: 2});
+const ringkas = new Intl.NumberFormat("id-ID", {notation: "compact", maximumFractionDigits: 2}); // 1,98 T / 860,12 rb
+const $ = (s, el=document) => el.querySelector(s);
+let AWAL = {}, RIWAYAT = [], DASHBOARDS = [];
+
+async function api(url, data, method) {
+  const opsi = {method: method || (data ? "POST" : "GET"), headers: {"X-CSRFToken": CSRF}};
+  if (data) { opsi.headers["Content-Type"] = "application/json"; opsi.body = JSON.stringify(data); }
+  const r = await fetch(url, opsi);
+  const j = await r.json().catch(() => ({error: "Jawaban server tidak terbaca (" + r.status + ")"}));
+  if (!r.ok) throw new Error(j.error || ("Error " + r.status));
+  return j;
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function md(s) {   // markdown sederhana: **tebal**, - butir, baris baru
+  return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/^- (.*)$/gm, "• $1").replace(/\n/g, "<br>");
+}
+function tabelHTML(kolom, baris, maks=200) {
+  const isAngka = v => typeof v === "number";
+  let h = '<div class="tabelbox" data-ekspor="Hasil Asisten AI"><table class="data"><tr>' + kolom.map(k => `<th>${esc(k)}</th>`).join("") + "</tr>";
+  for (const b of baris.slice(0, maks))
+    h += "<tr>" + kolom.map(k => isAngka(b[k]) ? `<td class="n">${fmt.format(b[k])}</td>` : `<td>${esc(b[k])}</td>`).join("") + "</tr>";
+  h += "</table></div>";
+  if (baris.length > maks) h += `<small class="ket">Menampilkan ${maks} dari ${baris.length} baris.</small>`;
+  return h;
+}
+function tautan(url, teks) { return `<a class="tautan" href="${esc(url)}" target="_blank">${esc(teks)}</a>`; }
+
+// ---------- Tab ----------
+document.querySelectorAll("nav.tab button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav.tab button").forEach(x => x.classList.toggle("aktif", x === b));
+  document.querySelectorAll("main section").forEach(s => s.classList.toggle("aktif", s.id === b.dataset.tab));
+  if (b.dataset.tab === "story") muatStory();
+});
+
+// ---------- Awal ----------
+async function mulai() {
+  try { AWAL = await api("/asisten/api/awal"); } catch (e) { $("#obrolan").innerHTML = `<p class="galat">${esc(e.message)}</p>`; return; }
+  const pm = $("#pilihModel");
+  pm.innerHTML = AWAL.model.map(m => `<option value="${esc(m.id)}">${esc(m.nama)}</option>`).join("");
+  pm.value = AWAL.bawaan; pm.onchange = infoModel;
+  if (AWAL.model.length) infoModel();
+  else {
+    // Tanpa model aktif: tanya-jawab & narasi AI dimatikan; Auto Dashboard (statistik) tetap jalan.
+    pm.closest("label").style.display = "none";
+    $("#masukan").disabled = true; $("#kirim").disabled = true;
+    $("#obrolan").innerHTML = `<p class="ket"><b>Belum ada model AI yang aktif.</b> Tanya-jawab dengan AI tidak tersedia;
+      Auto Dashboard di bawah tetap bisa dipakai. Admin: nyalakan LM Studio / Ollama di server atau isi key model cloud
+      (panduan docs\\20-model-ai-lokal.md), lalu muat ulang halaman ini setelah ±1 menit.</p>`;
+  }
+  const ds = AWAL.dataset.map(d => `<option value="${d.id}">${esc(d.nama)}</option>`).join("");
+  $("#autoDataset").innerHTML = ds || "<option value=''>(tidak ada dataset yang boleh diakses)</option>";
+  $("#autoDataset").onchange = muatKolomFokus; muatKolomFokus();
+  const contoh = ["Dataset apa saja yang tersedia?", "Berapa penjualan per kategori tahun ini?",
+                  "Analisis otomatis dataset kategori, apa yang menarik?", "Buatkan grafik batang penjualan per cabang"];
+  $("#contoh").innerHTML = contoh.map(c => `<button class="kecil">${esc(c)}</button>`).join("");
+  $("#contoh").querySelectorAll("button").forEach(b => b.onclick = () => { $("#masukan").value = b.textContent; kirim(); });
+  tambahPesan("ai", `Halo **${AWAL.user}**! Saya bisa mencari dataset, mengambil data, menganalisis, dan membuat chart atau dashboard. Data yang saya lihat sudah dibatasi sesuai hak akses Anda.`);
+  // /asisten/?tanya=... (dari kotak Tanya AI di Beranda): langsung kirim pertanyaan.
+  const tanya = new URLSearchParams(location.search).get("tanya");
+  if (tanya && AWAL.model.length) { $("#masukan").value = tanya; kirim(); }
+}
+function infoModel() {
+  const m = AWAL.model.find(x => x.id === $("#pilihModel").value);
+  $("#infoModel").className = "lencana" + (m && !m.kirim_data ? " kuning" : "");
+  $("#infoModel").textContent = !m ? "" : m.kirim_data ? "Data boleh dianalisis model" : "Angka tidak dikirim ke model (privasi)";
+}
+
+// ---------- Tanya AI ----------
+function tambahPesan(peran, teks) {
+  const d = document.createElement("div"); d.className = "pesan " + peran; d.innerHTML = peran === "ai" ? md(teks) : esc(teks);
+  $("#obrolan").appendChild(d); $("#obrolan").scrollTop = 1e9; return d;
+}
+function tampilPeristiwa(p, wadah) {
+  if (p.tipe === "langkah") wadah.insertAdjacentHTML("beforeend", `<div class="langkah">${esc(p.teks)}</div>`);
+  if (p.tipe === "tabel") wadah.insertAdjacentHTML("beforeend", tabelHTML(p.kolom, p.baris));
+  if (p.tipe === "chart") wadah.insertAdjacentHTML("beforeend", tautan(p.url, (p.disimpan ? "Chart: " : "Pratinjau (belum disimpan): ") + p.judul));
+  if (p.tipe === "dashboard") wadah.insertAdjacentHTML("beforeend", tautan(p.url, "Dashboard: " + p.judul));
+  if (p.tipe === "saran") wadah.insertAdjacentHTML("beforeend",
+    `<div class="langkah">${p.saran.length} saran chart ditemukan — buka tab <b>Auto Chart</b> untuk memilih &amp; membuatnya.</div>` +
+    (p.wawasan || []).map(w => `<div class="alasan">${esc(w)}</div>`).join(""));
+}
+async function kirim() {
+  const teks = $("#masukan").value.trim(); if (!teks) return;
+  $("#masukan").value = ""; tambahPesan("user", teks); RIWAYAT.push({role: "user", content: teks});
+  const tunggu = tambahPesan("ai", "Sedang bekerja…"); $("#kirim").disabled = true;
+  try {
+    const j = await api("/asisten/api/chat", {model: $("#pilihModel").value, riwayat: RIWAYAT});
+    tunggu.innerHTML = "";
+    const wadah = document.createElement("div"); tunggu.appendChild(wadah);
+    j.peristiwa.forEach(p => tampilPeristiwa(p, wadah));
+    tunggu.insertAdjacentHTML("beforeend", `<div class="${j.status === "ok" ? "" : "galat"}">${md(j.jawaban || "(tanpa jawaban)")}</div>`);
+    RIWAYAT.push({role: "assistant", content: j.jawaban || ""});
+  } catch (e) { tunggu.innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
+  $("#kirim").disabled = false; $("#obrolan").scrollTop = 1e9;
+}
+$("#kirim").onclick = kirim;
+$("#masukan").onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); kirim(); } };
+$("#bersihkan").onclick = () => { RIWAYAT = []; $("#obrolan").innerHTML = ""; };
+
+// ---------- Auto chart ----------
+async function muatKolomFokus() {
+  const id = $("#autoDataset").value; if (!id) return;
+  try {
+    const info = await api(`/asisten/api/dataset/${id}`);
+    $("#autoFokus").innerHTML = '<option value="">(otomatis)</option>' + info.kolom.map(k => `<option>${esc(k.nama)}</option>`).join("");
+  } catch (e) { /* abaikan */ }
+}
+let SARAN = [];
+$("#autoAnalisis").onclick = async () => {
+  const btn = $("#autoAnalisis"); btn.disabled = true; $("#autoHasil").innerHTML = '<div class="kartu">Mempelajari data…</div>';
+  try {
+    const j = await api("/asisten/api/auto/saran", {dataset_id: +$("#autoDataset").value, fokus: $("#autoFokus").value, jumlah: +$("#autoJumlah").value});
+    SARAN = j.saran; tampilSaran(j);
+  } catch (e) { $("#autoHasil").innerHTML = `<div class="kartu galat">${esc(e.message)}</div>`; }
+  btn.disabled = false;
+};
+// Pratinjau kecil sesuai JENIS yang dipilih (pie, batang, garis, tabel, angka). Warna = palet chart.
+const PALET = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"];
+function pratinjau(prat, jenis) {
+  if (!prat || !prat.length) return "";
+  const data = prat.slice(0, jenis === "garis" ? 24 : 6);
+  const maks = Math.max(...data.map(p => Math.abs(p.nilai))) || 1;
+  const nilai = p => `<span title="${fmt.format(p.nilai)}">${ringkas.format(p.nilai)}</span>`;
+  if (jenis === "angka") return `<div class="mini"><div class="angkaBesar">${nilai(data[0])}</div></div>`;
+  if (jenis === "tabel") return '<div class="mini"><table>' + data.map(p =>
+    `<tr><td>${esc(p.kategori)}</td><td class="n">${nilai(p)}</td></tr>`).join("") + "</table></div>";
+  if (jenis === "pie") {
+    const total = data.reduce((t, p) => t + Math.max(0, p.nilai), 0) || 1;
+    let sudut = 0;
+    const irisan = data.map((p, i) => {
+      const a0 = sudut, a1 = sudut + Math.max(0, p.nilai) / total * 2 * Math.PI; sudut = a1;
+      const xy = a => [50 + 42 * Math.sin(a), 50 - 42 * Math.cos(a)];
+      const [x0, y0] = xy(a0), [x1, y1] = xy(a1 - 1e-6), besar = a1 - a0 > Math.PI ? 1 : 0;
+      return `<path d="M50,50 L${x0},${y0} A42,42 0 ${besar} 1 ${x1},${y1} Z" fill="${PALET[i % PALET.length]}"><title>${esc(p.kategori)}: ${fmt.format(p.nilai)}</title></path>`;
+    }).join("");
+    const legenda = data.map((p, i) => `<div class="lbl"><span><i class="titikWarna" style="background:${PALET[i % PALET.length]}"></i>${esc(p.kategori)}</span><span>${Math.round(Math.max(0, p.nilai) / total * 100)}%</span></div>`).join("");
+    return `<div class="mini pieMini"><svg viewBox="0 0 100 100" role="img" aria-label="pratinjau pie">${irisan}<circle cx="50" cy="50" r="20" fill="#fff"/></svg><div style="flex:1">${legenda}</div></div>`;
+  }
+  if (jenis === "garis") {
+    const n = data.length, min = Math.min(...data.map(p => p.nilai)), rentang = (maks - min) || 1;
+    const titik = data.map((p, i) => `${(n === 1 ? 50 : i / (n - 1) * 196 + 2).toFixed(1)},${(58 - (p.nilai - min) / rentang * 54).toFixed(1)}`).join(" ");
+    return `<div class="mini"><svg viewBox="0 0 200 60" preserveAspectRatio="none" style="width:100%;height:70px" role="img" aria-label="pratinjau garis">
+      <polyline points="${titik}" fill="none" stroke="${PALET[0]}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+      <div class="lbl"><span>${esc(data[0].kategori)}</span><span>${esc(data[n - 1].kategori)}</span></div></div>`;
+  }
+  return '<div class="mini">' + data.map(p =>
+    `<div class="lbl"><span>${esc(p.kategori)}</span>${nilai(p)}</div><div class="bar" style="width:${Math.max(2, Math.abs(p.nilai) / maks * 100)}%"></div>`).join("") + "</div>";
+}
+function tampilSaran(j) {
+  if (!j.saran.length) { $("#autoHasil").innerHTML = `<div class="kartu">${esc(j.catatan || "Tidak ada saran.")}</div>`; return; }
+  const p = j.profil || {};
+  let h = `<div class="kartu"><b>Profil kolom</b> <small class="ket">(${fmt.format(j.jumlah_sampel)} baris sampel)</small><br>
+    <small>Angka: ${esc((p.ukuran||[]).join(", ")||"-")} · Kategori: ${esc((p.dimensi||[]).join(", ")||"-")} · Waktu: ${esc((p.waktu||[]).join(", ")||"-")}</small>`;
+  if ((j.wawasan||[]).length) h += '<ul class="wawasan">' + j.wawasan.map(w => `<li>${esc(w)}</li>`).join("") + "</ul>";
+  h += "</div><div class='grid'>";
+  SARAN.forEach((s, i) => {
+    const pilihan = [s.jenis, ...s.alternatif].map(x => `<option ${x === s.jenis ? "selected" : ""}>${x}</option>`).join("");
+    h += `<div class="kartu saran" id="saran${i}">
+      <label class="baris"><input type="checkbox" data-i="${i}" ${i < 4 ? "checked" : ""}> <input value="${esc(s.judul)}" data-judul="${i}" style="flex:1"></label>
+      <div class="baris" style="margin-top:6px"><select data-jenis="${i}">${pilihan}</select><span class="lencana">skor ${Math.round(s.skor * 100)}</span></div>
+      <div class="skor"><div style="width:${Math.min(100, s.skor * 100)}%"></div></div>
+      <div class="alasan">${esc(s.alasan)}</div><div data-prat="${i}">${pratinjau(s.pratinjau, s.jenis)}</div></div>`;
+  });
+  h += `</div><div class="kartu baris">
+      <label>Judul dashboard <input id="autoJudul" placeholder="mis. Analisis Penerimaan Otomatis" size="34"></label>
+      <button class="kedua" id="autoBuatChart">Buat chart terpilih</button>
+      <button class="utama" id="autoBuatDash">Buat dashboard dari pilihan</button></div><div id="autoLink" class="kartu" style="display:none"></div>`;
+  $("#autoHasil").innerHTML = h;
+  document.querySelectorAll("#autoHasil input[type=checkbox]").forEach(c => {
+    const kartu = $("#saran" + c.dataset.i); kartu.classList.toggle("pilih", c.checked);
+    c.onchange = () => kartu.classList.toggle("pilih", c.checked);
+  });
+  document.querySelectorAll("#autoHasil select[data-jenis]").forEach(sel => sel.onchange = () => {
+    const i = +sel.dataset.jenis; $(`[data-prat="${i}"]`).innerHTML = pratinjau(SARAN[i].pratinjau, sel.value);
+  });
+  $("#autoBuatChart").onclick = () => buatAuto(false);
+  $("#autoBuatDash").onclick = () => buatAuto(true);
+  if (!AWAL.boleh_buat) $("#autoLink").outerHTML = '<div class="kartu"><small class="ket">Akun Anda belum boleh menyimpan chart; hasilnya berupa tautan pratinjau. Minta role Alpha ke admin untuk menyimpan.</small></div><div id="autoLink" class="kartu" style="display:none"></div>';
+}
+async function buatAuto(denganDashboard) {
+  const pilihan = [...document.querySelectorAll("#autoHasil input[type=checkbox]:checked")].map(c => {
+    const i = +c.dataset.i, s = SARAN[i];
+    return {jenis: $(`[data-jenis="${i}"]`).value, judul: $(`[data-judul="${i}"]`).value, metrik: s.metrik, kelompok: s.kelompok};
+  });
+  if (!pilihan.length) { alert("Pilih minimal satu saran."); return; }
+  const judul = denganDashboard ? ($("#autoJudul").value.trim() || "Dashboard Otomatis") : "";
+  const kotak = $("#autoLink"); kotak.style.display = "block"; kotak.innerHTML = "Membuat…";
+  try {
+    const j = await api("/asisten/api/auto/buat", {dataset_id: +$("#autoDataset").value, pilihan, judul_dashboard: judul});
+    kotak.innerHTML = (j.dashboard ? `<div class="sukses">Dashboard dibuat:</div>${tautan(j.dashboard.url, j.dashboard.judul)}<br>` : "") +
+      j.chart.map(c => tautan(c.url, (c.disimpan ? "" : "Pratinjau: ") + c.judul)).join("");
+  } catch (e) { kotak.innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
+}
+
+// ---------- Story ----------
+async function muatStory() {
+  $("#storyEditor").style.display = "none";
+  try {
+    const daftar = await api("/asisten/api/story");
+    $("#storyDaftar").innerHTML = daftar.map(s => `<div class="kartu"><b>${esc(s.judul)}</b><br>
+      <small class="ket">${s.jumlah_langkah} dashboard · oleh ${esc(s.pemilik)}${s.publik ? " · publik" : ""}</small>
+      <div class="alasan">${esc(s.keterangan)}</div><div class="baris" style="margin-top:8px">
+      <a class="tautan" href="/asisten/story/${s.id}" target="_blank">Putar</a>
+      ${s.boleh_ubah ? `<button class="kecil" data-ubah="${s.id}">Ubah</button><button class="kecil" data-hapus="${s.id}">Hapus</button>` : ""}</div></div>`).join("")
+      || '<div class="kartu"><small class="ket">Belum ada story. Klik "Story baru".</small></div>';
+    document.querySelectorAll("[data-ubah]").forEach(b => b.onclick = async () => editor(await api(`/asisten/api/story/${b.dataset.ubah}`)));
+    document.querySelectorAll("[data-hapus]").forEach(b => b.onclick = async () => {
+      if (!confirm("Hapus story ini?")) return; await api(`/asisten/api/story/${b.dataset.hapus}`, null, "DELETE"); muatStory(); });
+  } catch (e) { $("#storyDaftar").innerHTML = `<div class="kartu galat">${esc(e.message)}</div>`; }
+}
+$("#storyBaru").onclick = () => editor({judul: "", keterangan: "", publik: false, langkah: []});
+async function editor(st) {
+  if (!DASHBOARDS.length) DASHBOARDS = await api("/asisten/api/dashboard?siap=1");
+  const ed = $("#storyEditor"); ed.style.display = "block"; ed.scrollIntoView({behavior: "smooth"});
+  const opsi = DASHBOARDS.map(d => `<option value="${d.id}">${esc(d.judul)}</option>`).join("");
+  ed.innerHTML = `<b>${st.id ? "Ubah story" : "Story baru"}</b>
+    <div class="baris" style="margin:8px 0"><input id="stJudul" placeholder="Judul story" value="${esc(st.judul)}" size="40">
+    <label><input type="checkbox" id="stPublik" ${st.publik ? "checked" : ""}> Publik (bisa dilihat semua pengguna yang berhak atas dashboard-nya)</label></div>
+    <textarea id="stKet" rows="2" placeholder="Keterangan singkat">${esc(st.keterangan)}</textarea>
+    <div id="stLangkah"></div>
+    <div class="baris"><button class="kedua" id="stTambah">Tambah dashboard</button>
+    <button class="utama" id="stSimpan" style="margin-left:auto">Simpan story</button></div><div id="stPesan"></div>`;
+  const wadah = $("#stLangkah");
+  const tambah = (l = {}) => {
+    const div = document.createElement("div"); div.className = "langkahstory";
+    div.innerHTML = `<div class="baris"><b class="no"></b><select class="stDash">${opsi}</select>
+      <input class="stJ" placeholder="Judul langkah" value="${esc(l.judul || "")}" style="flex:1">
+      <button class="kecil naik">Naik</button><button class="kecil turun">Turun</button><button class="kecil buang">Hapus</button></div>
+      <textarea class="stN" rows="2" placeholder="Narasi untuk audiens">${esc(l.narasi || "")}</textarea>
+      ${AWAL.model.length ? '<button class="kecil ai">Tulis narasi dengan AI</button>' : ""}`;
+    if (l.dashboard_id) $(".stDash", div).value = l.dashboard_id;
+    $(".naik", div).onclick = () => { div.previousElementSibling && wadah.insertBefore(div, div.previousElementSibling); nomori(); };
+    $(".turun", div).onclick = () => { div.nextElementSibling && wadah.insertBefore(div.nextElementSibling, div); nomori(); };
+    $(".buang", div).onclick = () => { div.remove(); nomori(); };
+    const tombolAi = $(".ai", div);                   // hanya ada bila ada model AI aktif
+    if (tombolAi) tombolAi.onclick = async (e) => {
+      e.target.disabled = true;
+      try { const j = await api("/asisten/api/story/narasi", {model: $("#pilihModel").value, judul_story: $("#stJudul").value, dashboard_id: +$(".stDash", div).value});
+            $(".stN", div).value = j.narasi; }
+      catch (err) { alert(err.message); }
+      e.target.disabled = false;
+    };
+    wadah.appendChild(div); nomori();
+  };
+  const nomori = () => wadah.querySelectorAll(".langkahstory").forEach((d, i) => $(".no", d).textContent = (i + 1) + ".");
+  (st.langkah.length ? st.langkah : [{}]).forEach(tambah);
+  $("#stTambah").onclick = () => tambah();
+  $("#stSimpan").onclick = async () => {
+    const data = {judul: $("#stJudul").value, keterangan: $("#stKet").value, publik: $("#stPublik").checked,
+      langkah: [...wadah.querySelectorAll(".langkahstory")].map(d => ({dashboard_id: +$(".stDash", d).value, judul: $(".stJ", d).value, narasi: $(".stN", d).value}))};
+    try { const j = await api(st.id ? `/asisten/api/story/${st.id}` : "/asisten/api/story", data);
+          $("#stPesan").innerHTML = `<span class="sukses">Tersimpan.</span> ${tautan(j.url, "Putar story")}`; muatStoryDaftarSaja(); }
+    catch (e) { $("#stPesan").innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
+  };
+}
+async function muatStoryDaftarSaja() { await muatStory(); $("#storyEditor").style.display = "block"; }
+
+mulai();
+</script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ekspor.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+# =============================================================================
+#  ATURAN HAK AKSES DATA (dibaca config/sps_akses.py)
+#
+#  Setiap pegawai yang login diambil profilnya dari Oracle (PEGAWAI + DIM_KANTOR,
+#  sama seperti engineN). Profil itu dicocokkan ke aturan di bawah, dari ATAS ke
+#  BAWAH; aturan PERTAMA yang cocok dipakai.
+#
+#  kapan   : syarat profil. Semua syarat harus cocok (DAN). Nilai boleh daftar
+#            (cukup salah satu cocok). Huruf besar/kecil tidak dibedakan.
+#            Kosong ({}) = cocok untuk semua orang.
+#  lingkup : data apa yang boleh dilihat.
+#            semua                 -> tanpa batas
+#            [kd_kanwil, kd_kpp]   -> dibatasi nilai atribut itu MILIK PEGAWAI
+#            {kd_kanwil: ["090","091"]} -> dibatasi nilai tetap (untuk pengecualian)
+#  peran   : role Superset tambahan (dipakai hak akses dashboard).
+#
+#  Atribut profil yang tersedia:
+#    nip (NIP9), nip18, nama, kd_kantor, kd_kpp (KPPADM), kd_kanwil, tp_kantor,
+#    kd_unor (KD_UNIT_ORGANISASI), kd_jabatan (KD_JAB_STRUKTURAL),
+#    kd_jabatan_fung (KD_JAB_FUNGSIONAL), jabatan (NAMA_JABATAN)
+#
+#  Perubahan file ini berlaku untuk login BERIKUTNYA (tanpa restart).
+#  Tidak ada aturan yang cocok -> tidak melihat data apa pun (aman secara default).
+# =============================================================================
+
+# Per orang (NIP9). Menimpa aturan umum. Contoh:
+#   "123456789": {lingkup: {kd_kanwil: ["090", "091"]}, peran: ["DJP Kanwil"]}
+pengecualian: {}
+
+aturan:
+  - nama: Kantor Pusat
+    kapan: {tp_kantor: KPDJP}
+    lingkup: semua
+    peran: ["DJP Pusat"]
+
+  - nama: Account Representative
+    kapan: {jabatan: Account Representative}
+    lingkup: [kd_kpp, nip]
+    peran: ["DJP KPP"]
+
+  - nama: Pegawai Kanwil
+    kapan: {tp_kantor: KANWIL}
+    lingkup: [kd_kanwil]
+    peran: ["DJP Kanwil"]
+
+  - nama: Pegawai KPP
+    kapan: {tp_kantor: KPP}
+    lingkup: [kd_kanwil, kd_kpp]
+    peran: ["DJP KPP"]

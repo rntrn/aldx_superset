@@ -1,0 +1,71 @@
+# =============================================================================
+#  NODE TAMBAHAN (scale-out) — dijalankan di komputer LAIN, bukan komputer utama.
+#
+#    superset         web (Gunicorn)         dibagi beban oleh gateway node utama
+#    superset-worker  backgrounder (Celery)  ikut mengerjakan antrean yang sama
+#
+#  Memakai metadb, engine & Redis milik node utama (METADB_HOST, ENGINE_HOST &
+#  REDIS_HOST = IP node utama di .env, diisi gabung-node.ps1). Jumlah proses dihitung otomatis dari CPU/RAM komputer ini saat start.
+#  Pasang dengan: scripts\gabung-node.ps1 -Utama <IP node utama>
+# =============================================================================
+
+x-superset: &superset
+  build:
+    context: ./docker
+    args:
+      SUPERSET_VERSION: ${SUPERSET_VERSION}
+  image: sps-superset:${SUPERSET_VERSION}
+  env_file: .env
+  volumes:
+    - ./config:/app/pythonpath:ro
+    - ./branding:/app/superset/static/assets/images/sps:ro
+    - ./branding:/app/superset/static/assets/images/djp:ro
+    - ./certs:/app/certs:ro
+    # Panduan di dalam aplikasi (/panduan/): dokumentasi Markdown, gambar & PDF (hanya-baca).
+    - ./docs:/app/docs:ro
+    - ./CARA-PASANG.md:/app/docs-akar/CARA-PASANG.md:ro
+    - ./server:/app/server
+  restart: unless-stopped
+
+x-superset-env: &superset-env
+  SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+  PYTHONPATH: /app/pythonpath
+  NODE_PERAN: tambahan
+  NODE_NAMA: ${NODE_NAMA:-node-tambahan}
+
+services:
+  superset:
+    <<: *superset
+    container_name: sps_superset
+    command: ["python", "-m", "sps_server.jalankan", "web"]
+    environment:
+      <<: *superset-env
+      NODE_LAYANAN: web
+    cpus: ${WEB_CPUS:-2}
+    mem_limit: ${WEB_MEM:-3g}
+    ports:
+      # Dijangkau gateway node utama lewat jaringan kantor.
+      - "8088:8088"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8088/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
+
+  superset-worker:
+    <<: *superset
+    container_name: sps_superset_worker
+    command: ["python", "-m", "sps_server.jalankan", "worker"]
+    # Pemeriksaan kesehatan: proses celery hidup (bukan port web 8088 bawaan image, yang selalu "unhealthy").
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qa '[c]elery' /proc/[0-9]*/cmdline"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    environment:
+      <<: *superset-env
+      NODE_LAYANAN: worker
+    cpus: ${WORKER_CPUS:-1}
+    mem_limit: ${WORKER_MEM:-2g}

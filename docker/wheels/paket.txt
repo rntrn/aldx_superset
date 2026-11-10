@@ -1,0 +1,29 @@
+# Paket yang dipasang ke image (docker/Dockerfile), SEMUA dari folder ini tanpa internet.
+# Satu nama per baris; baris '#' diabaikan. Menambah driver: taruh .whl-nya di sini lalu
+# tambahkan namanya (lihat README.md).
+
+# --- Wajib -------------------------------------------------------------------------------
+psycopg2-binary          # metadata (PostgreSQL) + sumber PostgreSQL / Redshift
+pymysql                  # sumber MySQL/MariaDB + pindah metadata versi lama
+ldap3
+pyasn1                   # login LDAP / Active Directory
+clickhouse-connect
+lz4                      # ALDx Engine + sumber ClickHouse
+oracledb                 # sumber Oracle
+
+# --- Sumber data tambahan (wizard "Hubungkan data") -----------------------------------------
+pymssql                  # SQL Server, Azure SQL, Azure Synapse
+snowflake-sqlalchemy     # Snowflake
+sqlalchemy-bigquery      # Google BigQuery
+sqlalchemy-redshift      # Amazon Redshift
+setuptools<81            # pkg_resources (dipakai sqlalchemy-redshift)
+databricks-sqlalchemy    # Databricks SQL
+databricks-sql-connector
+trino                    # Trino / Starburst / Presto
+pyathena                 # Amazon Athena
+duckdb-engine            # DuckDB (berkas .duckdb)
+sqlalchemy-hana          # SAP HANA
+sqlalchemy-vertica-python  # Vertica
+pydruid                  # Apache Druid
+access-parser            # impor Microsoft Access (.mdb/.accdb)
+xlrd                     # impor Excel lama (.xls)

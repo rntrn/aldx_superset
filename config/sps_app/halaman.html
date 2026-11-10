@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="{{ bahasa }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6F8">
+<title>{{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon?v={{ versi }}">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css?v={{ versi }}">
+<link rel="stylesheet" href="/app/static/app.css?v={{ versi }}">
+</head>
+<body>
+<!-- Sidebar: urutan = urutan membuat laporan (diisi app.js sesuai hak akses) -->
+<aside class="sidebar" aria-label="Navigasi">
+  <div class="kepala-sidebar">
+    <a class="merek" href="/app/" data-rute="beranda"><img src="/identitas/berkas/logo?v={{ versi }}" alt="{{ app_name }}"></a>
+    <button id="tombolRingkas" type="button" class="tombol-ringkas hanya-lebar"></button>
+  </div>
+  <nav class="nav" id="nav"></nav>
+</aside>
+
+<main class="kerja">
+  <header class="atas">
+    <button class="tombol-ikon hanya-ponsel" id="bukaNav" type="button" aria-label="Menu"></button>
+    <div class="jejak" id="jejak"></div>
+    <button class="cari-pintas" id="bukaPalet" type="button"><span id="teksCari">Cari atau jalankan perintah…</span><kbd>Ctrl K</kbd></button>
+    <button class="tombol-ikon" id="bukaUlasan" type="button" title="Komentar & rating" aria-label="Komentar & rating" hidden></button>
+    <button class="tombol-ikon" id="bukaFilter" type="button" title="Filter global: berlaku di semua dashboard & Story" aria-label="Filter global"></button>
+    <button class="tombol-ikon tombol-ai" id="bukaAi" type="button" title="Asisten AI (Ctrl + I)" aria-label="Asisten AI" hidden></button>
+    <button class="tombol-ikon" id="bukaBantuan" type="button" title="Cara pakai halaman ini (?)" aria-label="Bantuan"></button>
+    <button class="tombol-ikon hanya-lebar" id="bukaTab" type="button" title="Buka di tab baru" aria-label="Buka di tab baru"></button>
+    <button class="tombol-ikon hanya-ponsel" id="bukaLainnya" type="button" title="Lainnya" aria-label="Lainnya" aria-haspopup="menu"></button>
+    <span class="pemisah-atas" aria-hidden="true"></span>
+    <button class="tombol-akun" id="tombolAkun" type="button" aria-haspopup="menu"></button>
+  </header>
+  <section class="isi" id="isi">
+    <div class="bilah-muat" id="bilahMuat"></div>
+    <div class="beranda" id="beranda"></div>
+    <iframe id="bingkai" title="Isi halaman" hidden></iframe>
+  </section>
+  <nav class="tab-bawah" id="tabBawah" aria-label="Navigasi bawah"></nav>
+</main>
+
+<!-- Panel Asisten AI (ai.js): peran ahli, usulan dengan tombol Terapkan -->
+<aside class="panel-ai" id="panelAi" aria-label="Asisten AI" aria-hidden="true">
+  <header>
+    <span class="ikon-judul-ai" id="ikonJudulAi"></span>
+    <div class="judul-ai"><b>Asisten AI</b><small id="peranAiNama"></small></div>
+    <button class="tombol-ikon" id="sambungAi" type="button" title="Sambungkan AI (model lokal & key cloud)" aria-label="Sambungkan AI"></button>
+    <button class="tombol-ikon" id="baruAi" type="button" title="Percakapan baru" aria-label="Percakapan baru"></button>
+    <button class="tombol-ikon" id="tutupAi" type="button" title="Tutup (Esc)" aria-label="Tutup"></button>
+  </header>
+  <div class="daftar-peran" id="daftarPeran"></div>
+  <div class="obrolan-ai" id="obrolanAi" aria-live="polite"></div>
+  <form class="tulis-ai" id="formAi">
+    <div class="saran-perintah" id="saranPerintah"></div>
+    <div class="kotak-tulis">
+      <textarea id="masukanAi" rows="1" placeholder="Tanya, atau ketik / untuk memilih peran…"></textarea>
+      <button class="tombol utama" id="kirimAi" type="submit" aria-label="Kirim"></button>
+    </div>
+    <div class="kaki-ai"><select id="modelAi" aria-label="Model AI"></select><small id="privasiAi"></small></div>
+  </form>
+</aside>
+
+<div class="tirai" id="tirai"></div>
+<div class="palet" id="palet" role="dialog" aria-modal="true" aria-label="Cari & perintah">
+  <div class="cari"><span id="ikonCari"></span><input id="masukanPalet" autocomplete="off" placeholder="Cari halaman, dashboard, chart, dataset, atau perintah…"></div>
+  <ul id="hasilPalet"></ul>
+  <div class="kaki"><span><kbd>↑</kbd> <kbd>↓</kbd> pilih</span><span><kbd>Enter</kbd> buka</span><span><kbd>Esc</kbd> tutup</span></div>
+</div>
+<aside class="laci" id="laci" aria-label="Bantuan">
+  <header><h3 id="judulLaci">Cara pakai</h3><button class="tombol-ikon" id="tutupLaci" type="button" aria-label="Tutup"></button></header>
+  <div class="badan" id="badanLaci"></div>
+</aside>
+<div class="menu-mengambang" id="menuMengambang"></div>
+<div class="notif" id="notif" role="status"></div>
+
+<script nonce="{{ csp_nonce() }}">
+  window.SPS_AWAL = {csrf: "{{ csrf }}", app: {{ app_name|tojson }}, perusahaan: {{ perusahaan|tojson }},
+                     versi: "{{ versi }}", pengguna: {{ pengguna|safe }}};
+</script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ikon.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/i18n.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/app.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/beranda.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ai.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ekspor.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/filter.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ulasan.js?v={{ versi }}"></script>
+</body>
+</html>

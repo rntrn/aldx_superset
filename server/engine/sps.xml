@@ -1,0 +1,43 @@
+<!--
+  Pengaturan tambahan SPS Engine (ClickHouse). Dipasang ke container "engine" sebagai
+  /etc/clickhouse-server/config.d/sps.xml (server/engine/sps.xml). Batas memori total otomatis = 90% mem_limit
+  container (ENGINE_MEM, diatur Pusat Kendali > Pengaturan > Sumber daya).
+-->
+<clickhouse>
+    <logger>
+        <level>warning</level>
+        <size>100M</size>
+        <count>3</count>
+    </logger>
+    <!-- Log query sistem disimpan 14 hari saja agar disk tidak penuh. -->
+    <query_log replace="1">
+        <database>system</database>
+        <table>query_log</table>
+        <engine>ENGINE = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + INTERVAL 14 DAY</engine>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_log>
+    <!-- Profil RINGAN: log sistem yang tidak dipakai SPS dimatikan (hemat disk, RAM & CPU). -->
+    <trace_log remove="1"/>
+    <metric_log remove="1"/>
+    <asynchronous_metric_log remove="1"/>
+    <part_log remove="1"/>
+    <text_log remove="1"/>
+    <query_thread_log remove="1"/>
+    <query_views_log remove="1"/>
+    <query_metric_log remove="1"/>
+    <processors_profile_log remove="1"/>
+    <opentelemetry_span_log remove="1"/>
+    <session_log remove="1"/>
+    <latency_log remove="1"/>
+    <error_log remove="1"/>
+    <!-- Cache & thread latar belakang dikecilkan: data SPS (ekstrak/upload) umumnya < puluhan juta baris. -->
+    <mark_cache_size>268435456</mark_cache_size>
+    <index_mark_cache_size>67108864</index_mark_cache_size>
+    <!-- background_pool_size TIDAK dikecilkan: di bawah 16 ClickHouse menolak start
+         (number_of_free_entries_in_pool_to_execute_mutation = 20 > pool x 2). -->
+    <max_concurrent_queries>100</max_concurrent_queries>
+    <!-- Cadangan: BACKUP DATABASE ... TO File('/backups/...') -> folder backup\engine (scripts\cadangkan.ps1 -Engine) -->
+    <backups>
+        <allowed_path>/backups/</allowed_path>
+    </backups>
+</clickhouse>

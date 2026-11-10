@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kueri Visual · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F4E79);--navy2:var(--sps-utama-terang,#2B5F8F);--emas:var(--sps-aksen,#F2A900);--bg:var(--sps-latar,#F4F6F9);
+      --garis:#D5DCE4;--garis2:#E6EBF1;--teks:#1F2933;--redup:#5F6B7A;--merah:#B42318;--hijau:#0B7A52;--muda:#EAF1FB}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);background:var(--bg);color:var(--teks);font-size:13px;display:flex;flex-direction:column}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 20px;border-bottom:3px solid var(--emas);flex:none}
+header img{height:26px}header .judul{font-weight:700;font-size:15px}header .sub{font-size:11.5px;opacity:.8}
+header .kanan{margin-left:auto;display:flex;gap:18px}header a{color:#fff;opacity:.85;text-decoration:none;font-size:12.5px}header a:hover{opacity:1;text-decoration:underline}
+main{flex:1;min-height:0;display:grid;grid-template-columns:280px minmax(0,1fr)}
+.panel{background:#fff;border-right:1px solid var(--garis);overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.judulPanel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--redup);margin:8px 0 2px}
+select,input[type=text],input[type=number],textarea{font:inherit;padding:6px 8px;border:1px solid var(--garis);border-radius:6px;background:#fff;width:100%}
+button{font:inherit;border-radius:6px;cursor:pointer;padding:6px 12px;border:1px solid var(--navy);background:#fff;color:var(--navy)}
+button.utama{background:var(--navy);color:#fff}button.kecil{padding:2px 8px;font-size:11.5px}
+button:disabled{opacity:.45;cursor:default}
+.tabel{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;user-select:none;border:1px solid transparent}
+.tabel:hover{background:var(--muda)}.tabel.dipakai{border-color:var(--emas);background:#FFF8E6}
+.tabel .jenis{font-size:10px;color:var(--redup);margin-left:auto}
+.bantu{font-size:11.5px;color:var(--redup);line-height:1.45}
+.isi{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:12px 14px}
+.kartu h3{margin:0 0 8px;font-size:13px;color:var(--navy)}
+.kanvas{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.kotak{background:#fff;border:1px solid var(--garis);border-top:3px solid var(--navy);border-radius:8px;width:230px;max-height:300px;display:flex;flex-direction:column}
+.kotak .kepala{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--garis2);font-weight:700}
+.kotak .kepala .alias{font-size:10.5px;background:var(--muda);color:var(--navy);border-radius:4px;padding:1px 5px}
+.kotak .kepala button{margin-left:auto;border:0;padding:0 4px;font-size:16px;line-height:1}
+.kotak .kolom{overflow:auto;padding:4px 6px}
+.kotak label{display:flex;gap:6px;align-items:center;padding:2px 2px;font-size:12px;white-space:nowrap}
+.kotak label small{color:var(--redup);margin-left:auto;font-size:10px}
+.kotak .semua{font-size:11px;padding:4px 10px;border-top:1px solid var(--garis2);display:flex;gap:10px}
+.kotak .semua a{color:var(--navy);cursor:pointer}
+.baris{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
+.baris select,.baris input{width:auto;min-width:110px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--garis);border-radius:16px;padding:3px 4px 3px 10px;background:#fff;margin:3px 6px 3px 0}
+.chip select{border:0;padding:2px;min-width:0;width:auto;background:var(--muda);border-radius:10px}
+.chip button{border:0;padding:0 6px;font-size:14px}
+.gabung{background:#FFF8E6;border:1px solid #F0D48A;border-radius:8px;padding:6px 10px}
+textarea#sql{font-family:Consolas,'DejaVu Sans Mono',monospace;font-size:12px;min-height:170px;background:#FBFCFD}
+.aksi{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pesan{font-size:12px}.galat{color:var(--merah)}.sukses{color:var(--hijau)}
+.hasil{overflow:auto;max-height:420px;border:1px solid var(--garis);border-radius:8px}
+table.data{border-collapse:collapse;font-size:12px;width:100%}
+table.data th{position:sticky;top:0;background:#F4F6F9;text-align:left;padding:6px 8px;border-bottom:1px solid var(--garis);white-space:nowrap}
+table.data td{padding:5px 8px;border-bottom:1px solid var(--garis2);white-space:nowrap;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+table.data td.n{text-align:right;font-variant-numeric:tabular-nums}
+.kosong{color:var(--redup);text-align:center;padding:30px 10px}
+@media (max-width:900px){main{grid-template-columns:1fr}.panel{max-height:40vh;border-right:0;border-bottom:1px solid var(--garis)}}
+</style>
+</head>
+<body>
+<header class="sps-hiasan">
+  <img src="/identitas/berkas/logo_putih" alt="{{ app_name }}">
+  <div><div class="judul">Kueri Visual</div><div class="sub">{{ app_name }} · susun kueri dengan klik, tanpa mengetik SQL</div></div>
+  <div class="kanan"><a href="/sqllab/">SQL Lab</a><a href="/studio/">Studio Visual</a><a href="/">Beranda</a></div>
+</header>
+<main>
+  <aside class="panel">
+    <div class="judulPanel">1 · Sumber</div>
+<select id="pilihTersimpan" aria-label="Kueri tersimpan" title="Buka kueri visual yang pernah Anda simpan"><option value="">Kueri tersimpan…</option></select>
+        <select id="pilihDb" aria-label="Database"></select>
+    <select id="pilihSkema" aria-label="Skema"></select>
+    <div class="judulPanel">2 · Tabel di skema ini</div>
+    <input type="text" id="cariTabel" placeholder="Cari tabel…" aria-label="Cari tabel">
+    <div class="bantu">Klik dua kali tabel untuk memakainya. Tabel kedua dan seterusnya <b>digabung otomatis</b>.</div>
+    <div id="daftarTabel"></div>
+  </aside>
+  <div class="isi">
+    <div class="kartu" id="kartuKanvas">
+      <h3>3 · Tabel &amp; kolom</h3>
+      <div id="kanvas" class="kanvas"><div class="kosong">Belum ada tabel. Pilih database &amp; skema di kiri, lalu klik dua kali sebuah tabel.</div></div>
+      <div id="infoGabung" class="pesan" style="margin-top:8px"></div>
+      <div id="daftarGabung"></div>
+    </div>
+    <div class="kartu">
+      <h3>4 · Kolom hasil, ringkasan, filter &amp; urutan</h3>
+      <div id="chipKolom" class="bantu">Kolom yang dicentang muncul di sini. Pilih ringkasan (Jumlah, Rata-rata, …) untuk mengelompokkan otomatis.</div>
+      <div class="judulPanel">Filter</div>
+      <div id="daftarFilter"></div>
+      <button class="kecil" id="tambahFilter">+ Tambah filter</button>
+      <div class="judulPanel">Urutkan</div>
+      <div class="baris"><select id="urutKolom"></select><select id="urutArah"><option value="ASC">naik (A→Z, kecil→besar)</option><option value="DESC">turun</option></select></div>
+    </div>
+    <div class="kartu">
+      <h3>5 · SQL &amp; hasil</h3>
+      <textarea id="sql" readonly aria-label="SQL yang dihasilkan"></textarea>
+      <div class="aksi" style="margin-top:8px">
+        <button class="utama" id="jalankan">Jalankan</button>
+        <label class="bantu"><input type="checkbox" id="ubahManual"> ubah SQL manual</label>
+        <button id="keSqlLab">Buka di SQL Lab</button>
+        <input type="text" id="namaDataset" placeholder="nama dataset, mis. penjualan_per_cabang" style="width:260px">
+        <select id="jenisDataset" aria-label="Jenis dataset" title="Virtual: SQL disimpan, data selalu terbaru dari sumber.&#10;Fisik: hasil disalin jadi tabel di ALDx Engine, dashboard jauh lebih cepat, diperbarui sesuai jadwal.">
+          <option value="virtual">Virtual · selalu terbaru</option>
+          <option value="fisik" {{ "" if admin else "disabled" }}>Fisik · tabel ALDx Engine{{ "" if admin else " (Admin)" }}</option>
+        </select>
+        <select id="jadwalFisik" aria-label="Jadwal penyegaran tabel fisik" hidden>
+          <option value="manual">Segarkan: manual</option>
+          <option value="harian" selected>Segarkan: harian 02.00</option>
+          <option value="jam">Segarkan: setiap jam</option>
+        </select>
+        <button id="simpanDataset">Simpan jadi dataset</button>
+        <input type="text" id="namaKueri" placeholder="nama kueri, mis. penjualan per cabang" style="width:220px">
+        <button id="simpanKueri" title="Simpan susunan kueri ini (bisa dibuka & diubah lagi nanti)">Simpan kueri</button>
+        <span id="pesan" class="pesan"></span>
+      </div>
+      <div id="lanjut" class="aksi" style="margin-top:8px"></div>
+      <div class="hasil" data-ekspor="Hasil Kueri Visual" style="margin-top:10px"><div id="hasil" class="kosong">Hasil kueri tampil di sini (maks. 1.000 baris).</div></div>
+    </div>
+  </div>
+</main>
+<script nonce="{{ csp_nonce() }}">window.SPS_CSRF = "{{ csrf }}";</script>
+<script nonce="{{ csp_nonce() }}" src="/kueri/static/kueri.js"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ekspor.js"></script>
+</body>
+</html>

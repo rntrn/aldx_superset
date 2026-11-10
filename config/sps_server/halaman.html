@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pusat Kendali Server · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F2F5F);--navy2:var(--sps-utama-terang,#2B4A8F);--emas:var(--sps-aksen,#F2B705);--bg:var(--sps-latar,#F4F6F9);--garis:#D5DCE4;--teks:#1F2933;--redup:#5F6B7A;
+      --merah:#C0392B;--hijau:#1E8E5A;--kuning:#B7791F;--isi:#E6EBF1}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);font-variant-numeric:tabular-nums;background:var(--bg);color:var(--teks);font-size:14px}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 24px;border-bottom:4px solid var(--emas)}
+header img{height:30px}header .judul{font-weight:700;font-size:17px}header .sub{font-size:12px;opacity:.8}
+header a{color:#fff;opacity:.8;margin-left:auto;text-decoration:none;font-size:13px;border-bottom:1px solid transparent}
+header a:hover{opacity:1;border-color:var(--emas)}
+nav.tab{display:flex;gap:28px;padding:0 24px;background:#fff;border-bottom:1px solid var(--garis)}
+nav.tab button{border:0;background:none;padding:14px 0 12px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer;color:var(--redup);border-bottom:2px solid transparent}
+nav.tab button:hover{color:var(--navy)}nav.tab button.aktif{color:var(--navy);font-weight:700;border-color:var(--emas)}
+main{max-width:1240px;margin:0 auto;padding:18px 24px 90px}section{display:none}section.aktif{display:block}
+h2{font-size:15px;margin:22px 0 10px;color:var(--navy)}h2:first-child{margin-top:4px}
+.kartu.peringatan{border-color:#E8A33D;background:#FFF8EC}
+.alatAudit{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.alatAudit input{max-width:280px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.ket{color:var(--redup);font-size:12px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:12px}
+.kpi .kartu{margin:0}.kpi .angka{font-size:24px;font-weight:700;color:var(--navy);margin-top:4px}
+.dua{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-size:11.5px;font-weight:600;color:var(--redup);letter-spacing:.02em;padding:8px;border-bottom:1px solid var(--garis)}
+td{padding:8px;border-bottom:1px solid #EEF1F5;vertical-align:middle}td.n{text-align:right}
+.titik{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.on{background:var(--hijau)}.off{background:var(--merah)}
+.meter{height:6px;background:var(--isi);border-radius:3px;min-width:90px;margin-top:4px}
+.meter div{height:6px;border-radius:3px;background:var(--navy2)}.meter div.tinggi{background:var(--merah)}.meter div.sedang{background:var(--emas)}
+.batang{display:flex;align-items:flex-end;gap:3px;height:80px;margin-top:8px}
+.batang div{flex:1;background:var(--navy2);border-radius:2px 2px 0 0;min-height:1px}
+.sumbu{display:flex;justify-content:space-between;font-size:11px;color:var(--redup);margin-top:4px}
+.pita{background:#FFF6DB;border:1px solid #F0D48A;color:#6B5100;border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.pita code{background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #F0D48A}
+.lencana{font-size:11px;padding:2px 8px;border-radius:10px;background:#EAF2FB;color:var(--navy);white-space:nowrap}
+.lencana.terapkan{background:#FFF6DB;color:#8A6D00}
+.atur{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(180px,1fr) 120px;gap:6px 18px;align-items:center;padding:10px 0;border-bottom:1px solid #EEF1F5}
+.atur:last-child{border-bottom:0}.atur .nama{font-weight:600}.atur .tb{font-size:11.5px;color:var(--redup)}
+.atur .bantu{grid-column:1/-1;font-size:12px;color:var(--redup);margin-top:-2px}
+.atur.ubah{background:#FFFBEA;margin:0 -16px;padding:10px 16px}
+input[type=text],input[type=number]{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:6px;width:100%;background:#fff}
+.opsi{display:flex;flex-wrap:wrap;gap:4px 14px}.opsi label{font-size:13px;white-space:nowrap}
+.satuan{font-size:12px;color:var(--redup);margin-left:6px}
+.bawah{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--garis);padding:12px 24px;display:none;align-items:center;gap:14px;box-shadow:0 -2px 12px rgba(0,0,0,.05)}
+.bawah.tampil{display:flex}
+button.utama,button.kedua,button.kecil{font:inherit;border-radius:6px;cursor:pointer;padding:8px 16px;border:1px solid var(--navy)}
+button.utama{background:var(--navy);color:#fff}button.kedua{background:#fff;color:var(--navy)}
+button.kecil{padding:3px 9px;font-size:12px;background:#fff;color:var(--navy)}button:disabled{opacity:.5;cursor:default}
+.galat{color:var(--merah)}.sukses{color:var(--hijau)}
+.topo{display:grid;gap:12px}.topo table td,.topo table th{text-align:center}.topo table td:first-child,.topo table th:first-child{text-align:left}
+.sel{display:inline-block;min-width:34px;padding:3px 8px;border-radius:6px;background:#EAF2FB;color:var(--navy);font-weight:700}
+.sel.kosong{background:transparent;color:#B8C2CE;font-weight:400}
+.matriks td{text-align:center}.matriks td:first-child,.matriks th:first-child{text-align:left}
+.matriks th{text-align:center;vertical-align:bottom}
+.redup{color:#9AA5B1}
+.formEk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 16px;margin-bottom:8px}
+.formEk label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--redup);font-weight:600}
+select{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:6px;background:#fff;color:var(--teks)}
+.st{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.st.siap{background:#E3F6EE;color:#0B7A52}.st.gagal{background:#FDECEC;color:#B42318}
+.st.berjalan{background:#FFF6DB;color:#8A6D00}.st.baru{background:#EAF2FB;color:var(--navy)}
+.aksi{display:flex;gap:4px;flex-wrap:wrap}
+/* Tab Identitas & Tema */
+.idnPreset{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}.idnPreset button{display:flex;align-items:center;gap:6px}
+.idnChip{width:14px;height:14px;border-radius:4px;display:inline-block}
+.idnTata{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr);gap:16px;margin-top:14px;align-items:start}
+.idnSamping{position:sticky;top:12px}.idnWarna{display:flex;gap:8px}.idnWarna input[type=color]{width:44px;height:34px;padding:2px;border:1px solid var(--garis);border-radius:6px;background:#fff}
+.idnBerkas{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.idnGambar{display:inline-flex;align-items:center;justify-content:center;min-width:120px;height:46px;padding:4px 8px;border:1px dashed var(--garis);border-radius:6px;background:#fff}
+.idnGambar.gelap{background:var(--sps-utama,#1F2F5F)}.idnGambar img{max-height:36px;max-width:180px}
+.tombolBerkas{font:inherit;border-radius:6px;cursor:pointer;padding:3px 9px;font-size:12px;border:1px solid var(--navy);color:var(--navy);background:#fff}
+.idnP{border:1px solid var(--garis);border-radius:12px;overflow:hidden;background:var(--sps-latar)}
+.idnPBar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--sps-utama);color:var(--sps-teks-utama);border-bottom:3px solid var(--sps-aksen);font-size:13px}
+.idnPLogo{width:20px;height:20px;border-radius:5px;background:var(--sps-aksen)}.idnPMenu{margin-left:auto;opacity:.75;font-size:11px}
+.idnPIsi{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.idnPLogin{background:#fff;border-radius:8px;padding:10px;font-size:12px}.idnPPerusahaan{font-weight:700;color:var(--sps-utama)}
+.idnPInput{height:18px;border:1px solid var(--garis);border-radius:4px;margin-top:6px}
+.idnPTombol{margin-top:8px;background:var(--sps-utama);color:var(--sps-teks-utama);border-radius:4px;text-align:center;font-weight:700;padding:4px}
+.idnPKartu{background:#fff;border-radius:8px;padding:10px}.idnPJudul{height:8px;width:60%;background:var(--sps-utama-muda);border-radius:4px}
+.idnPBatang{display:flex;align-items:flex-end;gap:5px;height:70px;margin-top:10px}.idnPBatang i{flex:1;background:var(--sps-utama);border-radius:3px 3px 0 0}
+.idnPBatang i:nth-child(1){height:40%}.idnPBatang i:nth-child(2){height:62%}.idnPBatang i:nth-child(3){height:50%;background:var(--sps-aksen)}.idnPBatang i:nth-child(4){height:80%}.idnPBatang i:nth-child(5){height:96%}
+.idnCek{font-size:13px}
+/* Hubungkan data (sps_koneksi/tab.js) */
+.hbLangkah{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.hbLangkah span{font-size:12px;padding:4px 10px;border-radius:12px;background:var(--isi);color:var(--redup)}
+.hbLangkah span.aktif{background:var(--navy);color:#fff}
+.hbGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:14px}
+.hbJenis{text-align:left;background:#fff;border:1px solid var(--garis);border-radius:10px;padding:12px;cursor:pointer;font:inherit;color:inherit}
+.hbJenis:hover,.hbJenis:focus-visible{border-color:var(--navy);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.hbJenis b{display:block;font-size:14px}.hbJenis .ket{display:block;margin-top:4px}
+.hbJenis[disabled]{opacity:.5;cursor:not-allowed}
+.hbForm{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px 16px}
+.hbForm label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--redup);font-weight:600}
+.hbForm label.lebar{grid-column:1/-1}.hbForm textarea{min-height:110px;font-family:monospace;font-size:12px}
+.hbHasil{margin-top:12px;padding:12px 14px;border-radius:8px}.hbHasil.ok{background:#E3F6EE;color:#0B5E40}.hbHasil.gagal{background:#FDECEC;color:#B42318}
+.hbTabel{max-height:360px;overflow:auto;border:1px solid var(--garis);border-radius:8px}
+.hbTabel table{margin:0}.hbContoh{font-size:11px;color:var(--redup);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+#tabelBatas{min-width:980px}#tabelBatas td.ket{min-width:190px}
+@media (max-width:900px){.idnTata{grid-template-columns:1fr}.idnSamping{position:static}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="sps-hiasan">
+  <img src="/identitas/berkas/logo_putih" alt="{{ app_name }}">
+  <div><div class="judul">Pusat Kendali Server</div><div class="sub">{{ app_name }} · status, topologi, pengaturan, identitas, Asisten AI, hak akses, riwayat</div></div>
+  <a href="/">Kembali ke dashboard</a>
+</header>
+<nav class="tab">
+  <button data-tab="status" class="aktif">Status</button>
+  <button data-tab="topologi">Topologi</button>
+  {% if superadmin %}<button data-tab="pengaturan" title="Khusus Superadmin">Pengaturan</button>
+  <button data-tab="batas" title="Khusus Superadmin">Batas data</button>{% endif %}
+  <button data-tab="identitas">Identitas &amp; Tema</button>
+  <button data-tab="hubungkan">Hubungkan data</button>
+  <button data-tab="ekstrak">Ekstrak</button>
+  <button data-tab="ai">Asisten AI</button>
+  {% if superadmin %}<button data-tab="izin" title="Khusus Superadmin">Hak akses</button>{% endif %}
+  <button data-tab="riwayat">Riwayat</button>
+</nav>
+<main>
+  <div id="pita"></div>
+
+  <!-- ============ STATUS ============ -->
+  <section id="status" class="aktif">
+    <div class="kpi" id="kpi"></div>
+    <div class="dua">
+      <div class="kartu" data-ekspor="Chart dimuat per jam"><b>Chart dimuat per jam</b> <span class="ket">24 jam terakhir</span>
+        <div class="batang" id="perJam"></div><div class="sumbu"><span>24 jam lalu</span><span>sekarang</span></div></div>
+      <div class="kartu"><b>Cache server &amp; antrean backgrounder</b><div id="cache"></div></div>
+    </div>
+    <h2>Proses di setiap node</h2>
+    <div class="kartu" data-ekspor="Proses per node"><table id="tabelNode"></table></div>
+    <div class="dua">
+      <div><h2>Chart paling lambat (24 jam)</h2><div class="kartu" data-ekspor="Chart paling lambat"><table id="lambat"></table></div></div>
+      <div><h2>SQL Lab (24 jam)</h2><div class="kartu" id="sqllab"></div></div>
+    </div>
+    <div class="ket" id="waktuStatus"></div>
+  </section>
+
+  <!-- ============ TOPOLOGI ============ -->
+  <section id="topologi">
+    <div class="kartu ket">Setiap node menjalankan sekumpulan proses. Jumlah proses bernilai <b>auto</b>
+      dihitung sendiri oleh tiap node dari CPU &amp; RAM-nya saat container dinyalakan (auto-tuning), termasuk node
+      yang baru bergabung. Ubah angkanya di tab Pengaturan, lalu terapkan.</div>
+    <div class="topo" id="topo"></div>
+    <h2>Rekomendasi auto-tuning</h2>
+    <div class="kartu" data-ekspor="Rekomendasi auto-tuning"><table id="rekom"></table></div>
+    <h2>Menambah node (scale-out)</h2>
+    <div class="kartu ket" style="line-height:1.7">
+      1. Salin folder <code>D:\superset</code> (termasuk <code>.env</code>) ke komputer baru yang sudah ada Docker Desktop.<br>
+      2. Di komputer baru: <code>scripts\gabung-node.ps1 -Utama &lt;IP komputer ini&gt;</code><br>
+      3. Node muncul di tab Status dalam ±1 menit, lalu di komputer ini jalankan <code>scripts\terapkan-server.ps1</code> agar gateway ikut membagi beban ke node baru.<br>
+      Panduan lengkap: <code>docs\11-pusat-kendali-server.md</code>.
+    </div>
+  </section>
+
+  <!-- ============ PENGATURAN ============ -->
+  <section id="pengaturan"><div id="formAtur"></div></section>
+
+  <!-- ============ BATAS DATA (khusus Superadmin; sps_server/batas.py) ============ -->
+  <section id="batas">
+    <div class="kartu ket">Batas ukuran & jumlah baris data yang boleh masuk ke server. auto = dihitung dari RAM & disk
+      server (rumus di tiap baris), angka = batas tetap, 0 = tanpa batas. Berlaku langsung (≤ 10 detik).</div>
+    <div class="kpi" id="kpiBatas"></div>
+    <div class="kartu" data-ekspor="Batas data" style="overflow:auto"><table id="tabelBatas"></table></div>
+    <h2>Ubah batas</h2>
+    <div id="formBatas"></div>
+  </section>
+
+  <!-- ============ IDENTITAS & TEMA (sps_identitas/tab.js) ============ -->
+  <section id="identitas"></section>
+
+  <!-- ============ HUBUNGKAN DATA (sps_koneksi/tab.js) ============ -->
+  <section id="hubungkan"></section>
+
+  <!-- ============ ASISTEN AI (sps_ai/tab.js) ============ -->
+  <section id="ai"></section>
+
+  <!-- ============ EKSTRAK ============ -->
+  <section id="ekstrak">
+    <div class="kpi" id="kpiEngine"></div>
+    <div class="kartu ket">Ekstrak = salinan dataset dari database sumber ke <b>ALDx Engine</b>, database analitik internal.
+      Dashboard menjadi jauh lebih cepat dan sumber tidak terbebani. Aturan hak akses data (RLS) ikut disalin otomatis.
+      <b>Penuh</b> = ganti semua isi (tukar atomik, dashboard tak pernah melihat data setengah jadi);
+      <b>Inkremental</b> = hanya tambah baris yang kolom inkrementalnya lebih besar dari nilai terakhir.</div>
+    <h2>Daftar ekstrak</h2>
+    <div class="kartu" data-ekspor="Daftar ekstrak" style="overflow:auto"><table id="tabelEkstrak"></table></div>
+    <div id="pesanEkstrak"></div>
+    <h2>Buat ekstrak baru</h2>
+    <div class="kartu">
+      <div class="formEk">
+        <label>Dataset sumber<select id="ekSumber"></select></label>
+        <label>Nama ekstrak<input type="text" id="ekNama" placeholder="mis. penerimaan_harian"></label>
+        <label>Mode<select id="ekMode"><option value="penuh">Penuh</option><option value="inkremental">Inkremental</option></select></label>
+        <label id="ekKolomL" style="display:none">Kolom inkremental<select id="ekKolom"></select></label>
+        <label>Jadwal<select id="ekJadwal"></select></label>
+        <label id="ekJamL">Jam<input type="number" id="ekJam" min="0" max="23" value="2"></label>
+        <label id="ekHariL" style="display:none">Hari<select id="ekHari"></select></label>
+        <label id="ekSetiapL" style="display:none">Setiap (jam)<input type="number" id="ekSetiap" min="1" max="24" value="4"></label>
+      </div>
+      <p class="ket" id="ekCatatan"></p>
+      <button class="utama" id="ekBuat">Buat &amp; segarkan sekarang</button> <span id="ekPesan"></span>
+    </div>
+    <div id="riwayatEk"></div>
+  </section>
+
+  <section id="izin">
+    <div class="kartu ket">Kemampuan (apa yang boleh dilakukan) per role. Data mana yang terlihat
+      tetap diatur <code>config\akses.yaml</code>. Role bawaan Superset hanya ditampilkan karena dikembalikan otomatis oleh <code>superset init</code>.</div>
+    <div class="kartu peringatan" id="izinPeringatan" hidden></div>
+    <div class="kartu" data-ekspor="Hak akses per role" style="overflow:auto"><table class="matriks" id="matriks"></table></div>
+    <div id="izinPesan"></div>
+  </section>
+
+  <!-- ============ RIWAYAT ============ -->
+  <section id="riwayat">
+    <div id="kunciKartu" class="kartu" hidden><b>Akun terkunci</b>
+      <p class="ket">Dikunci otomatis setelah salah password berulang (Pengaturan › Gateway &amp; keamanan). Kunci habis sendiri, atau buka di sini.</p>
+      <table id="tabelKunci"></table></div>
+    <h2>Jejak audit</h2>
+    <div class="kartu">
+      <div class="alatAudit">
+        <select id="auditKelompok" aria-label="Kelompok"><option value="">Semua kelompok</option></select>
+        <select id="auditHari" aria-label="Periode"><option value="1">24 jam</option><option value="7" selected>7 hari</option><option value="30">30 hari</option><option value="0">Semua</option></select>
+        <input type="text" id="auditCari" placeholder="Cari pengguna, aksi, objek" aria-label="Cari audit">
+        <button class="kecil" id="auditUnduh" type="button">Unduh CSV</button>
+      </div>
+      <p class="ket">Login, unduh data, ekspor/impor, berkas .ald/.aldx, pengguna &amp; hak akses, koneksi, moderasi. Menampilkan 300 terbaru; unduh CSV untuk semua.</p>
+      <table id="tabelAudit"></table>
+    </div>
+    <h2>Riwayat pengaturan</h2>
+    <div class="kartu" data-ekspor="Riwayat perubahan"><table id="tabelRiwayat"></table></div>
+  </section>
+</main>
+<div class="bawah" id="bawah">
+  <span id="jumlahUbah"></span>
+  <button class="kedua" id="batal">Batalkan</button>
+  <button class="utama" id="simpan">Simpan perubahan</button>
+  <span id="pesanSimpan"></span>
+</div>
+
+<script nonce="{{ csp_nonce() }}">
+const CSRF = "{{ csrf }}";
+const SUPERADMIN = {{ "true" if superadmin else "false" }};      // tab vital hanya untuk Superadmin (sps_superadmin.py)
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = new Intl.NumberFormat("id-ID");
+const tampil = v => Array.isArray(v) ? (v.join(", ") || "–") : v === true ? "Ya" : v === false ? "Tidak" : String(v);
+const STATUS_QUERY = {success: "Berhasil", failed: "Gagal", running: "Berjalan", pending: "Menunggu",
+  stopped: "Dihentikan", timed_out: "Timeout", scheduled: "Terjadwal", fetching: "Mengambil hasil"};
+let SKEMA = null, NILAI = {}, UBAH = {};
+
+async function api(url, data) {
+  const r = await fetch(url, data === undefined ? {} : {method: "POST", headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF}, body: JSON.stringify(data)});
+  const j = await r.json().catch(() => ({error: "Jawaban server tidak terbaca (" + r.status + ")"}));
+  if (!r.ok) throw new Error(j.error || ("Error " + r.status));
+  return j;
+}
+
+document.querySelectorAll("nav.tab button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav.tab button, section").forEach(x => x.classList.remove("aktif"));
+  b.classList.add("aktif"); $("#" + b.dataset.tab).classList.add("aktif");
+  segarkanBawah();
+  ({status: muatStatus, topologi: muatStatus, pengaturan: muatPengaturan, batas: muatBatas, identitas: muatIdentitas, hubungkan: muatHubungkan,
+    ekstrak: muatEkstrak, ai: () => window.muatAi(), izin: muatIzin, riwayat: muatRiwayat})[b.dataset.tab]();
+});
+
+// ---------------- STATUS ----------------
+let STATUS = null;
+const kpi = (label, nilai, ket = "") => `<div class="kartu"><div class="ket">${label}</div><div class="angka">${nilai ?? "–"}</div><div class="ket">${ket}</div></div>`;
+const meter = (pakai, maks) => { if (pakai == null || !maks) return ""; const p = Math.min(100, pakai / maks * 100);
+  return `<div class="meter"><div class="${p > 85 ? "tinggi" : p > 65 ? "sedang" : ""}" style="width:${p}%"></div></div>`; };
+const detik = ms => ms == null ? "–" : (ms / 1000).toLocaleString("id-ID", {maximumFractionDigits: 1}) + " dtk";
+const labelProses = p => Object.entries(p || {}).filter(([k]) => !["timeout", "daur_ulang"].includes(k))
+  .map(([k, v]) => `${k} ${v}`).join(" · ");
+
+// Cadangan terakhir (scripts\cadangkan.ps1). Merah bila gagal atau lebih tua dari 2 hari.
+function kpiCadangan(c) {
+  const k = c.cadangan, u = c["uji-pulih"];
+  if (!k) return kpi("Cadangan", "belum ada", "jalankan scripts\\jadwal-cadangan.ps1");
+  const buruk = k.hasil !== "OK" || k.umur_jam > 48;
+  const ket = (u ? `uji pulih ${u.hasil === "OK" ? "OK" : "GAGAL"} ${esc(u.waktu)}` : "belum pernah diuji pulih");
+  return `<div class="kartu${buruk ? " galat" : ""}"><div class="ket">Cadangan terakhir</div><div class="angka">${esc(k.hasil === "OK" ? k.waktu.slice(5) : "GAGAL")}</div><div class="ket">${ket}</div></div>`;
+}
+
+async function muatStatus() {
+  try { STATUS = await api("/pusat-kendali/api/status"); } catch (e) { $("#pita").innerHTML = `<div class="kartu galat">${esc(e.message)}</div>`; return; }
+  const s = STATUS, a = s.aktivitas || {}, r = s.redis || {}, gw = s.gateway || {};
+  pita(s.menunggu || []);
+  $("#kpi").innerHTML = kpi("Pengguna aktif", a.pengguna_aktif_15m, "15 menit terakhir") + kpi("Pengguna", a.pengguna_24j, "24 jam terakhir")
+    + kpi("Chart dimuat", a.chart_24j != null ? fmt.format(a.chart_24j) : null, "24 jam terakhir")
+    + kpi("Waktu muat chart", detik(a.chart_median_ms), "median · p95 " + detik(a.chart_p95_ms))
+    + kpi("Cache hit", r.rasio_hit != null ? r.rasio_hit.toLocaleString("id-ID") + "%" : null, r.aktif ? "permintaan terlayani cache" : "cache server tidak aktif")
+    + kpi("Koneksi gateway", gw.koneksi_aktif, gw.aktif ? "sedang terbuka" : "gateway tidak terbaca")
+    + kpiCadangan(s.cadangan || {});
+  const jam = a.chart_per_jam || [], maks = Math.max(1, ...jam);
+  $("#perJam").innerHTML = jam.map((n, i) => `<div title="${24 - i} jam lalu: ${n} chart" style="height:${n / maks * 100}%"></div>`).join("");
+  $("#cache").innerHTML = r.aktif ? `<table>
+      <tr><td>Memori cache</td><td class="n">${r.memori_mb} / ${r.memori_maks_mb} MB${meter(r.memori_mb, r.memori_maks_mb)}</td></tr>
+      <tr><td>Data dibuang (cache penuh)</td><td class="n">${fmt.format(r.kunci_dibuang || 0)}</td></tr>
+      ${Object.entries(r.antrean || {}).map(([k, v]) => `<tr><td>Antrean ${esc(k)}</td><td class="n">${v} tugas menunggu</td></tr>`).join("")}</table>`
+    : `<p class="ket">${esc(r.galat || "Redis tidak aktif (REDIS_HOST kosong).")}</p>`;
+  const node = Array.isArray(s.node) ? s.node : [];
+  $("#tabelNode").innerHTML = "<tr><th>Node</th><th>Layanan</th><th>Proses</th><th>CPU</th><th>RAM</th><th>Status</th><th></th></tr>" +
+    (node.map(n => `<tr><td><b>${esc(n.node)}</b><div class="ket">${esc(n.peran)}${n.alamat ? " · " + esc(n.alamat) : ""}</div></td>
+      <td>${esc(n.layanan)}</td><td>${esc(labelProses(n.proses))}</td>
+      <td>${n.cpu_persen != null ? n.cpu_persen.toLocaleString("id-ID") + "%" : "–"} <span class="ket">dari ${n.cpu?.toLocaleString("id-ID")} inti</span>${meter(n.cpu_persen, 100)}</td>
+      <td>${n.ram_terpakai_mb != null ? fmt.format(n.ram_terpakai_mb) : "–"} / ${fmt.format(n.ram_mb || 0)} MB${meter(n.ram_terpakai_mb, n.ram_mb)}</td>
+      <td><span class="titik ${n.online ? "on" : "off"}"></span>${n.online ? "berjalan" : "tidak merespons"}<div class="ket">detak ${esc(n.terakhir.slice(11))}</div></td>
+      <td>${n.online || !SUPERADMIN ? "" : `<button class="kecil" data-hapus="${esc(n.nama)}">Hapus</button>`}</td></tr>`).join("")
+     || `<tr><td colspan="7" class="ket">${esc(s.node?.galat || "Belum ada detak node. Container dijalankan dengan peluncur sps_server?")}</td></tr>`);
+  document.querySelectorAll("[data-hapus]").forEach(b => b.onclick = async () => { await api("/pusat-kendali/api/node/hapus", {nama: b.dataset.hapus}); muatStatus(); });
+  $("#lambat").innerHTML = "<tr><th>Chart</th><th class='n'>Terlama</th><th class='n'>Dimuat</th></tr>" +
+    ((a.chart_lambat || []).map(c => `<tr><td><a href="/explore/?slice_id=${c.id}" target="_blank">${esc(c.nama)}</a></td><td class="n">${detik(c.maks_ms)}</td><td class="n">${c.jumlah}×</td></tr>`).join("")
+     || "<tr><td colspan='3' class='ket'>Belum ada data.</td></tr>");
+  const q = s.sqllab || {};
+  $("#sqllab").innerHTML = Object.keys(q).length && !q.galat ? "<table>" + Object.entries(q).map(([k, v]) => `<tr><td>${esc(STATUS_QUERY[k] || k)}</td><td class="n">${v}</td></tr>`).join("") + "</table>" : "<p class='ket'>Belum ada query.</p>";
+  $("#waktuStatus").textContent = "Diperbarui " + s.waktu + " · otomatis tiap 30 detik";
+  topologi(node, s.rekomendasi || []);
+}
+
+function pita(menunggu) {
+  $("#pita").innerHTML = menunggu.length ? `<div class="pita"><b>${menunggu.length} perubahan menunggu diterapkan</b> —
+    ${menunggu.map(m => `${esc(m.label)}: ${esc(tampil(m.aktif))} → <b>${esc(tampil(m.baru))}</b>`).join(" · ")}<br>
+    Jalankan <code>scripts\\terapkan-server.ps1</code> di komputer utama (container dinyalakan ulang ±1 menit).</div>` : "";
+}
+
+function topologi(node, rekom) {
+  const kolom = [["web", "worker", "Proses web"], ["web", "thread", "Thread/proses"], ["worker", "sqllab", "Backgrounder SQL Lab"],
+    ["worker", "grafik", "Backgrounder chart"], ["worker", "cache", "Backgrounder cache"], ["worker", "laporan", "Backgrounder laporan"], ["beat", "beat", "Penjadwal"]];
+  const perNode = {};
+  node.filter(n => n.online).forEach(n => { (perNode[n.node] ??= {peran: n.peran, layanan: {}}).layanan[n.layanan] = n; });
+  const isi = Object.entries(perNode).map(([nama, d]) => `<tr><td><b>${esc(nama)}</b><div class="ket">${esc(d.peran)}</div></td>` +
+    kolom.map(([lay, k]) => { const v = d.layanan[lay]?.proses?.[k]; return `<td><span class="sel ${v ? "" : "kosong"}">${v ?? "–"}</span></td>`; }).join("") +
+    `<td><span class="sel ${d.peran === "utama" ? "" : "kosong"}">${d.peran === "utama" ? 1 : "–"}</span></td></tr>`).join("");
+  $("#topo").innerHTML = `<div class="kartu" style="overflow:auto"><table><tr><th>Node</th>${kolom.map(k => `<th>${k[2]}</th>`).join("")}<th>Cache server &amp; gateway</th></tr>${isi || "<tr><td colspan='9' class='ket'>Belum ada node online.</td></tr>"}</table></div>`;
+  $("#rekom").innerHTML = "<tr><th>Container</th><th>Sekarang</th><th>Bila diterapkan ulang</th></tr>" +
+    (rekom.map(r => `<tr><td>${esc(r.nama)}</td><td>${esc(labelProses(r.sekarang))}</td><td>${esc(labelProses(r.rekomendasi))}</td></tr>`).join("")
+     || "<tr><td colspan='3' class='ket'>–</td></tr>");
+}
+setInterval(() => { if ($("#status").classList.contains("aktif") || $("#topologi").classList.contains("aktif")) muatStatus(); }, 30000);
+
+// ---------------- PENGATURAN ----------------
+async function muatPengaturan() {
+  SKEMA = await api("/pusat-kendali/api/pengaturan"); NILAI = SKEMA.nilai; UBAH = {};
+  const html = SKEMA.grup.filter(([g]) => g !== "data").map(([g, judul]) => `<h2>${esc(judul)}</h2><div class="kartu">` +
+    SKEMA.daftar.filter(a => a.grup === g).map(baris).join("") + "</div>").join("");
+  $("#formAtur").innerHTML = `<input type="search" id="cariAtur" placeholder="Cari pengaturan, mis. timeout, cache, upload..." style="width:100%;max-width:420px;margin:4px 0 8px">` + html;
+  document.querySelectorAll("[data-kunci]").forEach(el => el.addEventListener("input", () => catat(el.dataset.kunci)));
+  $("#cariAtur").addEventListener("input", e => {            // saring per baris; judul grup ikut tersembunyi bila kosong
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll("#formAtur .kartu").forEach(k => {
+      let ada = 0;
+      k.querySelectorAll(".atur").forEach(b => { const ok = !q || b.textContent.toLowerCase().includes(q); b.hidden = !ok; ada += ok; });
+      k.hidden = !ada; if (k.previousElementSibling && k.previousElementSibling.tagName === "H2") k.previousElementSibling.hidden = !ada;
+    });
+  });
+  segarkanBawah();
+}
+
+function baris(a) {
+  const v = NILAI[a.kunci], id = "f_" + a.kunci.replace(".", "_");
+  let input;
+  if (a.tipe === "ya_tidak") input = `<label><input type="checkbox" id="${id}" data-kunci="${a.kunci}" ${v ? "checked" : ""}> Aktif</label>`;
+  else if (a.tipe === "pilihan") input = `<div class="opsi" id="${id}" data-kunci="${a.kunci}">` +
+    a.opsi.map(o => `<label><input type="checkbox" value="${esc(o)}" ${v.includes(o) ? "checked" : ""}> ${esc(o)}</label>`).join("") + "</div>";
+  else input = `<div style="display:flex;align-items:center"><input type="text" id="${id}" data-kunci="${a.kunci}" value="${esc(v)}"
+      placeholder="${a.tipe === "auto" ? "auto atau angka" : ""}"><span class="satuan">${esc(a.satuan)}</span></div>`;
+  return `<div class="atur" id="b_${id}"><div><div class="nama">${esc(a.label)}</div>${a.istilah ? `<div class="tb">${esc(a.istilah)}</div>` : ""}</div>
+    <div>${input}</div><div><span class="lencana ${a.berlaku}">${a.berlaku === "langsung" ? "Langsung berlaku" : "Perlu diterapkan"}</span></div>
+    ${a.bantuan ? `<div class="bantu">${esc(a.bantuan)}${a.min != null && a.tipe !== "ya_tidak" ? ` (${a.min}–${a.maks})` : ""}</div>` : ""}</div>`;
+}
+
+function bacaInput(kunci) {
+  const a = SKEMA.daftar.find(x => x.kunci === kunci), el = $("#f_" + kunci.replace(".", "_"));
+  if (a.tipe === "ya_tidak") return el.checked;
+  if (a.tipe === "pilihan") return [...el.querySelectorAll("input:checked")].map(i => i.value);
+  const t = el.value.trim().toLowerCase();
+  return t === "auto" ? "auto" : (t === "" ? "" : Number(t));
+}
+
+function catat(kunci) {
+  const baru = bacaInput(kunci);
+  if (JSON.stringify(baru) === JSON.stringify(NILAI[kunci])) delete UBAH[kunci]; else UBAH[kunci] = baru;
+  $("#b_f_" + kunci.replace(".", "_")).classList.toggle("ubah", kunci in UBAH);
+  segarkanBawah();
+}
+
+function segarkanBawah() {
+  const n = Object.keys(UBAH).length;
+  $("#bawah").classList.toggle("tampil", n > 0 && !!document.querySelector("#pengaturan.aktif, #batas.aktif"));
+  $("#jumlahUbah").textContent = n + " pengaturan diubah";
+}
+$("#batal").onclick = () => { $("#pesanSimpan").textContent = ""; $("#batas").classList.contains("aktif") ? muatBatas() : muatPengaturan(); };
+$("#simpan").onclick = async () => {
+  $("#simpan").disabled = true; $("#pesanSimpan").innerHTML = "";
+  try {
+    const j = await api("/pusat-kendali/api/pengaturan", {perubahan: UBAH});
+    const bagian = [];
+    if (j.langsung.length) bagian.push(`${j.langsung.length} langsung berlaku (≤ 10 detik)`);
+    if (j.terapkan.length) bagian.push(`${j.terapkan.length} perlu diterapkan: jalankan scripts\\terapkan-server.ps1`);
+    alertSimpan(`<span class="sukses">Tersimpan.</span> ${esc(bagian.join("; "))}${j.catatan.length ? "<br>" + j.catatan.map(esc).join("<br>") : ""}`);
+    if ($("#batas").classList.contains("aktif")) await muatBatas(); else await muatPengaturan();
+    muatStatus();
+  } catch (e) { $("#pesanSimpan").innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
+  $("#simpan").disabled = false;
+};
+function alertSimpan(html) {
+  const wadah = $("#batas").classList.contains("aktif") ? $("#formBatas") : $("#formAtur");
+  wadah.insertAdjacentHTML("afterbegin", `<div class="kartu">${html}</div>`); window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+// ---------------- BATAS DATA ----------------
+const angkaBatas = (v, satuan) => v == null || v === 0 ? "Tanpa batas" : fmt.format(v) + " " + satuan;
+const byte = b => b == null ? "–" : b >= 1e9 ? (b / 1e9).toLocaleString("id-ID", {maximumFractionDigits: 1}) + " GB"
+  : (b / 1048576).toLocaleString("id-ID", {maximumFractionDigits: 1}) + " MB";
+async function muatBatas() {
+  const [skema, b] = await Promise.all([api("/pusat-kendali/api/pengaturan"), api("/pusat-kendali/api/batas")]);
+  SKEMA = skema; NILAI = skema.nilai; UBAH = {};
+  const p = b.perangkat;
+  $("#kpiBatas").innerHTML = kpi("RAM container web", fmt.format(p.ram_web_mb) + " MB", p.proses_web + " proses web") +
+    kpi("Disk ALDx Engine kosong", byte(p.bebas), "dari " + byte(p.total)) + kpi("Data di ALDx Engine", byte(p.terpakai), "ekstrak & impor berkas");
+  $("#tabelBatas").innerHTML = "<tr><th>Batas</th><th>Pengaturan</th><th class='n'>Berlaku sekarang</th><th class='n'>Rekomendasi</th><th>Rumus</th><th></th></tr>" +
+    b.daftar.map(d => `<tr><td>${esc(d.label)}</td><td>${esc(d.nilai === "auto" ? "auto" : angkaBatas(d.nilai, d.satuan))}</td>
+      <td class="n"><b>${esc(angkaBatas(d.berlaku, d.satuan))}</b></td><td class="n">${esc(angkaBatas(d.rekomendasi, d.satuan))}</td>
+      <td class="ket">${esc(d.rumus)}</td><td style="white-space:nowrap">
+      <button class="kecil" data-isi="${d.kunci}" data-nilai="${d.rekomendasi}">Pakai rekomendasi</button>
+      <button class="kecil" data-isi="${d.kunci}" data-nilai="auto">auto</button>
+      <button class="kecil" data-isi="${d.kunci}" data-nilai="0">Tanpa batas</button></td></tr>`).join("");
+  $("#formBatas").innerHTML = `<div class="kartu">${SKEMA.daftar.filter(a => a.grup === "data").map(baris).join("")}</div>`;
+  $("#formBatas").querySelectorAll("[data-kunci]").forEach(el => el.addEventListener("input", () => catat(el.dataset.kunci)));
+  $("#tabelBatas").querySelectorAll("[data-isi]").forEach(t => t.onclick = () => {
+    const el = $("#f_" + t.dataset.isi.replace(".", "_"));
+    el.value = t.dataset.nilai; catat(t.dataset.isi); el.scrollIntoView({behavior: "smooth", block: "center"}); el.focus();
+  });
+  segarkanBawah();
+}
+
+// ---------------- EKSTRAK ----------------
+const HARI = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+const JADWAL = {manual: "Manual", jam: "Tiap beberapa jam", harian: "Harian", mingguan: "Mingguan"};
+const ukuran = b => b == null ? "–" : b < 1048576 ? fmt.format(Math.round(b / 1024)) + " KB"
+  : b < 1073741824 ? (b / 1048576).toLocaleString("id-ID", {maximumFractionDigits: 1}) + " MB"
+  : (b / 1073741824).toLocaleString("id-ID", {maximumFractionDigits: 2}) + " GB";
+const teksJadwal = j => j.jenis === "jam" ? `Tiap ${j.setiap} jam` : j.jenis === "harian" ? `Harian ${String(j.jam).padStart(2, "0")}:00`
+  : j.jenis === "mingguan" ? `${HARI[j.hari]} ${String(j.jam).padStart(2, "0")}:00` : "Manual";
+let SUMBER = [], TIMER_EK = null;
+
+$("#ekJadwal").innerHTML = Object.entries(JADWAL).map(([k, v]) => `<option value="${k}" ${k === "harian" ? "selected" : ""}>${v}</option>`).join("");
+$("#ekHari").innerHTML = HARI.map((h, i) => `<option value="${i}">${h}</option>`).join("");
+function aturForm() {
+  const j = $("#ekJadwal").value, s = SUMBER.find(x => x.id == $("#ekSumber").value);
+  $("#ekJamL").style.display = ["harian", "mingguan"].includes(j) ? "" : "none";
+  $("#ekHariL").style.display = j === "mingguan" ? "" : "none";
+  $("#ekSetiapL").style.display = j === "jam" ? "" : "none";
+  $("#ekKolomL").style.display = $("#ekMode").value === "inkremental" ? "" : "none";
+  if (s) {
+    $("#ekKolom").innerHTML = s.kolom.map(k => `<option ${k.waktu ? "selected" : ""}>${esc(k.nama)}</option>`).join("");
+    if (!$("#ekNama").dataset.diisi) $("#ekNama").value = s.nama.toLowerCase().replace(/[^a-z0-9_]/g, "_");
+    $("#ekCatatan").innerHTML = s.template ? '<span class="galat">Dataset ini memakai template filter (&#123;&#123; … &#125;&#125;) dan tidak bisa diekstrak.</span>'
+      : `Sumber: ${esc(s.database)} · ${s.kolom.length} kolom`;
+  }
+  $("#ekBuat").disabled = !s || s.template;
+}
+// Daftar sumber: yang bisa diekstrak di atas; dataset bertemplate (isi berubah per filter) tampil tapi tidak bisa dipilih.
+function isiSumber() {
+  const opsi = x => `<option value="${x.id}" ${x.template ? "disabled" : ""}>${esc(x.nama)} — ${esc(x.database)}</option>`;
+  const bisa = SUMBER.filter(x => !x.template), tidak = SUMBER.filter(x => x.template);
+  $("#ekSumber").innerHTML = (bisa.length ? bisa.map(opsi).join("") : '<option value="">(belum ada dataset yang bisa diekstrak)</option>') +
+    (tidak.length ? `<optgroup label="Tidak bisa diekstrak: memakai template filter &#123;&#123; … &#125;&#125;">${tidak.map(opsi).join("")}</optgroup>` : "");
+  aturForm();
+}
+["ekJadwal", "ekMode", "ekSumber"].forEach(id => $("#" + id).onchange = aturForm);
+$("#ekNama").oninput = () => $("#ekNama").dataset.diisi = "1";
+function jadwalForm() {
+  return {jenis: $("#ekJadwal").value, jam: +$("#ekJam").value, hari: +$("#ekHari").value, setiap: +$("#ekSetiap").value};
+}
+
+async function muatEkstrak() {
+  clearTimeout(TIMER_EK);
+  const [d, s] = await Promise.all([api("/pusat-kendali/api/ekstrak"), SUMBER.length ? SUMBER : api("/pusat-kendali/api/ekstrak/sumber")]);
+  if (!SUMBER.length) { SUMBER = s; isiSumber(); }
+  const e = d.engine, list = d.ekstrak;
+  $("#kpiEngine").innerHTML = kpi("ALDx Engine", e.aktif ? '<span class="titik on"></span>Aktif' : '<span class="titik off"></span>Mati', e.aktif ? "ClickHouse " + esc(e.versi) : esc(e.pesan))
+    + kpi("Jumlah ekstrak", fmt.format(list.length), list.filter(x => x.status === "gagal").length + " gagal")
+    + kpi("Total baris", fmt.format(list.reduce((a, x) => a + (x.baris_total || 0), 0)))
+    + kpi("Ukuran di engine", ukuran(e.ukuran_byte), "setelah kompresi");
+  $("#tabelEkstrak").innerHTML = "<tr><th>Ekstrak</th><th>Mode</th><th>Jadwal</th><th>Status</th><th>Terakhir</th><th class='n'>Baris</th><th class='n'>Ukuran</th><th>Berikutnya</th><th></th></tr>" +
+    (list.map(x => `<tr><td><b>${esc(x.nama)}</b><div class="ket">${esc(x.tabel)}${x.chart_dipindah.length ? ` · ${x.chart_dipindah.length} chart memakai ekstrak` : ""}</div></td>
+      <td>${x.mode === "inkremental" ? "Inkremental<div class='ket'>" + esc(x.kolom_inkremental) + "</div>" : "Penuh"}</td>
+      <td><select data-jadwal="${x.id}">${Object.entries(JADWAL).map(([k, v]) => `<option value="${k}" ${x.jadwal.jenis === k ? "selected" : ""}>${k === x.jadwal.jenis ? esc(teksJadwal(x.jadwal)) : v}</option>`).join("")}</select></td>
+      <td><span class="st ${x.status}">${esc(x.status)}</span>${x.pesan ? `<div class="ket galat" title="${esc(x.pesan)}">${esc(x.pesan.slice(0, 80))}</div>` : ""}</td>
+      <td>${esc(x.selesai || "–")}<div class="ket">${x.durasi_detik != null ? x.durasi_detik + " dtk" : ""}</div></td>
+      <td class="n">${fmt.format(x.baris_total || 0)}<div class="ket">+${fmt.format(x.baris_terakhir || 0)}</div></td>
+      <td class="n">${ukuran(x.ukuran_byte)}</td><td>${esc(x.berikutnya || "–")}</td>
+      <td><div class="aksi">
+        <button class="kecil" data-aksi="segarkan" data-id="${x.id}" ${x.status === "berjalan" ? "disabled" : ""}>Segarkan</button>
+        ${x.mode === "inkremental" ? `<button class="kecil" data-aksi="penuh" data-id="${x.id}">Penuh</button>` : ""}
+        ${x.dataset_id ? `<button class="kecil" data-aksi="pindah" data-id="${x.id}" title="Arahkan semua chart dataset sumber ke ekstrak">Pakai di chart</button>` : ""}
+        ${x.chart_dipindah.length ? `<button class="kecil" data-aksi="kembali" data-id="${x.id}">Kembalikan chart</button>` : ""}
+        <button class="kecil" data-aksi="riwayat" data-id="${x.id}">Riwayat</button>
+        <button class="kecil" data-aksi="hapus" data-id="${x.id}">Hapus</button></div></td></tr>`).join("")
+     || "<tr><td colspan='9' class='ket'>Belum ada ekstrak. Buat di bawah.</td></tr>");
+  document.querySelectorAll("#tabelEkstrak button").forEach(b => b.onclick = () => aksiEkstrak(b.dataset.aksi, +b.dataset.id, b));
+  document.querySelectorAll("#tabelEkstrak select").forEach(sel => sel.onchange = () => ubahJadwal(+sel.dataset.jadwal, sel.value));
+  if (list.some(x => x.status === "berjalan") && $("#ekstrak").classList.contains("aktif")) TIMER_EK = setTimeout(muatEkstrak, 5000);
+}
+
+function pesanEk(html, galat) { $("#pesanEkstrak").innerHTML = `<p class="${galat ? "galat" : "sukses"}">${html}</p>`; }
+
+async function aksiEkstrak(aksi, id, tombol) {
+  const url = `/pusat-kendali/api/ekstrak/${id}/`;
+  if (aksi === "riwayat") return tampilRiwayatEk(id);
+  if (aksi === "hapus" && !confirm("Hapus ekstrak ini beserta tabelnya di engine?")) return;
+  tombol.disabled = true;
+  try {
+    if (aksi === "segarkan" || aksi === "penuh") { const r = await api(url + "segarkan", {penuh: aksi === "penuh"}); pesanEk(r.kirim === "antre" ? "Penyegaran dikirim ke backgrounder (antrean ekstrak)." : "Penyegaran selesai."); }
+    if (aksi === "pindah") pesanEk(`${(await api(url + "pindah", {})).dipindah} chart kini memakai ekstrak.`);
+    if (aksi === "kembali") pesanEk(`${(await api(url + "kembali", {})).dikembalikan} chart dikembalikan ke sumber asli.`);
+    if (aksi === "hapus") { await api(url + "hapus", {}); pesanEk("Ekstrak dihapus."); }
+  } catch (e) { pesanEk(esc(e.message), true); }
+  muatEkstrak();
+}
+
+async function ubahJadwal(id, jenis) {
+  const lama = {jam: 2, hari: 0, setiap: 4};
+  let j = {jenis, ...lama};
+  if (jenis === "jam") j.setiap = +(prompt("Setiap berapa jam? (1–24)", "4") || 4);
+  if (jenis === "harian" || jenis === "mingguan") j.jam = +(prompt("Jam berapa? (0–23)", "2") || 2);
+  if (jenis === "mingguan") j.hari = Math.max(0, HARI.indexOf(prompt("Hari apa? (" + HARI.join(", ") + ")", "Senin")));
+  try { await api(`/pusat-kendali/api/ekstrak/${id}/jadwal`, {jadwal: j}); pesanEk("Jadwal disimpan."); } catch (e) { pesanEk(esc(e.message), true); }
+  muatEkstrak();
+}
+
+async function tampilRiwayatEk(id) {
+  const r = await api(`/pusat-kendali/api/ekstrak/${id}/riwayat`);
+  $("#riwayatEk").innerHTML = `<h2>Riwayat penyegaran</h2><div class="kartu"><table><tr><th>Mulai</th><th>Selesai</th><th>Pemicu</th><th>Status</th><th class="n">Baris</th><th>Keterangan</th></tr>` +
+    (r.map(x => `<tr><td>${esc(x.mulai)}</td><td>${esc(x.selesai || "–")}</td><td>${esc(x.pemicu)}</td><td><span class="st ${x.status}">${esc(x.status)}</span></td><td class="n">${fmt.format(x.baris || 0)}</td><td>${esc(x.pesan || "")}</td></tr>`).join("")
+     || "<tr><td colspan='6' class='ket'>Belum pernah disegarkan.</td></tr>") + "</table></div>";
+  $("#riwayatEk").scrollIntoView({behavior: "smooth"});
+}
+
+$("#ekBuat").onclick = async () => {
+  const b = $("#ekBuat"); b.disabled = true; $("#ekPesan").innerHTML = "Memproses…";
+  try {
+    const r = await api("/pusat-kendali/api/ekstrak", {dataset_id: +$("#ekSumber").value, nama: $("#ekNama").value, mode: $("#ekMode").value,
+      kolom_inkremental: $("#ekMode").value === "inkremental" ? $("#ekKolom").value : null, jadwal: jadwalForm()});
+    $("#ekPesan").innerHTML = `<span class="sukses">Ekstrak '${esc(r.ekstrak.nama)}' dibuat${r.kirim === "antre" ? " dan sedang disegarkan di backgrounder" : ""}.</span>`;
+    $("#ekNama").value = ""; delete $("#ekNama").dataset.diisi; aturForm();
+  } catch (e) { $("#ekPesan").innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
+  b.disabled = false; muatEkstrak();
+};
+
+// ---------------- HAK AKSES ----------------
+async function muatIzin(data) {
+  const m = data || await api("/pusat-kendali/api/izin");
+  $("#izinPeringatan").hidden = !m.peringatan.length;
+  $("#izinPeringatan").innerHTML = m.peringatan.length ? `<b>⚠ ${m.peringatan.length} pengguna non-Admin bisa melihat SEMUA data</b>` +
+    `<p class="ket">Role Alpha atau izin all_datasource_access melewati batas hak akses per sumber data. Di produksi, ` +
+    `cabut role ini di Kelola › Pengguna kecuali memang disengaja.</p><table><tr><th>Pengguna</th><th>Nama</th><th>Penyebab</th></tr>` +
+    m.peringatan.map(x => `<tr><td>${esc(x.username)}</td><td>${esc(x.nama)}</td><td>${esc(x.role.join(", "))}</td></tr>`).join("") + "</table>" : "";
+  $("#matriks").innerHTML = `<tr><th>Role</th><th>Pengguna</th>${m.kemampuan.map(k => `<th title="${esc(k.catatan)}">${esc(k.label)}${k.istilah ? `<div class="ket">${esc(k.istilah)}</div>` : ""}</th>`).join("")}</tr>` +
+    m.role.map(r => `<tr><td><b>${esc(r.nama)}</b>${r.bawaan ? `<div class="ket">bawaan Superset</div>` : r.nama === "Superadmin" ? `<div class="ket">selalu bersama Admin</div>` : ""}</td><td>${r.jumlah_user}</td>` +
+      m.kemampuan.map(k => `<td><input type="checkbox" data-role="${esc(r.nama)}" data-k="${k.id}" ${r.punya[k.id] ? "checked" : ""}
+        ${r.bawaan || r.nama === "Superadmin" || k.diatur_di ? `disabled title="${esc(k.diatur_di ? "Diatur di " + k.diatur_di : r.nama === "Superadmin" ? "Sama dengan Admin" : "Role bawaan")}"` : ""}></td>`).join("") + "</tr>").join("");
+  $("#izinPesan").innerHTML = '<div class="ket">' + m.kemampuan.filter(k => k.catatan || k.diatur_di)
+    .map(k => `<b>${esc(k.label)}</b>: ${esc(k.catatan || "diatur di " + k.diatur_di)}`).join("<br>") + "</div>";
+  document.querySelectorAll("#matriks input:not([disabled])").forEach(c => c.onchange = async () => {
+    try { muatIzin(await api("/pusat-kendali/api/izin", {role: c.dataset.role, kemampuan: c.dataset.k, aktif: c.checked})); }
+    catch (e) { c.checked = !c.checked; $("#izinPesan").insertAdjacentHTML("afterbegin", `<p class="galat">${esc(e.message)}</p>`); }
+  });
+}
+
+// ---------------- RIWAYAT ----------------
+function qAudit() {
+  return new URLSearchParams({kelompok: $("#auditKelompok").value, hari: $("#auditHari").value, cari: $("#auditCari").value.trim()});
+}
+async function muatAudit() {
+  const r = await api("/pusat-kendali/api/audit?" + qAudit());
+  const sel = $("#auditKelompok");
+  if (sel.options.length === 1) Object.entries(r.kelompok).forEach(([k, v]) => sel.insertAdjacentHTML("beforeend", `<option value="${esc(k)}">${esc(v)}</option>`));
+  $("#tabelAudit").innerHTML = "<tr><th>Waktu</th><th>Oleh</th><th>Alamat IP</th><th>Kelompok</th><th>Aksi</th><th>Objek</th></tr>" +
+    (r.baris.map(x => `<tr><td>${esc(x.waktu)}</td><td>${esc(x.oleh)}</td><td class="redup">${esc(x.alamat)}</td><td>${esc(x.kelompok_label)}</td>` +
+      `<td>${esc(x.aksi)}${x.rincian ? `<div class="ket">${esc(x.rincian)}</div>` : ""}</td><td>${esc(x.objek)}</td></tr>`).join("")
+     || "<tr><td colspan='6' class='ket'>Belum ada catatan untuk filter ini.</td></tr>");
+}
+async function muatKunci(daftar) {
+  const r = daftar || await api("/pusat-kendali/api/terkunci");
+  $("#kunciKartu").hidden = !r.length;
+  $("#tabelKunci").innerHTML = "<tr><th>Akun</th><th>Terkunci sampai</th><th></th></tr>" +
+    r.map(x => `<tr><td>${esc(x.username)}</td><td>${esc(x.sampai)}</td><td><button class="kecil" data-buka="${esc(x.username)}">Buka kunci</button></td></tr>`).join("");
+}
+$("#tabelKunci").addEventListener("click", async e => {
+  const b = e.target.closest("[data-buka]"); if (!b) return;
+  try { muatKunci(await api("/pusat-kendali/api/terkunci/buka", {username: b.dataset.buka})); muatAudit(); }
+  catch (err) { $("#tabelKunci").insertAdjacentHTML("beforebegin", `<p class="galat">${esc(err.message)}</p>`); }
+});
+let tundaAudit;
+["#auditKelompok", "#auditHari"].forEach(s => $(s).addEventListener("change", muatAudit));
+$("#auditCari").addEventListener("input", () => { clearTimeout(tundaAudit); tundaAudit = setTimeout(muatAudit, 350); });
+$("#auditUnduh").addEventListener("click", () => { location.href = "/pusat-kendali/api/audit?format=csv&" + qAudit(); });
+
+async function muatRiwayat() {
+  muatKunci(); muatAudit();
+  const r = await api("/pusat-kendali/api/riwayat");
+  $("#tabelRiwayat").innerHTML = "<tr><th>Waktu</th><th>Oleh</th><th>Pengaturan</th><th>Sebelum</th><th>Sesudah</th></tr>" +
+    (r.map(x => `<tr><td>${esc(x.waktu)}</td><td>${esc(x.oleh)}</td><td>${esc(x.label)}<div class="ket">${esc(x.kunci)}</div></td><td class="redup">${esc(tampil(JSON.parse(x.lama)))}</td><td>${esc(tampil(JSON.parse(x.baru)))}</td></tr>`).join("")
+     || "<tr><td colspan='5' class='ket'>Belum ada perubahan.</td></tr>");
+}
+
+muatStatus();
+</script>
+<script nonce="{{ csp_nonce() }}" src="/identitas/tab.js"></script>
+<script nonce="{{ csp_nonce() }}" src="/hubungkan/tab.js"></script>
+<script nonce="{{ csp_nonce() }}" src="/asisten/tab.js"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/ekspor.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Story · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F2F5F);--emas:var(--sps-aksen,#F2B705);--garis:#D5DCE4;--redup:#5F6B7A}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);font-variant-numeric:tabular-nums;color:#1F2933}
+body{display:flex;flex-direction:column;background:var(--sps-latar,#F4F6F9)}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 18px;border-bottom:4px solid var(--emas)}
+header img{height:26px}header .judul{font-weight:700;font-size:16px}header a{color:#fff;opacity:.85;margin-left:auto;text-decoration:none;font-size:13px}
+#langkah{display:flex;gap:6px;padding:8px 18px;background:#fff;border-bottom:1px solid var(--garis);overflow-x:auto}
+#langkah button{border:1px solid var(--garis);background:#fff;border-radius:16px;padding:5px 12px;cursor:pointer;white-space:nowrap;font:inherit;font-size:13px}
+#langkah button.aktif{background:var(--navy);color:#fff;border-color:var(--navy)}
+.isi{flex:1;display:flex;min-height:0}
+aside{width:320px;padding:18px;background:#fff;border-right:1px solid var(--garis);overflow:auto}
+aside h2{margin:0 0 6px;font-size:18px;color:var(--navy)}aside .ket{color:var(--redup);font-size:12px;margin-bottom:12px}
+aside .narasi{line-height:1.6;white-space:pre-wrap}
+.nav{display:flex;gap:8px;margin-top:18px}.nav button{flex:1;padding:8px;border-radius:6px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer;font:inherit}
+.nav button.utama{background:var(--navy);color:#fff}
+iframe{flex:1;border:0;background:#fff}
+.kunci{flex:1;display:flex;align-items:center;justify-content:center;color:var(--redup);padding:30px;text-align:center}
+@media (max-width:800px){.isi{flex-direction:column}aside{width:auto;max-height:35vh}}
+</style>
+</head>
+<body>
+<header class="sps-hiasan"><img src="/identitas/berkas/logo_putih" alt="{{ app_name }}"><div class="judul" id="judulStory">Story</div>
+  <a href="/asisten/">Asisten AI</a></header>
+<div id="langkah"></div>
+<div class="isi">
+  <aside><h2 id="judulLangkah"></h2><div class="ket" id="ketLangkah"></div><div class="narasi" id="narasi"></div>
+    <div class="nav"><button id="mundur">Sebelumnya</button><button id="maju" class="utama">Berikutnya</button></div>
+    <div class="ket" style="margin-top:10px">Tombol panah kiri/kanan di keyboard juga bisa dipakai.</div></aside>
+  <div class="kunci" id="wadah">Memuat…</div>
+</div>
+<script nonce="{{ csp_nonce() }}">
+const ID = {{ story_id|int }};
+let ST = null, posisi = 0;
+const $ = s => document.querySelector(s);
+function tampil(i) {
+  posisi = Math.max(0, Math.min(i, ST.langkah.length - 1));
+  const l = ST.langkah[posisi];
+  document.querySelectorAll("#langkah button").forEach((b, k) => b.classList.toggle("aktif", k === posisi));
+  $("#judulLangkah").textContent = `${posisi + 1}. ${l.judul}`;
+  $("#ketLangkah").textContent = l.terkunci ? "" : l.judul_dashboard;
+  $("#narasi").textContent = l.narasi || "";
+  const lama = $("#wadah");
+  let baru;
+  if (l.terkunci) { baru = document.createElement("div"); baru.className = "kunci"; baru.textContent = "Anda tidak punya akses ke dashboard pada langkah ini."; }
+  else { baru = document.createElement("iframe"); baru.src = l.url; baru.title = l.judul; }
+  baru.id = "wadah"; lama.replaceWith(baru);
+  $("#mundur").disabled = posisi === 0; $("#maju").disabled = posisi === ST.langkah.length - 1;
+}
+async function mulai() {
+  const r = await fetch(`/asisten/api/story/${ID}`);
+  const j = await r.json();
+  if (!r.ok) { $("#wadah").textContent = j.error || "Story tidak bisa dibuka."; return; }
+  ST = j; document.title = `${ST.judul} · Story`; $("#judulStory").textContent = ST.judul;
+  ST.langkah.forEach((l, i) => { const b = document.createElement("button"); b.textContent = `${i + 1}. ${l.judul}`; b.onclick = () => tampil(i); $("#langkah").appendChild(b); });
+  tampil(0);
+}
+$("#mundur").onclick = () => tampil(posisi - 1);
+$("#maju").onclick = () => tampil(posisi + 1);
+document.addEventListener("keydown", e => { if (!ST) return; if (e.key === "ArrowRight") tampil(posisi + 1); if (e.key === "ArrowLeft") tampil(posisi - 1); });
+mulai();
+</script>
+</body>
+</html>

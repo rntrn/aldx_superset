@@ -1,0 +1,407 @@
+{
+  "pintasan": {
+    "judul": "Keyboard shortcuts",
+    "ringkas": "These shortcuts work on every page. On a Mac, use ⌘ instead of Ctrl.",
+    "pintasan": [
+      [
+        "Ctrl + K",
+        "Search pages, dashboards, charts, datasets, or commands"
+      ],
+      [
+        "Ctrl + I",
+        "Open / close the AI Assistant panel"
+      ],
+      [
+        "?",
+        "How to use the current page"
+      ],
+      [
+        "Ctrl + \\",
+        "Collapse / expand the sidebar"
+      ],
+      [
+        "Esc",
+        "Close a panel or window"
+      ],
+      [
+        "g → h",
+        "Go to Home"
+      ],
+      [
+        "g → t",
+        "Go to Datasets"
+      ],
+      [
+        "g → k",
+        "Go to Visual Query"
+      ],
+      [
+        "g → q",
+        "Go to SQL Lab"
+      ],
+      [
+        "g → s",
+        "Go to Visual Studio"
+      ],
+      [
+        "g → c",
+        "Go to Charts"
+      ],
+      [
+        "g → d",
+        "Go to Dashboards"
+      ],
+      [
+        "g → y",
+        "Go to Stories"
+      ]
+    ]
+  },
+  "umum": {
+    "judul": "How to use",
+    "ringkas": "The menu on the left follows the order in which a report is built: Data, Query, Visual, then Dashboards & Stories. The small numbers next to menu items are the step order.",
+    "langkah": [
+      "Pick a menu item on the left, or press Ctrl + K and type a page name.",
+      "Press ? at any time to open the guide for the current page.",
+      "Click ✦ in the top bar (Ctrl + I) for the AI Assistant. Pick a role: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
+      "Hover over a table or chart on an ALDx page and click Export (top right): Image, PDF, Excel, CSV, Text, or Copy table."
+    ]
+  },
+  "beranda": {
+    "judul": "Home",
+    "ringkas": "Your starting point: search anything, follow the report-building steps, and pick up where you left off.",
+    "langkah": [
+      "Type in the search box: a dashboard, chart, or dataset name. When the AI Assistant is active, click Ask AI to ask in plain language.",
+      "Follow the 5 Build a report cards from the left: Connect data, Prepare data, Create a chart, Build a dashboard, Tell it with a story.",
+      "The card marked Next step is a step you have not done yet.",
+      "Continue where you left off lists the charts & dashboards you opened most recently."
+    ],
+    "tips": [
+      "Star a dashboard (in Dashboards) so it always appears at the top of Home."
+    ]
+  },
+  "hubungkan": {
+    "judul": "Connect data",
+    "ringkas": "Connect a database, data warehouse, or file (Excel, CSV, Access) in 4 steps. Admins only.",
+    "langkah": [
+      "Choose the source type.",
+      "Fill in the address, database name, user, and password (ask your DBA for a read-only account).",
+      "Click Test connection; fix anything shown in red.",
+      "Click Save. The source appears right away in Datasets, Visual Query, and SQL Lab."
+    ],
+    "tips": [
+      "Connections are always read-only and passwords are stored encrypted.",
+      "An Excel file with several sheets becomes several datasets at once."
+    ]
+  },
+  "dataset": {
+    "judul": "Datasets",
+    "ringkas": "A dataset is a table or query ready to be charted. Data access rules (RLS) are attached here.",
+    "langkah": [
+      "Click + Dataset to pick a table from a connection, or create one from Visual Query / Data prep.",
+      "Click a dataset name to start a chart straight away.",
+      "Pencil icon: edit columns, number formats, and metrics."
+    ],
+    "tips": [
+      "Columns named lat/lon, province, or city are recognised automatically as map columns."
+    ]
+  },
+  "prep": {
+    "judul": "Data prep",
+    "ringkas": "Clean and shape data without SQL.",
+    "langkah": [
+      "Choose the Source data.",
+      "Click Actions on a column card or Add step: filter, rename, change type, calculate a new column, join tables, summarise.",
+      "Check the column profile & preview below.",
+      "Enter a name, then Save as dataset."
+    ],
+    "tips": [
+      "Click any step to edit or delete it; steps run from left to right.",
+      "Hover over a table or chart on an ALDx page and click Export (top right): Image, PDF, Excel, CSV, Text, or Copy table."
+    ]
+  },
+  "ekstrak": {
+    "judul": "Extract to ALDx Engine",
+    "ringkas": "Copy a dataset into the ALDx Engine so dashboards are much faster and the source database is not burdened. Admins only.",
+    "langkah": [
+      "Choose the Source dataset (datasets with template filters cannot be extracted).",
+      "Choose a mode: Full (replace everything) or Incremental (append new rows).",
+      "Set the schedule, then click Create & refresh now."
+    ],
+    "tips": [
+      "Data access rules (RLS) are copied to the extract dataset too."
+    ]
+  },
+  "kueri": {
+    "judul": "Visual Query",
+    "ringkas": "Build a query by clicking, without typing SQL. Requires the Analyst role.",
+    "langkah": [
+      "Choose a database and schema; only that schema's tables are shown.",
+      "Double-click a table: the query is built and run immediately.",
+      "Double-click a second table: it is joined automatically through a matching column.",
+      "Tick columns, choose a summary (Sum, Average…), add filters & sorting.",
+      "Save as dataset, then continue in Visual Studio."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Run the query"
+      ]
+    ],
+    "tips": [
+      "If the row count jumps after a join, the join column is probably wrong; check the Join box.",
+      "Hover over a table or chart on an ALDx page and click Export (top right): Image, PDF, Excel, CSV, Text, or Copy table."
+    ]
+  },
+  "sqllab": {
+    "judul": "SQL Lab",
+    "ringkas": "SQL editor for advanced users. Results can be saved as a dataset or downloaded.",
+    "langkah": [
+      "Choose the database & schema on the left.",
+      "Type SQL, then run it.",
+      "Click Save dataset to use the results in a chart."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Run query"
+      ],
+      [
+        "Ctrl + Shift + Enter",
+        "Run the statement at the cursor"
+      ],
+      [
+        "Ctrl + E",
+        "Stop query"
+      ],
+      [
+        "Ctrl + Shift + F",
+        "Format SQL"
+      ],
+      [
+        "Ctrl + Q",
+        "New tab (Windows)"
+      ],
+      [
+        "Ctrl + T",
+        "New tab (Mac/Linux)"
+      ],
+      [
+        "Ctrl + [",
+        "Previous tab"
+      ],
+      [
+        "Ctrl + ]",
+        "Next tab"
+      ],
+      [
+        "Ctrl + F",
+        "Find"
+      ],
+      [
+        "Ctrl + H",
+        "Find & replace"
+      ]
+    ],
+    "tips": [
+      "Not used to SQL? Use Visual Query."
+    ]
+  },
+  "tersimpan": {
+    "judul": "Saved queries",
+    "ringkas": "The SQL queries you saved from SQL Lab.",
+    "langkah": [
+      "Click a query name to reopen it in SQL Lab.",
+      "Use the search box to find older queries."
+    ]
+  },
+  "studio": {
+    "judul": "Visual Studio",
+    "ringkas": "Build charts by drag and drop, then lay out a dashboard.",
+    "langkah": [
+      "Choose a Data source.",
+      "Drag Dimensions (by what?) to the Columns shelf and Measures (how much?) to the Rows shelf.",
+      "Pick a type under Show me; a gold frame = recommended.",
+      "Add Color, Filters, Forecast if needed, then Save.",
+      "Build a dashboard tab: drag worksheets onto the canvas, add filters, Save."
+    ],
+    "pintasan": [
+      [
+        "Double-click a column",
+        "Add it to a shelf automatically"
+      ],
+      [
+        "Esc",
+        "Close a dialog"
+      ]
+    ],
+    "tips": [
+      "Drag a pill off its shelf to remove it.",
+      "Hover over a table or chart on an ALDx page and click Export (top right): Image, PDF, Excel, CSV, Text, or Copy table."
+    ]
+  },
+  "chart": {
+    "judul": "Charts",
+    "ringkas": "Every chart you are allowed to see. Click a name to open & edit it.",
+    "langkah": [
+      "Filter by name, type, owner, or dataset.",
+      "Click the star to mark a favourite.",
+      "Click a chart name to open the editor (Explore)."
+    ]
+  },
+  "explore": {
+    "judul": "Editing a chart",
+    "ringkas": "The built-in chart editor: choose a type, metrics, dimensions, filters, then save.",
+    "langkah": [
+      "Change the chart type at the top left.",
+      "Set Metrics, Dimensions, Filters, then click Update chart.",
+      "Save: save it and add it to a dashboard."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Update the chart"
+      ]
+    ],
+    "tips": [
+      "The ⋯ menu at the top right: download CSV/Excel/image, copy a link, view the query."
+    ]
+  },
+  "dashboard": {
+    "judul": "Dashboards",
+    "ringkas": "Every dashboard you are allowed to see.",
+    "langkah": [
+      "Click a name to open the dashboard.",
+      "Click the star to favourite it (it then appears on Home).",
+      "+ Dashboard creates an empty dashboard; the fastest way is the Build a dashboard tab in Visual Studio."
+    ]
+  },
+  "lihat-dashboard": {
+    "judul": "Reading a dashboard",
+    "ringkas": "Filter in the left panel; every chart follows.",
+    "langkah": [
+      "Open the filter panel on the left, choose values, click Apply filters.",
+      "Click part of a chart (e.g. one bar) to filter the other charts (cross-filter).",
+      "Hover over a chart and click ⋯ for full screen, view data, or download."
+    ],
+    "tips": [
+      "The ⋯ button at the top right of the dashboard: download PDF/image, share a link, schedule an email."
+    ]
+  },
+  "story": {
+    "judul": "Stories",
+    "ringkas": "A story is a presentation scenario that chains several dashboards in order, with narration.",
+    "langkah": [
+      "Click New story and enter a title & description.",
+      "Add dashboards; reorder them with Up/Down.",
+      "Write narration for each step (or Write narration with AI when available).",
+      "Save, then open it to present; move between steps with the arrow buttons."
+    ],
+    "pintasan": [
+      [
+        "← →",
+        "Previous / next step while presenting"
+      ]
+    ],
+    "tips": [
+      "Tick Public so other users with access to its dashboards can view the story."
+    ]
+  },
+  "asisten": {
+    "judul": "AI Assistant",
+    "ringkas": "Ask about your data in plain language, or create charts & dashboards automatically.",
+    "langkah": [
+      "Ask AI: type a question, e.g. What are sales by branch this year?",
+      "Auto Chart: choose a dataset, click Analyse dataset, tick suggestions, then Create."
+    ],
+    "pintasan": [
+      [
+        "Enter",
+        "Send the question"
+      ],
+      [
+        "Shift + Enter",
+        "New line"
+      ]
+    ],
+    "tips": [
+      "The AI always queries data as you, so your data access rules still apply."
+    ]
+  },
+  "pusat": {
+    "judul": "Control Center",
+    "ringkas": "Server status, identity & theme, connections & extracts (Admin). Settings, Data limits & Permissions are Superadmin only.",
+    "langkah": [
+      "Status: monitor CPU, RAM, cache, and processes.",
+      "Settings (Superadmin): change limits & capacity; items labelled Needs apply take effect after scripts\\terapkan-server.ps1.",
+      "Data limits (Superadmin): see recommendations from RAM & disk, then choose Use recommendation, auto, or No limit.",
+      "Identity & Theme: name, logo, colors, motion (applies immediately).",
+      "Permissions (Superadmin): capabilities per role."
+    ],
+    "tips": [
+      "Open the AI Assistant (Ctrl + I) with the /hw-engineer or /ahli-ui-ux role for settings & theme proposals; changes only apply after you press Apply."
+    ]
+  },
+  "pengguna": {
+    "judul": "Users",
+    "ringkas": "Create, edit, and deactivate accounts.",
+    "langkah": [
+      "+ for a new account: username, name, email, password, roles (Gamma + Pengguna; add sql_lab for analysts).",
+      "Deactivate unused accounts instead of deleting them, so history stays intact."
+    ]
+  },
+  "role": {
+    "judul": "Roles",
+    "ringkas": "Groups of permissions. Branch roles are used by data access rules (RLS).",
+    "langkah": [
+      "Create a role per data group (e.g. Bandung Branch).",
+      "Set role capabilities in Control Center > Permissions."
+    ]
+  },
+  "rls": {
+    "judul": "Data access (RLS)",
+    "ringkas": "Rules for which rows each role may see.",
+    "langkah": [
+      "+ new rule: choose the dataset, role, and clause, e.g. kd_cabang = 'C02'.",
+      "Test with two different accounts; Admins always see all data."
+    ]
+  },
+  "koneksi": {
+    "judul": "Database connections (advanced)",
+    "ringkas": "Superset's built-in connection list for advanced settings. For new connections use Data > Connect data."
+  },
+  "riwayat": {
+    "judul": "Query history",
+    "ringkas": "Every query run in SQL Lab, for auditing and troubleshooting."
+  },
+  "log": {
+    "judul": "Activity log",
+    "ringkas": "A record of user actions (open, edit, download)."
+  },
+  "berkas": {
+    "judul": "Files .ald / .aldx",
+    "ringkas": "Save & share dashboards, charts, or datasets as encrypted files.",
+    "langkah": [
+      "Export: choose a type, tick objects, choose .ald (no data) or .aldx (may carry a data copy), choose a key, then Download file.",
+      "Server key = opens only on this ALDx server. Password = opens on any ALDx server with that password.",
+      "Import: choose a file, enter the password if asked, check the summary, choose target connections (or Use data in file), then Import.",
+      "New copy leaves existing objects untouched. Overwrite updates the same dashboard/chart."
+    ],
+    "tips": [
+      "Files never carry server addresses or connection passwords.",
+      "Data in .aldx holds only rows the file creator may see. Set access rights on imported datasets before sharing."
+    ]
+  },
+  "moderasi": {
+    "judul": "Review moderation",
+    "ringkas": "Approve or reject comments & ratings before others see them. Superadmin only.",
+    "langkah": [
+      "The Pending tab lists new comments.",
+      "Show = visible to everyone who may open that dashboard/chart.",
+      "Reject = enter a reason (seen by the author), then Reject."
+    ],
+    "tips": [
+      "Moderation can be turned off in Control Center › Settings › Comments need Superadmin approval."
+    ]
+  }
+}

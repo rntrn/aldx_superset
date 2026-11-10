@@ -1,0 +1,169 @@
+# =============================================================================
+#  PENGATURAN ASISTEN AI (dibaca config/sps_ai/pengaturan.py)
+#  Halaman: http://localhost:8088/asisten/
+#
+#  Setiap model memakai API "OpenAI-compatible" (/v1/chat/completions), standar
+#  yang didukung hampir semua penyedia:
+#    LOKAL : Ollama, LM Studio, vLLM, llama.cpp server
+#    API   : Gemini, Groq, OpenRouter, Cerebras, Mistral, GitHub Models (gratis), Grok (xAI),
+#            OpenAI, Anthropic (Claude), DeepSeek, dll.
+#
+#  Model WAJIB mendukung "tool calling" (pemanggilan fungsi). Lokal yang disarankan:
+#    qwen2.5:7b / qwen2.5:14b / llama3.1:8b / mistral-nemo (ollama pull <nama>)
+#  Panduan memasang model lokal untuk pemula: docs/20-model-ai-lokal.md
+#
+#  kirim_data:
+#    true  -> isi hasil query (angka) boleh dikirim ke model untuk dianalisis.
+#    false -> model hanya melihat nama kolom & jumlah baris; angka langsung
+#             ditampilkan ke pengguna TANPA lewat model. Wajib false untuk model
+#             API di luar kantor, kecuali sudah ada izin resmi.
+#
+#  api_key_env: NAMA key. Isi key-nya lewat aplikasi (panel Asisten AI › Sambungkan AI, Admin;
+#               tersimpan terenkripsi) ATAU di .env. Key-nya TIDAK ditulis di berkas ini.
+#  kategori    : gratis | berbayar (pengelompokan di layar Sambungkan AI).
+#  url_key     : halaman tempat membuat key (tombol "Buat key").
+#  Model yang butuh key tetapi key-nya belum diisi otomatis disembunyikan.
+#  Perubahan file ini berlaku tanpa restart (dibaca ulang tiap permintaan).
+# =============================================================================
+
+bawaan: lokal-qwen          # id model yang dipilih pertama kali
+
+model:
+  - id: lokal-qwen
+    nama: "Qwen 2.5 7B — lokal (Ollama)"
+    base_url: http://host.docker.internal:11434/v1
+    model: qwen2.5:7b
+    kirim_data: true
+
+  - id: lokal-llama
+    nama: "Llama 3.1 8B — lokal (Ollama)"
+    base_url: http://host.docker.internal:11434/v1
+    model: llama3.1:8b
+    kirim_data: true
+
+  # LM Studio: unduh model "qwen2.5-7b-instruct", lalu Developer > Start Server (port 1234).
+  # Panduan: docs/20-model-ai-lokal.md
+  - id: lokal-lmstudio
+    nama: "Qwen 2.5 7B — lokal (LM Studio)"
+    base_url: http://host.docker.internal:1234/v1
+    model: qwen2.5-7b-instruct
+    kirim_data: true
+
+  # ---- Cloud GRATIS (kuota harian; key dibuat lewat tombol "? Cara membuat key" di installer) ----
+  # Nama model penyedia gratis sering berganti. Bila model hilang/galat "model not found",
+  # ganti nilai "model:" di bawah dengan nama di halaman model penyedia (tanpa restart).
+  - id: gemini
+    nama: "Gemini Flash — Google (gratis)"
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai
+    model: gemini-flash-latest
+    api_key_env: AI_GEMINI_API_KEY
+    kategori: gratis
+    url_key: https://aistudio.google.com/app/apikey
+    kirim_data: false
+
+  - id: groq
+    nama: "GPT-OSS 120B — Groq (gratis)"
+    base_url: https://api.groq.com/openai/v1
+    model: openai/gpt-oss-120b
+    api_key_env: AI_GROQ_API_KEY
+    kategori: gratis
+    url_key: https://console.groq.com/keys
+    kirim_data: false
+
+  - id: openrouter
+    nama: "GPT-OSS 120B — OpenRouter (gratis)"
+    base_url: https://openrouter.ai/api/v1
+    model: openai/gpt-oss-120b:free
+    api_key_env: AI_OPENROUTER_API_KEY
+    kategori: gratis
+    url_key: https://openrouter.ai/settings/keys
+    kirim_data: false
+
+  - id: cerebras
+    nama: "GPT-OSS 120B — Cerebras (gratis)"
+    base_url: https://api.cerebras.ai/v1
+    model: gpt-oss-120b
+    api_key_env: AI_CEREBRAS_API_KEY
+    kategori: gratis
+    url_key: https://cloud.cerebras.ai/
+    kirim_data: false
+
+  - id: mistral
+    nama: "Mistral Small — Mistral (gratis, paket Experiment)"
+    base_url: https://api.mistral.ai/v1
+    model: mistral-small-latest
+    api_key_env: AI_MISTRAL_API_KEY
+    kategori: gratis
+    url_key: https://console.mistral.ai/api-keys
+    kirim_data: false
+
+  - id: github
+    nama: "GPT-4.1 mini — GitHub Models (gratis)"
+    base_url: https://models.github.ai/inference
+    model: openai/gpt-4.1-mini
+    api_key_env: AI_GITHUB_TOKEN
+    kategori: gratis
+    url_key: https://github.com/settings/personal-access-tokens/new
+    kirim_data: false
+
+  # ---- Cloud berbayar / kredit awal ----
+  - id: grok
+    nama: "Grok — xAI"
+    base_url: https://api.x.ai/v1
+    model: grok-latest
+    api_key_env: AI_XAI_API_KEY
+    kategori: berbayar
+    url_key: https://console.x.ai/
+    kirim_data: false
+
+  - id: openai
+    nama: "GPT-4o mini — API OpenAI"
+    base_url: https://api.openai.com/v1
+    model: gpt-4o-mini
+    api_key_env: AI_OPENAI_API_KEY
+    kategori: berbayar
+    url_key: https://platform.openai.com/api-keys
+    kirim_data: false
+
+  - id: claude
+    nama: "Claude — API Anthropic"
+    base_url: https://api.anthropic.com/v1
+    model: claude-sonnet-4-5
+    api_key_env: AI_ANTHROPIC_API_KEY
+    kategori: berbayar
+    url_key: https://console.anthropic.com/settings/keys
+    kirim_data: false
+
+  - id: deepseek
+    nama: "DeepSeek Chat — DeepSeek (berbayar, murah)"
+    base_url: https://api.deepseek.com/v1
+    model: deepseek-chat
+    api_key_env: AI_DEEPSEEK_API_KEY
+    kategori: berbayar
+    url_key: https://platform.deepseek.com/api_keys
+    kirim_data: false
+
+# ---- Model LOKAL ditemukan OTOMATIS ----
+# Setiap server di bawah ditanya daftar modelnya (GET <base_url>/models) tiap 60 detik.
+# Semua model chat yang sudah diunduh langsung muncul di pilihan model, TANPA perlu menulis
+# namanya di "model:" di atas. Model embedding (bge, nomic-embed, ...) dilewati.
+# Tambahkan server lain (mis. vLLM di komputer lain) dengan nama + base_url.
+temukan_lokal:
+  - nama: Ollama
+    base_url: http://host.docker.internal:11434/v1
+  - nama: LM Studio
+    base_url: http://host.docker.internal:1234/v1
+  - nama: Jan
+    base_url: http://host.docker.internal:1337/v1
+  - nama: llama.cpp
+    base_url: http://host.docker.internal:8080/v1
+
+# Siapa yang boleh memakai asisten (role Superset). Admin selalu boleh.
+# {role_pengguna} = role dasar semua pengguna (SPS_ROLE_PENGGUNA di .env).
+peran_boleh: ["{role_pengguna}"]
+
+# Batas kerja agent per pertanyaan.
+langkah_maks: 6          # maksimal pemanggilan alat
+baris_maks: 500          # maksimal baris hasil query yang ditampilkan
+baris_ke_model: 50       # maksimal baris yang dikirim ke model (bila kirim_data: true)
+batas_detik_model: 120   # waktu tunggu jawaban model

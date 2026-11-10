@@ -1,0 +1,407 @@
+{
+  "pintasan": {
+    "judul": "Pintasan keyboard",
+    "ringkas": "Pintasan ini berlaku di semua halaman. Di Mac, ganti Ctrl dengan ⌘.",
+    "pintasan": [
+      [
+        "Ctrl + K",
+        "Cari halaman, dashboard, chart, dataset, atau perintah"
+      ],
+      [
+        "Ctrl + I",
+        "Buka / tutup panel Asisten AI"
+      ],
+      [
+        "?",
+        "Cara pakai halaman yang sedang dibuka"
+      ],
+      [
+        "Ctrl + \\",
+        "Ringkas / lebarkan menu samping"
+      ],
+      [
+        "Esc",
+        "Tutup panel atau jendela"
+      ],
+      [
+        "g → h",
+        "Ke Beranda"
+      ],
+      [
+        "g → t",
+        "Ke Dataset"
+      ],
+      [
+        "g → k",
+        "Ke Kueri Visual"
+      ],
+      [
+        "g → q",
+        "Ke SQL Lab"
+      ],
+      [
+        "g → s",
+        "Ke Studio Visual"
+      ],
+      [
+        "g → c",
+        "Ke Daftar chart"
+      ],
+      [
+        "g → d",
+        "Ke Daftar dashboard"
+      ],
+      [
+        "g → y",
+        "Ke Story"
+      ]
+    ]
+  },
+  "umum": {
+    "judul": "Cara pakai",
+    "ringkas": "Menu di kiri tersusun sesuai urutan membuat laporan: Data, Kueri, Visual, lalu Dashboard & Story. Angka kecil di samping menu adalah urutan langkahnya.",
+    "langkah": [
+      "Pilih menu di kiri, atau tekan Ctrl + K lalu ketik nama halaman.",
+      "Tekan ? kapan saja untuk membuka panduan halaman yang sedang dibuka.",
+      "Klik ✦ di bilah atas (Ctrl + I) untuk Asisten AI. Pilih peran: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
+      "Arahkan kursor ke tabel atau grafik di halaman ALDx, klik Ekspor (pojok kanan atas): Gambar, PDF, Excel, CSV, Teks, atau Salin tabel."
+    ]
+  },
+  "beranda": {
+    "judul": "Beranda",
+    "ringkas": "Titik mulai: cari apa pun, lihat langkah membuat laporan, dan lanjutkan pekerjaan terakhir.",
+    "langkah": [
+      "Ketik di kotak cari: nama dashboard, chart, atau dataset. Bila Asisten AI aktif, klik Tanya AI untuk bertanya dengan kalimat biasa.",
+      "Ikuti 5 kartu Bangun laporan dari kiri: Sambungkan data, Siapkan data, Buat chart, Susun dashboard, Ceritakan dengan story.",
+      "Kartu bertanda Langkah berikutnya adalah langkah yang belum pernah Anda kerjakan.",
+      "Bagian Lanjutkan berisi chart & dashboard yang terakhir Anda buka."
+    ],
+    "tips": [
+      "Klik bintang pada dashboard (di Daftar dashboard) agar selalu muncul paling atas di Beranda."
+    ]
+  },
+  "hubungkan": {
+    "judul": "Hubungkan data",
+    "ringkas": "Menyambungkan database, data warehouse, atau berkas (Excel, CSV, Access) dalam 4 langkah. Khusus Admin.",
+    "langkah": [
+      "Pilih jenis sumber.",
+      "Isi alamat, nama database, pengguna, dan password (minta akun hanya-baca ke DBA).",
+      "Klik Uji koneksi; perbaiki bila ada pesan merah.",
+      "Klik Simpan. Sumber langsung muncul di Dataset, Kueri Visual, dan SQL Lab."
+    ],
+    "tips": [
+      "Koneksi selalu hanya-baca dan password disimpan terenkripsi.",
+      "Berkas Excel banyak lembar menjadi beberapa dataset sekaligus."
+    ]
+  },
+  "dataset": {
+    "judul": "Dataset",
+    "ringkas": "Dataset adalah tabel atau kueri yang siap dipakai untuk chart. Hak akses data (RLS) melekat di sini.",
+    "langkah": [
+      "Klik + Dataset untuk memilih tabel dari koneksi, atau buat dari Kueri Visual / Persiapan data.",
+      "Klik nama dataset untuk langsung membuat chart.",
+      "Ikon pensil: ubah kolom, format angka, dan metrik."
+    ],
+    "tips": [
+      "Kolom bernama lat/lon, provinsi, kota dikenali otomatis sebagai kolom peta."
+    ]
+  },
+  "prep": {
+    "judul": "Persiapan data",
+    "ringkas": "Membersihkan dan membentuk data tanpa SQL.",
+    "langkah": [
+      "Pilih Data asal.",
+      "Klik Aksi pada kartu kolom atau Tambah langkah: saring, ganti nama, ubah tipe, hitung kolom baru, gabung tabel, ringkas.",
+      "Periksa profil kolom & pratinjau di bawah.",
+      "Isi nama lalu Simpan sebagai dataset."
+    ],
+    "tips": [
+      "Setiap langkah bisa diklik untuk diubah atau dihapus; urutannya dijalankan dari kiri.",
+      "Arahkan kursor ke tabel atau grafik di halaman ALDx, klik Ekspor (pojok kanan atas): Gambar, PDF, Excel, CSV, Teks, atau Salin tabel."
+    ]
+  },
+  "ekstrak": {
+    "judul": "Ekstrak ke ALDx Engine",
+    "ringkas": "Menyalin dataset ke ALDx Engine agar dashboard jauh lebih cepat dan database sumber tidak terbebani. Khusus Admin.",
+    "langkah": [
+      "Pilih Dataset sumber (dataset bertemplate filter tidak bisa diekstrak).",
+      "Pilih mode: Penuh (ganti semua) atau Inkremental (tambah baris baru).",
+      "Atur jadwal, lalu klik Buat & segarkan sekarang."
+    ],
+    "tips": [
+      "Aturan hak akses data (RLS) ikut tersalin ke dataset ekstrak."
+    ]
+  },
+  "kueri": {
+    "judul": "Kueri Visual",
+    "ringkas": "Menyusun kueri dengan klik, tanpa mengetik SQL. Butuh peran Analis.",
+    "langkah": [
+      "Pilih database dan skema; hanya tabel skema itu yang tampil.",
+      "Klik dua kali tabel: kueri langsung jadi dan dijalankan.",
+      "Klik dua kali tabel kedua: digabung otomatis lewat kolom penghubung.",
+      "Centang kolom, pilih ringkasan (Jumlah, Rata-rata…), tambah filter & urutan.",
+      "Simpan jadi dataset, lalu lanjut ke Studio Visual."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Jalankan kueri"
+      ]
+    ],
+    "tips": [
+      "Jumlah baris melonjak setelah gabung = kolom penghubung kurang tepat; periksa kotak Gabung.",
+      "Arahkan kursor ke tabel atau grafik di halaman ALDx, klik Ekspor (pojok kanan atas): Gambar, PDF, Excel, CSV, Teks, atau Salin tabel."
+    ]
+  },
+  "sqllab": {
+    "judul": "SQL Lab",
+    "ringkas": "Editor SQL untuk pengguna yang mahir. Hasil bisa disimpan sebagai dataset atau diunduh.",
+    "langkah": [
+      "Pilih database & skema di kiri.",
+      "Ketik SQL, lalu jalankan.",
+      "Klik Save dataset untuk memakai hasilnya di chart."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Jalankan kueri"
+      ],
+      [
+        "Ctrl + Shift + Enter",
+        "Jalankan pernyataan di posisi kursor"
+      ],
+      [
+        "Ctrl + E",
+        "Hentikan kueri"
+      ],
+      [
+        "Ctrl + Shift + F",
+        "Rapikan SQL"
+      ],
+      [
+        "Ctrl + Q",
+        "Tab baru (Windows)"
+      ],
+      [
+        "Ctrl + T",
+        "Tab baru (Mac/Linux)"
+      ],
+      [
+        "Ctrl + [",
+        "Tab sebelumnya"
+      ],
+      [
+        "Ctrl + ]",
+        "Tab berikutnya"
+      ],
+      [
+        "Ctrl + F",
+        "Cari"
+      ],
+      [
+        "Ctrl + H",
+        "Cari & ganti"
+      ]
+    ],
+    "tips": [
+      "Belum terbiasa SQL? Pakai Kueri Visual."
+    ]
+  },
+  "tersimpan": {
+    "judul": "Kueri tersimpan",
+    "ringkas": "Daftar kueri SQL yang Anda simpan dari SQL Lab.",
+    "langkah": [
+      "Klik nama kueri untuk membukanya lagi di SQL Lab.",
+      "Pakai kolom pencarian untuk menemukan kueri lama."
+    ]
+  },
+  "studio": {
+    "judul": "Studio Visual",
+    "ringkas": "Membuat chart dengan seret-lepas, lalu menyusun dashboard.",
+    "langkah": [
+      "Pilih Sumber data.",
+      "Seret Dimensi (per apa?) ke rak Kolom dan Ukuran (berapa?) ke rak Baris.",
+      "Pilih jenis di Tampilkan saya; bingkai emas = rekomendasi.",
+      "Tambah Warna, Filter, Ramalan bila perlu, lalu Simpan.",
+      "Tab Susun dashboard: seret lembar kerja ke kanvas, tambah filter, Simpan."
+    ],
+    "pintasan": [
+      [
+        "Klik dua kali kolom",
+        "Tambahkan ke rak secara otomatis"
+      ],
+      [
+        "Esc",
+        "Tutup dialog"
+      ]
+    ],
+    "tips": [
+      "Seret pil keluar dari rak untuk membuangnya.",
+      "Arahkan kursor ke tabel atau grafik di halaman ALDx, klik Ekspor (pojok kanan atas): Gambar, PDF, Excel, CSV, Teks, atau Salin tabel."
+    ]
+  },
+  "chart": {
+    "judul": "Daftar chart",
+    "ringkas": "Semua chart yang boleh Anda lihat. Klik nama untuk membuka & mengubahnya.",
+    "langkah": [
+      "Saring dengan nama, jenis, pemilik, atau dataset.",
+      "Klik bintang untuk menandai favorit.",
+      "Klik nama chart untuk membuka editor (Explore)."
+    ]
+  },
+  "explore": {
+    "judul": "Mengubah chart",
+    "ringkas": "Editor chart bawaan: pilih jenis, metrik, dimensi, filter, lalu simpan.",
+    "langkah": [
+      "Ganti jenis chart di kiri atas.",
+      "Atur Metrics, Dimensions, Filters, lalu klik Update chart.",
+      "Save: simpan dan tambahkan ke dashboard."
+    ],
+    "pintasan": [
+      [
+        "Ctrl + Enter",
+        "Perbarui chart"
+      ]
+    ],
+    "tips": [
+      "Menu ⋯ kanan atas: unduh CSV/Excel/gambar, salin tautan, lihat kueri."
+    ]
+  },
+  "dashboard": {
+    "judul": "Daftar dashboard",
+    "ringkas": "Semua dashboard yang boleh Anda lihat.",
+    "langkah": [
+      "Klik nama untuk membuka dashboard.",
+      "Klik bintang untuk favorit (muncul di Beranda).",
+      "+ Dashboard membuat dashboard kosong; cara tercepat: tab Susun dashboard di Studio Visual."
+    ]
+  },
+  "lihat-dashboard": {
+    "judul": "Membaca dashboard",
+    "ringkas": "Saring di panel kiri; semua chart ikut berubah.",
+    "langkah": [
+      "Buka panel filter di kiri, pilih nilai, klik Apply filters.",
+      "Klik bagian chart (mis. satu batang) untuk menyaring chart lain (cross-filter).",
+      "Arahkan kursor ke chart, klik ⋯ untuk layar penuh, lihat data, atau unduh."
+    ],
+    "tips": [
+      "Tombol ⋯ di kanan atas dashboard: unduh PDF/gambar, bagikan tautan, kirim terjadwal."
+    ]
+  },
+  "story": {
+    "judul": "Story",
+    "ringkas": "Story adalah skenario presentasi yang merangkai beberapa dashboard secara berurutan, lengkap dengan narasi.",
+    "langkah": [
+      "Klik Story baru, isi judul & keterangan.",
+      "Tambah dashboard; atur urutan dengan Naik/Turun.",
+      "Tulis narasi tiap langkah (atau Tulis narasi dengan AI bila tersedia).",
+      "Simpan, lalu buka untuk presentasi; pindah langkah dengan tombol panah."
+    ],
+    "pintasan": [
+      [
+        "← →",
+        "Langkah sebelumnya / berikutnya saat presentasi"
+      ]
+    ],
+    "tips": [
+      "Centang Publik agar story bisa dilihat pengguna lain yang berhak atas dashboard-nya."
+    ]
+  },
+  "asisten": {
+    "judul": "Asisten AI",
+    "ringkas": "Bertanya tentang data dengan kalimat biasa, atau membuat chart & dashboard otomatis.",
+    "langkah": [
+      "Tanya AI: ketik pertanyaan, mis. Berapa penjualan per cabang tahun ini?",
+      "Auto Chart: pilih dataset, klik Analisis dataset, centang saran, lalu Buat."
+    ],
+    "pintasan": [
+      [
+        "Enter",
+        "Kirim pertanyaan"
+      ],
+      [
+        "Shift + Enter",
+        "Baris baru"
+      ]
+    ],
+    "tips": [
+      "AI selalu bertanya ke data sebagai Anda, jadi hak akses data tetap berlaku."
+    ]
+  },
+  "pusat": {
+    "judul": "Pusat Kendali",
+    "ringkas": "Status server, identitas & tema, koneksi & ekstrak (Admin). Pengaturan, Batas data & Hak akses khusus Superadmin.",
+    "langkah": [
+      "Status: pantau CPU, RAM, cache, dan proses.",
+      "Pengaturan (Superadmin): ubah batas & kapasitas; yang berlabel Perlu diterapkan baru aktif setelah scripts\\terapkan-server.ps1.",
+      "Batas data (Superadmin): lihat rekomendasi dari RAM & disk, lalu pilih Pakai rekomendasi, auto, atau Tanpa batas.",
+      "Identitas & Tema: nama, logo, warna, animasi (langsung berlaku).",
+      "Hak akses (Superadmin): kemampuan per role."
+    ],
+    "tips": [
+      "Buka Asisten AI (Ctrl + I) dengan peran /hw-engineer atau /ahli-ui-ux untuk usulan pengaturan & tema; perubahan baru berlaku setelah Anda menekan Terapkan."
+    ]
+  },
+  "pengguna": {
+    "judul": "Pengguna",
+    "ringkas": "Membuat, mengubah, dan menonaktifkan akun.",
+    "langkah": [
+      "+ untuk akun baru: isi username, nama, email, password, role (Gamma + Pengguna; tambah sql_lab untuk analis).",
+      "Nonaktifkan akun yang tidak dipakai, jangan dihapus, agar riwayat tetap utuh."
+    ]
+  },
+  "role": {
+    "judul": "Role",
+    "ringkas": "Kelompok izin. Role cabang dipakai aturan hak akses data (RLS).",
+    "langkah": [
+      "Buat role per kelompok data (mis. Cabang Bandung).",
+      "Atur kemampuan role di Pusat Kendali > Hak akses."
+    ]
+  },
+  "rls": {
+    "judul": "Hak akses data (RLS)",
+    "ringkas": "Aturan baris mana yang boleh dilihat setiap role.",
+    "langkah": [
+      "+ aturan baru: pilih dataset, role, dan klausa, mis. kd_cabang = 'C02'.",
+      "Uji dengan dua akun berbeda; Admin selalu melihat semua data."
+    ]
+  },
+  "koneksi": {
+    "judul": "Koneksi database (lanjutan)",
+    "ringkas": "Daftar koneksi bawaan Superset untuk pengaturan lanjutan. Untuk koneksi baru, pakai Data > Hubungkan data."
+  },
+  "riwayat": {
+    "judul": "Riwayat kueri",
+    "ringkas": "Semua kueri yang dijalankan di SQL Lab, untuk audit dan pemecahan masalah."
+  },
+  "log": {
+    "judul": "Log aktivitas",
+    "ringkas": "Catatan aksi pengguna (membuka, mengubah, mengunduh)."
+  },
+  "berkas": {
+    "judul": "Berkas .ald / .aldx",
+    "ringkas": "Simpan & bagikan dashboard, chart, atau dataset sebagai berkas terenkripsi.",
+    "langkah": [
+      "Ekspor: pilih jenis, centang objek, pilih .ald (tanpa data) atau .aldx (bisa membawa salinan data), pilih kunci, lalu Unduh berkas.",
+      "Kunci server = hanya dibuka di server ALDx ini. Kata sandi = dibuka di server ALDx mana pun dengan sandi itu.",
+      "Impor: pilih berkas, isi sandi bila diminta, periksa ringkasan, pilih koneksi tujuan (atau Pakai data di berkas), lalu Impor.",
+      "Salinan baru tidak mengubah objek lama. Timpa memperbarui dashboard/chart yang sama."
+    ],
+    "tips": [
+      "Berkas tidak pernah membawa alamat server atau password koneksi.",
+      "Data di .aldx hanya baris yang boleh dilihat pembuat berkas. Atur hak akses dataset hasil impor sebelum dibagikan."
+    ]
+  },
+  "moderasi": {
+    "judul": "Moderasi ulasan",
+    "ringkas": "Setujui atau tolak komentar & rating sebelum tampil untuk pengguna lain. Khusus Superadmin.",
+    "langkah": [
+      "Tab Menunggu berisi komentar baru.",
+      "Tampilkan = terlihat semua yang boleh membuka dashboard/chart itu.",
+      "Tolak = isi alasan (dilihat penulis), lalu Tolak."
+    ],
+    "tips": [
+      "Moderasi bisa dimatikan di Pusat Kendali › Pengaturan › Komentar perlu disetujui Superadmin."
+    ]
+  }
+}

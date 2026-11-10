@@ -1,0 +1,42 @@
+# Rahasia & data lokal
+.env
+data/
+*.log
+__pycache__/
+diagnosa.txt
+docker/oracle/*.zip
+docker/oracle/*.deb
+backup/*.sql
+backup/engine/*
+!backup/engine/.gitkeep
+
+# Jangan pernah masuk git: rahasia, cadangan, log
+.env.*
+!.env.example
+backup/*
+!backup/README.md
+!backup/engine/
+installer/log/
+*.dump
+*.pyc
+dump.rdb
+# Sertifikat & kunci HTTPS gateway (dibuat per server)
+server/tls/*.key
+server/tls/*.crt
+server/status/
+.pytest_cache/
+.ruff_cache/
+installer/setup/Output/
+offline/
+
+# Berkas hasil pasang lokal (uninstaller Inno Setup)
+unins*.exe
+unins*.dat
+
+
+# Berkas hasil pasang lokal & perkakas pengembang
+unins*.exe
+unins*.dat
+docs/node_modules/
+dist/
+.claude/

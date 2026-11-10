@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lihat sebagai · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F4E79);--emas:var(--sps-aksen,#F2A900);--bg:var(--sps-latar,#F4F6F9);--garis:#D5DCE4;--teks:#1F2933;--redup:#5F6B7A;--merah:#B42318;--hijau:#0B7A52}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);background:var(--bg);color:var(--teks);font-size:13px}
+header{background:var(--navy);color:#fff;padding:10px 20px;border-bottom:3px solid var(--emas)}
+header .judul{font-weight:700;font-size:15px}header .sub{font-size:11.5px;opacity:.85}
+main{max-width:1180px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:12px 14px;min-width:0}
+.alat{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.alat label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+input,select{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:6px;background:#fff;min-width:240px}
+button{font:inherit;border-radius:6px;cursor:pointer;padding:8px 16px;border:1px solid var(--navy);background:var(--navy);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.pita{background:#FFF8EC;border:1px solid #E8A33D;border-radius:10px;padding:10px 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:4px 6px;border-top:1px solid var(--garis);text-align:left;white-space:nowrap}
+th{color:var(--redup);font-weight:600;border-top:0}.gulir{overflow:auto;max-height:280px}
+.galat{color:var(--merah)}.redup{color:var(--redup)}.rls{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#F4F6F9;border-radius:6px;padding:2px 6px;display:inline-block;margin:2px 0}
+</style>
+</head>
+<body>
+<header class="sps-hiasan"><div class="judul">Lihat sebagai…</div>
+<div class="sub">Uji hak akses: lihat data dashboard persis seperti pengguna lain melihatnya. Hanya baca; tercatat di jejak audit.</div></header>
+<main>
+  <div class="kartu alat">
+    <label>Pengguna <input list="daftarPengguna" id="pengguna" placeholder="ketik nama / username" autocomplete="off"></label>
+    <datalist id="daftarPengguna"></datalist>
+    <label>Dashboard <select id="dashboard"></select></label>
+    <button id="jalankan">Tampilkan</button>
+    <span id="pesan" class="redup"></span>
+  </div>
+  <div id="hasil"></div>
+</main>
+<script nonce="{{ csp_nonce() }}">
+(() => {
+  "use strict";
+  const CSRF = "{{ csrf }}", $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  const fmt = v => typeof v === "number" ? v.toLocaleString("id-ID") : v;
+  let tunda;
+  async function pilihan(q = "") {
+    const d = await (await fetch(`/lihat-sebagai/api/pilihan?q=${encodeURIComponent(q)}`, {credentials: "same-origin"})).json();
+    $("#daftarPengguna").innerHTML = d.pengguna.map(p => `<option value="${esc(p.username)}">${esc(p.nama)} · ${esc(p.role.join(", "))}</option>`).join("");
+    if (!$("#dashboard").options.length) $("#dashboard").innerHTML = d.dashboard.map(x => `<option value="${x.id}">${esc(x.judul)}</option>`).join("");
+  }
+  $("#pengguna").addEventListener("input", e => { clearTimeout(tunda); tunda = setTimeout(() => pilihan(e.target.value), 250); });
+  $("#jalankan").onclick = async () => {
+    const username = $("#pengguna").value.trim();
+    if (!username) return ($("#pesan").textContent = "Pilih pengguna dulu.");
+    $("#jalankan").disabled = true; $("#pesan").textContent = "Menjalankan semua chart sebagai pengguna itu…";
+    try {
+      const r = await fetch("/lihat-sebagai/api/jalankan", {method: "POST", credentials: "same-origin",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": CSRF},
+        body: JSON.stringify({username, dashboard_id: Number($("#dashboard").value)})});
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Gagal");
+      $("#pesan").textContent = "";
+      const kepala = `<div class="pita">Tampilan sebagai <b>${esc(d.pengguna.nama || d.pengguna.username)}</b> (${esc(d.pengguna.username)} · role: ${esc(d.pengguna.role.join(", "))}) — dashboard <b>${esc(d.dashboard)}</b>.</div>`;
+      if (!d.boleh_buka) { $("#hasil").innerHTML = kepala + `<div class="kartu galat" style="margin-top:12px">Pengguna ini TIDAK berhak membuka dashboard ini.</div>`; return; }
+      $("#hasil").innerHTML = kepala + `<div class="grid" style="margin-top:12px">` + d.chart.map(c => `<div class="kartu">
+        <b>${esc(c.nama)}</b> <span class="redup">${esc(c.jenis)}</span>
+        ${c.galat ? `<p class="galat">${esc(c.galat)}</p>` : `<p class="redup">${fmt(c.jumlah_baris)} baris${c.jumlah_baris > c.baris.length ? ` (tampil ${c.baris.length})` : ""}</p>
+        ${(c.rls || []).length ? `<div>Aturan hak akses data: ${c.rls.map(x => `<span class="rls">${esc(x.klausa)}</span>`).join(" ")}</div>` : `<div class="redup">Tanpa aturan hak akses data (melihat semua baris dataset).</div>`}
+        <div class="gulir"><table><tr>${c.kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr>${c.baris.map(b => `<tr>${c.kolom.map(k => `<td>${esc(fmt(b[k]))}</td>`).join("")}</tr>`).join("")}</table></div>`}
+      </div>`).join("") + `</div>`;
+    } catch (e) { $("#pesan").textContent = e.message; }
+    finally { $("#jalankan").disabled = false; }
+  };
+  pilihan();
+})();
+</script>
+</body>
+</html>
