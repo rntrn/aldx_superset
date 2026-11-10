@@ -41,6 +41,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Akun, password ada di mana, cara masuk tiap container | [14-akun-dan-akses.md](14-akun-dan-akses.md) |
 | Menentukan CPU/RAM/disk | [15-sizing.md](15-sizing.md) |
 | Upgrade / downgrade komponen | [16-upgrade-downgrade.md](16-upgrade-downgrade.md) |
+| **Beda versi antar komputer** (Setup.exe vs offline vs git), **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](29-versi-pembaruan-hapus-total.md) |
 | **Menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) | [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md) |
 | Rincian model AI lokal (RAM, jaringan kantor, masalah) | [20-model-ai-lokal.md](20-model-ai-lokal.md) |
 | Pusat Kendali, auto-tuning, multi-node | [11-pusat-kendali-server.md](11-pusat-kendali-server.md) |

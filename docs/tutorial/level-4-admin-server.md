@@ -174,6 +174,7 @@ powershell -ExecutionPolicy Bypass -File scripts\jadwal-cadangan.ps1 -Salin \\na
 | Masalah umum | [04-troubleshooting.md](../04-troubleshooting.md) |
 | **Menyambungkan Asisten AI** (lokal, cloud gratis, berbayar) | [28-sambungkan-asisten-ai.md](../28-sambungkan-asisten-ai.md) |
 | Rincian model AI lokal | [20-model-ai-lokal.md](../20-model-ai-lokal.md) |
+| Beda versi antar komputer, **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](../29-versi-pembaruan-hapus-total.md) |
 | **Urutan menyala, SOP, FAQ admin** | [19-runbook-faq-admin.md](../19-runbook-faq-admin.md) |
 | Identitas (nama, logo, warna) | Pusat Kendali → **Identitas & Tema** ([09](../09-identitas-tema.md)) |
 

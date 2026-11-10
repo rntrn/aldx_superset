@@ -65,6 +65,39 @@ class SpsSecurityManager(SupersetSecurityManager):
     ALPHA_ONLY_VIEW_MENUS = SupersetSecurityManager.ALPHA_ONLY_VIEW_MENUS | {"Databases"}
     SPS_ADMIN_ONLY_PMVS = {("can_write", "Theme"), ("can_export", "Theme")}
 
+    # Role pendamping wajib (sama dengan peta peran installer, sps_pengguna.PERAN):
+    #   Superadmin            -> + Admin  (Superadmin = Admin + pengaturan vital)
+    #   role dasar (Pengguna) -> + Gamma  (izin dasar Superset: menu, dashboard, chart)
+    # Akun yang dibuat lewat Kelola > Pengguna kadang hanya diberi satu role: tanpa pendamping, API menu
+    # menolak (403) sehingga sidebar kosong & tombol Asisten AI hilang. Dilengkapi otomatis saat dimuat.
+    _sudah_dilengkapi: set[int] = set()
+
+    def load_user(self, user_id):
+        user = super().load_user(user_id)
+        if user is not None and getattr(user, "id", None) not in self._sudah_dilengkapi:
+            try:
+                self.lengkapi_role(user)
+            except Exception:  # noqa: BLE001 - tidak boleh menggagalkan login
+                log.exception("ALDx: gagal melengkapi role %s", getattr(user, "username", user_id))
+            self._sudah_dilengkapi.add(user.id)
+        return user
+
+    def lengkapi_role(self, user) -> list[str]:
+        """Tambahkan role pendamping yang wajib. Kembalikan nama role yang ditambahkan."""
+        nama = {r.name for r in user.roles}
+        tambah = []
+        if "Superadmin" in nama and self.auth_role_admin not in nama:
+            tambah.append(self.auth_role_admin)
+        if ROLE_PEGAWAI in nama and not nama & {"Gamma", "Alpha", self.auth_role_admin, *tambah}:
+            tambah.append("Gamma")
+        role = [r for r in (self.find_role(n) for n in tambah) if r is not None]
+        if role:
+            user.roles.extend(role)
+            self.get_session.merge(user)
+            self.get_session.commit()
+            log.info("ALDx: role %s dilengkapi dengan %s", user.username, [r.name for r in role])
+        return [r.name for r in role]
+
     def _is_admin_only(self, pvm) -> bool:
         if (pvm.permission.name, pvm.view_menu.name) in self.SPS_ADMIN_ONLY_PMVS:
             return True

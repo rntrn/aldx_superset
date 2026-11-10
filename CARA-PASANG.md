@@ -89,6 +89,13 @@ Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *
 | **Ya** | **cadangan lengkap dibuat dulu** di folder `backup\`, lalu program, container, image & semua data dihapus. Folder `backup\` tidak ikut terhapus |
 | Batal | tidak jadi |
 
+**Hapus total (komputer bersih sepenuhnya):** menu Start › ALDx › **Hapus total (bersih)**. Data dicadangkan dulu ke
+*Dokumen\ALDx-cadangan-…*, lalu container, data, image, sertifikat, pintasan, entri Apps, dan folder ALDx dihapus.
+Rinci & cara mencoba dulu (`-Simulasi`): [docs/29](docs/29-versi-pembaruan-hapus-total.md).
+
+**Komputer lain berbeda tampilan/fitur?** Setup.exe membekukan versi saat dibangun; `git pull` selalu terbaru.
+Lihat [docs/29 §1](docs/29-versi-pembaruan-hapus-total.md).
+
 Lupa password? Menu Start › ALDx › **Atur ulang password**: ketik email & password baru (kunci akun ikut dibuka).
 
 ## C. Cara lain: tanpa Setup.exe (folder / ZIP)

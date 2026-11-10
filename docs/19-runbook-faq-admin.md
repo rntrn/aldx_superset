@@ -248,6 +248,14 @@ Buka panel Asisten AI (`Ctrl + I`) › ikon **sambung**: layar itu menunjukkan a
 model yang terdeteksi, dan key cloud yang terisi. Langkah & tabel masalah: [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md).
 Model lokal (Ollama / LM Studio) dipasang sendiri di Windows, bukan di Docker.
 
+**16b. Komputer lain tampil beda / fitur baru tidak ada?**
+Setup.exe berisi versi saat dibangun; `git pull` selalu terbaru. Samakan versinya:
+[29 §1](29-versi-pembaruan-hapus-total.md). Menghapus tanpa sisa: [29 §3](29-versi-pembaruan-hapus-total.md).
+
+**16c. Pengguna tidak melihat menu / tombol Asisten AI?**
+Akun hanya ber-role *Pengguna* (tanpa Gamma) atau *Superadmin* (tanpa Admin). Sejak 2026.11.10 role pendamping
+dilengkapi otomatis saat akun dimuat; minta pengguna memuat ulang halaman.
+
 **17. Apa yang harus dicadangkan di luar server?**
 Folder `backup\` dan berkas `.env`. Keduanya berisi rahasia: simpan di lokasi terbatas.
 
