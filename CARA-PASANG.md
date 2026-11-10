@@ -89,7 +89,8 @@ Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *
 | **Ya** | **hapus bersih**: cadangan lengkap dibuat dulu di *Dokumen\ALDx-cadangan-…*, lalu container, image, volume data, jaringan, objek Kubernetes ALDx, sertifikat, tugas terjadwal & seluruh folder ALDx dihapus |
 | Batal | tidak jadi |
 
-**Hapus total (komputer bersih sepenuhnya):** menu Start › ALDx › **Hapus total (bersih)**. Data dicadangkan dulu ke
+**Hapus total (komputer bersih sepenuhnya):** unduh **ALDx-HapusTotal.exe** (Releases) lalu klik dua kali, atau menu Start ›
+ALDx › **Hapus total (bersih)**. Bisa juga bila folder ALDx sudah terhapus. Data dicadangkan dulu ke
 *Dokumen\ALDx-cadangan-…*, lalu container, data, image, sertifikat, pintasan, entri Apps, dan folder ALDx dihapus.
 Rinci & cara mencoba dulu (`-Simulasi`): [docs/29](docs/29-versi-pembaruan-hapus-total.md).
 

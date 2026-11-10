@@ -18,7 +18,8 @@ winget install JRSoftware.InnoSetup                                   # sekali
 powershell -ExecutionPolicy Bypass -File installer\setup\buat-installer.ps1 -Offline
 ```
 
-Hasil di `installer\setup\Output\`: `ALDx-Setup.exe` (online) dan `ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-*.bin`
+Hasil di `installer\setup\Output\`: `ALDx-Setup.exe` (online), `ALDx-HapusTotal.exe` (pembersih total), dan
+`ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-*.bin`
 (semua berkas offline harus berada di **satu folder**). Setiap berkas dipindai Windows Defender; Docker Desktop Installer
 diperiksa tanda tangan resminya. Tanpa sertifikat tanda tangan kode, Windows SmartScreen bisa menampilkan *"Windows protected
 your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › Peringatan Windows & antivirus](18-installer.md)).
@@ -56,7 +57,18 @@ dengan `Ctrl + F5`.
 
 ## 3. Hapus total (uninstall bersih)
 
-Menu Start › ALDx › **Hapus total (bersih)**, atau di PowerShell:
+Tiga cara, hasilnya sama:
+
+| Cara | Kapan dipakai |
+|---|---|
+| **ALDx-HapusTotal.exe** (Releases, satu berkas 2 MB) | paling mudah; juga bila folder ALDx sudah terhapus, Settings › Apps rusak, atau ALDx dipasang dari git/ZIP. Klik dua kali › pilih folder ALDx (terisi otomatis) › **Hapus** |
+| Menu Start › ALDx › **Hapus total (bersih)** | ALDx dipasang dengan Setup.exe |
+| PowerShell (di bawah) | otomatisasi / pilihan lanjutan |
+
+Bila folder ALDx sudah tidak ada, data tidak bisa dicadangkan, tetapi container, image, volume, Kubernetes, dan jejak
+Windows ALDx tetap dibersihkan (dicari dari namanya).
+
+PowerShell:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File D:\ALDXsuperset\scripts\hapus-total.ps1
@@ -84,6 +96,7 @@ dibersihkan manual dengan `docker builder prune` (perintah ini juga menghapus ca
 | `-SimpanFolder` | hapus semuanya kecuali folder instalasi (untuk memasang ulang bersih dari folder yang sama) |
 | `-TanpaCadangan` | tanpa cadangan; **data hilang permanen** |
 | `-Ya` | tanpa pertanyaan (untuk otomatisasi) |
+| `-Akar D:\superset` | folder ALDx bila skrip dijalankan dari tempat lain (dipakai ALDx-HapusTotal.exe) |
 
 Kode keluar: `0` berhasil · `1` dibatalkan · `2` Docker Desktop tidak menyala · `3` cadangan gagal (tidak ada yang dihapus).
 

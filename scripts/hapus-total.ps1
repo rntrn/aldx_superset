@@ -25,17 +25,22 @@
 .PARAMETER Ya              Tanpa pertanyaan konfirmasi (untuk otomatisasi).
 .PARAMETER SimpanFolder    Jangan hapus folder instalasi (mis. untuk memasang ulang dari folder yang sama).
 .PARAMETER Simulasi        Hanya tampilkan apa saja yang AKAN dihapus; tidak ada yang diubah.
+.PARAMETER Akar            Folder instalasi ALDx (bawaan: folder induk skrip ini). Dipakai ALDx-HapusTotal.exe, yang
+                           menjalankan salinan skrip ini dari folder sementara. Folder sudah hilang? Container, image,
+                           volume, Kubernetes & jejak Windows tetap dibersihkan (dicari dari nama), tanpa cadangan.
 
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File scripts\hapus-total.ps1
     powershell -ExecutionPolicy Bypass -File scripts\hapus-total.ps1 -SimpanCadangan D:\Arsip\ALDx
 #>
-param([string]$SimpanCadangan = "", [switch]$TanpaCadangan, [switch]$Ya, [switch]$SimpanFolder, [switch]$Simulasi)
+param([string]$SimpanCadangan = "", [switch]$TanpaCadangan, [switch]$Ya, [switch]$SimpanFolder, [switch]$Simulasi,
+      [string]$Akar = "")
 
 $ErrorActionPreference = "Continue"
-$AKAR = Split-Path $PSScriptRoot -Parent
-Set-Location $AKAR
-. "$PSScriptRoot\_umum.ps1"
+$AKAR = if ($Akar) { $Akar.TrimEnd("\") } else { Split-Path $PSScriptRoot -Parent }
+$adaFolder = Test-Path (Join-Path $AKAR "docker-compose.yml")
+if ($adaFolder) { Set-Location $AKAR } else { Set-Location $env:TEMP }
+. $(if (Test-Path "$AKAR\scripts\_umum.ps1") { "$AKAR\scripts\_umum.ps1" } else { "$PSScriptRoot\_umum.ps1" })
 $Host.UI.RawUI.WindowTitle = "Menghapus total ALDx"
 $APP_ID = "{6D3C2A61-4E0B-4C5E-9B7A-1A1D0C000001}_is1"         # AppId installer (installer\setup\aldx-setup.iss)
 
@@ -71,7 +76,7 @@ if ($Simulasi) {
     if ($LASTEXITCODE -eq 0) {
         Write-Host "`nContainer :"; docker ps -a --filter "name=^sps_" --format "  {{.Names}}  ({{.Status}})"
         Write-Host "Volume    :"; docker volume ls -q | Where-Object { $_ -match '^(sps_|aldx)' } | ForEach-Object { "  $_" }
-        Write-Host "Image     :"; docker compose --profile pindah config --images 2>$null | Sort-Object -Unique | ForEach-Object { "  $_" }
+        Write-Host "Image     :"; $(if ($adaFolder) { docker compose --profile pindah config --images 2>$null } else { docker ps -a --filter "name=^sps_" --format "{{.Image}}" }) | Sort-Object -Unique | ForEach-Object { "  $_" }
     } else { Write-Host "Docker Desktop tidak menyala: bagian Docker tidak bisa diperiksa." -ForegroundColor Yellow }
     Write-Host "Kubernetes:"; $k8s = Jejak-K8s
     if ($k8s.Count) { $k8s | ForEach-Object { "  [$($_.Konteks)] $($_.Objek)" } }
@@ -90,6 +95,10 @@ if ($Simulasi) {
 # --- 0. Konfirmasi ----------------------------------------------------------------------------------
 if (-not $SimpanCadangan) {
     $SimpanCadangan = Join-Path ([Environment]::GetFolderPath("MyDocuments")) "ALDx-cadangan-$(Get-Date -Format 'yyyyMMdd-HHmm')"
+}
+if (-not $adaFolder -and -not $TanpaCadangan) {
+    Write-Host "Folder ALDx tidak ditemukan di ${AKAR}: data TIDAK bisa dicadangkan otomatis." -ForegroundColor Yellow
+    $TanpaCadangan = $true
 }
 Write-Host "HAPUS TOTAL ALDx" -ForegroundColor Red
 Write-Host "Folder instalasi : $AKAR$(if ($SimpanFolder) { ' (dipertahankan)' })"
@@ -112,7 +121,7 @@ if (-not $TanpaCadangan) {
     if ($adaContainer) {
         docker compose up -d metadb engine *> $null
         Wait-Container @("metadb", "engine") 120
-        & powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\cadangkan.ps1" -Engine -Salin $SimpanCadangan
+        & powershell -NoProfile -ExecutionPolicy Bypass -File "$AKAR\scripts\cadangkan.ps1" -Engine -Salin $SimpanCadangan
         if ($LASTEXITCODE -ne 0) { Keluar 3 "Cadangan GAGAL: demi keamanan TIDAK ada yang dihapus." "Red" }
     }
     if (Test-Path ".env") { Copy-Item ".env" (Join-Path $SimpanCadangan "env-RAHASIA.env") }
@@ -122,11 +131,15 @@ if (-not $TanpaCadangan) {
 
 # --- 2. Docker ----------------------------------------------------------------------------------------
 Langkah "Menghapus container, volume data, jaringan & image ALDx"
-docker compose --profile pindah down --volumes --remove-orphans --rmi all 2>&1 | Out-Host
+$imageDipakai = @(docker ps -a --filter "name=^sps_" --format "{{.Image}}" | Sort-Object -Unique)
+if ($adaFolder) { docker compose --profile pindah down --volumes --remove-orphans --rmi all 2>&1 | Out-Host }
 # Sisa dengan awalan sps_ (mis. dari folder instalasi lain / versi lama)
 docker ps -aq --filter "name=^sps_" | ForEach-Object { docker rm -f $_ *> $null }
 docker volume ls -q | Where-Object { $_ -match '^(sps_|aldx)' } | ForEach-Object { docker volume rm -f $_ *> $null }
 docker images --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -match '^sps-superset' } | ForEach-Object { docker rmi -f $_ *> $null }
+# Image dasar (postgres, redis, clickhouse, nginx) hanya terhapus bila tidak dipakai project lain (docker menolak bila dipakai)
+$imageDipakai | Where-Object { $_ } | ForEach-Object { docker rmi $_ *> $null }
+docker network ls -q --filter "name=superset" | ForEach-Object { docker network rm $_ *> $null }
 Write-Host "OK  Docker bersih dari ALDx" -ForegroundColor Green
 
 Langkah "Memeriksa Kubernetes"
@@ -163,6 +176,11 @@ foreach ($kunci in @("HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\
 Write-Host "OK  Windows bersih dari ALDx" -ForegroundColor Green
 
 # --- 4. Folder instalasi --------------------------------------------------------------------------------
+$berbahaya = ($AKAR.Length -le 3) -or ($AKAR -ieq $env:USERPROFILE) -or ($AKAR -ieq $env:SystemRoot)
+if ($SimpanFolder -or -not (Test-Path $AKAR) -or $berbahaya) {
+    if ($berbahaya) { Write-Host "Folder $AKAR tidak dihapus (akar drive / folder sistem)." -ForegroundColor Yellow }
+    Keluar 0 "ALDx sudah dibersihkan.$(if (-not $TanpaCadangan) { " Cadangan: $SimpanCadangan" })"
+}
 if ($SimpanFolder) { Keluar 0 "Selesai. Folder $AKAR dipertahankan.$(if (-not $TanpaCadangan) { " Cadangan: $SimpanCadangan" })" }
 Langkah "Menghapus folder $AKAR"
 Set-Location $env:TEMP
