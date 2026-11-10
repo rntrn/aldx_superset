@@ -8,8 +8,20 @@ berbeda bisa menjalankan versi yang berbeda.
 | Cara memasang | Versi yang terpasang | Kapan versinya diperbarui |
 |---|---|---|
 | `git clone` / `git pull` / Download ZIP | **selalu terbaru** (cabang `main`) | setiap kali Anda *pull* / unduh ulang |
-| **ALDx-Setup.exe** (Releases › *ALDx terbaru*) | isi repo **saat exe dibangun** | dibangun otomatis GitHub Actions (`setup.yml`) setiap push ke `main` |
-| **ALDx-Setup-Offline.exe** + `.bin` (Releases › *ALDx offline*) | isi repo + image Docker **saat dibangun** | dibangun otomatis GitHub Actions (`setup-offline.yml`) |
+| **ALDx-Setup.exe** | isi repo **saat exe dibangun** | `installer\setup\buat-installer.ps1` di komputer pengembang, atau GitHub Actions (`setup.yml`) |
+| **ALDx-Setup-Offline.exe** + `.bin` | isi repo + image Docker **saat dibangun** | `installer\setup\buat-installer.ps1 -Offline`, atau GitHub Actions (`setup-offline.yml`) |
+
+**Membangun installer terbaru sendiri** (tanpa GitHub Actions), di folder repo:
+
+```powershell
+winget install JRSoftware.InnoSetup                                   # sekali
+powershell -ExecutionPolicy Bypass -File installer\setup\buat-installer.ps1 -Offline
+```
+
+Hasil di `installer\setup\Output\`: `ALDx-Setup.exe` (online) dan `ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-*.bin`
+(semua berkas offline harus berada di **satu folder**). Setiap berkas dipindai Windows Defender; Docker Desktop Installer
+diperiksa tanda tangan resminya. Tanpa sertifikat tanda tangan kode, Windows SmartScreen bisa menampilkan *"Windows protected
+your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › Peringatan Windows & antivirus](18-installer.md)).
 
 > **Bila GitHub Actions tidak berjalan** (kuota menit habis, repo dipindah, atau workflow dimatikan), exe di Releases
 > **tidak ikut diperbarui** dan tetap berisi versi lama. Cek tanggal berkas di halaman Releases sebelum dipakai.
@@ -39,7 +51,7 @@ dengan `Ctrl + F5`.
 | Cara | Untuk | Yang tersisa |
 |---|---|---|
 | Settings › Apps › ALDx › **Uninstall**, pilih *hapus data* = **Tidak** | pasang ulang / perbaikan | data (volume Docker) & `.env`: kembali saat dipasang ulang ke folder yang sama |
-| Settings › Apps › ALDx › **Uninstall**, pilih *hapus data* = **Ya** | berhenti memakai di komputer ini | folder `backup\` (cadangan otomatis) |
+| Settings › Apps › ALDx › **Uninstall**, pilih *hapus bersih* = **Ya** | berhenti memakai di komputer ini | **tidak ada**, kecuali cadangan di *Dokumen\ALDx-cadangan-…* (sama dengan hapus total) |
 | **Hapus total** (`scripts\hapus-total.ps1`) | komputer bersih sepenuhnya, mis. sebelum dipindah ke orang lain | **tidak ada**, kecuali cadangan di folder yang Anda pilih |
 
 ## 3. Hapus total (uninstall bersih)
@@ -56,6 +68,7 @@ Nyalakan **Docker Desktop** dulu. Skrip menampilkan ringkasan, lalu meminta Anda
 |---|---|
 | 1. Cadangan | metadata, isi ALDx Engine, dan `.env` disalin ke **Dokumen\ALDx-cadangan-&lt;waktu&gt;** (di luar folder instalasi). **Cadangan gagal → berhenti, tidak ada yang dihapus** |
 | 2. Docker | container, volume data (`sps_metadb_pg`, `sps_engine`), jaringan, dan image ALDx |
+| 2b. Kubernetes | bila ada cluster yang menyala (mis. Kubernetes Docker Desktop): namespace `aldx*` dan objek berlabel `app.kubernetes.io/part-of=aldx`. ALDx sendiri tidak memakai Kubernetes, jadi biasanya tidak ada yang dihapus |
 | 3. Windows | tugas terjadwal cadangan, sertifikat HTTPS ALDx yang dipercayai, pintasan Desktop & menu Start, entri di Settings › Apps |
 | 4. Folder | folder instalasi dihapus beberapa detik setelah jendela tertutup |
 

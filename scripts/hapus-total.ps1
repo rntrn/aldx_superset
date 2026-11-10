@@ -9,6 +9,8 @@
       1. Cadangan        metadata + ALDx Engine + .env disalin ke folder DI LUAR instalasi
                          (bawaan: Dokumen\ALDx-cadangan-<waktu>). Gagal -> berhenti, tidak ada yang dihapus.
       2. Docker          container, volume data (sps_metadb_pg, sps_engine, ...), jaringan, dan image ALDx.
+                         Kubernetes (bila ada cluster menyala): namespace "aldx*" & objek berlabel
+                         app.kubernetes.io/part-of=aldx. ALDx sendiri tidak memakai Kubernetes.
       3. Windows         tugas terjadwal cadangan, sertifikat HTTPS ALDx yang dipercayai (Trusted Root
                          pengguna ini), pintasan Desktop & menu Start, entri di Settings > Apps.
       4. Folder          folder instalasi ini dihapus setelah skrip selesai.
@@ -37,6 +39,24 @@ Set-Location $AKAR
 $Host.UI.RawUI.WindowTitle = "Menghapus total ALDx"
 $APP_ID = "{6D3C2A61-4E0B-4C5E-9B7A-1A1D0C000001}_is1"         # AppId installer (installer\setup\aldx-setup.iss)
 
+# --- Kubernetes (Docker Desktop / kubectl): ALDx tidak memakai Kubernetes, tetapi sisa uji coba dibersihkan ---
+# Hanya objek milik ALDx: namespace berawalan "aldx" dan objek berlabel app.kubernetes.io/part-of=aldx.
+function Jejak-K8s {
+    $kubectl = Get-Command kubectl -ErrorAction SilentlyContinue
+    if (-not $kubectl) { return @() }
+    $konteks = @(kubectl config get-contexts -o name 2>$null | Where-Object { $_ })
+    $hasil = @()
+    foreach ($k in $konteks) {
+        kubectl --context $k version --request-timeout=5s *> $null
+        if ($LASTEXITCODE -ne 0) { continue }                          # cluster tidak menyala
+        $ns = @(kubectl --context $k get ns -o name 2>$null | Where-Object { $_ -match '^namespace/aldx' })
+        $obj = @(kubectl --context $k get all,cm,secret,pvc,ingress -A -l app.kubernetes.io/part-of=aldx -o name 2>$null)
+        $hasil += @($ns | ForEach-Object { [pscustomobject]@{Konteks = $k; Objek = $_} })
+        $hasil += @($obj | ForEach-Object { [pscustomobject]@{Konteks = $k; Objek = $_} })
+    }
+    return $hasil
+}
+
 function Langkah([string]$teks) { Write-Host "`n==> $teks" -ForegroundColor Cyan }
 function Keluar([int]$kode, [string]$pesan, [string]$warna = "Green") {
     Write-Host "`n$pesan" -ForegroundColor $warna
@@ -53,6 +73,9 @@ if ($Simulasi) {
         Write-Host "Volume    :"; docker volume ls -q | Where-Object { $_ -match '^(sps_|aldx)' } | ForEach-Object { "  $_" }
         Write-Host "Image     :"; docker compose --profile pindah config --images 2>$null | Sort-Object -Unique | ForEach-Object { "  $_" }
     } else { Write-Host "Docker Desktop tidak menyala: bagian Docker tidak bisa diperiksa." -ForegroundColor Yellow }
+    Write-Host "Kubernetes:"; $k8s = Jejak-K8s
+    if ($k8s.Count) { $k8s | ForEach-Object { "  [$($_.Konteks)] $($_.Objek)" } }
+    elseif (Get-Command kubectl -ErrorAction SilentlyContinue) { "  tidak ada objek ALDx (atau cluster tidak menyala)" } else { "  kubectl tidak ada" }
     Write-Host "Tugas     :"; Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "ALDx*" } | ForEach-Object { "  $($_.TaskName)" }
     $toko = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "CurrentUser"); $toko.Open("ReadOnly")
     Write-Host "Sertifikat:"; $toko.Certificates | Where-Object { $_.Subject -match '(^|, )O=ALDx(,|$)' } | ForEach-Object { "  $($_.Subject)" }; $toko.Close()
@@ -71,7 +94,7 @@ if (-not $SimpanCadangan) {
 Write-Host "HAPUS TOTAL ALDx" -ForegroundColor Red
 Write-Host "Folder instalasi : $AKAR$(if ($SimpanFolder) { ' (dipertahankan)' })"
 Write-Host "Cadangan ke      : $(if ($TanpaCadangan) { 'TIDAK ADA - data hilang permanen' } else { $SimpanCadangan })"
-Write-Host "Dihapus          : container, data, image, tugas terjadwal, sertifikat, pintasan, entri Apps$(if (-not $SimpanFolder) { ', folder' })"
+Write-Host "Dihapus          : container, volume data, jaringan, image, objek Kubernetes ALDx, tugas terjadwal, sertifikat, pintasan, entri Apps$(if (-not $SimpanFolder) { ', folder' })"
 if (-not $Ya) {
     $jawab = Read-Host "`nKetik HAPUS untuk melanjutkan"
     if ($jawab -cne "HAPUS") { Keluar 1 "Dibatalkan. Tidak ada yang dihapus." "Yellow" }
@@ -105,6 +128,13 @@ docker ps -aq --filter "name=^sps_" | ForEach-Object { docker rm -f $_ *> $null 
 docker volume ls -q | Where-Object { $_ -match '^(sps_|aldx)' } | ForEach-Object { docker volume rm -f $_ *> $null }
 docker images --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -match '^sps-superset' } | ForEach-Object { docker rmi -f $_ *> $null }
 Write-Host "OK  Docker bersih dari ALDx" -ForegroundColor Green
+
+Langkah "Memeriksa Kubernetes"
+$k8s = Jejak-K8s
+foreach ($o in $k8s) {
+    kubectl --context $o.Konteks delete $o.Objek --wait=false 2>&1 | Out-Host
+}
+Write-Host "OK  Kubernetes: $($k8s.Count) objek ALDx dihapus" -ForegroundColor Green
 
 # --- 3. Windows ---------------------------------------------------------------------------------------
 Langkah "Menghapus tugas terjadwal, sertifikat, pintasan & entri Apps"

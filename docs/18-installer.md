@@ -33,14 +33,14 @@ dilewati otomatis.
 
 | Hal | Keterangan |
 |---|---|
-| Dibangun | otomatis GitHub Actions (`.github/workflows/setup.yml`, Inno Setup 6) di setiap push ke `main` → Releases › **ALDx terbaru** |
+| Dibangun | **lokal (disarankan):** `installer\setup\buat-installer.ps1` (online) atau `... -Offline` (+ paket offline) → `installer\setup\Output\`; butuh Inno Setup 6 (`winget install JRSoftware.InnoSetup`). Setiap hasil dipindai **Windows Defender**, dan **isinya diperiksa** dari manifest Inno Setup (berkas fitur AI, panduan & hapus bersih wajib ada; catatan AI, log, `.env`, `unins*` tidak boleh ikut). Gagal bila salah satu tidak terpenuhi. Otomatis: GitHub Actions (`setup.yml`) di setiap push ke `main` → Releases › **ALDx terbaru** (hanya bila Actions berjalan) |
 | Skrip | `installer/setup/aldx-setup.iss` (teks Indonesia, ikon `aldx.ico`); bangun manual: `iscc /DVersi=2026.11.05 installer\setup\aldx-setup.iss` |
 | Hak admin | tidak perlu (`PrivilegesRequired=lowest`); berkas hasil salin tidak bertanda "dari internet", jadi tidak diblokir PowerShell |
 | Pemeriksaan | Docker Desktop belum terpasang → pesan + tautan unduh; folder berspasi / Desktop / OneDrive ditolak |
-| Isi | semua berkas proyek kecuali `.env`, cadangan, log, kunci TLS, `.git`, `tests` |
+| Isi | berkas proyek **tanpa** `.env`, cadangan, log, kunci TLS, `.git`, sisa pemasangan lokal (`unins*`), log pengembangan (CHANGELOG, laporan QA), catatan AI, dan perkakas pengembang (`tests`, CI, situs dok) |
 | Pintasan | **ALDx** (Desktop & Start, `scripts\buka.ps1`: menyalakan Docker bila perlu, membuka alamat dari `.env`) · *Pasang - ubah pengaturan ALDx* · *Panduan pasang* · *Folder ALDx* |
 | Memperbarui | jalankan Setup versi baru ke folder yang sama: berkas program diganti, `.env` & data tetap; wizard lalu menerapkan pembaruan |
-| Menghapus | Settings › Apps › ALDx › Uninstall → pertanyaan *hapus juga data?* → `scripts\hapus-aldx.ps1`: container & image selalu dihapus; data (volume, `.env`, kunci TLS, log) hanya bila *Ya* dan **setelah** cadangan lengkap berhasil (`backup\` disimpan). Docker mati → bisa ditunggu atau hanya berkas program. **Hapus total** (tanpa sisa): menu Start › *Hapus total (bersih)* = `scripts\hapus-total.ps1` ([29](29-versi-pembaruan-hapus-total.md)) |
+| Menghapus | Settings › Apps › ALDx › Uninstall → pertanyaan *hapus bersih semua data?* · **Tidak** = `scripts\hapus-aldx.ps1`: container & image dihapus, data tetap untuk pasang ulang · **Ya** = `scripts\hapus-total.ps1 -Ya -SimpanFolder`: cadangan ke *Dokumen\ALDx-cadangan-…*, lalu container, image, volume, jaringan, objek Kubernetes ALDx, sertifikat, tugas terjadwal, dan seluruh folder ALDx dihapus (cadangan gagal → tidak ada yang dihapus). Docker mati → bisa ditunggu atau hanya berkas program. **Hapus total** (tanpa sisa): menu Start › *Hapus total (bersih)* = `scripts\hapus-total.ps1` ([29](29-versi-pembaruan-hapus-total.md)) |
 | Lupa password | menu Start › ALDx › *Atur ulang password* (`scripts\atur-password.ps1`, password lewat stdin, kunci akun dibuka) |
 | Paket offline | `ALDx-Setup-Offline.exe` + `.bin`: lihat §6 |
 | Data sebelumnya | volume Docker `sps_metadb_pg` ada tetapi `.env` hilang (folder dihapus) → halaman **Data sebelumnya**: *Mulai baru* (`hapus-aldx.ps1 -MulaiBaru`: cadangkan lalu hapus volume data) atau *Pakai data lama* (`Sync-MetadbPassword` menyamakan password metadb dengan `.env` baru; password koneksi sumber perlu diisi ulang) |

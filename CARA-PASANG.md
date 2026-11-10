@@ -86,7 +86,7 @@ Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *
 | Pilihan | Hasil |
 |---|---|
 | **Tidak** (bawaan) | program & container dihapus. **Data tetap** (dashboard, pengguna) dan kembali bila ALDx dipasang ulang ke folder yang sama |
-| **Ya** | **cadangan lengkap dibuat dulu** di folder `backup\`, lalu program, container, image & semua data dihapus. Folder `backup\` tidak ikut terhapus |
+| **Ya** | **hapus bersih**: cadangan lengkap dibuat dulu di *Dokumen\ALDx-cadangan-…*, lalu container, image, volume data, jaringan, objek Kubernetes ALDx, sertifikat, tugas terjadwal & seluruh folder ALDx dihapus |
 | Batal | tidak jadi |
 
 **Hapus total (komputer bersih sepenuhnya):** menu Start › ALDx › **Hapus total (bersih)**. Data dicadangkan dulu ke
