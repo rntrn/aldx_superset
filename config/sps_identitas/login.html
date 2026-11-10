@@ -102,9 +102,9 @@ input:focus{outline:none;border-color:var(--sps-utama);box-shadow:0 0 0 4px var(
 <body>
 <section class="panggung" aria-hidden="false">
   <div class="gumpal g1"></div><div class="gumpal g2"></div><div class="gumpal g3"></div><div class="motif"></div>
-  <img class="logo" src="/identitas/berkas/logo_putih?v={{ v }}" alt="{{ n.nama_perusahaan }}">
+  <img class="logo" src="/identitas/berkas/logo_putih?v={{ v }}" alt="{{ n.nama_perusahaan or n.nama_aplikasi }}">
   <div class="isi">
-    <span class="perusahaan">{{ n.nama_perusahaan }}</span>
+    {% if n.nama_perusahaan %}<span class="perusahaan">{{ n.nama_perusahaan }}</span>{% endif %}
     <h1>{{ n.nama_aplikasi }}</h1>
     <p>{{ n.slogan }}</p>
     <div class="ilustrasi" aria-hidden="true">

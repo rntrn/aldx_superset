@@ -84,7 +84,7 @@ CANGKANG = [
     ('Selamat malam', 'Good evening', 'こんばんは'),
     ('Mau mulai dari mana hari ini?', 'Where would you like to start today?', '今日はどこから始めますか？'),
     ('Cari dashboard, chart, dataset…', 'Search dashboards, charts, datasets…', 'ダッシュボード、チャート、データセットを検索…'),
-    ('Cari dashboard, chart, dataset… atau tanyakan sesuatu ke AI', 'Search dashboards, charts, datasets… or ask the AI', 'ダッシュボード・チャート・データセットを検索、または AI に質問…'),
+    ('Cari data, chart, dashboard… atau tanya AI', 'Search dashboards, charts, datasets… or ask the AI', 'ダッシュボード・チャート・データセットを検索、または AI に質問…'),
     ('Tanya AI', 'Ask AI', 'AI に質問'),
     ('Cari', 'Search', '検索'),
     ('Bangun laporan, langkah demi langkah', 'Build a report, step by step', 'ステップごとにレポートを作成'),

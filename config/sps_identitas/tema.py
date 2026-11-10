@@ -61,7 +61,7 @@ def url_berkas(nama: str, nilai: dict[str, Any], versi: str) -> str:
 
 
 def teks_kaki(n: dict[str, Any]) -> str:
-    return n["teks_kaki"].replace("{tahun}", str(date.today().year)).replace("{perusahaan}", n["nama_perusahaan"])
+    return n["teks_kaki"].replace("{tahun}", str(date.today().year)).replace("{perusahaan}", n["nama_perusahaan"] or n["nama_aplikasi"])
 
 
 # --- Tema Superset --------------------------------------------------------------------------
@@ -70,7 +70,7 @@ def token_superset(n: dict[str, Any], versi: str, dasar: dict[str, Any]) -> dict
     p = palet(n)
     return {**dasar,
             "brandAppName": n["nama_aplikasi"],
-            "brandLogoAlt": n["nama_perusahaan"],
+            "brandLogoAlt": n["nama_perusahaan"] or n["nama_aplikasi"],
             "brandLogoUrl": url_berkas("logo", n, versi),
             "brandLogoHref": n["halaman_depan"],
             "brandSpinnerUrl": f"/identitas/berkas/spinner?v={versi}",
@@ -148,7 +148,7 @@ def _tanda(p: dict[str, str], putih: bool = False) -> str:
 def svg_logo(n: dict[str, Any], putih: bool = False) -> str:
     p = palet(n)
     nama = escape(n["nama_aplikasi"])
-    lebar = 52 + int(len(n["nama_aplikasi"]) * 11.2)
+    lebar = 58 + int(len(n["nama_aplikasi"]) * 13.5)      # 20 px tebal: huruf besar ±13 px, + jarak aman
     warna = "#FFFFFF" if putih else p["utama"]
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{lebar}" height="40" viewBox="0 0 {lebar} 40" '
             f'role="img" aria-label="{nama}">{_tanda(p, putih)}'

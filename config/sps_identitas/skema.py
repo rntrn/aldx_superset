@@ -45,7 +45,7 @@ HIASAN = ("gelombang", "titik", "garis", "polos")
 ISIAN: tuple[Isian, ...] = (
     Isian("nama_aplikasi", "Nama aplikasi", "nama", "teks", "ALDx",
           "Tampil di judul tab, navbar & halaman login.", maks=40),
-    Isian("nama_perusahaan", "Nama perusahaan / instansi", "nama", "teks", "Nama Perusahaan", maks=80),
+    Isian("nama_perusahaan", "Nama perusahaan / instansi", "nama", "teks", "", maks=80),
     Isian("slogan", "Slogan", "nama", "teks", "Satu tempat untuk semua data", "Baris kecil di halaman login.", maks=80),
     Isian("teks_login", "Sapaan halaman login", "nama", "teks", "Masuk dengan email atau akun kantor Anda.", maks=120),
     Isian("teks_kaki", "Teks kaki halaman login", "nama", "teks", "© {tahun} {perusahaan}",

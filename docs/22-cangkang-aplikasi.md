@@ -115,8 +115,12 @@ judul halaman tidak terpotong. Kartu Beranda bergeser ke samping. Studio Visual 
 ## 6b. Mode gelap
 
 Avatar › **Tampilan**: *Terang*, *Gelap*, atau *Ikuti sistem* (mengikuti pengaturan Windows/ponsel). Berlaku untuk
-cangkang, dashboard, chart, SQL Lab dan halaman bawaan Superset; pilihan disimpan di browser. Halaman pengaturan ALDx
-(Pusat Kendali, Berkas, Studio) tetap terang. Cocok untuk layar monitor di ruang pantau.
+cangkang, dashboard, chart, SQL Lab, halaman bawaan Superset, **Panduan**, dan halaman ALDx (Pusat Kendali, Kueri Visual,
+Studio, Asisten, Berkas; berganti langsung tanpa muat ulang). Pilihan disimpan di browser. Cocok untuk layar monitor
+di ruang pantau.
+
+**Pembaruan tampilan** termuat otomatis setelah server diperbarui: setiap berkas tampilan membawa nomor versi, jadi
+tidak perlu menekan `Ctrl + F5`.
 
 ## 7. Ekspor: gambar, PDF, Excel, CSV, TXT
 

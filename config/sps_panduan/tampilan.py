@@ -131,7 +131,23 @@ def _tautan(html_isi: str, halaman: str) -> str:
             return f'{attr}="/panduan/{rel}{tanda}"'
         return f'{attr}="/panduan/berkas/{rel}{tanda}"'
 
-    return re.sub(r'(href|src)="([^"]+)"', ganti, html_isi)
+    html_isi = re.sub(r'(href|src)="([^"]+)"', ganti, html_isi)
+
+    def judul_tautan(m):
+        """Teks tautan yang hanya nama berkas ("22-cangkang-aplikasi.md") diganti judul babnya."""
+        p = _berkas(m.group(2).strip("/") + ("/" if m.group(2).endswith("/") else ""))
+        if p is None:
+            return m.group(0)
+        j = re.search(r"^#\s+(.+)$", p.read_text(encoding="utf-8"), re.M)
+        if not j:
+            return m.group(0)
+        teks = re.sub(r"[`*]", "", j.group(1)).strip()
+        akhir = m.group(4).strip()
+        bagian = re.search(r"(§\s*[\w.]+)$", akhir)
+        return f'{m.group(1)}{html.escape(teks)}{" " + bagian.group(1) if bagian else ""}</a>'
+
+    return re.sub(r'(<a href="/panduan/([^"#]*)(#[^"]*)?"[^>]*>)\s*((?:\.\./)*[\w./-]+\.md(?:\s*§\s*[\w.]+)?)\s*</a>',
+                  judul_tautan, html_isi)
 
 
 @lru_cache(maxsize=256)

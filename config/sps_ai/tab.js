@@ -48,7 +48,7 @@
         ${kpi("Model aktif", d.model.length, d.model.length ? "siap dipakai pengguna" : "belum ada: pilih jalur di bawah")}
         ${kpi("Aplikasi lokal menyala", `${hidup} / ${d.lokal.length}`, "Ollama, LM Studio, Jan, llama.cpp")}
         ${kpi("Key cloud terisi", `${terisi} / ${d.cloud.length}`, "gratis & berbayar")}
-        ${kpi("Model bawaan", bawaan ? esc(bawaan.nama.split(" — ")[0]) : "–", bawaan ? (bawaan.jalur === "lokal" ? "lokal" : "cloud") : "")}
+        ${kpi("Model bawaan", bawaan ? `<span style="font-size:15px;line-height:1.3;display:block;overflow-wrap:anywhere" title="${esc(bawaan.nama)}">${esc(bawaan.nama.split(" — ")[0])}</span>` : "–", bawaan ? (bawaan.jalur === "lokal" ? "lokal" : "cloud") : "")}
       </div>
       <div style="display:flex;gap:8px;margin-bottom:6px"><button class="kedua" id="aiPeriksa" type="button">Periksa lagi</button>
         <span class="ket" id="aiPesan" style="align-self:center"></span></div>

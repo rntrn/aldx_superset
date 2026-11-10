@@ -28,7 +28,7 @@ Setiap perubahan tercatat di tab **Riwayat** (siapa, kapan, nilai lama/baru).
 | Kelompok | Isian | Keterangan |
 |---|---|---|
 | Nama & teks | Nama aplikasi | judul tab browser, navbar, login (maks 40 huruf) |
-| | Nama perusahaan / instansi | login, kaki halaman, Asisten AI |
+| | Nama perusahaan / instansi | login, kaki halaman, Asisten AI. Boleh kosong: login & kaki halaman memakai nama aplikasi |
 | | Slogan, Sapaan login, Teks kaki | teks di halaman login; `{tahun}` & `{perusahaan}` diganti otomatis |
 | | Halaman pertama setelah login | bawaan `/app/` (Beranda); bisa juga `/superset/dashboard/latihan/`. Bila dashboard tujuannya belum ada (mis. `beranda` profil DJP sebelum koneksi Oracle DMP dibuat), pengguna diarahkan ke daftar dashboard |
 | Warna | Warna utama | navbar, tombol, header |

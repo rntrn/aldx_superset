@@ -186,7 +186,7 @@
     $("#daftarTabel").innerHTML = isi.length ? isi.map((t, i) =>
       `<div class="tabel ${dipakai.has(t.value) ? "dipakai" : ""}" data-i="${TABEL.indexOf(t)}" title="${t.virtual
         ? "Dataset virtual (SQL tersimpan), dipakai sebagai subkueri. Klik dua kali untuk memakai" : "Klik dua kali untuk memakai"}">${
-        t.virtual ? "◇" : "▦"} ${esc(t.value)}<span class="jenis">${esc(t.type || "")}</span></div>`).join("")
+        t.virtual ? "◇" : "▦"} <span class="nama" title="${esc(t.value)}">${esc(t.value)}</span><span class="jenis">${esc(t.type || "")}</span></div>`).join("")
       : `<div class="bantu">${cari ? `Tidak ada tabel berisi "${esc(cari)}" di skema <b>${esc(Q.skema)}</b>. Coba skema lain di atas.`
                                    : "Skema ini tidak berisi tabel/view yang boleh Anda baca."}</div>`;
     document.querySelectorAll("#daftarTabel .tabel").forEach(el => el.ondblclick = () => {

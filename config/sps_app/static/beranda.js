@@ -94,7 +94,7 @@
       <div class="sapa"><h1>${esc(sapaan())}, ${esc((p.nama || "").split(" ")[0])}</h1>
         <p>${esc(t("Mau mulai dari mana hari ini?"))}</p></div>
       <form class="tanya" id="formTanya">${ik("cari")}
-        <input id="masukanTanya" autocomplete="off" placeholder="${esc(ai ? t("Cari dashboard, chart, dataset… atau tanyakan sesuatu ke AI") : t("Cari dashboard, chart, dataset…"))}">
+        <input id="masukanTanya" autocomplete="off" placeholder="${esc(ai ? t("Cari data, chart, dashboard… atau tanya AI") : t("Cari dashboard, chart, dataset…"))}">
         ${ai ? `<button class="tombol" type="button" id="tombolAi">${ik("ai", 18)}${esc(t("Tanya AI"))}</button>` : ""}
         <button class="tombol utama besar" type="submit">${esc(t("Cari"))}</button></form>
       ${p.admin ? `<section class="kartu-siap" id="persiapan" hidden></section>` : ""}

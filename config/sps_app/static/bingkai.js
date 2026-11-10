@@ -296,7 +296,29 @@
     }), 1000);
   }
 
+  // ---- Mode gelap untuk halaman ALDx di bingkai (Pusat Kendali, Kueri Visual, Studio, Asisten, Berkas) ----
+  // Halaman-halaman ini memakai warna tetap; cangkang menyimpan pilihan tema di <html data-tema>. Bila gelap, halaman
+  // dibalik warnanya dengan rona dipertahankan (invert + hue-rotate); gambar, video & peta dibalik lagi ke warna asli.
+  // Panduan punya mode gelap sendiri; halaman Superset memakai tema Superset sendiri.
+  function gelapBingkai() {
+    if (!halamanSps || location.pathname.startsWith("/panduan")) return;
+    const gaya = document.createElement("style");
+    gaya.textContent = "html.sps-gelap{filter:invert(.92) hue-rotate(180deg);background:#fff}" +
+      "html.sps-gelap img,html.sps-gelap video,html.sps-gelap picture,html.sps-gelap .leaflet-tile-pane," +
+      "html.sps-gelap [style*='background-image']{filter:invert(1) hue-rotate(180deg)}";
+    document.head.appendChild(gaya);
+    const atur = () => {
+      let gelap = false;
+      try { gelap = induk.document.documentElement.dataset.tema === "gelap"; } catch (e) { /* lain origin */ }
+      document.documentElement.classList.toggle("sps-gelap", gelap);
+    };
+    atur();
+    try { new MutationObserver(atur).observe(induk.document.documentElement, {attributes: true, attributeFilter: ["data-tema"]}); }
+    catch (e) { /* abaikan */ }
+  }
+
   function mulai() {
+    gelapBingkai();
     sqlLabRapi();
     if (halamanSps) pasangTab();
     muatI18n();

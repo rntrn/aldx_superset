@@ -28,6 +28,18 @@ HALAMAN_DIBINGKAI = re.compile(
 BAHASA = ("id", "en", "ja")
 
 
+# Versi kode aset: waktu ubah terakhir SEMUA berkas statis ALDx (config/*/static, mis. /app, /kueri, /studio),
+# dihitung sekali saat server menyala. Berkas statis disajikan dengan cache 1 tahun, jadi setiap tautan .js/.css
+# harus membawa ?v=<versi>; tanpa itu pembaruan kode tidak pernah sampai ke browser tanpa Ctrl+F5.
+_VERSI_KODE = str(max((int(f.stat().st_mtime) for d in FOLDER.parent.glob("*/static") for f in d.rglob("*")
+                       if f.is_file()), default=0))
+_TAUTAN_STATIS = re.compile(r'((?:src|href)=")(/[\w-]+/static/[^"?#]+\.(?:js|css))(")')
+
+
+def versi_aset() -> str:
+    return f"{current_app.config.get('SPS_IDENTITAS_VERSI', '0')}-{_VERSI_KODE}"
+
+
 def bahasa_aktif() -> str:
     b = request.cookies.get("sps_bahasa", "")
     if b in BAHASA:
@@ -50,7 +62,7 @@ def cangkang():
     html = (FOLDER / "halaman.html").read_text(encoding="utf-8")
     return render_template_string(
         html, csrf=generate_csrf(), app_name=current_app.config.get("APP_NAME", "ALDx"),
-        perusahaan=nilai.get("nama_perusahaan", ""), versi=current_app.config.get("SPS_IDENTITAS_VERSI", "0"),
+        perusahaan=nilai.get("nama_perusahaan", ""), versi=versi_aset(),
         bahasa=bahasa_aktif(), pengguna=json.dumps(pengguna))
 
 
@@ -79,15 +91,17 @@ def daftarkan(app) -> None:
 
     @app.after_request
     def sisipkan_bingkai(resp):
-        """Setiap halaman HTML mendapat bingkai.js; skrip itu hanya bekerja bila halaman ada di dalam cangkang."""
+        """Setiap halaman HTML ALDx: tautan /…/static/*.js|css tanpa versi diberi ?v=<versi kode> (cache 1 tahun),
+        lalu bingkai.js disisipkan (skrip itu hanya bekerja bila halaman ada di dalam cangkang)."""
         if (resp.mimetype != "text/html" or resp.status_code != 200 or resp.direct_passthrough
-                or resp.is_streamed or request.path.startswith(("/app", "/login", "/identitas"))):
+                or resp.is_streamed or request.path.startswith(("/login", "/identitas"))):
             return resp
         html = resp.get_data(as_text=True)
-        if "</body>" not in html or "bingkai.js" in html:
-            return resp
-        nonce = getattr(request, "csp_nonce", "")
-        versi = current_app.config.get("SPS_IDENTITAS_VERSI", "0")
-        skrip = f'<script nonce="{nonce}" src="/app/static/bingkai.js?v={versi}" defer></script>'
-        resp.set_data(html.replace("</body>", skrip + "</body>", 1))
+        versi = versi_aset()
+        baru = _TAUTAN_STATIS.sub(lambda m: f"{m.group(1)}{m.group(2)}?v={versi}{m.group(3)}", html)
+        if "</body>" in baru and "bingkai.js" not in baru and not request.path.startswith("/app"):
+            nonce = getattr(request, "csp_nonce", "")
+            baru = baru.replace("</body>", f'<script nonce="{nonce}" src="/app/static/bingkai.js?v={versi}" defer></script></body>', 1)
+        if baru != html:
+            resp.set_data(baru)
         return resp

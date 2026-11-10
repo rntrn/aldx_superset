@@ -22,7 +22,10 @@ button.utama{background:var(--navy);color:#fff}button.kecil{padding:2px 8px;font
 button:disabled{opacity:.45;cursor:default}
 .tabel{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;user-select:none;border:1px solid transparent}
 .tabel:hover{background:var(--muda)}.tabel.dipakai{border-color:var(--emas);background:#FFF8E6}
-.tabel .jenis{font-size:10px;color:var(--redup);margin-left:auto}
+.tabel .jenis{font-size:10px;color:var(--redup);margin-left:auto;flex:none}
+.tabel .nama{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.simpan-ds{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;padding:4px 6px;border:1px solid var(--garis);border-radius:8px}
+.simpan-ds select{width:auto}
 .bantu{font-size:11.5px;color:var(--redup);line-height:1.45}
 .isi{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
 .kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:12px 14px}
@@ -95,7 +98,7 @@ table.data td.n{text-align:right;font-variant-numeric:tabular-nums}
         <button class="utama" id="jalankan">Jalankan</button>
         <label class="bantu"><input type="checkbox" id="ubahManual"> ubah SQL manual</label>
         <button id="keSqlLab">Buka di SQL Lab</button>
-        <input type="text" id="namaDataset" placeholder="nama dataset, mis. penjualan_per_cabang" style="width:260px">
+        <span class="simpan-ds"><input type="text" id="namaDataset" placeholder="nama dataset, mis. penjualan_per_cabang" style="width:240px">
         <select id="jenisDataset" aria-label="Jenis dataset" title="Virtual: SQL disimpan, data selalu terbaru dari sumber.&#10;Fisik: hasil disalin jadi tabel di ALDx Engine, dashboard jauh lebih cepat, diperbarui sesuai jadwal.">
           <option value="virtual">Virtual · selalu terbaru</option>
           <option value="fisik" {{ "" if admin else "disabled" }}>Fisik · tabel ALDx Engine{{ "" if admin else " (Admin)" }}</option>
@@ -105,7 +108,7 @@ table.data td.n{text-align:right;font-variant-numeric:tabular-nums}
           <option value="harian" selected>Segarkan: harian 02.00</option>
           <option value="jam">Segarkan: setiap jam</option>
         </select>
-        <button id="simpanDataset">Simpan jadi dataset</button>
+        <button id="simpanDataset">Simpan jadi dataset</button></span>
         <input type="text" id="namaKueri" placeholder="nama kueri, mis. penjualan per cabang" style="width:220px">
         <button id="simpanKueri" title="Simpan susunan kueri ini (bisa dibuka & diubah lagi nanti)">Simpan kueri</button>
         <span id="pesan" class="pesan"></span>
