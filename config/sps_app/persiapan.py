@@ -34,8 +34,8 @@ def _ada_data() -> bool:
 
 
 def _ada_pengguna() -> bool:
-    from superset import security_manager as sm
-    return sm.get_session.query(sm.user_model).count() > 1
+    from superset import db, security_manager as sm
+    return db.session.query(sm.user_model).count() > 1
 
 
 def _ada_identitas() -> bool:
@@ -50,7 +50,10 @@ def _ada_cadangan() -> bool:
 
 
 def api_persiapan():
+    from flask_login import current_user
     from superset import security_manager as sm
+    if not current_user.is_authenticated:
+        return jsonify(error="Belum login"), 401
     if not sm.is_admin():
         return jsonify(langkah=[], selesai=0, total=0)
     langkah = [

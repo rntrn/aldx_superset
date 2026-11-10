@@ -184,28 +184,51 @@ def berkas(nama: str):
     return send_from_directory(DOCS, nama)
 
 
+_indeks: dict = {"kunci": None, "isi": []}
+
+
+def _berkas_md() -> list[tuple[Path, str]]:
+    """Semua halaman panduan (tanpa node_modules / .vitepress / public), relatif ke docs/."""
+    hasil = []
+    for akar, folder, berkas in os.walk(DOCS):
+        folder[:] = [f for f in folder if f not in ("node_modules", ".vitepress", "public", "gambar", "pdf")]
+        for b in berkas:
+            if b.endswith(".md"):
+                p = Path(akar) / b
+                hasil.append((p, str(p.relative_to(DOCS))[:-3].replace("\\", "/")))
+    hasil += [(AKAR / v, k) for k, v in LUAR.items() if (AKAR / v).is_file()]
+    return hasil
+
+
+def _indeks_cari() -> list[tuple[str, str, str]]:
+    """(halaman, judul, teks) semua halaman; dibangun ulang hanya bila ada berkas yang berubah."""
+    daftar = _berkas_md()
+    kunci = tuple(sorted((n, p.stat().st_mtime) for p, n in daftar))
+    if _indeks["kunci"] != kunci:
+        isi = []
+        for p, nama in daftar:
+            if nama in ("index", "cara-pasang", "catatan-versi") and p.parent == DOCS:
+                continue
+            teks = p.read_text(encoding="utf-8")
+            judul = (re.search(r"^#\s+(.+)$", teks, re.M) or [None, nama])[1]
+            isi.append((nama[:-6] if nama.endswith("README") else nama, judul, teks))
+        _indeks.update(kunci=kunci, isi=isi)
+    return _indeks["isi"]
+
+
 @bp.route("/api/cari")
 def cari():
     """Pencarian teks penuh sederhana di semua halaman: judul dulu, lalu isi."""
-    if (r := _login()) is not None:
+    if _login() is not None:
         return jsonify(error="Belum login"), 401
-    q = (request.args.get("q") or "").strip().lower()
+    q = (request.args.get("q") or "").strip().lower()[:100]
     if len(q) < 2:
         return jsonify(hasil=[])
     hasil = []
-    berkas_md = [(p, str(p.relative_to(DOCS))[:-3].replace("\\", "/")) for p in DOCS.rglob("*.md")
-                 if "node_modules" not in p.parts and ".vitepress" not in p.parts]
-    berkas_md += [(AKAR / v, k) for k, v in LUAR.items() if (AKAR / v).is_file()]
-    for p, nama in berkas_md:
-        if nama in ("index", "cara-pasang", "catatan-versi") and p.parent == DOCS:
-            continue
-        nama = nama[:-6] if nama.endswith("README") else nama
-        teks = p.read_text(encoding="utf-8")
-        rendah = teks.lower()
-        i = rendah.find(q)
+    for nama, judul, teks in _indeks_cari():
+        i = teks.lower().find(q)
         if i < 0:
             continue
-        judul = (re.search(r"^#\s+(.+)$", teks, re.M) or [None, nama])[1]
         bagian = None
         for m in re.finditer(r"^#{2,3}\s+(.+)$", teks[:i], re.M):
             bagian = m.group(1)

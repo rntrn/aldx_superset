@@ -210,7 +210,14 @@ def data_chart(chart_id: int, batas: int = 200) -> dict:
     metrics, kelompok = _metrik(p), _kelompok(p)
     kolom = [k for k in kelompok if k in {x.column_name for x in t.columns}]
     if not metrics and not kolom:
-        kolom = [x for x in (p.get("all_columns") or []) if isinstance(x, str)][:20]
+        # Chart peta (deck_*): kolom koordinat ada di "spatial"; tabel mentah: "all_columns".
+        sp = p.get("spatial") if isinstance(p.get("spatial"), dict) else {}
+        calon = [sp.get(k) for k in ("lonCol", "latCol", "lonlatCol", "geohashCol", "delimitedColumn")]
+        calon += [x for x in (p.get("all_columns") or []) if isinstance(x, str)]
+        ada = {x.column_name for x in t.columns}
+        kolom = list(dict.fromkeys(c for c in calon if c in ada))[:20]
+    if not metrics and not kolom:
+        raise LookupError(f"Chart '{c.slice_name}' tidak punya ukuran atau kolom yang bisa diambil.")
     orderby = [[metrics[0], False]] if metrics else []
     h = alat.jalankan_objek(t, metrics, kolom, _filter_sederhana(p), orderby, batas)
     return {"chart": c.slice_name, **h}

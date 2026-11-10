@@ -238,7 +238,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     try:
         for langkah in range(atur.langkah_maks + 1):
             boleh_alat = langkah < atur.langkah_maks
-            msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], atur.batas_detik_model)
+            msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], atur.batas_untuk(model))
             panggilan = (msg.get("tool_calls") or []) if boleh_alat else []
             if not panggilan:
                 jawaban = msg.get("content") or ""
@@ -275,5 +275,5 @@ def tulis_narasi(model: ModelAI, atur: Pengaturan, judul_story: str, dashboard: 
                 f"'{judul_story}'. Dashboard: '{dashboard['judul']}'. Isi chart: {', '.join(dashboard['chart'])}. "
                 "Jelaskan apa yang perlu diperhatikan audiens. Jangan menyebut angka.")
     msg = llm.chat(model, [{"role": "system", "content": _sistem()}, {"role": "user", "content": perintah}],
-                   [], atur.batas_detik_model)
+                   [], atur.batas_untuk(model))
     return (msg.get("content") or "").strip()

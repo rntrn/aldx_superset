@@ -36,8 +36,8 @@ lalu angkanya ditampilkan langsung ke Anda tanpa lewat model.
 
 **Kecepatan.** Model lokal kecil (4B) tanpa GPU butuh ±1–3 menit untuk pertanyaan yang memakai beberapa alat. Di halaman
 dashboard, angka sudah disertakan sehingga biasanya cukup satu langkah. Untuk jawaban cepat, pakai model 8B+ dengan GPU atau
-layanan cloud ([28](28-sambungkan-asisten-ai.md)). Bila sering melewati batas waktu, naikkan `batas_detik_model` di
-`config\ai.yaml`.
+layanan cloud ([28](28-sambungkan-asisten-ai.md)). Bila sering melewati batas waktu, naikkan `batas_detik_lokal` (model lokal, bawaan 240 dtk)
+atau `batas_detik_model` (cloud, 120 dtk) di `config\ai.yaml`.
 
 ## 2. Peran ahli
 

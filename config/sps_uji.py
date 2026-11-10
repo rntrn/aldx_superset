@@ -440,6 +440,52 @@ def jalankan_semua() -> None:
             raise RuntimeError("belum terpasang: " + ", ".join(kurang) + " (lihat docker/wheels/README.md)")
         return f"{len(katalog.KATALOG)} jenis database + Access/Excel/CSV/SQLite/DuckDB/Parquet"
 
+    # ---- Fitur 10 November 2026 (QA putaran 2)
+    @uji("2026.11.10", "Role pendamping lengkap & tersimpan (Pengguna+Gamma, Superadmin+Admin)")
+    def _():
+        import sps_security
+        kurang = []
+        for u in sm.get_all_users():
+            nama = {r.name for r in u.roles}
+            if "Superadmin" in nama and sm.auth_role_admin not in nama:
+                kurang.append(f"{u.username}: Superadmin tanpa Admin")
+            if sps_security.ROLE_PEGAWAI in nama and not nama & {"Gamma", "Alpha", sm.auth_role_admin}:
+                kurang.append(f"{u.username}: {sps_security.ROLE_PEGAWAI} tanpa Gamma")
+        if kurang:
+            raise RuntimeError("; ".join(kurang[:3]) + " (dilengkapi otomatis saat akun login berikutnya)")
+        return f"{len(sm.get_all_users())} akun sesuai"
+
+    @uji("2026.11.10", "Panduan di aplikasi: semua halaman menu ada & pencarian")
+    def _():
+        from sps_panduan import tampilan as P
+        hilang = [h for _, isi in P.NAVIGASI for h, _ in isi if P._berkas(h.rstrip("/") + ("/" if h.endswith("/") else "")) is None]
+        if hilang:
+            raise RuntimeError("halaman tidak ada: " + ", ".join(hilang))
+        isi = P._indeks_cari()
+        if not any("ollama" in t.lower() for _, _, t in isi):
+            raise RuntimeError("pencarian tidak menemukan 'ollama'")
+        return f"{sum(len(i) for _, i in P.NAVIGASI)} halaman menu, {len(isi)} halaman terindeks"
+
+    @uji("2026.11.10", "Asisten AI: peta pengetahuan, konteks dashboard, kunci terenkripsi")
+    def _():
+        from sps_ai import kunci_api, status, pengaturan, wawasan
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            wawasan.lupakan(admin.id)
+            peta = wawasan.ringkasan_katalog(admin.id)
+            konteks = wawasan.konteks_halaman("/superset/dashboard/latihan/", dengan_data=True)
+        if "DATASET" not in peta or "DASHBOARD" not in konteks:
+            raise RuntimeError("peta / konteks dashboard kosong")
+        kunci_api.simpan("AI_UJI_ASAP", "kunci-uji-12345678", "uji")
+        ok = kunci_api.semua().get("AI_UJI_ASAP") == "kunci-uji-12345678"
+        kunci_api.simpan("AI_UJI_ASAP", "", "uji")
+        if not ok:
+            raise RuntimeError("kunci terenkripsi tidak terbaca kembali")
+        lokal = status.temukan(pengaturan.sumber_lokal())
+        hidup = [s["nama"] for s in lokal if s["aktif"]]
+        return f"peta {peta.count(chr(10) + '- [')} objek; lokal menyala: {', '.join(hidup) or 'tidak ada'}"
+
     _ = sps_latihan  # modul data latihan harus bisa dimuat
 
 

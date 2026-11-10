@@ -254,7 +254,9 @@ Setup.exe berisi versi saat dibangun; `git pull` selalu terbaru. Samakan versiny
 
 **16c. Pengguna tidak melihat menu / tombol Asisten AI?**
 Akun hanya ber-role *Pengguna* (tanpa Gamma) atau *Superadmin* (tanpa Admin). Sejak 2026.11.10 role pendamping
-dilengkapi otomatis saat akun dimuat; minta pengguna memuat ulang halaman.
+dilengkapi otomatis dan **disimpan** saat akun dimuat; minta pengguna memuat ulang halaman. `scripts\uji.ps1` memeriksa
+semua akun (*Role pendamping lengkap & tersimpan*). Pengguna tetap hanya melihat dataset yang izinnya diberikan
+ke role Gamma/Pengguna.
 
 **17. Apa yang harus dicadangkan di luar server?**
 Folder `backup\` dan berkas `.env`. Keduanya berisi rahasia: simpan di lokasi terbatas.

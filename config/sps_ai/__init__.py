@@ -16,4 +16,6 @@ Struktur modul:
 Dipasang ke Superset oleh superset_config.py (FLASK_APP_MUTATOR -> daftarkan).
 """
 
-from sps_ai.tampilan import daftarkan  # noqa: F401
+from sps_ai.tampilan import daftarkan
+
+__all__ = ["daftarkan"]  # API paket: dipakai superset_config.py

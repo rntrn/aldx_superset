@@ -169,3 +169,4 @@ gratisnya kurang.
 | *Penyedia tidak bisa dihubungi dari server* | tidak ada internet / proxy kantor / SSL inspection | taruh sertifikat CA kantor di `certs\`, isi `AI_CA_BUNDLE` di `.env` ([certs/README](../certs/README.md)); atau pakai jalur lokal |
 | Key yang diisi lewat aplikasi tidak terbaca setelah pindah server | `SUPERSET_SECRET_KEY` berbeda | isi ulang key di layar Sambungkan AI |
 | Jawaban lambat / ngawur | model terlalu kecil untuk pertanyaannya | pakai model lebih besar (§2.1) atau layanan cloud |
+| *"terlalu lama menjawab"* | model lokal di CPU melewati batas waktu | naikkan `batas_detik_lokal` (bawaan 240 dtk) di `config\ai.yaml`; cloud memakai `batas_detik_model` (120 dtk) |

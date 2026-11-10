@@ -69,17 +69,17 @@ class SpsSecurityManager(SupersetSecurityManager):
     #   Superadmin            -> + Admin  (Superadmin = Admin + pengaturan vital)
     #   role dasar (Pengguna) -> + Gamma  (izin dasar Superset: menu, dashboard, chart)
     # Akun yang dibuat lewat Kelola > Pengguna kadang hanya diberi satu role: tanpa pendamping, API menu
-    # menolak (403) sehingga sidebar kosong & tombol Asisten AI hilang. Dilengkapi otomatis saat dimuat.
-    _sudah_dilengkapi: set[int] = set()
-
+    # menolak (403) sehingga sidebar kosong & tombol Asisten AI hilang. Dilengkapi otomatis saat dimuat
+    # (pemeriksaan himpunan nama role di memori; database hanya ditulis bila memang ada yang kurang).
     def load_user(self, user_id):
         user = super().load_user(user_id)
-        if user is not None and getattr(user, "id", None) not in self._sudah_dilengkapi:
+        if user is not None:
             try:
                 self.lengkapi_role(user)
             except Exception:  # noqa: BLE001 - tidak boleh menggagalkan login
+                from superset import db
+                db.session.rollback()
                 log.exception("ALDx: gagal melengkapi role %s", getattr(user, "username", user_id))
-            self._sudah_dilengkapi.add(user.id)
         return user
 
     def lengkapi_role(self, user) -> list[str]:
@@ -92,10 +92,10 @@ class SpsSecurityManager(SupersetSecurityManager):
             tambah.append("Gamma")
         role = [r for r in (self.find_role(n) for n in tambah) if r is not None]
         if role:
+            from superset import db
             user.roles.extend(role)
-            self.get_session.merge(user)
-            self.get_session.commit()
-            log.info("ALDx: role %s dilengkapi dengan %s", user.username, [r.name for r in role])
+            db.session.commit()                    # FAB versi ini tidak punya self.get_session
+            log.warning("ALDx: role %s dilengkapi dengan %s", user.username, [r.name for r in role])
         return [r.name for r in role]
 
     def _is_admin_only(self, pvm) -> bool:

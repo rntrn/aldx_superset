@@ -35,6 +35,11 @@ class Pengaturan:
     baris_maks: int
     baris_ke_model: int
     batas_detik_model: int
+    batas_detik_lokal: int = 240
+
+    def batas_untuk(self, model: "ModelAI") -> int:
+        """Model lokal (tanpa key, sering di CPU) diberi waktu lebih lama daripada layanan cloud."""
+        return self.batas_detik_model if model.api_key else max(self.batas_detik_model, self.batas_detik_lokal)
 
     def cari_model(self, model_id: str | None) -> ModelAI:
         for m in self.model:
@@ -103,4 +108,5 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
         baris_maks=int(data.get("baris_maks", 500)),
         baris_ke_model=int(data.get("baris_ke_model", 50)),
         batas_detik_model=int(data.get("batas_detik_model", 120)),
+        batas_detik_lokal=int(data.get("batas_detik_lokal", 240)),
     )

@@ -308,7 +308,7 @@ def api_uji():
     atur = pengaturan.muat()
     model = atur.cari_model(str(_data().get("model") or "") or None)
     mulai = time.monotonic()
-    jawab = llm.chat(model, [{"role": "user", "content": "Balas hanya dengan satu kata: siap"}], [], 90)
+    jawab = llm.chat(model, [{"role": "user", "content": "Balas hanya dengan satu kata: siap"}], [], atur.batas_untuk(model))
     teks = str(jawab.get("content") or "").strip()
     return jsonify(ok=True, model=model.nama, detik=round(time.monotonic() - mulai, 1), jawaban=teks[:120])
 
@@ -325,7 +325,7 @@ def api_sambungan_simpan():
     d = _data()
     env, key = str(d.get("env") or "").strip(), str(d.get("key") or "").strip()
     data = pengaturan.baca_yaml()
-    model = [m for m in data.get("model") or [] if (m.get("api_key_env") or "").strip() == env]
+    model = [m for m in data.get("model") or [] if env and (m.get("api_key_env") or "").strip() == env]
     if not model:
         raise ValueError("Layanan AI tidak dikenal.")
     if key:
