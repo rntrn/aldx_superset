@@ -254,12 +254,13 @@ function pratinjau(prat, jenis) {
 function tampilSaran(j) {
   if (!j.saran.length) { $("#autoHasil").innerHTML = `<div class="kartu">${esc(j.catatan || "Tidak ada saran.")}</div>`; return; }
   const p = j.profil || {};
-  let h = `<div class="kartu"><b>Profil kolom</b> <small class="ket">(${fmt.format(j.jumlah_sampel)} baris sampel)</small><br>
+  let h = `<div class="kartu"><b>Profil kolom</b> <small class="ket">(${fmt.format(j.jumlah_sampel)} baris sampel · ${j.jumlah_jenis || ""} jenis chart diusulkan)</small><br>
     <small>Angka: ${esc((p.ukuran||[]).join(", ")||"-")} · Kategori: ${esc((p.dimensi||[]).join(", ")||"-")} · Waktu: ${esc((p.waktu||[]).join(", ")||"-")}</small>`;
   if ((j.wawasan||[]).length) h += '<ul class="wawasan">' + j.wawasan.map(w => `<li>${esc(w)}</li>`).join("") + "</ul>";
   h += "</div><div class='grid'>";
   SARAN.forEach((s, i) => {
-    const pilihan = [s.jenis, ...s.alternatif].map(x => `<option ${x === s.jenis ? "selected" : ""}>${x}</option>`).join("");
+    const LBL = j.label_jenis || {};
+    const pilihan = [s.jenis, ...s.alternatif].map(x => `<option value="${x}" ${x === s.jenis ? "selected" : ""}>${esc(LBL[x] || x)}</option>`).join("");
     h += `<div class="kartu saran" id="saran${i}">
       <label class="baris"><input type="checkbox" data-i="${i}" ${i < 4 ? "checked" : ""}> <input value="${esc(s.judul)}" data-judul="${i}" style="flex:1"></label>
       <div class="baris" style="margin-top:6px"><select data-jenis="${i}">${pilihan}</select><span class="lencana">skor ${Math.round(s.skor * 100)}</span></div>
@@ -285,7 +286,8 @@ function tampilSaran(j) {
 async function buatAuto(denganDashboard) {
   const pilihan = [...document.querySelectorAll("#autoHasil input[type=checkbox]:checked")].map(c => {
     const i = +c.dataset.i, s = SARAN[i];
-    return {jenis: $(`[data-jenis="${i}"]`).value, judul: $(`[data-judul="${i}"]`).value, metrik: s.metrik, kelompok: s.kelompok};
+    return {jenis: $(`[data-jenis="${i}"]`).value, judul: $(`[data-judul="${i}"]`).value, metrik: s.metrik, kelompok: s.kelompok,
+            spec: s.spec};
   });
   if (!pilihan.length) { alert("Pilih minimal satu saran."); return; }
   const judul = denganDashboard ? ($("#autoJudul").value.trim() || "Dashboard Otomatis") : "";

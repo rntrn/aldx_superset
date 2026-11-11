@@ -341,12 +341,18 @@
     try {
       const h = await Studio.api(`/studio/api/saran/${ds}`);
       if (ds !== L.ds) return;                                 // dataset sudah diganti: abaikan jawaban lama
-      $("#saranData").innerHTML = h.saran.slice(0, 6).map((s, i) => `<div data-i="${i}"><b>${esc(s.judul)}</b><span class="ket">${esc(s.alasan)}</span></div>`).join("")
+      const label = h.label_jenis || {};
+      $("#saranData").innerHTML = h.saran.map((s, i) => `<div data-i="${i}"><b>${esc(s.judul)}</b>
+        <span class="ket"><span class="lencanaJenis">${esc(label[s.jenis] || s.jenis)}</span> ${esc(s.alasan)}</span></div>`).join("")
         || '<div class="ket">Tidak ada saran.</div>';
       $$("#saranData [data-i]").forEach(el => el.onclick = () => terapkanSaran(h.saran[el.dataset.i]));
     } catch (e) { if (ds === L.ds) $("#saranData").innerHTML = `<div class="ket">${esc(e.message)}</div>`; }
   }
   function terapkanSaran(s) {
+    if (s.spec && s.jenis in Studio.awal.aturan) {
+      return terapkanSpec({kolom: s.spec.kolom || [], baris: s.spec.baris || [], warna: s.spec.warna || null,
+                           ukuran: s.spec.ukuran || null, tanda: s.jenis, judul: s.judul});
+    }
     const uk = s.metrik.map(m => {
       const c = /^(\w+)\((.+)\)$/.exec(m);
       return c ? {field: c[2], peran: "ukuran", agg: c[1].toUpperCase()} : {field: m, peran: "ukuran", metrik: true};

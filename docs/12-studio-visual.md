@@ -77,8 +77,10 @@ dengan satu dimensi berurutan. Penjelasan: [17 bagian 4](17-katalog-chart-peta-p
 
 ### Saran dari data
 
-Memakai mesin Auto Chart (`sps_ai/auto.py`: tren R², konsentrasi, korelasi). Klik saran →
-rak terisi otomatis.
+Memakai mesin Auto Chart (`sps_ai/auto.py`: tren R², konsentrasi, korelasi, k-means). Hingga 16 saran dari
+berbagai jenis chart (batang, garis, treemap, peta panas, pivot, sankey, sebar, peta, …), masing-masing dengan
+label jenisnya. Klik saran → rak Kolom, Baris, Warna, dan jenis chart terisi otomatis. Daftar lengkap jenis menurut
+bentuk data: [10 §5](10-asisten-ai.md).
 
 ### Warna
 

@@ -145,6 +145,23 @@ def jalankan_semua() -> None:
                     raise RuntimeError(s["ramalan"]["metode"])
                 return f"{s['ramalan']['metode']}, R² {s['tren']['r2']}, {len(s['anomali'])} anomali"
 
+            @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
+            def _():
+                from sps_ai import auto
+                jenis, gagal = set(), []
+                for ds_id in (P, L):
+                    h = auto.sarankan(ds_id, "", None, 40)
+                    for sr in {x["jenis"]: x for x in h["saran"]}.values():
+                        jenis.add(sr["jenis"])
+                        try:
+                            tt, lb = lembar.dari_dict({"dataset_id": ds_id, "tanda": sr["jenis"], **sr["spec"]})
+                            lembar.ke_superset(tt, lb)
+                        except Exception as e:  # noqa: BLE001
+                            gagal.append(f"{sr['jenis']}: {e}")
+                if gagal or len(jenis) < 12:
+                    raise RuntimeError(f"{len(jenis)} jenis; gagal: {gagal[:3]}")
+                return f"{len(jenis)} jenis chart diusulkan, semua bisa dibangun"
+
     @uji("Analitik", "Label periode ramalan")
     def _():
         if prediksi.label_berikut(["2025-11-01", "2025-12-01"], 2) != ["2026-01-01", "2026-02-01"]:

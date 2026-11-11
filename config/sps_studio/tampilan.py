@@ -81,7 +81,7 @@ def api_nilai(dataset_id: int):
 @_login()
 def api_saran(dataset_id: int):
     from sps_ai import auto
-    return jsonify(auto.sarankan(dataset_id, "", None, 6))
+    return jsonify(auto.sarankan(dataset_id, "", None, 16))
 
 
 @bp.route("/api/kueri", methods=["POST"])
