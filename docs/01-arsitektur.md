@@ -18,7 +18,7 @@ Semua komponen berjalan di **Docker** (tidak lagi memakai XAMPP).
 └──────────────────────────────────────┬────────────────────────────────────────────────────────────┘
                                        ▼  (hanya baca, lewat jaringan kantor/VPN)
        Sumber data perusahaan: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery,
-       Redshift, Databricks, Trino, Athena, SAP HANA, Vertica, Druid   (Data > Hubungkan data)
+       Redshift, Databricks, Trino, Athena, SAP HANA*, Vertica, Druid   (Data > Hubungkan data; *driver opsional)
        Login: akun lokal, atau LDAP / Active Directory kantor (opsional)
 ```
 

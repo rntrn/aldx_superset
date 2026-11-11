@@ -21,7 +21,7 @@ Pusat Kendali → tab **Hubungkan data** (role Admin). Empat langkah: **Pilih su
 |---|---|---|
 | 1 | **Berkas** | Microsoft Access (`.mdb`/`.accdb`), Excel, CSV, SQLite, DuckDB, Parquet: isinya **disalin** ke ALDx Engine |
 | 2 | **Database** | PostgreSQL, MySQL/MariaDB, SQL Server/Azure SQL, Oracle, ClickHouse |
-| 3 | **Data warehouse** | Snowflake, BigQuery, Redshift, Databricks, Trino/Presto, Athena, SAP HANA, Vertica, Druid |
+| 3 | **Data warehouse** | Snowflake, BigQuery, Redshift, Databricks, Trino/Presto, Athena, SAP HANA (driver diunduh sendiri), Vertica, Druid |
 | 4 | **Koneksi tersimpan** | semua koneksi yang sudah ada |
 
 ### Menghubungkan database / data warehouse

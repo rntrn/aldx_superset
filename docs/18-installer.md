@@ -243,7 +243,10 @@ Redis, nginx), `offline\versi.txt`, dan Docker Desktop Installer. Berkas `.exe` 
 | Pemeriksaan | *Internet*: "paket offline" (OK) |
 | `scripts\init.ps1` | `Import-ImageOffline` (`scripts\_umum.ps1`): `docker load` sekali per versi paket (`.env` `SPS_OFFLINE_VERSI`), image tidak dibangun |
 
-Catatan: Oracle Instant Client (mode *thick*, Oracle < 12.1) tidak termasuk; lihat `docker/oracle/README.md`.
+Catatan: Oracle Instant Client (mode *thick*, Oracle < 12.1) dan driver SAP HANA (`hdbcli`) tidak termasuk; lihat
+`docker/oracle/README.md` dan `docker/wheels/README.md`. **Membangun paket offline untuk dibagikan:** pastikan tidak ada
+`docker\wheels\hdbcli-*.whl` maupun zip Instant Client di komputer pembangun, karena keduanya ikut masuk ke image
+dan lisensinya melarang dibagikan ulang ([THIRD-PARTY-LICENSES.md](../THIRD-PARTY-LICENSES.md) §4).
 WSL 2 di Windows yang sangat lama mungkin perlu pembaruan (`wsl --update` dari berkas, minta TI).
 
 **Cara manual**, di komputer yang punya internet:

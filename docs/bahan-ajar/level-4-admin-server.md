@@ -15,7 +15,7 @@
 3. memantau dan mengatur kapasitas di Pusat Kendali; menerapkan auto-tuning;
 4. mencadangkan & memulihkan (metadb, engine), menjadwalkan cadangan;
 5. melakukan upgrade/downgrade aman;
-6. mengatur identitas & tema (nama, logo, warna) tanpa restart;
+6. mengatur identitas & tema (nama, logo, warna) tanpa restart, termasuk preset `djp` dengan logo ALDx;
 7. membedakan Superadmin & Admin, mengatur **Batas data**, dan memakai saran AI `/hw-engineer` dengan aman;
 8. menangani gangguan dengan prosedur 7 langkah (pendalaman: [modul runbook admin](modul-runbook-admin.md)).
 
@@ -71,7 +71,7 @@
 
 | No | Jawaban |
 |---|---|
-| 1 | **55 uji**, semua LULUS pada instalasi sehat (4 komponen, 1 data, 23 chart Studio, 2 analitik, 2 engine, 8 halaman termasuk Kueri Visual & cangkang, 3 keamanan termasuk Superadmin, 5 Tahap 2: batas data, ekspor Excel, peran AI, Oracle ROWNUM, skema terpilih, 2 Tahap 3: berkas .ald/.aldx & filter global/ulasan, 1 Hubungkan data, 1 HTTPS gateway, 2 keamanan: penguncian & audit, hak minimum, 1 ketahanan: ekspor latar & cadangan) |
+| 1 | **55 uji**, semua LULUS pada instalasi sehat (4 komponen, 1 data, 23 chart Studio, 2 analitik, 2 engine, 8 halaman termasuk Kueri Visual & cangkang, 3 keamanan termasuk Superadmin, 5 Tahap 2: batas data, ekspor Excel, peran AI, Oracle ROWNUM, skema terpilih, 2 Tahap 3: berkas .ald/.aldx & filter global/ulasan, 1 Hubungkan data (driver opsional seperti SAP HANA yang belum dipasang tetap LULUS, dengan catatan), 1 HTTPS gateway, 2 keamanan: penguncian & audit, hak minimum, 1 ketahanan: ekspor latar & cadangan) |
 | 2 | Pusat Kendali → **Riwayat**: waktu, oleh siapa, sebelum **5.000** (bawaan) → sesudah **10.000**. Berlaku ±10 detik tanpa restart |
 | 3 | **Topologi** (kolom backgrounder ekstrak = 2) dan Status → antrean |
 | 4 | Ya, chart kembali. Chart/dashboard yang dibuat setelah cadangan **hilang** (dicatat & dibuat ulang) |

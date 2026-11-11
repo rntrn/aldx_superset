@@ -231,7 +231,11 @@ Ya, setelah `scripts\uji.ps1` lulus. Metadata sudah di container `metadb`; data 
 Cadangkan → salin berkas versi baru ke `D:\superset` (`.env` & `backup\` jangan ditimpa) → `PASANG.cmd` → `scripts\uji.ps1`.
 
 **12. Mengganti logo, nama, warna?**
-Pusat Kendali → **Identitas & Tema**. Tanpa restart.
+Pusat Kendali → **Identitas & Tema**. Tanpa restart. Preset `djp` memakai logo ALDx; logo instansi diunggah sendiri.
+
+**12a. Kartu SAP HANA abu-abu di Hubungkan data?**
+Driver SAP (`hdbcli`) tidak disertakan karena lisensinya. Unduh `hdbcli-*.whl`, taruh di `docker\wheels\`, jalankan
+`scripts\init.ps1` ([06 §4](06-sumber-data.md#4-menambah-jenis-database-baru-pengembang)). Fitur lain tidak terpengaruh.
 
 **13. Menambah sumber data baru?**
 Pusat Kendali → **Hubungkan data** (database, data warehouse, atau berkas Access/Excel/CSV). Lihat [06-sumber-data.md](06-sumber-data.md).

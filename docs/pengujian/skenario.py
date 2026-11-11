@@ -70,6 +70,9 @@ SKENARIO = [
     ("A14", 4, "Sedang", "Instalasi dengan LDAP", "Server LDAP uji terjangkau",
      "PASANG.cmd → Login & pengguna: LDAP → isi server, domain, search base, admin LDAP → Uji koneksi → Pasang",
      "Uji koneksi OK; .env LDAP_* terisi; login username jaringan berhasil; admin lokal tetap bisa login"),
+    ("A15", 4, "Sedang", "Berkas lisensi ikut terpasang", "A01",
+     "Buka folder instalasi (mis. D:\\superset); buka LICENSE, NOTICE, THIRD-PARTY-LICENSES.md",
+     "Ketiga berkas ada; LICENSE = Apache License 2.0; NOTICE menyebut ALDx & Apache Superset; tidak ada logo instansi di branding\\"),
 
     # B. Login & sesi
     ("B01", 1, "Tinggi/asap", "Login akun pengguna", "Akun lokal dibuat admin (atau LDAP aktif)",
@@ -219,6 +222,15 @@ SKENARIO = [
     ("F15", 3, "Sedang", "Impor Microsoft Access", "Berkas .mdb/.accdb (mis. Northwind)",
      "Hubungkan data → Berkas → pilih berkas → centang tabel → Impor",
      "Tabel terbaca dengan contoh isi; kolom foto/lampiran dilewati; dataset terbentuk"),
+    ("F18", 3, "Tinggi", "Impor data latihan Penerbangan (6 lembar)", "berkas bahan-ajar/berkas/contoh-penerbangan-sedang.xlsx",
+     "Hubungkan data → Berkas → pilih berkas → centang 6 lembar, awalan terbang → Impor; Kueri Visual: gabung tiket + jadwal + "
+     "penerbangan + maskapai, jumlahkan harga (status bukan Refund) per maskapai",
+     "6 dataset terbang_*; tiket 150.000 baris; Nusa Air terbesar Rp151,25 miliar, total Rp323,94 miliar "
+     "(angka kunci: bahan-ajar/berkas/README.md)"),
+    ("F19", 3, "Sedang", "SAP HANA opsional", "Image tanpa hdbcli-*.whl di docker\\wheels",
+     "Hubungkan data → lihat kartu SAP HANA, arahkan kursor; jalankan scripts\\uji.ps1",
+     "Kartu SAP HANA nonaktif dengan petunjuk unduh driver SAP; uji 'driver database & berkas terpasang' LULUS "
+     "dengan catatan 'opsional belum dipasang: SAP HANA'. Setelah hdbcli ditaruh & init.ps1: kartu aktif"),
 
     # G. Pusat Kendali
     ("G01", 4, "Tinggi/asap", "Status", "A01", "Pusat Kendali → Status", "Semua node online; CPU/RAM tampil; antrean tampil"),
@@ -243,6 +255,10 @@ SKENARIO = [
     ("G11", 4, "Tinggi", "Usulan /hw-engineer & /ahli-ui-ux", "Akun Superadmin; model AI aktif",
      "Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru",
      "Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat"),
+    ("G12", 4, "Sedang", "Preset djp memakai logo ALDx", "Akun Admin",
+     "Identitas & Tema → preset djp → Terapkan; lihat navbar, halaman login, tab browser; lalu preset netral",
+     "Logo ALDx (tanda batang + tulisan ALDx) di latar terang & gelap, favicon ALDx; tidak ada gambar rusak; "
+     "netral mengembalikan logo otomatis"),
 
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",
@@ -342,6 +358,11 @@ SKENARIO = [
      "Dashboard tetap bisa dibuka selama penyegaran; selesai < batas 6 jam"),
     ("I04", 4, "Rendah", "Ramalan harian", "Ada chart ramalan", "Cek keesokan hari setelah 03:00",
      "Kolom diperbarui di tabel sps_ramalan berganti; chart memuat data terbaru"),
+    ("I05", 3, "Sedang", "Data besar 1 juta tiket", "scripts\\data-penerbangan.ps1 (berkas besar dibuat)",
+     "Hubungkan data → Berkas → contoh-penerbangan-besar.xlsx → Impor; buat chart pendapatan per bulan dari tiket + jadwal; "
+     "ulangi setelah ekstrak",
+     "Impor selesai tanpa melebihi batas (atau pesan batas jelas); 1.000.000 baris tiket; pendapatan Rp2,28 triliun; "
+     "chart tampil < 5 detik setelah ekstrak"),
 ]
 
 LEVEL = {1: "1 Pengguna", 2: "2 Analis", 3: "3 Admin data", 4: "4 Admin server"}

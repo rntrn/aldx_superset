@@ -47,6 +47,9 @@ di repo ini. `sqlalchemy-hana` (Apache-2.0) sudah ada di folder ini dan otomatis
 
 Tanpa langkah ini semua fitur lain berjalan normal; kartu SAP HANA tampil nonaktif dengan petunjuk di atas.
 
+**Penting:** image yang dibangun dengan `hdbcli` berisi driver SAP, jadi image itu (dan paket offline darinya) hanya untuk
+dipakai sendiri, tidak untuk dibagikan.
+
 ## Menambah driver baru
 
 1. Di komputer yang punya internet & Python 3.10:

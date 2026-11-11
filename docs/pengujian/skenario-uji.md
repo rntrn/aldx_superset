@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **127 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **132 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -26,6 +26,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | A12 | 4 Admin server | Sedang | Simulasi gangguan engine | A01 | docker compose stop engine → ikuti pohon keputusan 19-runbook §4 → perbaiki | Penyebab ditemukan dari docker compose ps; setelah start engine + restart worker, uji.ps1 LULUS |
 | A13 | 4 Admin server | Tinggi | Instalasi baru netral + akun lokal | Komputer tanpa instalasi SPS | PASANG.cmd → Login & pengguna: Akun lokal → isi 2 baris (peran Pengguna & Analis) → Pasang | Login akun baru berhasil; Settings → List Users: peran sesuai (Analis punya sql_lab); tidak ada koneksi selain ALDx Engine; LDAP_SERVERS kosong; password tidak ada di .env & log |
 | A14 | 4 Admin server | Sedang | Instalasi dengan LDAP | Server LDAP uji terjangkau | PASANG.cmd → Login & pengguna: LDAP → isi server, domain, search base, admin LDAP → Uji koneksi → Pasang | Uji koneksi OK; .env LDAP_* terisi; login username jaringan berhasil; admin lokal tetap bisa login |
+| A15 | 4 Admin server | Sedang | Berkas lisensi ikut terpasang | A01 | Buka folder instalasi (mis. D:\superset); buka LICENSE, NOTICE, THIRD-PARTY-LICENSES.md | Ketiga berkas ada; LICENSE = Apache License 2.0; NOTICE menyebut ALDx & Apache Superset; tidak ada logo instansi di branding\ |
 
 ## B. Login & sesi
 
@@ -113,6 +114,8 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | F16 | 3 Admin data | Tinggi | Skema yang ditampilkan per koneksi | Koneksi database dengan banyak skema (mis. Oracle) | Hubungkan data → Koneksi tersimpan → Atur skema → centang satu skema → Simpan skema; buka Dataset (+ Dataset), SQL Lab, Kueri Visual | Hanya skema tercentang yang tampil; Kueri Visual langsung memilih skema itu; tabelnya terdaftar |
 | F17 | 3 Admin data | Tinggi | Oracle lama (11g) di SQL Lab, Kueri Visual & dataset | Koneksi Oracle 11g | SQL Lab: SELECT * FROM <skema>.<tabel> → Jalankan; Kueri Visual: gabung 2 tabel → Jalankan → Simpan jadi dataset; Buka di SQL Lab | Tidak ada ORA-00933/ORA-00942; maks 1.000 baris; dataset tersimpan; SQL Lab terbuka tanpa 502 |
 | F15 | 3 Admin data | Sedang | Impor Microsoft Access | Berkas .mdb/.accdb (mis. Northwind) | Hubungkan data → Berkas → pilih berkas → centang tabel → Impor | Tabel terbaca dengan contoh isi; kolom foto/lampiran dilewati; dataset terbentuk |
+| F18 | 3 Admin data | Tinggi | Impor data latihan Penerbangan (6 lembar) | berkas bahan-ajar/berkas/contoh-penerbangan-sedang.xlsx | Hubungkan data → Berkas → pilih berkas → centang 6 lembar, awalan terbang → Impor; Kueri Visual: gabung tiket + jadwal + penerbangan + maskapai, jumlahkan harga (status bukan Refund) per maskapai | 6 dataset terbang_*; tiket 150.000 baris; Nusa Air terbesar Rp151,25 miliar, total Rp323,94 miliar (angka kunci: bahan-ajar/berkas/README.md) |
+| F19 | 3 Admin data | Sedang | SAP HANA opsional | Image tanpa hdbcli-*.whl di docker\wheels | Hubungkan data → lihat kartu SAP HANA, arahkan kursor; jalankan scripts\uji.ps1 | Kartu SAP HANA nonaktif dengan petunjuk unduh driver SAP; uji 'driver database & berkas terpasang' LULUS dengan catatan 'opsional belum dipasang: SAP HANA'. Setelah hdbcli ditaruh & init.ps1: kartu aktif |
 
 ## G. Pusat Kendali (Level 4)
 
@@ -129,6 +132,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | G09 | 4 Admin server | Sedang | Preset tema | G07 | Klik preset Hijau, lalu Netral | Warna & motif berganti; Netral mengembalikan semua isian ke bawaan |
 | G10 | 4 Admin server | Tinggi | Batas data: rekomendasi, angka, tanpa batas | Akun Superadmin | Pusat Kendali → Batas data → Impor berkas: baris maksimal = 3 → Simpan; impor CSV 10 baris; lalu klik auto → Simpan | Rekomendasi & rumus tampil; impor ditolak dengan pesan 'melebihi batas 3 baris' tanpa dataset terbentuk; setelah auto impor berhasil |
 | G11 | 4 Admin server | Tinggi | Usulan /hw-engineer & /ahli-ui-ux | Akun Superadmin; model AI aktif | Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru | Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat |
+| G12 | 4 Admin server | Sedang | Preset djp memakai logo ALDx | Akun Admin | Identitas & Tema → preset djp → Terapkan; lihat navbar, halaman login, tab browser; lalu preset netral | Logo ALDx (tanda batang + tulisan ALDx) di latar terang & gelap, favicon ALDx; tidak ada gambar rusak; netral mengembalikan logo otomatis |
 
 ## H. Keamanan
 
@@ -159,6 +163,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | I02 | 4 Admin server | Sedang | Beban bersamaan | ≥ 20 penguji | Semua membuka & menyaring dashboard latihan pada menit yang sama | Tidak ada galat; Status: CPU web < 85%; antrean kembali 0 dalam 1 menit |
 | I03 | 4 Admin server | Sedang | Penyegaran ekstrak besar | Sumber ≥ 10 juta baris | Segarkan ekstrak penuh saat jam kerja | Dashboard tetap bisa dibuka selama penyegaran; selesai < batas 6 jam |
 | I04 | 4 Admin server | Rendah | Ramalan harian | Ada chart ramalan | Cek keesokan hari setelah 03:00 | Kolom diperbarui di tabel sps_ramalan berganti; chart memuat data terbaru |
+| I05 | 3 Admin data | Sedang | Data besar 1 juta tiket | scripts\data-penerbangan.ps1 (berkas besar dibuat) | Hubungkan data → Berkas → contoh-penerbangan-besar.xlsx → Impor; buat chart pendapatan per bulan dari tiket + jadwal; ulangi setelah ekstrak | Impor selesai tanpa melebihi batas (atau pesan batas jelas); 1.000.000 baris tiket; pendapatan Rp2,28 triliun; chart tampil < 5 detik setelah ekstrak |
 
 ## J. Berkas, filter global & ulasan
 
