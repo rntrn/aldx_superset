@@ -1,7 +1,5 @@
 # ALDx — Advanced Learning & Data eXperience
 
-> Dulu bernama **SPS Analytics**. Nama teknis (`sps_*`, `SPS_*`, tabel database) tetap sama, jadi instalasi lama cukup di-upgrade.
-
 Platform dashboard & BI **siap pakai untuk perusahaan/instansi mana pun**, berbasis Apache Superset.
 Semua komponen berjalan di **Docker**: web, backgrounder, metadata (PostgreSQL), **ALDx Engine**
 (ClickHouse), cache (Redis), dan gateway. Nama, logo, dan warna bisa diganti kapan saja (white-label).
