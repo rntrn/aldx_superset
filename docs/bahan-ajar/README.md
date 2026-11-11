@@ -32,6 +32,10 @@ Semua latihan memakai data **fiktif** perusahaan ritel rekaan *PT Contoh Sejahte
 (`latihan_penjualan`, `latihan_lokasi_pelanggan`) dengan angka tetap. Peserta boleh mencoba apa saja
 tanpa risiko membocorkan data perusahaan. Berkas latihan impor: [`berkas/contoh-target-toko.xlsx`](berkas/contoh-target-toko.xlsx).
 
+Untuk latihan gabung tabel & demo data besar tersedia set **Penerbangan** (fiktif): 6 lembar saling terhubung
+(maskapai, bandara, penerbangan, jadwal, penumpang, tiket) dalam tiga ukuran, 1.000 sampai 1 juta tiket lebih.
+Kamus data, cara impor, dan angka kunci: [`berkas/README.md`](berkas/README.md).
+
 Angka kunci yang sering dipakai:
 
 | Pertanyaan | Jawaban |

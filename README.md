@@ -100,6 +100,7 @@ D:\superset
 │   ├── sps_dashboard_builder.py, sps_dash_*.py  # Dashboard as code (contoh profil DJP)
 │   ├── sps_build_dashboards.py # Menyiapkan dashboard, menu, izin, ALDx Engine
 │   ├── sps_latihan.py      # DATA LATIHAN fiktif (penjualan ritel) + dashboard latihan
+│   ├── sps_latihan_penerbangan.py # DATA LATIHAN fiktif penerbangan (Excel/CSV, 6 tabel, s.d. jutaan baris)
 │   ├── sps_uji.py          # UJI OTOMATIS (scripts\uji.ps1)
 │   ├── ai.yaml + sps_ai/   # Asisten AI
 │   ├── sps_server/         # Pusat Kendali Server: pengaturan, auto-tuning, monitor, multi-node, HTTPS (tls.py)
@@ -121,6 +122,7 @@ D:\superset
 │   ├── cadangkan.ps1       # Cadangan & pemulihan metadb (+ engine)
 │   ├── versi.ps1           # Versi tiap komponen
 │   ├── data-latihan.ps1    # Muat data latihan fiktif
+│   ├── data-penerbangan.ps1 # Buat Excel/CSV latihan penerbangan ukuran besar
 │   ├── bersihkan-profil-djp.ps1 # Hapus dashboard & dataset profil DJP yang tidak dipakai
 │   ├── pindah-metadata.ps1 # Pindah metadata versi lama (XAMPP/MariaDB) ke PostgreSQL
 │   ├── add-connections.ps1 # Daftarkan koneksi dari .env (profil DJP)

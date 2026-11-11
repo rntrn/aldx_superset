@@ -40,3 +40,7 @@ unins*.dat
 docs/node_modules/
 dist/
 .claude/
+
+# Data latihan penerbangan ukuran besar: dibuat sendiri (scripts\data-penerbangan.ps1)
+docs/bahan-ajar/berkas/contoh-penerbangan-besar*
+docs/bahan-ajar/berkas/contoh-penerbangan-[0-9]*

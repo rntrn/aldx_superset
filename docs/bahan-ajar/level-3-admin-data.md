@@ -67,6 +67,9 @@
 4. Upload CSV 3 kolom × 10 baris ke **ALDx Engine**, buat chart batang dari hasilnya.
 5. Jelaskan kapan ekstrak **penuh** dan kapan **inkremental**; beri satu contoh dataset perusahaan untuk masing-masing.
 6. Dengan **Lihat sebagai…**, bandingkan dashboard latihan untuk akun Cabang Bandung dan Cabang Jakarta.
+7. Impor [`contoh-penerbangan-sedang.xlsx`](berkas/contoh-penerbangan-sedang.xlsx) lewat **Hubungkan data → Berkas** dengan awalan `terbang`.
+   Berapa dataset terbentuk? Di Kueri Visual gabungkan tiket + jadwal + penerbangan + maskapai: maskapai mana yang
+   pendapatannya terbesar (tanpa tiket Refund)? Berapa jadwal dari/ke DPS yang batal pada 12–13 November 2024?
 
 ### Kunci jawaban
 
@@ -77,6 +80,7 @@
 | 3 | ± **Rp37,3 miliar** (hanya Cabang Bandung). Akun Admin tetap melihat Rp208,8 miliar |
 | 4 | dinilai: tabel tampil di Datasets dengan database *ALDx Engine (ClickHouse)*, chart tampil |
 | 6 | Setiap chart menampilkan aturan `nm_cabang = 'Cabang Bandung'` / `'Cabang Jakarta'` dan angka cabang masing-masing; chart yang dataset-nya tanpa RLS menampilkan semua baris (perlu diperiksa) |
+| 7 | **6 dataset** `terbang_maskapai`, `terbang_bandara`, `terbang_penerbangan`, `terbang_jadwal`, `terbang_penumpang`, `terbang_tiket`; **Nusa Air, Rp151,25 miliar** (total semua maskapai Rp323,94 miliar); **56 jadwal** (insiden abu vulkanik). Rincian: [berkas/README.md](berkas/README.md#angka-kunci-untuk-memeriksa-hasil) |
 | 5 | Penuh: data bisa dikoreksi mundur / tabel referensi (mis. master produk, target). Inkremental: data hanya bertambah dengan kolom naik (mis. transaksi penjualan per tanggal) |
 
 ## Kuis
