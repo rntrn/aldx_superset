@@ -236,6 +236,7 @@ def _pasang_tambahan(app) -> None:
     sps_panduan.daftarkan(app)              # /panduan/: dokumentasi docs/ di dalam aplikasi
     import sps_tolak
     sps_tolak.daftarkan(app)                # halaman 404 bermerek (bukan halaman bawaan Superset)
+    sps_sematkan.daftarkan(app)             # /sematkan/: embed dashboard + izin bingkai khusus halaman sematan
 
 
 FLASK_APP_MUTATOR = _pasang_tambahan
@@ -248,7 +249,17 @@ FEATURE_FLAGS = {
     "ENABLE_TEMPLATE_PROCESSING": True,  # Jinja di SQL & RLS: {{ sps_akses() }}, {{ sps_periode() }}
     "RLS_IN_SQLLAB": True,               # aturan hak akses juga berlaku di SQL Lab
     "ALERT_REPORTS": True,               # Langganan laporan & peringatan (menu Dashboard & Story › Langganan)
+    "DASHBOARD_CROSS_FILTERS": True,     # klik batang/irisan -> chart lain di dashboard ikut tersaring
+    "DRILL_TO_DETAIL": True,             # klik kanan -> lihat baris data di balik angka
+    "DRILL_BY": True,                    # klik kanan -> rinci menurut kolom lain (drill-down)
+    "EMBEDDED_SUPERSET": True,           # sematkan dashboard ke web/aplikasi lain (sps_sematkan.py, docs/30)
 }
+
+# --- Sematkan (embed): token tamu ditandatangani turunan SECRET_KEY, bukan nilai bawaan Superset -------------
+import sps_sematkan  # noqa: E402
+GUEST_TOKEN_JWT_SECRET = sps_sematkan.rahasia_token(SECRET_KEY)
+GUEST_TOKEN_JWT_EXP_SECONDS = sps_sematkan.umur_token_detik()
+GUEST_ROLE_NAME = "Penonton Sematan"        # izin baca minimum; dibuat build-dashboards (sps_sematkan.siapkan)
 
 # --- 7b. Email untuk langganan laporan (opsional, isi di .env) ---------------------------------
 # Tanpa SMTP_HOST laporan tetap dijadwalkan tetapi TIDAK dikirim (mode uji: tercatat di log saja).

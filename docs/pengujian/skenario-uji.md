@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **133 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **134 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -134,6 +134,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | G11 | 4 Admin server | Tinggi | Usulan /hw-engineer & /ahli-ui-ux | Akun Superadmin; model AI aktif | Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru | Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat |
 | G12 | 4 Admin server | Sedang | Logo ALDx "Tebasan" & animasi pemuatan | Akun Admin | Lihat navbar, halaman login, tab browser; buka dashboard berat; ganti preset ke hijau lalu kembali ke netral | Logo huruf A dibelah sayatan pink di latar terang & gelap, favicon tajam; pemuatan menampilkan sayatan melesat; di preset lain tanda mengikuti warna preset; tidak ada gambar rusak |
 | G13 | 4 Admin server | Sedang | Tema bawaan Tinta & Sakura | Akun Admin | Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom isian login; lalu preset navy | Login bersih: kanvas gradasi hitam → abu tanpa motif, hanya logo di kiri atas + slogan di kiri bawah, garis data tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama |
+| G14 | 4 Admin server | Tinggi | Sematkan dashboard ke web lain | .env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu | Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe /sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';' | Dashboard tampil tanpa login, hanya Cabang Bandung & Elektronik; domain lain diblokir; kunci salah 401; rls ';' 400; Matikan → iframe berhenti tampil; halaman ALDx biasa tetap tidak bisa dibingkai |
 
 ## H. Keamanan
 

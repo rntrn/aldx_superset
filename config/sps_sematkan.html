@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sematkan · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--utama:var(--sps-utama,#18181B);--aksen:var(--sps-aksen,#E11D74);--bg:var(--sps-latar,#F4F4F5);
+      --garis:#E4E4E7;--teks:#27272A;--redup:#71717A;--hijau:#0B7A52;--merah:#B42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);background:var(--bg);color:var(--teks);font-size:13.5px}
+header{background:var(--utama);color:#fff;padding:12px 20px;border-bottom:3px solid var(--aksen)}
+header b{font-size:15px}header div{font-size:12px;opacity:.8;margin-top:2px}
+main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:12px;padding:16px 18px}
+h2{margin:0 0 10px;font-size:14.5px}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--redup);padding:6px 8px}
+td{padding:9px 8px;border-top:1px solid var(--garis);vertical-align:middle}
+.lencana{display:inline-block;border-radius:10px;padding:2px 9px;font-size:11.5px;font-weight:700}
+.ok{background:#E3F4EC;color:var(--hijau)}.awas{background:#FFF4E5;color:#8A4B00}
+button{font:inherit;font-weight:600;border-radius:8px;cursor:pointer;padding:6px 13px;border:1px solid var(--utama);background:#fff;color:var(--utama)}
+button.utama{background:var(--utama);color:#fff}button:hover{border-color:var(--aksen)}
+pre{background:#18181B;color:#F4F4F5;border-radius:10px;padding:12px 14px;overflow:auto;font:12px/1.55 Consolas,'Cascadia Mono',monospace;margin:8px 0 0;white-space:pre-wrap;word-break:break-all}
+code{font-family:Consolas,'Cascadia Mono',monospace;background:var(--bg);border-radius:4px;padding:0 4px}
+.ket{color:var(--redup);line-height:1.55}.galat{color:var(--merah)}
+ol{margin:6px 0 0;padding-left:20px;line-height:1.7}
+</style>
+</head>
+<body>
+<header><b>Sematkan dashboard</b><div>Tampilkan dashboard di web atau aplikasi lain, dengan filter dari alamat dan data sesuai penontonnya.</div></header>
+<main>
+  <section class="kartu">
+    <h2>Status</h2>
+    <div id="status" class="ket">Memuat…</div>
+  </section>
+  <section class="kartu">
+    <h2>Dashboard</h2>
+    <table><thead><tr><th>Dashboard</th><th>Status</th><th></th></tr></thead><tbody id="daftar"></tbody></table>
+    <div id="pesan" class="galat"></div>
+  </section>
+  <section class="kartu" id="contoh" hidden>
+    <h2>Cara menyematkan: <span id="judulContoh"></span></h2>
+    <ol>
+      <li><b>Server</b> aplikasi Anda meminta token (jangan dari browser; kunci harus tetap rahasia):<pre id="kodeToken"></pre></li>
+      <li>Halaman Anda menampilkan dashboard. Filter ditulis di alamat, <code>f.&lt;nama kolom&gt;=nilai</code>:<pre id="kodeBingkai"></pre></li>
+    </ol>
+    <p class="ket">Filter alamat: <code>f.cabang=Bandung,Jakarta</code> (pilihan), <code>f.tahun.min=2024&amp;f.tahun.max=2025</code> (rentang angka),
+      <code>f.waktu=Last month</code> (rentang waktu). Berlaku bila dashboard punya filter di kolom itu, dan hanya mempersempit data.
+      <code>rls</code> pada token membatasi baris untuk penonton itu dan tidak bisa diubah dari browser. Rinci: Panduan › Sematkan dashboard.</p>
+  </section>
+</main>
+<script nonce="{{ csp_nonce() }}">
+(function () {
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  let DATA = null;
+
+  async function api(alamat, isi) {
+    const opsi = {credentials: "same-origin", headers: {}};
+    if (isi) {
+      const t = await (await fetch("/api/v1/security/csrf_token/", {credentials: "same-origin"})).json();
+      Object.assign(opsi, {method: "POST", body: JSON.stringify(isi), headers: {"Content-Type": "application/json", "X-CSRFToken": t.result}});
+    }
+    const r = await fetch(alamat, opsi), j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || "Gagal (" + r.status + ")");
+    return j;
+  }
+
+  function gambar() {
+    const d = DATA;
+    $("#status").innerHTML =
+      `<p><span class="lencana ${d.domain.length ? "ok" : "awas"}">${d.domain.length ? "Domain diizinkan" : "Belum ada domain"}</span>
+        ${d.domain.length ? d.domain.map(x => `<code>${esc(x)}</code>`).join(" ") : "isi <code>SPS_SEMATKAN_DOMAIN</code> di <code>.env</code> (mis. <code>https://portal.kantor.local</code>), lalu <code>scripts\\start.ps1</code>"}</p>
+       <p><span class="lencana ${d.kunci_terisi ? "ok" : "awas"}">${d.kunci_terisi ? "Kunci server terisi" : "Belum ada kunci"}</span>
+        ${d.kunci_terisi ? `token berlaku ${d.menit} menit` : "isi <code>SPS_SEMATKAN_KUNCI</code> di <code>.env</code> dengan rahasia panjang (min. 32 karakter)"}</p>`;
+    $("#daftar").innerHTML = d.dashboard.map(x => `<tr>
+      <td><b>${esc(x.judul)}</b>${x.terbit ? "" : ' <span class="ket">(draf)</span>'}</td>
+      <td>${x.uuid ? '<span class="lencana ok">Boleh disematkan</span>' : '<span class="ket">mati</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">${x.uuid ? `<button data-contoh="${x.id}">Cara pakai</button> ` : ""}
+        <button class="${x.uuid ? "" : "utama"}" data-atur="${x.id}" data-aktif="${x.uuid ? 0 : 1}">${x.uuid ? "Matikan" : "Nyalakan"}</button></td></tr>`).join("")
+      || '<tr><td colspan="3" class="ket">Belum ada dashboard.</td></tr>';
+  }
+
+  function contoh(id) {
+    const x = DATA.dashboard.find(d => d.id === +id), asal = location.origin;
+    $("#judulContoh").textContent = x.judul;
+    $("#kodeToken").textContent = `curl -X POST ${asal}/sematkan/api/token \\\n  -H "X-ALDx-Kunci: <SPS_SEMATKAN_KUNCI>" -H "Content-Type: application/json" \\\n  -d '{"dashboard": "${x.uuid}", "pengguna": "budi", "rls": ["kd_cabang = 'C01'"]}'\n\n→ {"token": "eyJ...", "berlaku_detik": ${DATA.menit * 60}, "alamat": "/sematkan/d/${x.uuid}"}`;
+    $("#kodeBingkai").textContent = `<iframe src="${asal}/sematkan/d/${x.uuid}?token=<token>&f.cabang=Bandung"\n        style="width:100%;height:720px;border:0"></iframe>`;
+    $("#contoh").hidden = false; $("#contoh").scrollIntoView({behavior: "smooth"});
+  }
+
+  async function muat() { DATA = await api("/sematkan/api/daftar"); gambar(); }
+
+  document.addEventListener("click", async e => {
+    const t = e.target.closest("button"); if (!t) return;
+    $("#pesan").textContent = "";
+    try {
+      if (t.dataset.contoh) return contoh(t.dataset.contoh);
+      if (t.dataset.atur) {
+        if (t.dataset.aktif === "0" && !confirm("Matikan? Semua halaman yang menyematkan dashboard ini berhenti menampilkannya.")) return;
+        await api("/sematkan/api/atur", {dashboard: +t.dataset.atur, aktif: t.dataset.aktif === "1"});
+        await muat(); if (t.dataset.aktif === "1") contoh(t.dataset.atur); else $("#contoh").hidden = true;
+      }
+    } catch (g) { $("#pesan").textContent = g.message; }
+  });
+  muat().catch(g => { $("#status").innerHTML = `<span class="galat">${esc(g.message)}</span>`; });
+})();
+</script>
+</body>
+</html>

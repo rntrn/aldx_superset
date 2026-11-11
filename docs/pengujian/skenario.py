@@ -266,6 +266,12 @@ SKENARIO = [
      "tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan "
      "pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama"),
 
+    ("G14", 4, "Tinggi", "Sematkan dashboard ke web lain", ".env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu",
+     "Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe "
+     "/sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';'",
+     "Dashboard tampil tanpa login, hanya Cabang Bandung & Elektronik; domain lain diblokir; kunci salah 401; rls ';' 400; "
+     "Matikan → iframe berhenti tampil; halaman ALDx biasa tetap tidak bisa dibingkai"),
+
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",
      "Keduanya membuka dashboard ber-RLS yang sama", "Masing-masing hanya melihat cabangnya; total berbeda"),

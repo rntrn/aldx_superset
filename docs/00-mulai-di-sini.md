@@ -54,6 +54,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Ada masalah (tabel pesan galat) | [04-troubleshooting.md](04-troubleshooting.md) |
 | Login LDAP / Active Directory (opsional) | [05-login-ldap.md](05-login-ldap.md) |
 | Nama, logo, warna, animasi (white-label) | [09-identitas-tema.md](09-identitas-tema.md) |
+| Sematkan dashboard ke web/aplikasi lain (token, RLS, filter URL) | [30-sematkan-dashboard.md](30-sematkan-dashboard.md) |
 | Lisensi (Apache 2.0) & komponen pihak ketiga yang diunduh sendiri | [THIRD-PARTY-LICENSES.md](../THIRD-PARTY-LICENSES.md) |
 | Dashboard sebagai kode (untuk pengembang) | [07-dashboard-sebagai-kode.md](07-dashboard-sebagai-kode.md) |
 

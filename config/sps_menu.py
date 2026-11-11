@@ -47,6 +47,7 @@ SUSUNAN = [
         ("Dashboards", "Daftar dashboard", None),
         ("Story", "Story (rangkuman dashboard)", "/asisten/?tab=story"),
         ("Berkas ALDx", "Berkas .ald / .aldx", "/berkas/"),
+        ("Sematkan", "Sematkan ke web lain", "/sematkan/"),
     ]),
 ]
 
@@ -56,7 +57,7 @@ SUSUNAN = [
 KE_PENGATURAN = [("Databases", "Koneksi database (lanjutan)"), ("Query Search", "Riwayat kueri")]
 
 # Item tambahan -> menu yang izinnya dipakai
-KHUSUS_ADMIN = {"Hubungkan data", "Ekstrak data"}      # halamannya memang hanya untuk Admin
+KHUSUS_ADMIN = {"Hubungkan data", "Ekstrak data", "Sematkan"}      # halamannya memang hanya untuk Admin
 IZIN_DASAR = {
     "Hubungkan data": "Pusat Kendali Server",
     "Ekstrak data": "Pusat Kendali Server",
@@ -64,6 +65,7 @@ IZIN_DASAR = {
     "Kueri Visual": "SQL Editor",
     "Story": "Asisten AI",
     "Berkas ALDx": "Dashboards",
+    "Sematkan": "Pusat Kendali Server",
 }
 KATEGORI = {k: [n for n, _, _ in isi] for k, _, isi in SUSUNAN}
 
