@@ -54,7 +54,8 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Ada masalah (tabel pesan galat) | [04-troubleshooting.md](04-troubleshooting.md) |
 | Login LDAP / Active Directory (opsional) | [05-login-ldap.md](05-login-ldap.md) |
 | Nama, logo, warna, animasi (white-label) | [09-identitas-tema.md](09-identitas-tema.md) |
-| Dashboard sebagai kode (contoh: profil DJP) | [07-dashboard-home-nasional.md](07-dashboard-home-nasional.md) |
+| Lisensi (Apache 2.0) & komponen pihak ketiga yang diunduh sendiri | [THIRD-PARTY-LICENSES.md](../THIRD-PARTY-LICENSES.md) |
+| Dashboard sebagai kode (untuk pengembang) | [07-dashboard-sebagai-kode.md](07-dashboard-sebagai-kode.md) |
 
 ## Saya pengajar / penguji
 
@@ -66,11 +67,12 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Skenario uji (UAT) & lembar isian Excel | [pengujian/](pengujian/README.md) |
 | **Laporan QA** (temuan & urutan perbaikan) | [pengujian/laporan-qa.md](pengujian/laporan-qa.md) |
 
-## Profil DJP (opsional)
+## Netral untuk siapa pun
 
-Aplikasi ini netral untuk perusahaan mana pun. Bagian khusus Direktorat Jenderal Pajak (login
-intranet, profil pegawai dari Oracle DMP, Beranda & Home Nasional, preset tema `djp`) aktif hanya bila
-diisi di `.env`. Lihat dokumen 05, 07, 08 dan preset `djp` di 09.
+ALDx tidak membawa identitas, server, atau sumber data organisasi tertentu. Setelah instalasi:
+nama & logo diatur di Identitas & Tema ([09](09-identitas-tema.md)), login kantor (LDAP) opsional ([05](05-login-ldap.md)),
+sumber data dihubungkan lewat wizard ([06](06-sumber-data.md)), dan hak akses data per role atau dari profil
+pengguna ([08](08-hak-akses-data.md)).
 
 ## Urutan membaca untuk pengembang
 

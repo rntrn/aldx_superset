@@ -29,10 +29,10 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 | Metadata | container `metadb` (PostgreSQL), database `sps_superset` |
 | ALDx Engine | container `engine`, database `sps_engine`: ekstrak, impor berkas, upload, ramalan |
 | Sumber data | **Hubungkan data**: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery, Redshift, Databricks, Trino, Athena, SAP HANA (driver opsional), Vertica, Druid + berkas Access/Excel/CSV |
-| Login | akun lokal ber-email (Superadmin wajib, pengguna lain diisi di installer) + LDAP / Active Directory **opsional** untuk NIP; halaman login beranimasi |
+| Login | akun lokal ber-email (Superadmin wajib, pengguna lain diisi di installer) + LDAP / Active Directory **opsional** untuk akun jaringan kantor; halaman login beranimasi |
 | HTTPS | opsional (centang di installer): sertifikat dibuat otomatis, `http://` dialihkan; sertifikat kantor bisa dipakai. Lihat [docs/11 §9b](docs/11-pusat-kendali-server.md#https) |
-| Identitas & tema | nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
-| Hak akses data | RLS per role (semua perusahaan) atau otomatis dari profil pengguna (profil DJP) |
+| Identitas & tema | bawaan **Tinta & Sakura** (hitam → abu → putih, semburat pink); nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
+| Hak akses data | RLS per role, atau otomatis dari profil pengguna (opsional, `config/akses.yaml`) |
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
@@ -94,12 +94,11 @@ D:\superset
 │   ├── sps_ldap.py         # Koneksi ke LDAP / Active Directory (ldap3), opsional
 │   ├── sps_identitas/      # Identitas & tema, halaman login beranimasi
 │   ├── sps_koneksi/        # Wizard Hubungkan data (database, data warehouse, Access/Excel/CSV)
-│   ├── akses.yaml          # Aturan hak akses dari profil pengguna (profil DJP, opsional)
+│   ├── akses.yaml          # Aturan hak akses dari profil pengguna (opsional)
 │   ├── sps_akses.py        # Profil pengguna + fungsi RLS sps_akses(), sps_sidik()
-│   ├── sps_connections.py  # Koneksi dari .env (profil DJP, opsional)
 │   ├── sps_pindah_meta.py  # Pindah metadata versi lama (MySQL/MariaDB) -> PostgreSQL
 │   ├── sps_jinja.py        # Fungsi SQL template: sps_periode()
-│   ├── sps_dashboard_builder.py, sps_dash_*.py  # Dashboard as code (contoh profil DJP)
+│   ├── sps_dashboard_builder.py, sps_dash_*.py  # Dashboard as code (docs/07)
 │   ├── sps_build_dashboards.py # Menyiapkan dashboard, menu, izin, ALDx Engine
 │   ├── sps_latihan.py      # DATA LATIHAN fiktif (penjualan ritel) + dashboard latihan
 │   ├── sps_latihan_penerbangan.py # DATA LATIHAN fiktif penerbangan (Excel/CSV, 6 tabel, s.d. jutaan baris)
@@ -125,9 +124,7 @@ D:\superset
 │   ├── versi.ps1           # Versi tiap komponen
 │   ├── data-latihan.ps1    # Muat data latihan fiktif
 │   ├── data-penerbangan.ps1 # Buat Excel/CSV latihan penerbangan ukuran besar
-│   ├── bersihkan-profil-djp.ps1 # Hapus dashboard & dataset profil DJP yang tidak dipakai
 │   ├── pindah-metadata.ps1 # Pindah metadata versi lama (XAMPP/MariaDB) ke PostgreSQL
-│   ├── add-connections.ps1 # Daftarkan koneksi dari .env (profil DJP)
 │   ├── build-dashboards.ps1 # Dashboard, menu, izin, ALDx Engine
 │   ├── terapkan-server.ps1 # Terapkan pengaturan Pusat Kendali yang butuh restart
 │   ├── percayai-sertifikat.ps1 # Percayai sertifikat HTTPS server di komputer pengguna

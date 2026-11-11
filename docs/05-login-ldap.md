@@ -8,16 +8,16 @@ Dua mode login, dipilih otomatis dari `.env`:
 | terisi | **LDAP / Active Directory** — username & password jaringan kantor | otomatis saat login pertama; akun lokal darurat tetap bisa (`AUTH_LOCAL_USERS`) |
 
 **LDAP tidak wajib.** Akun ber-email (Superadmin & pengguna yang dibuat installer) **selalu** login sebagai akun lokal,
-juga saat LDAP aktif atau server LDAP mati. Username NIP (tanpa `@`) diperiksa ke LDAP. Bawaan nilai LDAP kosong:
+juga saat LDAP aktif atau server LDAP mati. Username jaringan (tanpa `@`) diperiksa ke LDAP. Bawaan nilai LDAP kosong:
 LDAP hanya dipakai bila `LDAP_SERVERS` diisi (installer halaman *Login kantor*, atau `.env`).
 
-> Penguncian: salah password berulang mengunci akun sementara, termasuk NIP LDAP, sebelum LDAP ditanya lagi
+> Penguncian: salah password berulang mengunci akun sementara, termasuk akun LDAP, sebelum LDAP ditanya lagi
 > (bawaan 5 kali / 15 menit, [14 §4.5](14-akun-dan-akses.md)).
 >
-> Keamanan: pakai `ldaps://` (terenkripsi). Dengan `ldap://` password pegawai berjalan tanpa enkripsi di jaringan.
+> Keamanan: pakai `ldaps://` (terenkripsi). Dengan `ldap://` password pengguna berjalan tanpa enkripsi di jaringan.
 
 Halaman login sama untuk kedua mode (beranimasi, mengikuti [Identitas & Tema](09-identitas-tema.md)).
-Sisa dokumen ini membahas mode LDAP. Contoh nilai memakai **profil DJP** (login intranet, sama dengan engineN).
+Sisa dokumen ini membahas mode LDAP. Contoh nilai memakai domain rekaan `kantor.local`; minta nilai aslinya ke tim TI.
 
 ## Cara kerja
 
@@ -49,16 +49,16 @@ yang harus dikompilasi dan diunduh dari internet, dan itu diblokir jaringan kant
 
 ## Pengaturan (`.env`)
 
-| Variabel | Contoh (profil DJP) | Arti |
+| Variabel | Contoh | Arti |
 |---|---|---|
-| `LDAP_SERVERS` | `ldap://10.254.28.50,ldap://10.254.28.142` | Server AD, dicoba berurutan. **Kosong = LDAP mati** |
-| `LDAP_DOMAIN` | `INTRANET` | Prefix login: `DOMAIN\username` |
-| `LDAP_SEARCH_BASE` | `OU=Pegawai DJP,DC=intranet,DC=pajak,DC=go,DC=id` | Tempat data pengguna dicari |
+| `LDAP_SERVERS` | `ldaps://dc1.kantor.local,ldaps://dc2.kantor.local` | Server AD, dicoba berurutan. **Kosong = LDAP mati** |
+| `LDAP_DOMAIN` | `KANTOR` | Prefix login: `DOMAIN\username` |
+| `LDAP_SEARCH_BASE` | `OU=Karyawan,DC=kantor,DC=local` | Tempat data pengguna dicari |
 | `LDAP_DEFAULT_ROLE` | `Gamma` | Role pengguna saat login pertama |
-| `SPS_ROLE_PENGGUNA` | `Pengguna` (instalasi DJP lama: `DJP Pegawai`) | Role dasar tambahan untuk semua pengguna LDAP: menu Studio, Asisten AI |
-| `LDAP_ADMIN_USERS` | (kosong) | Username yang otomatis jadi Admin. Boleh lebih dari satu, pisahkan koma: `111111111,222222222` |
+| `SPS_ROLE_PENGGUNA` | `Pengguna` | Role dasar tambahan untuk semua pengguna LDAP: menu Studio, Asisten AI |
+| `LDAP_ADMIN_USERS` | (kosong) | Username yang otomatis jadi Admin. Boleh lebih dari satu, pisahkan koma: `budi.santoso,siti.rahayu` |
 | `SPS_KUNCI_BERKAS` | kosong | Kunci berkas .ald/.aldx "kunci server"; samakan antar-server untuk berbagi berkas ([25](25-berkas-filter-global-ulasan.md)) |
-| `SPS_SUPERADMIN_USERS` | email Superadmin + NIP opsional dari installer | Username yang otomatis jadi **Admin + Superadmin** (pengaturan vital). Contoh: `060110956` ([24](24-superadmin-dan-batas-data.md)) |
+| `SPS_SUPERADMIN_USERS` | email Superadmin + username jaringan opsional dari installer | Username yang otomatis jadi **Admin + Superadmin** (pengaturan vital). Contoh: `budi.santoso` ([24](24-superadmin-dan-batas-data.md)) |
 | `AUTH_LOCAL_USERS` | `admin` | Akun lokal darurat tanpa `@` (tidak lewat LDAP). Username ber-`@` otomatis akun lokal |
 
 Setelah mengubah `.env`: `scripts\stop.ps1` lalu `scripts\start.ps1`.
@@ -80,7 +80,7 @@ Role per orang bisa diubah oleh Admin di **Settings → List Users**.
    ```powershell
    powershell -ExecutionPolicy Bypass -File scripts\test-ldap.ps1
    ```
-   Harus muncul `BERHASIL: LdapUser(username=..., display_name=..., nip=...)`.
+   Harus muncul `BERHASIL: LdapUser(username=..., display_name=..., nomor_pegawai=...)`.
 3. Nyalakan Superset, login dengan username & password jaringan kantor.
 
 ## Aturan keamanan yang sengaja dipasang

@@ -30,13 +30,13 @@ Setiap perubahan tercatat di tab **Riwayat** (siapa, kapan, nilai lama/baru).
 | Nama & teks | Nama aplikasi | judul tab browser, navbar, login (maks 40 huruf) |
 | | Nama perusahaan / instansi | login, kaki halaman, Asisten AI. Boleh kosong: login & kaki halaman memakai nama aplikasi |
 | | Slogan, Sapaan login, Teks kaki | teks di halaman login; `{tahun}` & `{perusahaan}` diganti otomatis |
-| | Halaman pertama setelah login | bawaan `/app/` (Beranda); bisa juga `/superset/dashboard/latihan/`. Bila dashboard tujuannya belum ada (mis. `beranda` profil DJP sebelum koneksi Oracle DMP dibuat), pengguna diarahkan ke daftar dashboard |
+| | Halaman pertama setelah login | bawaan `/app/` (Beranda); bisa juga `/superset/dashboard/latihan/`. Bila dashboard tujuannya belum ada atau sudah dihapus, pengguna diarahkan ke daftar dashboard |
 | Warna | Warna utama | navbar, tombol, header |
 | | Warna aksen | garis hiasan, sorotan, tab aktif |
 | | Warna latar halaman | latar belakang |
 | Tampilan & animasi | Huruf | Plus Jakarta Sans, Sistem (Segoe UI), Klasik (Georgia) — disimpan lokal, tanpa internet |
 | | Sudut | lembut, tegas, bulat |
-| | Motif hiasan | gelombang, titik, garis, polos |
+| | Motif hiasan | tinta (sapuan kuas & percikan, bawaan), gelombang, titik, garis, polos |
 | | Animasi halus | latar login bergerak, garis aksen mengalir, chart muncul perlahan |
 | Logo & ikon | Logo (latar terang), Logo (latar gelap), Ikon tab | unggah PNG/SVG/JPG/WebP maks 1 MB; **kosong = dibuat otomatis** dari nama & warna |
 
@@ -48,27 +48,50 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 
 | Preset | Warna utama / aksen | Motif |
 |---|---|---|
-| `netral` | biru `#1F4E79` / jingga `#F2A900` | gelombang — juga **mengembalikan semua isian ke bawaan** |
+| `netral` | **Tinta & Sakura**: hitam `#18181B` / pink `#E11D74`, latar `#F4F4F5` | tinta — juga **mengembalikan semua isian ke bawaan** |
+| `navy` | navy `#1E2A44` / biru `#4F7CF7` (tampilan bawaan versi sebelumnya) | polos |
 | `hijau` | `#0F6E56` / `#F4B400` | titik |
 | `marun` | `#7A1F2B` / `#E0A100` | garis |
 | `ungu` | `#4B2E83` / `#19B5A5` | gelombang |
 | `grafit` | `#263238` / `#26A69A` | titik |
-| `djp` | navy `#1F2F5F` / emas `#F2B705` | gelombang; nama & halaman depan DJP, logo ALDx |
 
-Preset selain `netral` dan `djp` hanya mengganti warna & motif; nama dan logo Anda tetap.
+Preset selain `netral` hanya mengganti warna & motif; nama dan logo Anda tetap.
 
-Logo resmi DJP **tidak disertakan** di repo (merek milik instansi). Preset `djp` memakai logo ALDx
-(`branding\logo-aldx.svg`, `logo-aldx-putih.svg`, `favicon-aldx.svg`). Logo lain bisa diunggah di tab ini
-kapan saja. Bila berkas logo `statis:` tidak ditemukan, logo dibuat otomatis dari nama & warna (tidak ada gambar rusak).
+### Tinta & Sakura (bawaan)
 
-Berkas logo ALDx dibuat dari generator yang sama dengan logo otomatis (`tema.svg_logo()`, warna bawaan),
+Gradasi **hitam → abu → putih** dengan **semburat pink**, proporsi 60-30-10:
+
+| Porsi | Peran | Warna |
+|---|---|---|
+| ±60% | latar & permukaan | putih `#FFFFFF`, latar `#F4F4F5`, abu muda turunan utama (`--sps-utama-muda`) |
+| ±30% | struktur: navbar gelap, tombol utama, judul, panggung login | hitam tinta `#18181B`, gelap `#121214`, abu `#4A4A4F` (`--sps-utama-terang`) |
+| ±10% | sorotan: fokus, tautan, langkah berikutnya, titik logo, motif | pink `#E11D74`; di latar gelap `#E85697` (`--sps-aksen-terang`) |
+
+Kontras (WCAG): putih di atas hitam 17,7:1; pink di atas putih 4,5:1 (AA); pink terang di atas hitam 5,5:1.
+Tautan memakai pink hanya bila kontrasnya ≥ 4,5:1 (`tema.warna_tautan()`); preset lain tidak berubah.
+Palet **chart** ikut tema: pink lebih dulu, lalu batu permata gelap yang tetap aman buta warna ([12 §1](12-studio-visual.md)).
+
+**Logo "Tebasan"**: huruf A tajam yang condong ke depan dibelah sayatan warna aksen yang naik ke kanan dan menembus
+bingkai, melambangkan ambisi, kecepatan, presisi. Tanda yang sama dipakai untuk logo otomatis setiap preset, ikon tab,
+dan animasi pemuatan (sayatan melesat).
+
+Instalasi yang sudah berjalan tidak berubah otomatis: pilih preset **netral** di tab ini untuk memakai tampilan baru,
+atau **navy** untuk kembali ke tampilan lama.
+
+Logo ALDx tersedia sebagai berkas di `branding\` (`logo-aldx.svg`, `logo-aldx-putih.svg`, `favicon-aldx.svg`) untuk
+dipakai lewat `statis:`. Logo perusahaan Anda bisa diunggah di tab ini kapan saja. Bila berkas logo `statis:` tidak ditemukan, logo dibuat otomatis dari nama & warna (tidak ada gambar rusak).
+
+Berkas logo ALDx (hitam dengan titik pink) dibuat dari generator yang sama dengan logo otomatis (`tema.svg_logo()`, warna bawaan),
 jadi identitasnya konsisten. Bila bentuk tanda di `tema.py` diubah, buat ulang ketiga berkas itu.
 
 ## 4. Halaman login beranimasi
 
-Halaman `/login/` memakai identitas di atas: panggung warna yang bergerak perlahan, motif hiasan,
-dan contoh grafik "hidup". Keamanan tidak berubah: formulir tetap dikirim ke Superset (LDAP / akun
-lokal, CSRF, batas percobaan). Pesan galat berbahasa Indonesia.
+Halaman `/login/` dibuat **bersih**: kanvas gradasi hitam → abu (tanpa motif) dengan logo di kiri atas, nama perusahaan
+dan slogan di kiri bawah, lalu panel formulir yang dipotong diagonal oleh sayatan warna aksen. Animasinya halus: tiga
+garis data tergambar bergantian, satu titik cahaya terus melaju di garis aksen, dan kilau lembut melintas perlahan.
+Formulir minimal bergaris bawah, tombol dengan sapuan aksen saat disorot. Di ponsel, kanvas menjadi kepala bermiring
+di atas formulir. Semua warna mengikuti preset. Keamanan tidak berubah: formulir tetap
+dikirim ke Superset (LDAP / akun lokal, CSRF, batas percobaan). Pesan galat berbahasa Indonesia.
 
 Bila tampilan bermasalah (mis. browser sangat lama), buka **`/login/?klasik=1`** untuk halaman login bawaan Superset.
 
@@ -79,7 +102,7 @@ Dibaca **sekali** oleh `scripts\build-dashboards.ps1` bila database belum punya 
 
 | Variabel | Contoh |
 |---|---|
-| `SPS_PRESET` | `netral`, `hijau`, `marun`, `ungu`, `grafit`, `djp` |
+| `SPS_PRESET` | `netral`, `navy`, `hijau`, `marun`, `ungu`, `grafit` |
 | `SPS_NAMA_APLIKASI` | `Analitik Penjualan` |
 | `SPS_NAMA_PERUSAHAAN` | `PT Contoh Sejahtera` |
 | `SPS_LOGO` | nama berkas di folder `branding\`, mis. `logo-kustom.png` |

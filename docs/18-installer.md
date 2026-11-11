@@ -25,7 +25,7 @@ Agar tidak mirip pola program jahat, pintasan **ALDx** memakai `scripts\buka.cmd
 berkas Setup memuat keterangan penerbit/versi.
 
 **Wizard ringkas (bawaan):** Pemeriksaan › Akun Superadmin › Pasang › Selesai. Centang **Atur pengaturan lanjutan**
-di halaman Superadmin untuk menampilkan Identitas & alamat, Pengguna lain, Login kantor, Sumber data DJP. Halaman **Asisten AI** selalu tampil (boleh dilewati)
+di halaman Superadmin untuk menampilkan Identitas & alamat, Pengguna lain, Login kantor. Halaman **Asisten AI** selalu tampil (boleh dilewati)
 (§2). Pada pasang ulang, centang ini otomatis aktif agar isian lama bisa ditinjau. Halaman yang tidak relevan
 dilewati otomatis.
 
@@ -141,16 +141,13 @@ Lewati bila tidak memakai jaringan kantor. Bila dicentang:
 | Isian | Keterangan |
 |---|---|
 | Server LDAP, Domain, Search base | dari tim jaringan. Sebaiknya `ldaps://` (terenkripsi); `ldap://` memunculkan peringatan merah |
-| NIP yang jadi Superadmin / Admin | opsional, pisah koma. Orang itu otomatis mendapat peran tersebut saat login |
-| **Uji (opsional)** | mencoba login NIP & password ke LDAP (password tidak disimpan). **Tidak wajib**: boleh lanjut walau komputer belum terhubung jaringan kantor |
+| Username yang jadi Superadmin / Admin | opsional, pisah koma. Orang itu otomatis mendapat peran tersebut saat login |
+| **Uji (opsional)** | mencoba login username & password ke LDAP (password tidak disimpan). **Tidak wajib**: boleh lanjut walau komputer belum terhubung jaringan kantor |
 
-Pegawai lain cukup login dengan NIP & password jaringan kantor; akunnya dibuat otomatis saat login pertama.
+Pengguna lain cukup login dengan username & password jaringan kantor; akunnya dibuat otomatis saat login pertama.
 Akun ber-email (Superadmin & pengguna halaman 4) selalu login sebagai akun lokal. Detail: [05](05-login-ldap.md).
 
-### Lanjutan: Sumber data DJP (hanya preset DJP)
-Password sumber **profil DJP** (Oracle DMP/IKU/Dashboard, ClickHouse DMP_OLAP). Muncul hanya bila tema warna
-*Direktorat Jenderal Pajak* dipilih. Perusahaan lain menghubungkan sumber data setelah instalasi lewat
-**Data → Hubungkan data** ([06](06-sumber-data.md)).
+Sumber data dihubungkan setelah instalasi lewat **Data → Hubungkan data** ([06](06-sumber-data.md)).
 
 ### Asisten AI (opsional, selalu tampil)
 ![](gambar/installer/i6-asisten-ai.png)
@@ -181,7 +178,6 @@ Muncul bila metadata masih di **MySQL XAMPP** atau **MariaDB** (versi sebelumnya
 | 2 | pindah metadata lama (XAMPP/MariaDB) → PostgreSQL *(bila ada)* | `scripts\pindah-metadata.ps1` |
 | 3 | bangun image, nyalakan metadb/engine/Redis, buat tabel, akun admin, role, auto-tuning, sertifikat HTTPS | `scripts\init.ps1` |
 | 4 | nyalakan semua container | `scripts\start.ps1` |
-| 5 | daftarkan koneksi sumber DJP *(hanya preset DJP)* | `scripts\add-connections.ps1` |
 | 6 | identitas awal, menu, izin, ALDx Engine | `scripts\build-dashboards.ps1` |
 | 7 | data latihan + dashboard latihan | `scripts\data-latihan.ps1` |
 | 8 | buat akun pengguna, tunggu web siap (maks. 5 menit), hapus password admin dari `.env` | (installer) |
@@ -222,10 +218,9 @@ powershell -ExecutionPolicy Bypass -File scripts\uji.ps1
 
 Installer hanya memanggil skrip di `scripts\`. Urutan manual yang sama:
 ```powershell
-Copy-Item .env.example .env        # lalu isi ADMIN_PASSWORD (dan opsional LDAP/sumber data)
+Copy-Item .env.example .env        # lalu isi ADMIN_PASSWORD (dan opsional LDAP)
 powershell -ExecutionPolicy Bypass -File scripts\init.ps1
 powershell -ExecutionPolicy Bypass -File scripts\start.ps1
-powershell -ExecutionPolicy Bypass -File scripts\add-connections.ps1
 powershell -ExecutionPolicy Bypass -File scripts\build-dashboards.ps1
 powershell -ExecutionPolicy Bypass -File scripts\data-latihan.ps1
 powershell -ExecutionPolicy Bypass -File scripts\uji.ps1
@@ -243,7 +238,10 @@ Redis, nginx), `offline\versi.txt`, dan Docker Desktop Installer. Berkas `.exe` 
 | Pemeriksaan | *Internet*: "paket offline" (OK) |
 | `scripts\init.ps1` | `Import-ImageOffline` (`scripts\_umum.ps1`): `docker load` sekali per versi paket (`.env` `SPS_OFFLINE_VERSI`), image tidak dibangun |
 
-Catatan: Oracle Instant Client (mode *thick*, Oracle < 12.1) tidak termasuk; lihat `docker/oracle/README.md`.
+Catatan: Oracle Instant Client (mode *thick*, Oracle < 12.1) dan driver SAP HANA (`hdbcli`) tidak termasuk; lihat
+`docker/oracle/README.md` dan `docker/wheels/README.md`. **Membangun paket offline untuk dibagikan:** pastikan tidak ada
+`docker\wheels\hdbcli-*.whl` maupun zip Instant Client di komputer pembangun, karena keduanya ikut masuk ke image
+dan lisensinya melarang dibagikan ulang ([THIRD-PARTY-LICENSES.md](../THIRD-PARTY-LICENSES.md) §4).
 WSL 2 di Windows yang sangat lama mungkin perlu pembaruan (`wsl --update` dari berkas, minta TI).
 
 **Cara manual**, di komputer yang punya internet:

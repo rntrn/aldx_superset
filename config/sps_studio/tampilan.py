@@ -20,7 +20,7 @@ from sps_studio import bidang, dasbor, lembar, prep
 log = logging.getLogger(__name__)
 FOLDER = Path(__file__).resolve().parent
 MENU = "Studio Visual"
-ROLE_MENU = [os.environ.get("SPS_ROLE_PENGGUNA") or "DJP Pegawai"]   # role dasar pengguna (.env)
+ROLE_MENU = [os.environ.get("SPS_ROLE_PENGGUNA") or "Pengguna"]   # role dasar pengguna (.env)
 
 bp = Blueprint("sps_studio", __name__, url_prefix="/studio",
                static_folder=str(FOLDER / "static"), static_url_path="/static")

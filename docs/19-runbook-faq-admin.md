@@ -181,7 +181,6 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Query metadb langsung | `docker compose exec metadb psql -U superset -d sps_superset` (keluar: `\q`) |
 | Query engine langsung | `docker compose exec engine clickhouse-client` (keluar: `exit`) |
 | Bersihkan sisa image | `scripts\cleanup.ps1` |
-| Sambungkan ulang sumber `.env` | `scripts\add-connections.ps1` |
 | Bangun ulang dashboard bawaan & menu | `scripts\build-dashboards.ps1` |
 | Muat ulang data latihan | `scripts\data-latihan.ps1` |
 
@@ -231,7 +230,11 @@ Ya, setelah `scripts\uji.ps1` lulus. Metadata sudah di container `metadb`; data 
 Cadangkan → salin berkas versi baru ke `D:\superset` (`.env` & `backup\` jangan ditimpa) → `PASANG.cmd` → `scripts\uji.ps1`.
 
 **12. Mengganti logo, nama, warna?**
-Pusat Kendali → **Identitas & Tema**. Tanpa restart.
+Pusat Kendali → **Identitas & Tema**. Tanpa restart. Logo perusahaan diunggah di tab yang sama.
+
+**12a. Kartu SAP HANA abu-abu di Hubungkan data?**
+Driver SAP (`hdbcli`) tidak disertakan karena lisensinya. Unduh `hdbcli-*.whl`, taruh di `docker\wheels\`, jalankan
+`scripts\init.ps1` ([06 §4](06-sumber-data.md#4-menambah-jenis-database-baru-pengembang)). Fitur lain tidak terpengaruh.
 
 **13. Menambah sumber data baru?**
 Pusat Kendali → **Hubungkan data** (database, data warehouse, atau berkas Access/Excel/CSV). Lihat [06-sumber-data.md](06-sumber-data.md).
@@ -274,7 +277,7 @@ Disimpan 365 hari (Pengaturan › `keamanan.audit_simpan_hari`).
 Tunggu 15 menit, atau di server: `scripts\buka-kunci.ps1 -Akun <email>`.
 
 **19. LDAP mati / belum ada. Bisa login?**
-Bisa. Superadmin & akun ber-email selalu akun lokal. LDAP hanya untuk login NIP pegawai dan boleh diaktifkan nanti ([05](05-login-ldap.md)).
+Bisa. Superadmin & akun ber-email selalu akun lokal. LDAP hanya untuk login dengan akun jaringan kantor dan boleh diaktifkan nanti ([05](05-login-ldap.md)).
 
 ---
 

@@ -20,6 +20,7 @@ import json
 from typing import Any
 
 from sps_ai import alat
+from sps_studio import lembar
 
 LEBAR_SAH = (3, 4, 6, 8, 12)
 JENIS_FILTER = {"pilihan": "filter_select", "rentang": "filter_range"}
@@ -120,7 +121,7 @@ def simpan(data: dict, dashboard_id: int | None = None) -> dict:
     judul = (str(data.get("judul") or "").strip() or "Dashboard Studio")[:500]
     pos, charts = posisi(judul, str(data.get("keterangan") or ""), data.get("baris") or [])
     filter_studio = filter_native(data.get("filter") or [], [c.id for c in charts])
-    meta = {"sps_studio": True, "cross_filters_enabled": True, "color_scheme": "djpWarna"}
+    meta = {"sps_studio": True, "cross_filters_enabled": True, "color_scheme": lembar.SKEMA_WARNA}
 
     if dashboard_id:
         dash = db.session.query(Dashboard).get(int(dashboard_id))

@@ -4,7 +4,7 @@ Diatur di Pusat Kendali > Identitas & Tema (atau installer), berlaku TANPA resta
 setiap node memeriksa versi identitas tiap ±10 detik lalu memperbarui tema Superset.
 
 Struktur modul (baca berurutan):
-    skema.py        daftar isian, nilai bawaan, preset (netral, DJP, hijau, ...), validasi
+    skema.py        daftar isian, nilai bawaan, preset (netral, navy, hijau, ...), validasi
     penyimpanan.py  tabel sps_identitas & sps_identitas_berkas di database metadata
     tema.py         identitas -> token tema Superset, CSS bersama, logo/favicon/spinner SVG
     tampilan.py     /identitas/... (CSS, berkas, API admin) + penyisipan CSS ke semua halaman
@@ -56,7 +56,7 @@ def siapkan() -> list[str]:
 
     Isi awal dipakai bila database belum punya identitas, atau SPS_IDENTITAS_TERAPKAN=1
     (diisi installer ketika admin mengubah halaman Identitas).
-      SPS_PRESET           netral | djp | hijau | marun | ungu | grafit
+      SPS_PRESET           netral (Tinta & Sakura) | navy | hijau | marun | ungu | grafit
       SPS_NAMA_APLIKASI, SPS_NAMA_PERUSAHAAN, SPS_HALAMAN_DEPAN
       SPS_LOGO             nama berkas di folder branding/ (mis. logo-kustom.png)
     """
@@ -71,8 +71,9 @@ def siapkan() -> list[str]:
     if penyimpanan.ada_isian() and not paksa:
         return ["identitas: sudah ada (diubah lewat Pusat Kendali > Identitas & Tema)"]
 
-    lama_djp = os.environ.get("APP_NAME") == "DJP Analytics"          # instalasi versi sebelumnya
-    preset = os.environ.get("SPS_PRESET") or ("djp" if lama_djp else "netral")
+    preset = os.environ.get("SPS_PRESET") or "netral"
+    if preset not in skema.PRESET:                                     # preset yang sudah tidak ada
+        preset = "netral"
     isi = skema.nilai_preset(preset)
     for kunci, env in (("nama_aplikasi", "SPS_NAMA_APLIKASI"), ("nama_perusahaan", "SPS_NAMA_PERUSAHAAN"),
                        ("halaman_depan", "SPS_HALAMAN_DEPAN")):

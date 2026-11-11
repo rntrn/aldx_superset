@@ -184,7 +184,7 @@ def buat_dashboard(ip: int, il: int, pemilik: str = "admin") -> str:
     return f"dashboard '{JUDUL_DASHBOARD}' -> /superset/dashboard/{SLUG}/"
 
 
-# Data latihan versi lama (tema pajak). Dihapus otomatis saat data latihan baru dimuat.
+# Data latihan versi lama. Dihapus otomatis saat data latihan baru dimuat.
 LAMA = ("latihan_penerimaan", "latihan_lokasi_wp")
 
 
@@ -238,6 +238,8 @@ def siapkan(database=None) -> list[str]:
     import os
     hasil.append(buat_dashboard(ids["latihan_penjualan"], ids["latihan_lokasi_pelanggan"],
                                 os.environ.get("ADMIN_USERNAME", "admin")))
+    import sps_warna                    # warna kategori tetap & berurutan sesuai palet sejak awal
+    hasil.append(sps_warna.kunci_semua())
     return hasil
 
 

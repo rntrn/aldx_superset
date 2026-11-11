@@ -70,6 +70,9 @@ SKENARIO = [
     ("A14", 4, "Sedang", "Instalasi dengan LDAP", "Server LDAP uji terjangkau",
      "PASANG.cmd → Login & pengguna: LDAP → isi server, domain, search base, admin LDAP → Uji koneksi → Pasang",
      "Uji koneksi OK; .env LDAP_* terisi; login username jaringan berhasil; admin lokal tetap bisa login"),
+    ("A15", 4, "Sedang", "Berkas lisensi ikut terpasang", "A01",
+     "Buka folder instalasi (mis. D:\\superset); buka LICENSE, NOTICE, THIRD-PARTY-LICENSES.md",
+     "Ketiga berkas ada; LICENSE = Apache License 2.0; NOTICE menyebut ALDx & Apache Superset; tidak ada logo instansi di branding\\"),
 
     # B. Login & sesi
     ("B01", 1, "Tinggi/asap", "Login akun pengguna", "Akun lokal dibuat admin (atau LDAP aktif)",
@@ -80,7 +83,7 @@ SKENARIO = [
     ("B04", 1, "Sedang", "Batas percobaan login", "–",
      "Coba login salah lebih dari batas per menit (Pusat Kendali → Gateway)", "Ditolak sementara (HTTP 429), normal kembali setelah 1 menit"),
     ("B05", 1, "Sedang", "Akun LDAP terdaftar otomatis", "LDAP aktif; pengguna login pertama kali",
-     "Admin cek Settings → List Users", "User terdaftar dengan role LDAP_DEFAULT_ROLE + SPS_ROLE_PENGGUNA (profil DJP: role sesuai akses.yaml)"),
+     "Admin cek Settings → List Users", "User terdaftar dengan role LDAP_DEFAULT_ROLE + SPS_ROLE_PENGGUNA (+ role \"Akses …\" bila profil pengguna aktif)"),
     ("B06", 1, "Rendah", "Keluar", "B01", "Menu Settings → Log out", "Kembali ke halaman login; tombol Back tidak membuka data"),
     ("B07", 1, "Sedang", "Halaman login beranimasi", "–",
      "Buka /login/; lalu aktifkan Windows 'Show animations' = Off dan muat ulang; buka /login/?klasik=1",
@@ -219,6 +222,15 @@ SKENARIO = [
     ("F15", 3, "Sedang", "Impor Microsoft Access", "Berkas .mdb/.accdb (mis. Northwind)",
      "Hubungkan data → Berkas → pilih berkas → centang tabel → Impor",
      "Tabel terbaca dengan contoh isi; kolom foto/lampiran dilewati; dataset terbentuk"),
+    ("F18", 3, "Tinggi", "Impor data latihan Penerbangan (6 lembar)", "berkas bahan-ajar/berkas/contoh-penerbangan-sedang.xlsx",
+     "Hubungkan data → Berkas → pilih berkas → centang 6 lembar, awalan terbang → Impor; Kueri Visual: gabung tiket + jadwal + "
+     "penerbangan + maskapai, jumlahkan harga (status bukan Refund) per maskapai",
+     "6 dataset terbang_*; tiket 150.000 baris; Nusa Air terbesar Rp151,25 miliar, total Rp323,94 miliar "
+     "(angka kunci: bahan-ajar/berkas/README.md)"),
+    ("F19", 3, "Sedang", "SAP HANA opsional", "Image tanpa hdbcli-*.whl di docker\\wheels",
+     "Hubungkan data → lihat kartu SAP HANA, arahkan kursor; jalankan scripts\\uji.ps1",
+     "Kartu SAP HANA nonaktif dengan petunjuk unduh driver SAP; uji 'driver database & berkas terpasang' LULUS "
+     "dengan catatan 'opsional belum dipasang: SAP HANA'. Setelah hdbcli ditaruh & init.ps1: kartu aktif"),
 
     # G. Pusat Kendali
     ("G01", 4, "Tinggi/asap", "Status", "A01", "Pusat Kendali → Status", "Semua node online; CPU/RAM tampil; antrean tampil"),
@@ -243,6 +255,16 @@ SKENARIO = [
     ("G11", 4, "Tinggi", "Usulan /hw-engineer & /ahli-ui-ux", "Akun Superadmin; model AI aktif",
      "Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru",
      "Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat"),
+    ("G12", 4, "Sedang", "Logo ALDx \"Tebasan\" & animasi pemuatan", "Akun Admin",
+     "Lihat navbar, halaman login, tab browser; buka dashboard berat; ganti preset ke hijau lalu kembali ke netral",
+     "Logo huruf A dibelah sayatan pink di latar terang & gelap, favicon tajam; pemuatan menampilkan sayatan melesat; "
+     "di preset lain tanda mengikuti warna preset; tidak ada gambar rusak"),
+    ("G13", 4, "Sedang", "Tema bawaan Tinta & Sakura", "Akun Admin",
+     "Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom "
+     "isian login; lalu preset navy",
+     "Login bersih: kanvas gradasi hitam → abu tanpa motif, hanya logo di kiri atas + slogan di kiri bawah, garis data "
+     "tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan "
+     "pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama"),
 
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",
@@ -264,9 +286,9 @@ SKENARIO = [
     ("H10", 2, "Tinggi", "Kueri Visual tunduk RLS", "Akun Analis dengan aturan RLS cabang",
      "Kueri Visual → latihan_penjualan → kolom nm_cabang, Jumlah total → Jalankan",
      "Hanya cabang akun itu yang muncul (sama dengan SQL Lab & dashboard)"),
-    ("H12", 4, "Tinggi", "Installer: Superadmin email & NIP opsional", "Jaringan kantor/VPN (opsional)",
-     "PASANG.cmd → Akun Superadmin (email & password) → Login kantor: centang LDAP, isi NIP Superadmin → Pasang → login dengan email lalu dengan NIP",
-     "Email selalu bisa login (juga saat LDAP mati); NIP melihat tab Pengaturan/Batas data/Hak akses; password tidak ada di .env"),
+    ("H12", 4, "Tinggi", "Installer: Superadmin email & username LDAP opsional", "Jaringan kantor/VPN (opsional)",
+     "PASANG.cmd → Akun Superadmin (email & password) → Login kantor: centang LDAP, isi username Superadmin → Pasang → login dengan email lalu dengan username jaringan",
+     "Email selalu bisa login (juga saat LDAP mati); username jaringan melihat tab Pengaturan/Batas data/Hak akses; password tidak ada di .env"),
     ("H13", 1, "Tinggi", "Akun terkunci setelah salah password", "Akun uji", "Login dengan password salah 5 kali, lalu dengan password benar",
      "Pesan 'Akun dikunci sementara… coba lagi pukul …'; password benar ditolak sampai kunci habis atau Admin membuka di Pusat Kendali › Riwayat"),
     ("H14", 4, "Tinggi", "Jejak audit lengkap", "H13; akun Admin", "Unduh CSV dari chart, ekspor berkas .ald, ubah role pengguna, lalu buka Pusat Kendali › Riwayat",
@@ -342,6 +364,11 @@ SKENARIO = [
      "Dashboard tetap bisa dibuka selama penyegaran; selesai < batas 6 jam"),
     ("I04", 4, "Rendah", "Ramalan harian", "Ada chart ramalan", "Cek keesokan hari setelah 03:00",
      "Kolom diperbarui di tabel sps_ramalan berganti; chart memuat data terbaru"),
+    ("I05", 3, "Sedang", "Data besar 1 juta tiket", "scripts\\data-penerbangan.ps1 (berkas besar dibuat)",
+     "Hubungkan data → Berkas → contoh-penerbangan-besar.xlsx → Impor; buat chart pendapatan per bulan dari tiket + jadwal; "
+     "ulangi setelah ekstrak",
+     "Impor selesai tanpa melebihi batas (atau pesan batas jelas); 1.000.000 baris tiket; pendapatan Rp2,28 triliun; "
+     "chart tampil < 5 detik setelah ekstrak"),
 ]
 
 LEVEL = {1: "1 Pengguna", 2: "2 Analis", 3: "3 Admin data", 4: "4 Admin server"}

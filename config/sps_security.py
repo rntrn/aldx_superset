@@ -1,4 +1,4 @@
-"""Security manager Superset proyek ALDx: login LDAP DJP + akun lokal darurat.
+"""Security manager Superset proyek ALDx: login LDAP / Active Directory (opsional) + akun lokal.
 
 Superset memanggil `auth_user_ldap()` setiap ada yang login (AUTH_TYPE = AUTH_LDAP).
 Fungsi bawaannya butuh paket python-ldap (harus dikompilasi, tidak bisa
@@ -10,8 +10,8 @@ Alur login:
         - pertama kali login: user dibuat otomatis dengan role LDAP_DEFAULT_ROLE
         - username di LDAP_ADMIN_USERS: dipastikan punya role Admin
         - username di SPS_SUPERADMIN_USERS: dipastikan punya role Admin + Superadmin
-        - profil pegawai diambil dari Oracle -> role "DJP ..." sesuai akses.yaml
-          (lihat sps_akses.py; hak akses DATA diterapkan lewat RLS)
+        - bila profil diaktifkan di akses.yaml: profil pengguna diambil dari database perusahaan
+          -> role sesuai aturan (lihat sps_akses.py; hak akses DATA diterapkan lewat RLS)
 
 Penguncian akun (sps_kunci): salah password berulang -> akun dikunci sementara, lokal maupun LDAP.
 Hak minimum: menu admin ALDx & Superset tidak pernah diberikan ke role bawaan Gamma/Alpha oleh
@@ -32,10 +32,8 @@ import sps_ldap
 log = logging.getLogger(__name__)
 
 NAME_MAX_LENGTH = 64  # batas kolom first_name/last_name di tabel ab_user
-# Role dasar yang dimiliki semua pengguna login LDAP. Diatur SPS_ROLE_PENGGUNA di .env
-# (instalasi baru: "Pengguna"; instalasi DJP lama tetap "DJP Pegawai" agar tidak berubah).
-ROLE_PEGAWAI = os.environ.get("SPS_ROLE_PENGGUNA") or "DJP Pegawai"
-PREFIX_ROLE_DJP = "DJP "       # role dengan awalan ini dikelola otomatis
+# Role dasar yang dimiliki semua pengguna login LDAP. Diatur SPS_ROLE_PENGGUNA di .env.
+ROLE_PENGGUNA = os.environ.get("SPS_ROLE_PENGGUNA") or "Pengguna"
 
 
 def _env_list(name: str, default: str = "") -> set[str]:
@@ -88,7 +86,7 @@ class SpsSecurityManager(SupersetSecurityManager):
         tambah = []
         if "Superadmin" in nama and self.auth_role_admin not in nama:
             tambah.append(self.auth_role_admin)
-        if ROLE_PEGAWAI in nama and not nama & {"Gamma", "Alpha", self.auth_role_admin, *tambah}:
+        if ROLE_PENGGUNA in nama and not nama & {"Gamma", "Alpha", self.auth_role_admin, *tambah}:
             tambah.append("Gamma")
         role = [r for r in (self.find_role(n) for n in tambah) if r is not None]
         if role:
@@ -124,7 +122,7 @@ class SpsSecurityManager(SupersetSecurityManager):
             return None
 
         # Akun lokal: login berupa email (dibuat installer / Kelola > Pengguna) atau tercantum di AUTH_LOCAL_USERS.
-        # NIP pegawai (tanpa "@") selalu diperiksa ke LDAP. Jadi Superadmin tetap bisa masuk walau LDAP mati.
+        # Username jaringan (tanpa "@") selalu diperiksa ke LDAP. Jadi Superadmin tetap bisa masuk walau LDAP mati.
         if "@" in username or username in _env_list("AUTH_LOCAL_USERS", "admin"):
             user = self.auth_user_db(username, password)
             log.info("ALDx login lokal %s: %s", username, "BERHASIL" if user else "GAGAL")
@@ -205,7 +203,7 @@ class SpsSecurityManager(SupersetSecurityManager):
             role=role,
         )
         if user:
-            log.info("User LDAP baru terdaftar: %s (NIP %s)", ldap_user.username, ldap_user.nip)
+            log.info("User LDAP baru terdaftar: %s (nomor pegawai %s)", ldap_user.username, ldap_user.nomor_pegawai or "-")
         else:
             log.error("Gagal mendaftarkan user LDAP %s (email bentrok?)", ldap_user.username)
         return user
@@ -235,9 +233,10 @@ class SpsSecurityManager(SupersetSecurityManager):
     def _sync_akses_inti(self, user) -> None:
         profil = sps_akses.sinkron_profil(user.username)
         keputusan = sps_akses.putuskan(profil)
-        nama_role = {ROLE_PEGAWAI, *keputusan.peran}
+        nama_role = {ROLE_PENGGUNA, *keputusan.peran}
+        awalan = sps_akses.awalan_peran()
 
-        user.roles = [r for r in user.roles if not r.name.startswith(PREFIX_ROLE_DJP)]
+        user.roles = [r for r in user.roles if not r.name.startswith(awalan)]
         user.roles += [self.add_role(nama) for nama in sorted(nama_role)]
         self.update_user(user)
         log.info("ALDx akses %s: aturan '%s', lingkup %s, role %s",

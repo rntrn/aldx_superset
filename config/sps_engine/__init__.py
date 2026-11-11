@@ -2,7 +2,7 @@
 mesin analitik internal untuk ekstrak & upload.
 
 Dipakai untuk:
-    - EKSTRAK: salinan dataset Oracle/ClickHouse DMP/MySQL yang disegarkan terjadwal
+    - EKSTRAK: salinan dataset Oracle/ClickHouse/MySQL/dll. yang disegarkan terjadwal
     - UPLOAD Excel/CSV dari menu Superset
     - hasil PREDIKSI (forecast) yang disimpan sebagai dataset
 

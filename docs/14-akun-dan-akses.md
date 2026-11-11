@@ -44,7 +44,6 @@ Docker. Password **tidak ditulis di sini**; dokumen ini hanya menunjukkan di man
 | **engine** | Superset & admin ke ALDx Engine | `.env` → `ENGINE_USER` (`sps`) | `.env` → `ENGINE_PASSWORD` | sistem / Admin data |
 | **redis** | cache & antrean | (tanpa username) | `.env` → `REDIS_PASSWORD` | sistem |
 | **Sumber data** (wizard Hubungkan data) | membaca data perusahaan | diisi di wizard | metadb, **terenkripsi** dengan `SUPERSET_SECRET_KEY` | DBA pemilik sumber |
-| **Sumber data profil DJP** (opsional) | Oracle DMP/IKU/Dashboard, ClickHouse DMP_OLAP | `.env` → `ORACLE_*_USER`, `CLICKHOUSE_USER` | `.env` → `ORACLE_*_PASSWORD`, `CLICKHOUSE_PASSWORD` | pemilik sumber data |
 | **Model AI cloud** | Asisten AI (opsional) | – | `.env` → `AI_*_API_KEY` | Admin server |
 | **SECRET_KEY** | mengenkripsi password koneksi di metadb | – | `.env` → `SUPERSET_SECRET_KEY` | **jangan diganti** |
 
@@ -64,7 +63,7 @@ Password `REDIS_PASSWORD`, `METADB_PASSWORD`, `ENGINE_PASSWORD`, dan
 
 Peran di tabel pengguna installer: **Pengguna** = Gamma + Pengguna · **Analis** = Gamma + Pengguna + sql_lab · **Admin** = Admin · **Superadmin** = Admin + Superadmin.
 | role buatan Anda (mis. `Cabang Jakarta`) | kelompok untuk aturan RLS | Settings → List Roles; kemampuan di Pusat Kendali → Hak akses |
-| `DJP Pegawai`, `DJP Kanwil`, … | role profil DJP (otomatis dari `akses.yaml`) | hanya instalasi DJP |
+| `Akses …` (mis. `Akses Cabang`) | role otomatis dari profil pengguna (`akses.yaml`) | hanya bila profil diaktifkan ([08 §B](08-hak-akses-data.md)) |
 
 ---
 
@@ -168,7 +167,6 @@ lalu `scripts\start.ps1` (`docker compose up -d`); berlaku saat login berikutnya
 
 ### 4.3 Mengganti password sumber data
 **Settings → Database Connections** → edit koneksi → isi password baru → **Test connection** → **Finish**.
-Profil DJP (koneksi dari `.env`): ubah `ORACLE_*_PASSWORD` / `CLICKHOUSE_PASSWORD` → `scripts\add-connections.ps1`.
 
 ### 4.4 Mengganti password container (metadb, engine, redis)
 Password ini dipakai saat volume pertama kali dibuat. Menggantinya perlu dua langkah:
@@ -182,7 +180,7 @@ Password ini dipakai saat volume pertama kali dibuat. Menggantinya perlu dua lan
 Hindari tanda `$ " ' \` # spasi` di password (merusak `.env`).
 
 ### 4.5 Akun terkunci (salah password berulang)
-Setelah **5 kali** salah password berturut-turut, akun dikunci **15 menit** (akun email maupun NIP LDAP); selama itu
+Setelah **5 kali** salah password berturut-turut, akun dikunci **15 menit** (akun email maupun akun LDAP); selama itu
 password benar pun ditolak dan halaman login menampilkan jam kunci berakhir. Atur di Pusat Kendali › Pengaturan ›
 Gateway & keamanan (`keamanan.login_maks_gagal`, `keamanan.login_kunci_menit`; 0 = tidak dikunci).
 
@@ -190,7 +188,7 @@ Gateway & keamanan (`keamanan.login_maks_gagal`, `keamanan.login_kunci_menit`; 0
 |---|---|
 | Tunggu sampai waktu kunci habis | pengguna |
 | Pusat Kendali › **Riwayat** › *Akun terkunci* › **Buka kunci** | Admin (akun Superadmin hanya oleh Superadmin) |
-| `powershell -ExecutionPolicy Bypass -File scripts\buka-kunci.ps1 -Akun <email/NIP>` | admin server (darurat, mis. Superadmin satu-satunya terkunci) |
+| `powershell -ExecutionPolicy Bypass -File scripts\buka-kunci.ps1 -Akun <email/username>` | admin server (darurat, mis. Superadmin satu-satunya terkunci) |
 
 Semua login (berhasil, gagal, dikunci, dibuka) tercatat di **jejak audit** (Pusat Kendali › Riwayat).
 

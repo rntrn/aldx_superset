@@ -19,9 +19,11 @@
     if (!el || !sah(n.warna_utama) || !sah(n.warna_aksen)) return;
     const u = n.warna_utama, a = n.warna_aksen;
     Object.entries({"--sps-utama": u, "--sps-utama-gelap": campur(u, "#000000", .25), "--sps-utama-terang": campur(u, "#FFFFFF", .22),
-      "--sps-utama-muda": campur(u, "#FFFFFF", .9), "--sps-aksen": a, "--sps-latar": n.warna_latar,
+      "--sps-utama-muda": campur(u, "#FFFFFF", .9), "--sps-aksen": a, "--sps-aksen-terang": campur(a, "#FFFFFF", .25),
+      "--sps-latar": n.warna_latar,
       "--sps-teks-utama": terang(u) < .42 ? "#FFFFFF" : "#111827"}).forEach(([k, v]) => el.style.setProperty(k, v));
-    $("#idnPNama").textContent = n.nama_aplikasi; $("#idnPPerusahaan").textContent = n.nama_perusahaan;
+    $("#idnPNama").textContent = n.nama_aplikasi;
+    $("#idnPPerusahaan").textContent = n.nama_perusahaan;
     $("#idnPSlogan").textContent = n.slogan;
     el.dataset.hiasan = n.hiasan;
   }
@@ -58,10 +60,15 @@
       <div class="idnTata"><div>${grup}</div>
         <div class="idnSamping"><h2 style="margin-top:0">Pratinjau</h2>
           <div id="idnPratinjau" class="idnP">
-            <div class="idnPBar"><span class="idnPLogo"></span><b id="idnPNama"></b><span class="idnPMenu">Dashboard · Chart · SQL</span></div>
-            <div class="idnPIsi"><div class="idnPLogin"><div class="idnPPerusahaan" id="idnPPerusahaan"></div><div id="idnPSlogan" class="ket"></div>
-              <div class="idnPInput"></div><div class="idnPInput"></div><div class="idnPTombol">Masuk</div></div>
-              <div class="idnPKartu"><div class="idnPJudul"></div><div class="idnPBatang"><i></i><i></i><i></i><i></i><i></i></div></div></div>
+            <div class="idnPBar"><svg class="idnPLogo" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#fff"/>
+              <path d="M7.5 32.5 L20 10 L32.5 32.5" fill="none" stroke-width="4" stroke-miterlimit="10" style="stroke:var(--sps-utama)"/>
+              <path d="M13 26.6 L39.5 19.9" stroke="#fff" stroke-width="6.2"/><path d="M13 26.6 L39.5 19.9" stroke-width="3.4" style="stroke:var(--sps-aksen)"/></svg>
+              <b id="idnPNama"></b><span class="idnPMenu">Dashboard · Chart · SQL</span></div>
+            <div class="idnPPoster">
+              <div class="idnPKanvas"><span class="idnPPerusahaan" id="idnPPerusahaan"></span><b id="idnPSlogan" class="idnPSlogan"></b></div>
+              <div class="idnPForm"><b>Masuk</b><i></i><i></i><div class="idnPTombol">Masuk <span>→</span></div></div>
+              <svg class="idnPSayatan" aria-hidden="true"><line x1="64.1%" y1="0" x2="54%" y2="100%"/></svg>
+            </div>
           </div>
           <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <button class="utama" id="idnSimpan" ${Object.keys(UBAH).length ? "" : "disabled"}>Simpan identitas</button>

@@ -20,7 +20,8 @@ tampil di dalamnya. Navigasi, judul, pencarian, bantuan, dan bahasa sama di semu
 Prinsip visual: tenang dan lega. Abu-abu netral dipadukan dengan satu warna aksen dari Identitas & Tema,
 sudut membulat, dan bayangan tipis berlapis. Gerakannya singkat dan halus (160–260 ms), tanpa animasi berulang,
 dan otomatis mati bila pengguna memilih *kurangi gerakan* di sistem operasinya. Preset bawaan instalasi baru
-bernama **Elegan** (navy `#1E2A44`, biru `#4F7CF7`, latar `#F5F6F8`).
+bernama **Tinta & Sakura** (hitam `#18181B` → abu → putih, semburat pink `#E11D74`, latar `#F4F4F5`); tampilan lama
+tersedia sebagai preset **navy** ([09 §3](09-identitas-tema.md#3-preset)).
 
 ## 2. Susunan layar
 

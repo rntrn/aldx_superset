@@ -31,6 +31,39 @@ def _palet() -> list[str]:
     return list(bawaan["colors"]) if bawaan else ["#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD"]
 
 
+def _petakan_palet_lama(warna: dict[str, str]) -> tuple[dict[str, str], bool]:
+    """Warna dari palet versi sebelumnya -> warna di posisi yang sama pada palet baru.
+    Warna pilihan pembuat dashboard (bukan anggota palet lama) tidak diubah."""
+    from sps_studio.lembar import WARNA, WARNA_LAMA
+    peta = {lama.lower(): baru for lama, baru in zip(WARNA_LAMA, WARNA)}
+    hasil = {k: peta.get(str(v).lower(), v) for k, v in warna.items()}
+    return hasil, hasil != warna
+
+
+def skema_baru(nama: str | None) -> str | None:
+    """Id skema warna ALDx versi sebelumnya -> id skema sekarang; None bila bukan skema lama.
+    Skema lama ALDx berakhiran "Warna" (kategori) atau "Biru" (runtun); skema bawaan Superset tidak."""
+    from sps_studio.lembar import SKEMA_RUNTUN, SKEMA_WARNA
+    if not nama or nama in (SKEMA_WARNA, SKEMA_RUNTUN):
+        return None
+    if nama.endswith("Warna"):
+        return SKEMA_WARNA
+    if nama.endswith("Biru"):
+        return SKEMA_RUNTUN
+    return None
+
+
+def _alihkan_skema_chart(chart) -> None:
+    try:
+        p = json.loads(chart.params or "{}")
+    except ValueError:
+        return
+    ubah = {k: b for k in ("color_scheme", "linear_color_scheme") if (b := skema_baru(p.get(k)))}
+    if ubah:
+        p.update(ubah)
+        chart.params = json.dumps(p)
+
+
 def _dimensi(form_data: dict) -> list[str]:
     nama = []
     for k in KUNCI_DIMENSI:
@@ -46,7 +79,11 @@ def _dimensi(form_data: dict) -> list[str]:
 def kunci_dashboard(dash) -> int:
     """Lengkapi label_colors satu dashboard. Kembalikan jumlah label baru."""
     meta = json.loads(dash.json_metadata or "{}")
-    warna = dict(meta.get("label_colors") or {})
+    warna, dipetakan = _petakan_palet_lama(dict(meta.get("label_colors") or {}))
+    if (baru_skema := skema_baru(meta.get("color_scheme"))) is not None:
+        meta["color_scheme"], dipetakan = baru_skema, True
+    for chart in dash.slices:                                   # chart di dashboard ikut skema baru
+        _alihkan_skema_chart(chart)
     nilai: set[str] = set()
     for chart in dash.slices:
         ds = chart.datasource
@@ -74,7 +111,7 @@ def kunci_dashboard(dash) -> int:
         if v not in warna:
             warna[v] = palet[(terpakai + baru) % len(palet)]
             baru += 1
-    if baru:
+    if baru or dipetakan:
         meta["label_colors"] = warna
         dash.json_metadata = json.dumps(meta)
     return baru
@@ -91,11 +128,14 @@ def kunci_semua() -> str:
     if admin is None:
         return "warna kategori: tidak ada akun Admin aktif"
     total = jumlah = 0
+    from superset.models.slice import Slice
     with override_user(admin):
         for d in db.session.query(Dashboard).all():
             n = kunci_dashboard(d)
             total += n
             jumlah += bool(n)
+        for chart in db.session.query(Slice).all():      # chart di luar dashboard ikut skema warna baru
+            _alihkan_skema_chart(chart)
     db.session.commit()
     return f"warna kategori tetap: {total} label baru di {jumlah} dashboard"
 

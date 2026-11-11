@@ -5,9 +5,9 @@ Tipe ClickHouse dipilih dari data (potongan pertama):
     pecahan/Decimal  -> Nullable(Float64)
     tanggal-waktu    -> Nullable(DateTime64(3))
     tanggal          -> Nullable(Date32)
-    teks berulang    -> LowCardinality(Nullable(String))   (mis. kode kanwil: hemat & cepat)
+    teks berulang    -> LowCardinality(Nullable(String))   (mis. kode cabang: hemat & cepat)
     teks lain        -> Nullable(String)
-Urutan penyimpanan (ORDER BY) = kolom hak akses (mis. KD_KANWIL), agar filter per pegawai cepat.
+Urutan penyimpanan (ORDER BY) = kolom hak akses (mis. KD_CABANG), agar filter per pengguna cepat.
 """
 
 from __future__ import annotations

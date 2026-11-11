@@ -147,7 +147,7 @@ Tidak perlu container tambahan: `pandas` + `numpy` sudah ada di image Superset.
 | Tren | regresi linear (`np.polyfit`), R² | "tren naik kuat (R² 0,95)" |
 | Konsentrasi | indeks Herfindahl, porsi top-3 | "3 teratas = 72% total" |
 | Variasi | koefisien variasi | "perbedaan antar kategori besar" |
-| Pencilan | z-score > 2,5 | "ada nilai ekstrem: KPP X" |
+| Pencilan | z-score > 2,5 | "ada nilai ekstrem: Cabang X" |
 | Korelasi | Pearson r ≥ 0,7 | "jumlah_transaksi ↔ total sangat berkorelasi (r 0,98)" |
 | Segmen | k-means (numpy) | "kategori terbagi 3 kelompok" |
 

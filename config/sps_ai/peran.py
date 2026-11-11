@@ -10,7 +10,7 @@ PRINSIP KEAMANAN:
     - Setiap alat berjalan sebagai pengguna yang login (hak akses & RLS tetap berlaku).
     - Peran yang mengubah pengaturan HANYA membuat USULAN (peristiwa "usulan"). Perubahan baru terjadi
       setelah manusia menekan "Terapkan", lewat API biasa yang memeriksa hak aksesnya sendiri.
-    - Alat ahli (tema, server, batas) hanya membaca konfigurasi, bukan data pegawai/wajib pajak.
+    - Alat ahli (tema, server, batas) hanya membaca konfigurasi, bukan data bisnis/pribadi.
 
 Menambah peran: tambah satu Peran(...) di PERAN, tulis alatnya di ALAT_AHLI + JALANKAN.
 """

@@ -19,7 +19,7 @@ dengan SQLAlchemy, sehingga SQL-nya otomatis cocok untuk Oracle, ClickHouse, MyS
 KEAMANAN
     - Pratinjau memakai SQL dataset asal YANG SUDAH difilter hak akses user (RLS).
     - Dataset baru mewarisi aturan hak akses {{ sps_akses(...) }} dataset asal; kolom hak
-      akses (mis. KD_KANWIL) wajib tetap ada dan tidak diubah, kalau tidak penyimpanan ditolak.
+      akses (mis. KD_CABANG) wajib tetap ada dan tidak diubah, kalau tidak penyimpanan ditolak.
     - Rumus kolom hitung diperiksa sqlglot: tanpa subquery / perintah SQL / kolom asing.
     - Gabung (join): dataset kanan harus boleh diakses user & di database yang sama. Dataset baru
       memakai hak akses KEDUA sisi (AND); untuk left join, baris kanan yang kosong tetap boleh
@@ -63,7 +63,7 @@ class Alur:
 
 
 def asal_kanan(dataset_id: int, kolom: str) -> str:
-    """Penanda asal kolom dari dataset kanan, mis. '#7:KD_KANWIL'."""
+    """Penanda asal kolom dari dataset kanan, mis. '#7:KD_CABANG'."""
     return f"#{dataset_id}:{kolom}"
 
 

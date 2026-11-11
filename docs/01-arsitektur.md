@@ -18,7 +18,7 @@ Semua komponen berjalan di **Docker** (tidak lagi memakai XAMPP).
 └──────────────────────────────────────┬────────────────────────────────────────────────────────────┘
                                        ▼  (hanya baca, lewat jaringan kantor/VPN)
        Sumber data perusahaan: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery,
-       Redshift, Databricks, Trino, Athena, SAP HANA, Vertica, Druid   (Data > Hubungkan data)
+       Redshift, Databricks, Trino, Athena, SAP HANA*, Vertica, Druid   (Data > Hubungkan data; *driver opsional)
        Login: akun lokal, atau LDAP / Active Directory kantor (opsional)
 ```
 
@@ -41,7 +41,7 @@ Container tanpa data permanen boleh dihapus & dibuat ulang kapan saja. Data perm
 |---|---|---|
 | `sps_identitas/` | login, semua halaman | nama, logo, warna, hiasan & animasi; halaman login beranimasi |
 | `sps_security.py`, `sps_ldap.py` | login | akun lokal + LDAP/Active Directory (opsional) |
-| `sps_akses.py`, `akses.yaml` | – | hak akses data otomatis dari profil pengguna (profil DJP; opsional) |
+| `sps_akses.py`, `akses.yaml` | – | hak akses data otomatis dari profil pengguna (opsional) |
 | `sps_koneksi/` | tab Hubungkan data | wizard koneksi database/data warehouse + impor Access/Excel/CSV |
 | `sps_ai/` | `/asisten/`, panel AI | Asisten AI, peran ahli (`peran.py`), auto chart/dashboard, story ([10](10-asisten-ai.md), [23](23-asisten-ai-peran-ahli.md)) |
 | `sps_server/` | `/pusat-kendali/` | pengaturan server, auto-tuning, multi-node, batas data (`batas.py`) |
@@ -54,7 +54,7 @@ Container tanpa data permanen boleh dihapus & dibuat ulang kapan saja. Data perm
 | `sps_studio/` | `/studio/` | lembar kerja seret-lepas (23 chart, peta, ramalan), dashboard, persiapan data |
 | `sps_latihan.py`, `sps_uji.py` | – | data latihan fiktif (penjualan ritel) & uji otomatis |
 | `sps_pindah_meta.py` | – | memindahkan metadata versi lama (MySQL/MariaDB) ke PostgreSQL |
-| `sps_dash_*.py`, `sps_connections.py` | – | dashboard sebagai kode & koneksi dari `.env` (profil DJP) |
+| `sps_dashboard_builder.py`, `sps_dash_*.py` | – | dashboard sebagai kode ([07](07-dashboard-sebagai-kode.md)) |
 
 ## Istilah penting
 

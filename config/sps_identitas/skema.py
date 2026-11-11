@@ -41,7 +41,7 @@ FONT = {"Plus Jakarta Sans": "'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif
         "Sistem (Segoe UI)": "'Segoe UI', Roboto, Arial, sans-serif",
         "Klasik (Georgia)": "Georgia, 'Times New Roman', serif"}
 SUDUT = {"lembut": 8, "tegas": 2, "bulat": 14}
-HIASAN = ("gelombang", "titik", "garis", "polos")
+HIASAN = ("tinta", "gelombang", "titik", "garis", "polos")
 
 ISIAN: tuple[Isian, ...] = (
     Isian("nama_aplikasi", "Nama aplikasi", "nama", "teks", "ALDx",
@@ -53,12 +53,14 @@ ISIAN: tuple[Isian, ...] = (
           "{tahun} dan {perusahaan} diganti otomatis.", maks=120),
     Isian("halaman_depan", "Halaman pertama setelah login", "nama", "jalur", "/app/",
           "/app/ = Beranda. Bisa juga alamat dashboard, mis. /superset/dashboard/latihan/", maks=200),
-    Isian("warna_utama", "Warna utama", "warna", "warna", "#1E2A44", "Tombol utama, menu aktif, judul."),
-    Isian("warna_aksen", "Warna aksen", "warna", "warna", "#4F7CF7", "Sorotan, fokus, langkah berikutnya."),
-    Isian("warna_latar", "Warna latar halaman", "warna", "warna", "#F5F6F8"),
+    # Bawaan "Tinta & Sakura": hitam tinta -> abu -> putih, semburat pink. Kontras: putih di atas utama 17,7:1,
+    # putih di atas aksen 4,5:1 (WCAG AA). Gradasi abu dibuat otomatis dari warna utama (tema.palet).
+    Isian("warna_utama", "Warna utama", "warna", "warna", "#18181B", "Tombol utama, menu aktif, judul."),
+    Isian("warna_aksen", "Warna aksen", "warna", "warna", "#E11D74", "Sorotan, fokus, langkah berikutnya."),
+    Isian("warna_latar", "Warna latar halaman", "warna", "warna", "#F4F4F5"),
     Isian("font", "Huruf", "tampilan", "pilihan", "Plus Jakarta Sans", opsi=tuple(FONT)),
     Isian("sudut", "Sudut kotak & tombol", "tampilan", "pilihan", "lembut", opsi=tuple(SUDUT)),
-    Isian("hiasan", "Motif hiasan", "tampilan", "pilihan", "polos",
+    Isian("hiasan", "Motif hiasan", "tampilan", "pilihan", "tinta",
           "Motif di halaman login & header halaman ALDx.", opsi=HIASAN),
     Isian("animasi", "Animasi halus", "tampilan", "ya_tidak", True,
           "Latar login bergerak pelan, chart & kartu muncul lembut. "
@@ -80,10 +82,12 @@ def bawaan() -> dict[str, Any]:
 
 # --- Preset --------------------------------------------------------------------------------
 # Hanya kunci yang disebut yang berubah; nama perusahaan dll. tetap milik admin
-# kecuali preset menyebutnya (preset DJP mengisi identitas DJP lengkap).
+# kecuali preset menyebutnya.
 PRESET: dict[str, dict[str, Any]] = {
     # "netral" = kembali ke SEMUA nilai bawaan (nama, teks, warna, logo otomatis).
-    "netral": {"label": "Elegan / bawaan (navy & biru)", **{i.kunci: i.bawaan for i in ISIAN}},
+    "netral": {"label": "Tinta & Sakura / bawaan (hitam, abu, putih + pink)", **{i.kunci: i.bawaan for i in ISIAN}},
+    "navy": {"label": "Navy & biru (klasik)", "warna_utama": "#1E2A44", "warna_aksen": "#4F7CF7",
+             "warna_latar": "#F5F6F8", "hiasan": "polos"},
     "hijau": {"label": "Hijau segar", "warna_utama": "#0F6E56", "warna_aksen": "#F4B400",
               "warna_latar": "#F3F7F5", "hiasan": "titik"},
     "marun": {"label": "Merah marun", "warna_utama": "#7A1F2B", "warna_aksen": "#E0A100",
@@ -92,17 +96,11 @@ PRESET: dict[str, dict[str, Any]] = {
              "warna_latar": "#F5F4FA", "hiasan": "gelombang"},
     "grafit": {"label": "Grafit & toska", "warna_utama": "#263238", "warna_aksen": "#26A69A",
                "warna_latar": "#F3F5F6", "hiasan": "titik"},
-    "djp": {"label": "Direktorat Jenderal Pajak", "nama_aplikasi": "DJP Analytics",
-            "nama_perusahaan": "Direktorat Jenderal Pajak", "slogan": "Data penerimaan untuk keputusan",
-            "halaman_depan": "/superset/dashboard/beranda/",
-            "warna_utama": "#1F2F5F", "warna_aksen": "#F2B705", "warna_latar": "#F4F6F9", "hiasan": "gelombang",
-            "logo": "statis:logo-aldx.svg", "logo_putih": "statis:logo-aldx-putih.svg",
-            "favicon": "statis:favicon-aldx.svg"},
 }
 
 
 # Teks lama yang dibersihkan otomatis saat build-dashboards (kembali ke teks bawaan).
-TEKS_LOGIN_USANG = ("Masuk dengan akun intranet DJP (sama seperti engineN).",)
+TEKS_LOGIN_USANG: tuple[str, ...] = ()
 NAMA_APLIKASI_USANG = ("SPS Analytics",)                   # nama lama -> nama bawaan baru (ALDx)
 
 

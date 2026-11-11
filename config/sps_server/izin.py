@@ -4,7 +4,7 @@ Hak akses DATA (baris mana yang terlihat) tetap diatur config/akses.yaml (RLS).
 
 Kemampuan = kumpulan permission Superset yang selalu diberikan bersama.
 Role bawaan Superset (Admin, Alpha, Gamma, sql_lab, Public) hanya ditampilkan:
-isinya dikembalikan ke semula setiap `superset init`, jadi ubahlah role DJP
+isinya dikembalikan ke semula setiap `superset init`, jadi ubahlah role buatan Anda
 atau role buatan sendiri.
 """
 
@@ -121,7 +121,7 @@ def ubah(nama_role: str, kemampuan_id: str, aktif: bool, oleh: str) -> None:
         raise ValueError(f"'{k.label}' diatur di {k.diatur_di}.")
     if nama_role in ROLE_BAWAAN:
         raise ValueError(f"Role bawaan '{nama_role}' dikembalikan otomatis oleh superset init; "
-                         "ubah role DJP atau buat role baru.")
+                         "ubah role buatan Anda atau buat role baru.")
     role = _sm().find_role(nama_role)
     if role is None:
         raise ValueError(f"Role '{nama_role}' tidak ada.")

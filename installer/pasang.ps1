@@ -13,11 +13,10 @@
       3. Identitas    (L) nama aplikasi & perusahaan, warna, logo, port, HTTPS (semua bisa diubah nanti)
       4. Pengguna     (L) opsional: akun lain (email + peran), password kosong = P@ssw0rd
       5. Login kantor (L) opsional: LDAP / Active Directory (boleh diisi nanti; uji koneksi tidak wajib)
-      6. Sumber data  (L) hanya untuk preset DJP
-      7. Asisten AI   (L) opsional: periksa model lokal (Ollama / LM Studio) atau key cloud
-      8. Data lama        hanya bila ada metadata versi lama (XAMPP / MariaDB) -> PostgreSQL
-      9. Pasang           menjalankan skrip di folder scripts\ berurutan + log
-     10. Selesai          alamat web & tombol Buka
+      6. Asisten AI   (L) opsional: periksa model lokal (Ollama / LM Studio) atau key cloud
+      7. Data lama        hanya bila ada metadata versi lama (XAMPP / MariaDB) -> PostgreSQL
+      8. Pasang           menjalankan skrip di folder scripts\ berurutan + log
+      9. Selesai          alamat web & tombol Buka
 
     Semua langkah memakai skrip yang sama dengan instalasi manual (scripts\*.ps1),
     jadi hasilnya identik. Log lengkap: installer\log\pasang-<waktu>.log
@@ -51,8 +50,8 @@ $sudahTerpasang = -not $perluPindah -and ((docker volume ls -q 2>$null) -contain
 $dataYatim = $sudahTerpasang -and -not $envAda
 if ($dataYatim) { $sudahTerpasang = $false }
 
-$NAVY = [System.Drawing.Color]::FromArgb(30, 42, 68)       # warna preset "netral" (elegan)
-$EMAS = [System.Drawing.Color]::FromArgb(79, 124, 247)     # aksen biru
+$UTAMA = [System.Drawing.Color]::FromArgb(24, 24, 27)       # warna utama preset bawaan "Tinta & Sakura" (#18181B)
+$AKSEN = [System.Drawing.Color]::FromArgb(225, 29, 116)     # aksen pink (#E11D74)
 $REDUP = [System.Drawing.Color]::FromArgb(95, 107, 122)
 $HIJAU = [System.Drawing.Color]::FromArgb(11, 122, 82)
 $MERAH = [System.Drawing.Color]::FromArgb(180, 35, 24)
@@ -77,26 +76,26 @@ $form.FormBorderStyle = "FixedDialog"; $form.MaximizeBox = $false
 $form.Font = $HURUF; $form.BackColor = [System.Drawing.Color]::White
 
 $kepala = New-Object System.Windows.Forms.Panel
-$kepala.Dock = "Top"; $kepala.Height = 70; $kepala.BackColor = $NAVY
+$kepala.Dock = "Top"; $kepala.Height = 70; $kepala.BackColor = $UTAMA
 $lblJudul = New-Object System.Windows.Forms.Label
 $lblJudul.ForeColor = [System.Drawing.Color]::White; $lblJudul.Font = $JUDUL
 $lblJudul.Location = "24,12"; $lblJudul.AutoSize = $true
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(200, 210, 230); $lblSub.Location = "26,42"; $lblSub.AutoSize = $true
+$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(212, 212, 216); $lblSub.Location = "26,42"; $lblSub.AutoSize = $true
 $kepala.Controls.AddRange(@($lblJudul, $lblSub))
 $garis = New-Object System.Windows.Forms.Panel
-$garis.Dock = "Top"; $garis.Height = 4; $garis.BackColor = $EMAS
+$garis.Dock = "Top"; $garis.Height = 4; $garis.BackColor = $AKSEN
 
 $isi = New-Object System.Windows.Forms.Panel
 $isi.Location = "24,90"; $isi.Size = "712,380"
 
 $bawah = New-Object System.Windows.Forms.Panel
-$bawah.Dock = "Bottom"; $bawah.Height = 58; $bawah.BackColor = [System.Drawing.Color]::FromArgb(245, 247, 250)
+$bawah.Dock = "Bottom"; $bawah.Height = 58; $bawah.BackColor = [System.Drawing.Color]::FromArgb(244, 244, 245)
 $btnKembali = New-Object System.Windows.Forms.Button
 $btnKembali.Text = "< Kembali"; $btnKembali.Size = "100,32"; $btnKembali.Location = "430,13"
 $btnLanjut = New-Object System.Windows.Forms.Button
 $btnLanjut.Text = "Lanjut >"; $btnLanjut.Size = "110,32"; $btnLanjut.Location = "536,13"
-$btnLanjut.BackColor = $NAVY; $btnLanjut.ForeColor = [System.Drawing.Color]::White; $btnLanjut.FlatStyle = "Flat"
+$btnLanjut.BackColor = $UTAMA; $btnLanjut.ForeColor = [System.Drawing.Color]::White; $btnLanjut.FlatStyle = "Flat"
 $btnBatal = New-Object System.Windows.Forms.Button
 $btnBatal.Text = "Batal"; $btnBatal.Size = "90,32"; $btnBatal.Location = "652,13"
 $lblLangkah = New-Object System.Windows.Forms.Label
@@ -258,20 +257,17 @@ $HALAMAN += @{ Judul = "Pemeriksaan komputer"; Sub = "Docker, CPU, RAM, disk, po
 
 # --- 3.2 Identitas, alamat & HTTPS ------------------------------------------------------
 # Nilai awal saja: setelah terpasang, identitas diubah di Pusat Kendali > Identitas & Tema.
-$PRESET = [ordered]@{ "netral" = @("Elegan (navy & biru)", "#1E2A44", "#4F7CF7"); "hijau" = @("Hijau segar", "#0F6E56", "#F4B400")
+$PRESET = [ordered]@{ "netral" = @("Tinta & Sakura (bawaan)", "#18181B", "#E11D74"); "navy" = @("Navy & biru (klasik)", "#1E2A44", "#4F7CF7")
+    "hijau" = @("Hijau segar", "#0F6E56", "#F4B400")
     "marun" = @("Merah marun", "#7A1F2B", "#E0A100"); "ungu" = @("Ungu modern", "#4B2E83", "#19B5A5")
     "grafit" = @("Grafit & toska", "#263238", "#26A69A") }
-# Preset & halaman khusus DJP hanya untuk instalasi DJP (U20): PASANG.cmd djp, SPS_PROFIL_DJP=1, atau instalasi DJP lama.
-$profilDjp = ($args -contains "djp") -or (Get-EnvValue "SPS_PROFIL_DJP") -eq "1" -or (Get-EnvValue "SPS_PRESET") -eq "djp" -or
-    (Get-EnvValue "APP_NAME") -eq "DJP Analytics"
-if ($profilDjp) { $PRESET["djp"] = @("Direktorat Jenderal Pajak", "#1F2F5F", "#F2B705") }
 $pIdn = New-Object System.Windows.Forms.Panel; $pIdn.Dock = "Fill"
-$iNama = Isian "Nama aplikasi" 40 (Nilai "SPS_NAMA_APLIKASI" $(if ((Get-EnvValue "APP_NAME") -eq "DJP Analytics") { "DJP Analytics" } else { "ALDx" })) -Bantu "Nama yang tampil di judul browser, halaman login, dan menu. Contoh: Dashboard Kinerja. Bisa diganti nanti di Pusat Kendali > Identitas & Tema."
+$iNama = Isian "Nama aplikasi" 40 (Nilai "SPS_NAMA_APLIKASI" "ALDx") -Bantu "Nama yang tampil di judul browser, halaman login, dan menu. Contoh: Dashboard Kinerja. Bisa diganti nanti di Pusat Kendali > Identitas & Tema."
 $iPerusahaan = Isian "Nama perusahaan / instansi" 72 (Nilai "SPS_NAMA_PERUSAHAAN" "Nama Perusahaan") -Bantu "Nama kantor Anda, tampil di halaman login & kaki halaman. Contoh: PT Maju Jaya."
 $iPreset = New-Object System.Windows.Forms.ComboBox
 $iPreset.DropDownStyle = "DropDownList"; $iPreset.Location = "230,104"; $iPreset.Width = 260
 foreach ($k in $PRESET.Keys) { [void]$iPreset.Items.Add($PRESET[$k][0]) }
-$presetAwal = Nilai "SPS_PRESET" $(if ((Get-EnvValue "APP_NAME") -eq "DJP Analytics") { "djp" } else { "netral" })
+$presetAwal = Nilai "SPS_PRESET" "netral"
 $iPreset.SelectedIndex = [Math]::Max(0, @($PRESET.Keys).IndexOf($presetAwal))
 $iWarna1 = New-Object System.Windows.Forms.Panel; $iWarna1.Size = "28,22"; $iWarna1.Location = "500,105"
 $iWarna2 = New-Object System.Windows.Forms.Panel; $iWarna2.Size = "28,22"; $iWarna2.Location = "532,105"
@@ -279,7 +275,6 @@ function Warna-Preset {
     $w = $PRESET[@($PRESET.Keys)[$iPreset.SelectedIndex]]
     $iWarna1.BackColor = [System.Drawing.ColorTranslator]::FromHtml($w[1]); $iWarna2.BackColor = [System.Drawing.ColorTranslator]::FromHtml($w[2])
 }
-function Preset-Djp { return @($PRESET.Keys)[$iPreset.SelectedIndex] -eq "djp" }
 $iPreset.Add_SelectedIndexChanged({ Warna-Preset; $script:idnDiubah = $true }); Warna-Preset
 $iLogo = Isian "Logo (opsional)" 138 "" -lebar 300; $iLogo[1].ReadOnly = $true
 $btnLogo = New-Object System.Windows.Forms.Button; $btnLogo.Text = "Pilih..."; $btnLogo.Location = "536,136"; $btnLogo.Size = "74,26"
@@ -401,26 +396,25 @@ $HALAMAN += @{ Judul = "Pengguna lain"; Sub = "Opsional - akun dengan email & pe
 
 # --- 3.5 Login kantor (LDAP / Active Directory) - OPSIONAL --------------------------------
 # Tidak wajib & tidak harus terhubung saat instalasi. Uji koneksi hanya membantu, bukan syarat.
-# Pegawai login dengan NIP & password jaringan kantor; akun dibuat otomatis saat login pertama.
+# Pengguna login dengan username & password jaringan kantor; akun dibuat otomatis saat login pertama.
 $pLdap = New-Object System.Windows.Forms.Panel; $pLdap.Dock = "Fill"
 $cLdap = New-Object System.Windows.Forms.CheckBox
 $cLdap.Text = "Aktifkan login dengan akun jaringan kantor (LDAP / Active Directory)"; $cLdap.Location = "0,30"; $cLdap.AutoSize = $true
 $cLdap.Checked = [bool](Nilai "LDAP_SERVERS")
 $gLdap = New-Object System.Windows.Forms.Panel; $gLdap.Location = "0,58"; $gLdap.Size = "712,320"
-$djpLama = (Get-EnvValue "APP_NAME") -eq "DJP Analytics" -or (Get-EnvValue "SPS_PRESET") -eq "djp"
-$lServer = Isian "Server LDAP (pisah koma)" 6 (Nilai "LDAP_SERVERS" $(if ($djpLama) { "ldaps://10.254.28.50,ldaps://10.254.28.142" } else { "" })) -lebar 440 -Bantu "Alamat server Active Directory kantor, dari tim TI/jaringan. Format ldaps://IP-atau-nama (port 636, terenkripsi). Dua server cadangan dipisah koma."
-$lDomain = Isian "Domain" 38 (Nilai "LDAP_DOMAIN" $(if ($djpLama) { "INTRANET" } else { "" })) -lebar 160 -Bantu "Nama domain Windows kantor (bagian sebelum \ saat login Windows, mis. INTRANET\nip). Cek: buka cmd, ketik  echo %USERDOMAIN%"
-$lBase = Isian "Search base" 70 (Nilai "LDAP_SEARCH_BASE" $(if ($djpLama) { "OU=Pegawai DJP,DC=intranet,DC=pajak,DC=go,DC=id" } else { "" })) -lebar 440 -Bantu "Lokasi daftar pegawai di Active Directory, dari tim TI. Contoh: OU=Pegawai,DC=kantor,DC=go,DC=id"
-$lSuper = Isian "NIP yang jadi Superadmin" 102 (Nilai "SPS_SUPERADMIN_USERS") -lebar 300 -Bantu "NIP/username jaringan yang otomatis menjadi Superadmin saat login LDAP. Pisah koma. Boleh kosong."
-$lAdmin = Isian "NIP yang jadi Admin" 134 (Nilai "LDAP_ADMIN_USERS") -lebar 300 -Bantu "NIP/username jaringan yang otomatis menjadi Admin. Pisah koma. Boleh kosong."
-$lNipUji = Isian "Uji: NIP" 178 "" -lebar 140
+$lServer = Isian "Server LDAP (pisah koma)" 6 (Nilai "LDAP_SERVERS") -lebar 440 -Bantu "Alamat server Active Directory kantor, dari tim TI/jaringan. Format ldaps://IP-atau-nama (port 636, terenkripsi). Dua server cadangan dipisah koma."
+$lDomain = Isian "Domain" 38 (Nilai "LDAP_DOMAIN") -lebar 160 -Bantu "Nama domain Windows kantor (bagian sebelum \ saat login Windows, mis. KANTOR\budi). Cek: buka cmd, ketik  echo %USERDOMAIN%"
+$lBase = Isian "Search base" 70 (Nilai "LDAP_SEARCH_BASE") -lebar 440 -Bantu "Lokasi daftar pegawai di Active Directory, dari tim TI. Contoh: OU=Karyawan,DC=kantor,DC=local"
+$lSuper = Isian "Username yang jadi Superadmin" 102 (Nilai "SPS_SUPERADMIN_USERS") -lebar 300 -Bantu "Username jaringan yang otomatis menjadi Superadmin saat login LDAP. Pisah koma. Boleh kosong."
+$lAdmin = Isian "Username yang jadi Admin" 134 (Nilai "LDAP_ADMIN_USERS") -lebar 300 -Bantu "Username jaringan yang otomatis menjadi Admin. Pisah koma. Boleh kosong."
+$lAkunUji = Isian "Uji: username" 178 "" -lebar 140
 $lPwUji = Isian "Uji: password (tidak disimpan)" 210 "" -Rahasia -lebar 140
 $btnUjiLdap = New-Object System.Windows.Forms.Button
 $btnUjiLdap.Text = "Uji (opsional)"; $btnUjiLdap.Location = "380,190"; $btnUjiLdap.Size = "120,30"
 $lblUjiLdap = Teks "" 510 196 200
 $lblPeringatanLdap = Teks "" 230 246 470 $MERAH
-$gLdap.Controls.AddRange($lServer + $lDomain + $lBase + $lSuper + $lAdmin + $lNipUji + $lPwUji + @($btnUjiLdap, $lblUjiLdap, $lblPeringatanLdap,
-    (Teks "Pisah koma untuk beberapa NIP. Boleh dikosongkan & diisi nanti (.env, docs\05-login-ldap.md). Akun lokal (email) tetap bisa login walau LDAP mati." 230 270 470 $REDUP)))
+$gLdap.Controls.AddRange($lServer + $lDomain + $lBase + $lSuper + $lAdmin + $lAkunUji + $lPwUji + @($btnUjiLdap, $lblUjiLdap, $lblPeringatanLdap,
+    (Teks "Pisah koma untuk beberapa username. Boleh dikosongkan & diisi nanti (.env, docs\05-login-ldap.md). Akun lokal (email) tetap bisa login walau LDAP mati." 230 270 470 $REDUP)))
 function Atur-Ldap {
     $gLdap.Enabled = $cLdap.Checked
     $lblPeringatanLdap.Text = if ($cLdap.Checked -and $lServer[1].Text -match "(^|,)\s*ldap://") {
@@ -428,9 +422,9 @@ function Atur-Ldap {
 }
 $cLdap.Add_CheckedChanged({ Atur-Ldap }); $lServer[1].Add_TextChanged({ Atur-Ldap }); Atur-Ldap
 
-# Dijalankan di proses terpisah (Start-Job): bind "DOMAIN\NIP" lalu cari data pegawainya (sama seperti config\sps_ldap.py).
+# Dijalankan di proses terpisah (Start-Job): bind "DOMAIN\username" lalu cari data penggunanya (sama seperti config\sps_ldap.py).
 $KERJA_UJI_LDAP = {
-    param([string]$server, [string]$domain, [string]$base, [string]$nip, [string]$pw)
+    param([string]$server, [string]$domain, [string]$base, [string]$akun, [string]$pw)
     Add-Type -AssemblyName System.DirectoryServices.Protocols
     $pesan = "alamat kosong"
     foreach ($s in $server.Split(",")) {
@@ -444,24 +438,24 @@ $KERJA_UJI_LDAP = {
             $c.SessionOptions.ProtocolVersion = 3; $c.SessionOptions.SecureSocketLayer = $ssl
             if ($ssl) { $c.SessionOptions.VerifyServerCertificate = { $true } }     # sertifikat internal kantor
             $c.Timeout = [TimeSpan]::FromSeconds(8)
-            $c.Bind((New-Object System.Net.NetworkCredential("$domain\$nip", $pw)))
-            $saring = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=$($nip -replace '[()*\\]', ''))"
+            $c.Bind((New-Object System.Net.NetworkCredential("$domain\$akun", $pw)))
+            $saring = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=$($akun -replace '[()*\\]', ''))"
             $r = $c.SendRequest((New-Object System.DirectoryServices.Protocols.SearchRequest($base, $saring, "Subtree", @("displayName"))))
             $c.Dispose()
-            if ($r.Entries.Count -ne 1) { return @($false, "Login benar, tetapi data $nip tidak ditemukan di Search base.") }
+            if ($r.Entries.Count -ne 1) { return @($false, "Login benar, tetapi data $akun tidak ditemukan di Search base.") }
             $nama = $r.Entries[0].Attributes["displayName"]
-            return @($true, "Berhasil: " + $(if ($nama) { $nama[0] } else { $nip }))
+            return @($true, "Berhasil: " + $(if ($nama) { $nama[0] } else { $akun }))
         } catch [System.DirectoryServices.Protocols.LdapException] {
-            if ($_.Exception.ErrorCode -eq 49) { return @($false, "NIP atau password salah.") }
+            if ($_.Exception.ErrorCode -eq 49) { return @($false, "Username atau password salah.") }
             $pesan = $_.Exception.Message
         } catch { $pesan = $_.Exception.Message }
     }
     return @($false, "Tidak terjangkau ($pesan). Boleh dilanjutkan & diuji nanti.")
 }
 $btnUjiLdap.Add_Click({
-    if (-not $lNipUji[1].Text.Trim() -or -not $lPwUji[1].Text) { $lblUjiLdap.ForeColor = $MERAH; $lblUjiLdap.Text = "Isi NIP & password uji."; return }
+    if (-not $lAkunUji[1].Text.Trim() -or -not $lPwUji[1].Text) { $lblUjiLdap.ForeColor = $MERAH; $lblUjiLdap.Text = "Isi username & password uji."; return }
     $lblUjiLdap.ForeColor = $REDUP; $lblUjiLdap.Text = "Menghubungi..."; $btnUjiLdap.Enabled = $false
-    [void](Mulai-Latar $KERJA_UJI_LDAP @($lServer[1].Text, $lDomain[1].Text, $lBase[1].Text, $lNipUji[1].Text.Trim(), $lPwUji[1].Text) {
+    [void](Mulai-Latar $KERJA_UJI_LDAP @($lServer[1].Text, $lDomain[1].Text, $lBase[1].Text, $lAkunUji[1].Text.Trim(), $lPwUji[1].Text) {
         param($h)
         $btnUjiLdap.Enabled = $true
         $ok = $h.Count -ge 2 -and $h[0]
@@ -475,23 +469,11 @@ $HALAMAN += @{ Judul = "Login kantor (opsional)"; Sub = "LDAP / Active Directory
     if (-not $lServer[1].Text.Trim()) { return "Isi server LDAP, atau hilangkan centang 'Aktifkan login...'." }
     if (-not $lBase[1].Text.Trim()) { return "Isi Search base LDAP." }
     foreach ($n in (($lSuper[1].Text + "," + $lAdmin[1].Text).Split(",") | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
-        if ($n -notmatch '^[A-Za-z0-9._-]{2,64}$') { return "NIP '$n' tidak sah (tanpa spasi; pisah koma)." }
+        if ($n -notmatch '^[A-Za-z0-9._-]{2,64}$') { return "Username '$n' tidak sah (tanpa spasi; pisah koma)." }
     }
 } }
 
-# --- 3.6 Sumber data DJP (hanya preset DJP) ------------------------------------------------
-$pSumber = New-Object System.Windows.Forms.Panel; $pSumber.Dock = "Fill"
-$sDmp = Isian "Password Oracle DMP (genapp)" 40 (Nilai "ORACLE_DMP_PASSWORD") -Rahasia -lebar 240
-$sIku = Isian "Password Oracle IKU" 72 (Nilai "ORACLE_IKU_PASSWORD") -Rahasia -lebar 240
-$sTab = Isian "Password Oracle Dashboard (DASHBD)" 104 (Nilai "ORACLE_DASHBD_PASSWORD" (Nilai "ORACLE_TABLEAU_PASSWORD")) -Rahasia -lebar 240
-$sCh = Isian "Password ClickHouse DMP_OLAP" 136 (Nilai "CLICKHOUSE_PASSWORD") -Rahasia -lebar 240
-$pSumber.Controls.AddRange(@((Teks "Opsional. Kosongkan bila belum ada; sumber data juga bisa dihubungkan setelah instalasi lewat menu Data > Hubungkan data." 0 6)) +
-    $sDmp + $sIku + $sTab + $sCh)
-$HALAMAN += @{ Judul = "Sumber data DJP"; Sub = "Opsional - khusus preset DJP"; Panel = $pSumber; Tampil = { Preset-Djp }; Masuk = {}; Sah = {
-    foreach ($t in @($sDmp, $sIku, $sTab, $sCh)) { if ($t[1].Text -match $KARAKTER_TERLARANG) { return "Password sumber data tidak boleh berisi spasi atau tanda `$ `" ' `` # \" } }
-} }
-
-# --- 3.7 Asisten AI: model lokal (Ollama / LM Studio) atau key model cloud ------------
+# --- 3.6 Asisten AI: model lokal (Ollama / LM Studio) atau key model cloud ------------
 # Model lokal TIDAK berjalan di Docker: dipasang sendiri di Windows (panduan docs\20-model-ai-lokal.md).
 $pAi = New-Object System.Windows.Forms.Panel; $pAi.Dock = "Fill"
 $lblAiOllama = Teks "Ollama    : belum diperiksa" 0 96 460
@@ -632,7 +614,7 @@ $pSelesai = New-Object System.Windows.Forms.Panel; $pSelesai.Dock = "Fill"
 $lblSelesai = Teks "" 0 10 700 $null $TEBAL
 $btnBuka = New-Object System.Windows.Forms.Button
 $btnBuka.Text = "Buka aplikasi"; $btnBuka.Size = "180,36"; $btnBuka.Location = "0,300"
-$btnBuka.BackColor = $NAVY; $btnBuka.ForeColor = [System.Drawing.Color]::White; $btnBuka.FlatStyle = "Flat"
+$btnBuka.BackColor = $UTAMA; $btnBuka.ForeColor = [System.Drawing.Color]::White; $btnBuka.FlatStyle = "Flat"
 $btnSalin = New-Object System.Windows.Forms.Button
 $btnSalin.Text = "Salin alamat"; $btnSalin.Size = "130,36"; $btnSalin.Location = "190,300"
 $pSelesai.Controls.AddRange(@($lblSelesai, $btnBuka, $btnSalin))
@@ -688,7 +670,7 @@ function Jalankan([string]$judul, [string]$skrip, [string[]]$argumen = @()) {
 }
 
 function Simpan-Isian {
-    <# Superadmin selalu akun lokal (email). LDAP opsional: NIP di SPS_SUPERADMIN_USERS / LDAP_ADMIN_USERS. #>
+    <# Superadmin selalu akun lokal (email). LDAP opsional: username di SPS_SUPERADMIN_USERS / LDAP_ADMIN_USERS. #>
     $mail = $sMail[1].Text.Trim()
     if ($mail) {
         Set-EnvValue "ADMIN_USERNAME" $mail; Set-EnvValue "ADMIN_EMAIL" $mail
@@ -717,10 +699,6 @@ function Simpan-Isian {
         Set-EnvValue "LDAP_ADMIN_USERS" (($lAdmin[1].Text -split "[,\s]+" | Where-Object { $_ }) -join ",")
     } else { Set-EnvValue "LDAP_SERVERS" "" }
     foreach ($k in $AI_CLOUD.Keys) { Set-EnvValue $k $script:kunciAi[$k] }
-    if (Preset-Djp) {
-        foreach ($x in @(@("ORACLE_DMP_PASSWORD", $sDmp), @("ORACLE_IKU_PASSWORD", $sIku), @("ORACLE_DASHBD_PASSWORD", $sTab), @("CLICKHOUSE_PASSWORD", $sCh))) { Set-EnvValue $x[0] $x[1][1].Text }
-    }
-    Set-AlamatSumberDjp
     Initialize-ServerEnv | ForEach-Object { Tulis-Log $_ }
     Tulis-Log ".env diperbarui (password tidak ditampilkan)."
 }
@@ -770,7 +748,6 @@ function Pasang {
     if ($perluPindah) { $langkah += ,@("Memindahkan metadata lama ($sumberLama) ke PostgreSQL", "pindah-metadata", @()) }
     $langkah += ,@("Membangun image & menyiapkan database", "init", @())
     $langkah += ,@("Menyalakan semua container", "start", @())
-    if (Preset-Djp) { $langkah += ,@("Mendaftarkan koneksi sumber data DJP", "add-connections", @()) }
     $langkah += ,@("Menyiapkan dashboard, menu & ALDx Engine", "build-dashboards", @())
     $langkah += ,@("Memuat data latihan (fiktif) untuk pelatihan", "data-latihan", @())
     $bar.Maximum = $langkah.Count + 2; $bar.Value = 0
@@ -788,7 +765,7 @@ function Pasang {
         $login = "Superadmin: $(Get-EnvValue 'ADMIN_USERNAME')" +
             $(if ($script:jumlahPengguna) { " + $($script:jumlahPengguna) akun lain" } else { "" }) +
             $(if ($script:jumlahBawaan) { "`r`n$($script:jumlahBawaan) akun memakai password bawaan ${PW_BAWAAN}: minta segera diganti (Info pengguna)." } else { "" }) +
-            $(if ($cLdap.Checked) { "`r`nPegawai juga bisa login dengan NIP & password jaringan kantor." } else { "" })
+            $(if ($cLdap.Checked) { "`r`nPengguna juga bisa login dengan username & password jaringan kantor." } else { "" })
         $lblSelesai.Text = $(if ($siap) { "Instalasi selesai." } else { "Instalasi selesai, tetapi web belum menjawab. Tunggu 2-3 menit lalu klik Buka aplikasi. Bila tetap tidak terbuka: scripts\diagnose.ps1" }) +
             "`r`n`r`nAlamat   : $url`r`n$login" +
             $(if ($cHttps.Checked) { "`r`nHTTPS   : browser memperingatkan sekali (sertifikat dibuat sendiri). Pilih 'Lanjutkan', atau jalankan scripts\percayai-sertifikat.ps1." } else { "" }) +
@@ -816,7 +793,7 @@ $btnSalin.Add_Click({ [System.Windows.Forms.Clipboard]::SetText($script:alamatWe
 # ============================================================================
 # Urutan: Superadmin tepat setelah Pemeriksaan; halaman lanjutan hanya tampil bila dicentang.
 # Asisten AI selalu tampil (opsional, boleh dilewati): tanpa model AI menu Asisten tidak berguna.
-$LANJUTAN = @("Identitas & alamat", "Pengguna lain", "Login kantor (opsional)", "Sumber data DJP")
+$LANJUTAN = @("Identitas & alamat", "Pengguna lain", "Login kantor (opsional)")
 $URUTAN = @("Pemeriksaan komputer", "Akun Superadmin", "Data sebelumnya") + $LANJUTAN + @("Data lama", "Pasang", "Selesai")
 $HALAMAN = @($URUTAN | ForEach-Object { $j = $_; $HALAMAN | Where-Object { $_.Judul -eq $j } })
 foreach ($h in $HALAMAN) { $h.Lanjutan = $LANJUTAN -contains $h.Judul }

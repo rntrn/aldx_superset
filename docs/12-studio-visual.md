@@ -82,8 +82,11 @@ rak terisi otomatis.
 
 ### Warna
 
-Palet kategori 8 warna (`WARNA` di `lembar.py`) lolos uji buta warna dan didaftarkan ke
-Superset sebagai skema **"ALDx"**; peta panas memakai **"ALDx Biru"** (satu hue terang→gelap).
+Palet kategori 8 warna *Tinta & Sakura* (`WARNA` di `lembar.py`): pink `#E11D74` sebagai warna pertama, lalu indigo,
+toska, ungu, emas, anggur, biru baja, zaitun. Lolos validator buta warna (terang & gelap: pisah ΔE 14, kontras ≥ 3:1)
+dan didaftarkan ke Superset sebagai skema **"ALDx"**; peta panas memakai **"ALDx Pink"** (satu hue terang→gelap).
+Dashboard versi sebelumnya ikut berganti: id skema lama tetap terdaftar, dan warna kategori dari palet lama dipetakan
+ke palet baru saat `build-dashboards` / tugas malam (`sps_warna.py`); warna pilihan sendiri tidak diubah.
 Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = hasil di dashboard.
 
 ## 2. Susun dashboard
@@ -187,7 +190,7 @@ config/sps_studio/
 | Menu Studio Visual tidak ada | Izin belum dibuat | `scripts\build-dashboards.ps1`, login ulang |
 | Jenis grafik abu-abu di "Tampilkan saya" | Jumlah dimensi/ukuran tidak cocok | Arahkan kursor ke jenis itu untuk melihat kebutuhannya |
 | "Simpan" memberi tautan Explore | Belum punya izin simpan chart | Pusat Kendali → Hak akses |
-| "Kolom hak akses … harus tetap ada" | Kolom wilayah/NIP dibuang atau diubah di persiapan data | Pertahankan kolom tsb. tanpa diubah (boleh disembunyikan di chart) |
+| "Kolom hak akses … harus tetap ada" | Kolom wilayah/cabang dibuang atau diubah di persiapan data | Pertahankan kolom tsb. tanpa diubah (boleh disembunyikan di chart) |
 | "ada di database lain; gabung hanya bisa…" | Dataset kanan di koneksi berbeda | Gabung hanya sesama database; untuk lintas database minta Admin membuat view |
 | Filter dashboard tidak menyaring sebuah chart | Dataset chart itu tidak punya kolom bernama sama | Samakan nama kolom (persiapan data → Ganti nama) |
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |

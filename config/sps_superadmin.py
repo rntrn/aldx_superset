@@ -7,7 +7,7 @@ Cara kerja:
     - Role "Superadmin" adalah PENANDA; izin Superset tetap datang dari role Admin yang juga dimiliki
       pengguna itu. siapkan() memastikan setiap Superadmin juga Admin.
     - Akun ADMIN_USERNAME (.env, akun admin instalasi) dan semua username di SPS_SUPERADMIN_USERS
-      (.env, pisah koma; mis. NIP pegawai LDAP) otomatis menjadi Superadmin: saat build-dashboards / upgrade
+      (.env, pisah koma; mis. username jaringan LDAP) otomatis menjadi Superadmin: saat build-dashboards / upgrade
       dan setiap kali orang itu login (pastikan()).
     - Pengaman terkunci: bila TIDAK ADA satu pun pengguna aktif ber-role Superadmin, semua Admin
       diperlakukan sebagai Superadmin, sehingga pengaturan vital tidak pernah hilang aksesnya.

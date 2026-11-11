@@ -21,7 +21,7 @@ Pusat Kendali → tab **Hubungkan data** (role Admin). Empat langkah: **Pilih su
 |---|---|---|
 | 1 | **Berkas** | Microsoft Access (`.mdb`/`.accdb`), Excel, CSV, SQLite, DuckDB, Parquet: isinya **disalin** ke ALDx Engine |
 | 2 | **Database** | PostgreSQL, MySQL/MariaDB, SQL Server/Azure SQL, Oracle, ClickHouse |
-| 3 | **Data warehouse** | Snowflake, BigQuery, Redshift, Databricks, Trino/Presto, Athena, SAP HANA, Vertica, Druid |
+| 3 | **Data warehouse** | Snowflake, BigQuery, Redshift, Databricks, Trino/Presto, Athena, SAP HANA (driver diunduh sendiri), Vertica, Druid |
 | 4 | **Koneksi tersimpan** | semua koneksi yang sudah ada |
 
 ### Menghubungkan database / data warehouse
@@ -143,9 +143,9 @@ melihat apa pun", pakai jenis **Base** dengan clause `1 = 0` dan kecualikan role
 
 ### Cara 2 — otomatis dari profil pengguna (lanjutan)
 Bila login memakai LDAP dan profil pengguna (wilayah, unit, jabatan) tersedia di database kantor,
-satu aturan bisa melayani semua orang. Contoh pada profil DJP: `{{ sps_akses(kd_kanwil='KD_KANWIL') }}`
-menjadi `KD_KANWIL IN ('090')` sesuai profil masing-masing pegawai. Cara kerja, atribut profil, dan
-cara menyesuaikan untuk organisasi lain: [08-hak-akses-data.md](../08-hak-akses-data.md).
+satu aturan bisa melayani semua orang. Contoh: `{{ sps_akses(cabang='KD_CABANG') }}` menjadi
+`KD_CABANG IN ('C01')` sesuai profil masing-masing orang. Cara menyiapkan profil (koneksi + query di
+`config\akses.yaml`) dan menulis aturan: [08-hak-akses-data.md](../08-hak-akses-data.md).
 
 ### Memberi akses dataset ke role
 Pusat Kendali → **Hak akses** mengatur *kemampuan* (boleh membuat chart, mengunduh, dsb.).

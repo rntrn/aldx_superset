@@ -17,7 +17,17 @@
 
 Set-Location (Split-Path $PSScriptRoot -Parent)
 $report = "diagnosa.txt"
-$adHosts = @("10.254.28.50", "10.254.28.142")
+# Server AD dari LDAP_SERVERS di .env (ldap://host[:port] / ldaps://host[:port]). Kosong = LDAP tidak dipakai.
+$adServer = @()
+$barisLdap = Select-String -Path ".env" -Pattern '^LDAP_SERVERS=(.*)$' -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($barisLdap) {
+    foreach ($u in ($barisLdap.Matches[0].Groups[1].Value -split ",")) {
+        if ($u.Trim() -match '^(ldaps?)://([^:/]+)(?::(\d+))?') {
+            $port = if ($Matches[3]) { [int]$Matches[3] } elseif ($Matches[1] -eq "ldaps") { 636 } else { 389 }
+            $adServer += ,@($Matches[2], $port)
+        }
+    }
+}
 
 function Write-Section([string]$Title) { "`n===== $Title =====" }
 
@@ -31,14 +41,18 @@ function Write-Section([string]$Title) { "`n===== $Title =====" }
     Write-Section "Daftar user Superset"
     docker compose exec -T superset superset fab list-users
 
-    Write-Section "Koneksi ke AD dari Windows (port 389)"
-    foreach ($h in $adHosts) {
-        $ok = (Test-NetConnection $h -Port 389 -WarningAction SilentlyContinue).TcpTestSucceeded
-        "$h : $ok"
+    Write-Section "Koneksi ke Active Directory dari Windows"
+    if (-not $adServer) { "LDAP tidak dipakai (LDAP_SERVERS kosong di .env)" }
+    foreach ($s in $adServer) {
+        $ok = (Test-NetConnection $s[0] -Port $s[1] -WarningAction SilentlyContinue).TcpTestSucceeded
+        "$($s[0]):$($s[1]) : $ok"
     }
 
-    Write-Section "Koneksi ke AD dari dalam container (port 389)"
-    docker compose exec -T superset python -c "import socket;[print(h, ':', (lambda s: (s.settimeout(5), s.connect_ex((h,389))==0)[1])(socket.socket())) for h in ['10.254.28.50','10.254.28.142']]"
+    Write-Section "Koneksi ke Active Directory dari dalam container"
+    if ($adServer) {
+        $daftar = ($adServer | ForEach-Object { "('$($_[0])',$($_[1]))" }) -join ","
+        docker compose exec -T superset python -c "import socket;[print(h, p, ':', (lambda s: (s.settimeout(5), s.connect_ex((h,p))==0)[1])(socket.socket())) for h,p in [$daftar]]"
+    }
 
     Write-Section "Pemakaian CPU/RAM container"
     docker stats --no-stream

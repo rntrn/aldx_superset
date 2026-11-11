@@ -217,7 +217,7 @@ def jalankan_semua() -> None:
         try:
             import pandas as pd
             from superset.sql.parse import Table
-            CH.df_to_sql(Database(database_name="DMP uji"), Table("x"), pd.DataFrame({"a": [1]}), {})
+            CH.df_to_sql(Database(database_name="Sumber uji"), Table("x"), pd.DataFrame({"a": [1]}), {})
         except Exception as exc:  # noqa: BLE001
             if "ALDx Engine" in str(exc):
                 return "ClickHouse lain ditolak"
@@ -451,8 +451,8 @@ def jalankan_semua() -> None:
             nama = {r.name for r in u.roles}
             if "Superadmin" in nama and sm.auth_role_admin not in nama:
                 kurang.append(f"{u.username}: Superadmin tanpa Admin")
-            if sps_security.ROLE_PEGAWAI in nama and not nama & {"Gamma", "Alpha", sm.auth_role_admin}:
-                kurang.append(f"{u.username}: {sps_security.ROLE_PEGAWAI} tanpa Gamma")
+            if sps_security.ROLE_PENGGUNA in nama and not nama & {"Gamma", "Alpha", sm.auth_role_admin}:
+                kurang.append(f"{u.username}: {sps_security.ROLE_PENGGUNA} tanpa Gamma")
         if kurang:
             raise RuntimeError("; ".join(kurang[:3]) + " (dilengkapi otomatis saat akun login berikutnya)")
         return f"{len(sm.get_all_users())} akun sesuai"

@@ -16,9 +16,9 @@ Tab vital **tidak tampil** untuk Admin biasa, dan API-nya menolak (403):
 
 - Akun **Superadmin dari installer** (halaman 3: email & password, `ADMIN_USERNAME` di `.env`) otomatis menjadi Superadmin.
   Akun ini akun lokal: login dengan email, tetap bisa masuk walau LDAP mati. Instalasi lama: akun lokal `admin`.
-- **Login LDAP (NIP), opsional**: isi `SPS_SUPERADMIN_USERS=` di `.env` dengan NIP, pisah koma, mis.
+- **Login LDAP, opsional**: isi `SPS_SUPERADMIN_USERS=` di `.env` dengan username jaringan, pisah koma, mis.
   `SPS_SUPERADMIN_USERS=060110956`. Orang itu otomatis mendapat role **Admin + Superadmin** setiap kali login
-  (dan saat `build-dashboards`). Di installer: halaman *Login kantor* → *NIP yang jadi Superadmin*.
+  (dan saat `build-dashboards`). Di installer: halaman *Login kantor* → *Username yang jadi Superadmin*.
   Setelah mengubah `.env`: `docker compose up -d` (bukan `restart`, karena `restart` tidak membaca ulang `.env`),
   lalu **keluar & login lagi**.
 - Superadmin lain dibuat dari installer (peran **Superadmin**), atau oleh Superadmin di **Kelola › Pengguna**

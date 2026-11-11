@@ -6,7 +6,7 @@ Publik (dipakai halaman login juga):
 Khusus Admin (tab Identitas & Tema di Pusat Kendali):
     GET  /identitas/api                    isian, nilai, preset
     POST /identitas/api                    {"perubahan": {...}}
-    POST /identitas/api/preset             {"nama": "djp"}
+    POST /identitas/api/preset             {"nama": "navy"}
     POST /identitas/api/berkas/<nama>      unggah logo/favicon (form-data "berkas")
 """
 
@@ -112,10 +112,8 @@ def _jawaban():
 
 
 def _preset_tampil() -> dict:
-    """Preset "djp" hanya untuk instalasi DJP (SPS_PRESET=djp atau SPS_PROFIL_DJP=1), bukan perusahaan lain (U20)."""
-    import os
-    djp = os.environ.get("SPS_PRESET") == "djp" or os.environ.get("SPS_PROFIL_DJP") == "1"
-    return {k: v for k, v in skema.PRESET.items() if k != "djp" or djp}
+    """Preset yang ditawarkan di tab Identitas & Tema."""
+    return dict(skema.PRESET)
 
 
 @bp.route("/api")
