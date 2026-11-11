@@ -240,6 +240,9 @@ config/sps_studio/
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |
 | Saran dari data lama muncul | Sumber data lambat | Tunggu; jawaban lama otomatis diabaikan |
 | Panel Analitik pudar | jenis bukan Garis/Area/Batang, atau > 1 dimensi | sisakan satu dimensi berurutan; kosongkan Warna |
+| Kolom angka (mis. `total`) ada di **Dimensi**, tidak bisa dijumlah / diramal | versi lama: kolom desimal ClickHouse (`Float64`) tidak dikenali sebagai angka | perbarui ALDx ([31](31-catatan-versi.md)); bila sumber lain, set tipe kolom ke angka di Dataset › Edit › Kolom |
+| Huruf objek teks tidak berubah di dashboard | CSS dashboard dihapus manual di Superset | buka dashboard di Studio › Simpan lagi (bagian `ALDX-HURUF` dibuat ulang) |
+| Gambar objek: "Format gambar harus PNG, JPEG, WebP, atau GIF" | berkas SVG / format lain | ekspor ulang logo sebagai PNG |
 | "butuh minimal 4 titik" | periode terlalu sedikit | perluas filter periode |
 | Simpan ramalan: "ALDx Engine tidak bisa dihubungi" | container engine mati | `docker compose up -d engine`, atau simpan tanpa Ramalan |
 | Status "dicocokkan lewat nama" di peta provinsi | kolom berisi nama, bukan kode ISO | ubah ke kode ISO (ID-JK) sebelum disimpan |

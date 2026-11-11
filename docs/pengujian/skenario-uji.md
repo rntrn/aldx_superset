@@ -90,7 +90,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | E01 | 2 Analis | Tinggi | Peta titik | A10 | latihan_lokasi_pelanggan → lon ke Kolom, lat ke Baris, saluran ke Warna | Rekomendasi Peta titik; titik di 6 wilayah Indonesia, warna per saluran |
 | E02 | 2 Analis | Tinggi | Peta provinsi | A10 | provinsi ke Kolom, belanja ke Baris | Rekomendasi Peta provinsi; DKI Jakarta paling gelap; legenda nilai tampil |
 | E03 | 2 Analis | Sedang | Peta di Superset | E01–E02 disimpan | Buka chart di Explore | Peta provinsi (Indonesia) & peta titik deck.gl tampil; titik tampil walau ubin peta tidak termuat |
-| E04 | 2 Analis | Tinggi/asap | Ramalan | A10 | periode ke Kolom, total ke Baris → centang Ramalan 6 | Garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)' |
+| E04 | 2 Analis | Tinggi/asap | Ramalan | A10 | periode ke Kolom, total ke Baris → centang Ramalan 6 | total tercantum di bagian Ukuran (bukan Dimensi) & tampil SUM(total); garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)'; label sumbu berformat 2025-03-01 |
 | E05 | 2 Analis | Tinggi | Tren & anomali | E04 | Centang Garis tren & Tandai anomali | Garis tren titik-titik; satu titik merah di Maret 2025 |
 | E06 | 2 Analis | Tinggi | Ramalan tersimpan ke dashboard | E04 | Simpan → buka di Explore | Chart garis berisi seri Aktual, Ramalan, batas 80%/95%, Tren; pesan 'diperbarui otomatis tiap hari' |
 | E07 | 2 Analis | Tinggi | Ramalan mengikuti lingkup akses | Dua akun beda cabang (role RLS berbeda) | Akun A menyimpan ramalan; akun B membuka chart yang sama | Akun B tidak melihat angka milik lingkup akun A |

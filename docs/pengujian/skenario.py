@@ -182,7 +182,8 @@ SKENARIO = [
     ("E03", 2, "Sedang", "Peta di Superset", "E01–E02 disimpan", "Buka chart di Explore",
      "Peta provinsi (Indonesia) & peta titik deck.gl tampil; titik tampil walau ubin peta tidak termuat"),
     ("E04", 2, "Tinggi/asap", "Ramalan", "A10", "periode ke Kolom, total ke Baris → centang Ramalan 6",
-     "Garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)'"),
+     "total tercantum di bagian Ukuran (bukan Dimensi) & tampil SUM(total); garis putus-putus 6 bulan + pita 80/95%; "
+     "keterangan 'Holt-Winters (musiman 12)'; label sumbu berformat 2025-03-01"),
     ("E05", 2, "Tinggi", "Tren & anomali", "E04", "Centang Garis tren & Tandai anomali",
      "Garis tren titik-titik; satu titik merah di Maret 2025"),
     ("E06", 2, "Tinggi", "Ramalan tersimpan ke dashboard", "E04", "Simpan → buka di Explore",

@@ -15,6 +15,8 @@ Semua komponen berjalan di **Docker**: web, backgrounder, metadata (PostgreSQL),
 Tanpa internet: **`ALDx-Setup-Offline.exe`** + semua `.bin` ([Releases › ALDx offline](../../releases/tag/offline)), satu folder.
 Tanpa Setup.exe: Download ZIP › Extract All › klik dua kali `PASANG.cmd` (wizard yang sama).
 Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; data hanya bila dipilih, dicadangkan dulu).
+Bersih tanpa sisa: **`ALDx-HapusTotal.exe`** (Releases) atau menu Start › *Hapus total (bersih)* ([docs/29](docs/29-versi-pembaruan-hapus-total.md)).
+Memperbarui: jalankan Setup terbaru di atas instalasi lama (data dipertahankan); yang baru & langkahnya: [docs/31](docs/31-catatan-versi.md).
 
 ---
 
@@ -31,24 +33,25 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 | Sumber data | **Hubungkan data**: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery, Redshift, Databricks, Trino, Athena, SAP HANA (driver opsional), Vertica, Druid + berkas Access/Excel/CSV |
 | Login | akun lokal ber-email (Superadmin wajib, pengguna lain diisi di installer) + LDAP / Active Directory **opsional** untuk akun jaringan kantor; halaman login beranimasi |
 | HTTPS | opsional (centang di installer): sertifikat dibuat otomatis, `http://` dialihkan; sertifikat kantor bisa dipakai. Lihat [docs/11 §9b](docs/11-pusat-kendali-server.md#https) |
-| Identitas & tema | bawaan **Tinta & Sakura** (hitam → abu → putih, semburat pink); nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
+| Identitas & tema | bawaan **Tinta & Sakura** (hitam → abu → putih, semburat pink); preset lain termasuk **Neon malam** (gelap, pink + cyan) atau **kombinasi warna manual** (warna utama, aksen, aksen kedua, latar; warna teks otomatis paling kontras); nama, perusahaan, logo, huruf, hiasan, animasi: Pusat Kendali, tanpa restart. Lihat [docs/09](docs/09-identitas-tema.md) |
 | Hak akses data | RLS per role, atau otomatis dari profil pengguna (opsional, `config/akses.yaml`) |
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
-| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, ramalan, dashboard, persiapan data |
+| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **ramalan** (Holt-Winters + pita keyakinan, tren, anomali), **hierarki dimensi** (provinsi › kabupaten › … , klik untuk menelusuri), **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
 | Pusat Kendali | `/pusat-kendali/`: proses, cache, batas, identitas, hubungkan data, ekstrak, hak akses, multi-node |
 | Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
 | Ekspor | tombol **Ekspor** di setiap tabel & grafik halaman ALDx: gambar PNG, PDF, Excel, CSV, TXT, salin |
 | Keamanan & audit | akun terkunci otomatis setelah salah password berulang; **jejak audit** (login, unduh data, ekspor/impor, hak akses) di Pusat Kendali › Riwayat + CSV; role bawaan berhak minimum; peringatan akun non-Admin yang melihat semua data |
 | Superadmin & batas data | role **Superadmin** di atas Admin untuk pengaturan vital; **Batas data** (ukuran/baris upload, impor, ekstrak, kuota engine) dengan rekomendasi otomatis atau tanpa batas. Lihat [docs/24](docs/24-superadmin-dan-batas-data.md) |
 | Berkas .ald / .aldx | simpan & bagikan dashboard/chart/dataset sebagai berkas. Selalu **terenkripsi** (kunci server atau kata sandi), tanpa password koneksi; `.aldx` bisa membawa salinan data sesuai hak akses pembuat |
-| Dashboard lanjutan | riwayat versi & pulihkan, tata letak ponsel, langganan laporan email, lencana Resmi, **Lihat sebagai…** (uji hak akses). Lihat [docs/26](docs/26-langganan-versi-ponsel-lihat-sebagai.md) |
-| Filter global & ulasan | satu filter (pilihan, rentang angka, rentang waktu) berlaku di **semua dashboard & Story**, tersimpan per akun; **komentar & rating** dengan balasan, @sebut, pemberitahuan & moderasi Superadmin. Lihat [docs/25](docs/25-berkas-filter-global-ulasan.md) |
+| Dashboard lanjutan | klik-filter antar-chart (cross filter), **drill to detail** & **drill by**, riwayat versi & pulihkan, tata letak ponsel, langganan laporan email, lencana Resmi, **Lihat sebagai…** (uji hak akses). Lihat [docs/26](docs/26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Filter global & ulasan | satu filter (pilihan, rentang angka, rentang waktu) berlaku di **semua dashboard & Story**, tersimpan per akun; nilai dipilih dari daftar yang bisa dicari, **chip filter aktif** di bilah atas, *kecualikan dashboard ini*; **komentar & rating** dengan balasan, @sebut, pemberitahuan & moderasi Superadmin. Lihat [docs/25](docs/25-berkas-filter-global-ulasan.md) |
+| Sematkan ke web lain | dashboard tampil di web/aplikasi lain lewat `<iframe>` + token tamu: **RLS per penonton**, filter dari URL (`f.<kolom>=...`), hanya domain yang diizinkan (`.env`: `SPS_SEMATKAN_*`). Lihat [docs/30](docs/30-sematkan-dashboard.md) |
 | Dokumentasi | **Panduan di dalam aplikasi** (menu *Panduan*, `/panduan/`: pencarian, daftar isi, mode gelap, tanpa internet) dari Markdown di `docs\` + **PDF** di `docs\pdf\` |
 | Mutu | `scripts\uji.ps1` di server; daftar periksa audit keamanan [docs/27](docs/27-daftar-periksa-audit-keamanan.md) |
 
-**Mulai membaca:** [`docs/00-mulai-di-sini.md`](docs/00-mulai-di-sini.md) (peta dokumentasi per peran).
+**Mulai membaca:** [`docs/00-mulai-di-sini.md`](docs/00-mulai-di-sini.md) (peta dokumentasi per peran). **Apa yang baru:** [`docs/31-catatan-versi.md`](docs/31-catatan-versi.md).
 
 ---
 
@@ -57,7 +60,7 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 Bagian di bawah ini teknis. Pengguna biasa cukup bagian *Memasang* di atas.
 
 ```text
-git clone https://github.com/rntrn/superset-ald.git D:\superset   # akhir baris otomatis benar (.gitattributes)
+git clone https://github.com/rntrn/aldx_superset.git D:\superset   # akhir baris otomatis benar (.gitattributes)
 D:\superset\PASANG.cmd                                             # atau klik dua kali
 powershell -ExecutionPolicy Bypass -File scripts\uji.ps1           # setelah terpasang: semua LULUS
 ```
@@ -106,14 +109,15 @@ D:\superset
 │   ├── ai.yaml + sps_ai/   # Asisten AI
 │   ├── sps_server/         # Pusat Kendali Server: pengaturan, auto-tuning, monitor, multi-node, HTTPS (tls.py)
 │   ├── sps_engine/         # ALDx Engine: ekstrak, upload, tugas terjadwal
-│   ├── sps_studio/         # Studio Visual: lembar kerja, 23 chart, peta, ramalan, dashboard, persiapan data
+│   ├── sps_studio/         # Studio Visual: lembar kerja, 23 chart, peta, ramalan, hierarki, dashboard + objek desain, persiapan data
 │   ├── sps_app/            # Cangkang aplikasi /app/: Beranda, navigasi, bahasa, bantuan, panel AI, ekspor
 │   ├── sps_superadmin.py   # Role Superadmin di atas Admin + penjaganya
 │   ├── sps_kueri/          # Kueri Visual: susun kueri & gabung tabel tanpa SQL
 │   ├── sps_berkas/         # Berkas .ald/.aldx terenkripsi: ekspor & impor dashboard/chart/dataset (+ data)
 │   ├── sps_filter_global.py # Filter global: satu filter untuk semua dashboard & Story
+│   ├── sps_sematkan.py     # Sematkan dashboard ke web lain: token tamu, RLS, filter URL (docs/30)
 │   ├── sps_ulasan/         # Komentar & rating + moderasi Superadmin
-│   ├── sps_dialek.py, sps_skema.py # Penyesuaian Oracle & chart berat; skema terpilih per koneksi
+│   ├── sps_dialek.py, sps_skema.py # Penyesuaian Oracle, tipe angka ClickHouse & chart berat; skema terpilih per koneksi
 │   ├── sps_menu.py         # Susunan menu alur BI (izin menu; tampilan menu ada di sps_app)
 │   └── sps_pengguna.py     # Membuat akun lokal dari tabel pengguna installer
 ├── scripts/
