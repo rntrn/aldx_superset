@@ -130,6 +130,7 @@
     const judul = judulHalaman || (n ? t(n.label) : "");
     $("#jejak").innerHTML = grup + `<b>${esc(judul)}</b>`;
     document.title = (judul ? judul + " · " : "") + AWAL.app;
+    window.dispatchEvent(new Event("sps:halaman"));        // mis. chip filter global menyesuaikan dashboard yang dibuka
   }
   function buka(alamat, {dorong = true} = {}) {
     if (alamat.startsWith("/app")) { const p = new URL(alamat, location.origin).searchParams.get("p"); alamat = p || "beranda"; }

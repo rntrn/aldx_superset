@@ -344,6 +344,11 @@ SKENARIO = [
      "Dashboard tersaring sesuai rentang; filter yang sama sudah aktif di perangkat lain"),
     ("J09", 3, "Sedang", "Ekspor .aldx besar di latar", "Backgrounder menyala; dashboard dengan data", "Ekspor .aldx + data → pindah halaman → kembali ke Berkas",
      "Pesan 'disiapkan di latar'; bagian Ekspor terakhir berubah siap; Unduh berhasil; akun lain tidak bisa mengunduh"),
+    ("J11", 1, "Sedang", "Filter global: pilih nilai, chip & kecualikan", "Dashboard latihan; layar ≥ 1280 px",
+     "Corong → Cabang → ketik 'ban' → pilih Cabang Bandung dari daftar → Terapkan; × pada chip di bilah atas; "
+     "terapkan lagi lalu centang Kecualikan dashboard ini → Terapkan",
+     "Daftar nilai hanya berisi cabang yang boleh dilihat; chip 'Cabang Bandung' tampil & angka tersaring; × = kembali normal; "
+     "dikecualikan = dashboard tanpa filter, chip redup bertanda 'dikecualikan', dashboard lain tetap tersaring"),
     ("J10", 4, "Rendah", "Moderasi massal", "≥ 3 komentar menunggu", "Moderasi ulasan → Pilih semua → Tampilkan terpilih",
      "Semua tampil; lencana jumlah menunggu di menu & avatar hilang; tercatat di jejak audit"),
 

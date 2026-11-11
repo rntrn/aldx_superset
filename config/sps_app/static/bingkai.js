@@ -21,7 +21,8 @@
     let fg = null;
     try { fg = JSON.parse(localStorage.getItem(KUNCI_FG) || "null"); } catch (e) { return; }
     if (!fg || !fg.aktif || !Object.keys(fg.filter || {}).length) return;
-    const q = new URLSearchParams({dashboard: decodeURIComponent(m[1]), filter: JSON.stringify(fg.filter)});
+    const q = new URLSearchParams({dashboard: decodeURIComponent(m[1]), filter: JSON.stringify(fg.filter),
+                                   kecuali: JSON.stringify(fg.kecuali || [])});
     fetch("/filter-global/api/terapkan?" + q, {credentials: "same-origin"}).then(r => (r.ok ? r.json() : null)).then(j => {
       if (!j || !j.native_filters) return;
       p.set("native_filters", j.native_filters);

@@ -388,8 +388,12 @@ def jalankan_semua() -> None:
         rison, berlaku, tidak = sps_filter_global.native_filters(Dash(), {"NM_CABANG": ["Bandung"], "tahun": [2025]})
         if berlaku != ["nm_cabang"] or tidak != ["tahun"] or "NATIVE_FILTER-a" not in (rison or ""):
             raise RuntimeError("filter global salah: " + str((rison, berlaku, tidak)))
+        Dash.id, Dash.slug = 7, "penjualan"
+        kec = sps_filter_global._dikecualikan
+        if not (kec(Dash(), '["penjualan"]') and kec(Dash(), "[7]") and not kec(Dash(), '["lain"]') and not kec(Dash(), "rusak")):
+            raise RuntimeError("pengecualian dashboard filter global salah")
         model.ringkasan("dashboard", 0)                     # membuat tabel sps_ulasan bila belum ada
-        return f"native_filters ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
+        return f"native_filters & pengecualian ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
 
     @uji("Tahap 3", "HTTPS gateway: sertifikat otomatis & konfigurasi")
     def _():

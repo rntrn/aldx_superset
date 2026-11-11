@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **136 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **137 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -182,6 +182,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | J07 | 1 Pengguna | Sedang | Balasan & @sebut | J06; dua akun | A menulis komentar menyebut @B; B membalas komentar A | Saran nama muncul saat mengetik @; B mendapat titik di avatar & pemberitahuan; balasan tampil menjorok di bawah komentar A |
 | J08 | 1 Pengguna | Sedang | Filter global rentang & per akun | Dashboard dengan filter Tahun (rentang) & waktu | Corong → Tahun dari 2024; Rentang waktu 30 hari terakhir → Terapkan; buka ALDx dari komputer/ponsel lain | Dashboard tersaring sesuai rentang; filter yang sama sudah aktif di perangkat lain |
 | J09 | 3 Admin data | Sedang | Ekspor .aldx besar di latar | Backgrounder menyala; dashboard dengan data | Ekspor .aldx + data → pindah halaman → kembali ke Berkas | Pesan 'disiapkan di latar'; bagian Ekspor terakhir berubah siap; Unduh berhasil; akun lain tidak bisa mengunduh |
+| J11 | 1 Pengguna | Sedang | Filter global: pilih nilai, chip & kecualikan | Dashboard latihan; layar ≥ 1280 px | Corong → Cabang → ketik 'ban' → pilih Cabang Bandung dari daftar → Terapkan; × pada chip di bilah atas; terapkan lagi lalu centang Kecualikan dashboard ini → Terapkan | Daftar nilai hanya berisi cabang yang boleh dilihat; chip 'Cabang Bandung' tampil & angka tersaring; × = kembali normal; dikecualikan = dashboard tanpa filter, chip redup bertanda 'dikecualikan', dashboard lain tetap tersaring |
 | J10 | 4 Admin server | Rendah | Moderasi massal | ≥ 3 komentar menunggu | Moderasi ulasan → Pilih semua → Tampilkan terpilih | Semua tampil; lencana jumlah menunggu di menu & avatar hilang; tercatat di jejak audit |
 
 ## K. Dashboard lanjutan & kenyamanan
