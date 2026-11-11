@@ -6,7 +6,8 @@ nilai dari sini lewat sps_identitas.muat(). Menambah isian baru = tambah satu ba
 Nilai isian berkas (logo, logo_putih, favicon):
     ""               -> dibuat otomatis (SVG dari nama & warna)
     "unggah"         -> berkas yang diunggah admin (tabel sps_identitas_berkas)
-    "statis:<nama>"  -> berkas bawaan di folder branding/ (mis. statis:logo-djp.png)
+    "statis:<nama>"  -> berkas di folder branding/ (mis. statis:logo-kustom.png);
+                        bila berkasnya tidak ada, logo dibuat otomatis
 """
 
 from __future__ import annotations

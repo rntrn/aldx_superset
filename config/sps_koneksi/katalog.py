@@ -41,6 +41,9 @@ class Jenis:
     keterangan: str = ""
     extra: Callable[[dict], dict] = field(default=lambda n: {})
     rahasia_extra: Callable[[dict], dict] = field(default=lambda n: {})
+    # Diisi = driver opsional (lisensinya tidak boleh ikut dibagikan): cara memasang untuk admin.
+    # Driver opsional yang belum dipasang tidak dihitung gagal oleh uji otomatis.
+    opsional: str = ""
 
     def driver_ada(self) -> bool:
         try:
@@ -52,7 +55,7 @@ class Jenis:
     def publik(self) -> dict:
         return {"id": self.id, "nama": self.nama, "kelompok": self.kelompok, "keterangan": self.keterangan,
                 "isian": [i.publik for i in self.isian], "driver_ada": self.driver_ada(),
-                "paket": self.driver.split(".")[0]}
+                "paket": self.driver.split(".")[0], "opsional": self.opsional}
 
 
 KELOMPOK = {"database": "Database", "gudang": "Data warehouse & lakehouse", "cloud": "Layanan cloud",
@@ -137,7 +140,10 @@ KATALOG: tuple[Jenis, ...] = (
                      f"{q(n, 'schema')}?s3_staging_dir={q(n, 's3')}")),
     Jenis("hana", "SAP HANA", "gudang", "sqlalchemy_hana",
           (*_host("30015"), Isian("database", "Tenant database", wajib=False), USER, PASSWORD),
-          lambda n: _dasar("hana", n), "Tenant database kosong = SYSTEMDB."),
+          lambda n: _dasar("hana", n), "Tenant database kosong = SYSTEMDB.",
+          opsional="Driver SAP (hdbcli) berlisensi SAP, jadi tidak disertakan. Admin server: unduh berkas "
+                   "hdbcli-*.whl (Linux x86-64, Python 3.10) dari pypi.org, taruh di docker\\wheels, "
+                   "lalu jalankan scripts\\init.ps1 (lihat docs 06 §4)."),
     Jenis("vertica", "Vertica", "gudang", "vertica_python", (*_host("5433"), DATABASE, USER, PASSWORD),
           lambda n: _dasar("vertica+vertica_python", n), "Port bawaan 5433."),
     Jenis("druid", "Apache Druid", "gudang", "pydruid", (*_host("8082"), Isian("ssl", "HTTPS", jenis="ya_tidak", wajib=False)),

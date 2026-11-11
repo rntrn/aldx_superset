@@ -177,7 +177,7 @@ config/sps_studio/
     ├── lembar.js   lembar kerja (drag & drop, Tampilkan saya)
     ├── dasbor.js   penyusun dashboard
     ├── prep.js     persiapan data
-    └── echarts.min.js  ECharts 5.6.0 (Apache-2.0), disimpan lokal: tidak butuh internet
+    └── echarts.min.js  ECharts 5.6.1 (Apache-2.0), disimpan lokal: tidak butuh internet
 ```
 
 ## 6. Masalah umum

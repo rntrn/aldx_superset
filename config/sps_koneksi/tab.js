@@ -15,6 +15,7 @@
     JENIS = BERKAS = null;
     // Driver tidak ada di image: kartu nonaktif + cara memasang (U21).
     const kartu = j => `<button class="hbJenis" data-jenis="${j.id}" ${j.driver_ada ? "" : `disabled title="${esc(
+      j.opsional ||
       `Paket Python '${j.paket}' belum ada di image ini. Admin server: taruh berkas .whl-nya di docker\\wheels, tambahkan ` +
       `namanya ke docker\\wheels\\paket.txt, lalu jalankan scripts\\init.ps1 (lihat docs 06 §4).`)}"`}>
       <b>${esc(j.nama)}</b><span class="ket">${esc(j.driver_ada ? j.keterangan || " " : `Driver belum terpasang (paket ${j.paket}). Arahkan kursor untuk cara memasang.`)}</span></button>`;

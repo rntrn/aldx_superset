@@ -64,6 +64,19 @@ def tema_css():
     return _tembolok(Response(tema.css(nilai(), versi()), mimetype="text/css"))
 
 
+def _statis_ada(nama_berkas: str) -> bool:
+    """True bila berkas ada di folder branding/ (di-mount ke folder static Superset).
+
+    Logo merek pihak lain (mis. instansi) tidak disertakan di repo; bila preset menunjuk
+    berkas yang tidak ada, logo dibuat otomatis alih-alih gambar rusak.
+    """
+    from pathlib import Path
+    relatif = tema.STATIS.removeprefix("/static/")
+    # folder static aplikasi + jalur mount di docker-compose.yml (./branding -> /app/superset/static/...)
+    akar = {current_app.static_folder, "/app/superset/static"} - {None}
+    return any((Path(a) / relatif / nama_berkas).is_file() for a in akar)
+
+
 @bp.route("/berkas/<nama>")
 def berkas(nama: str):
     n = nilai()
@@ -74,9 +87,9 @@ def berkas(nama: str):
     sumber = n.get(nama, "")
     if sumber == "unggah" and (isi := penyimpanan.ambil_berkas(nama)):
         return _tembolok(Response(isi[1], mimetype=isi[0]))
-    if sumber.startswith("statis:"):
+    if sumber.startswith("statis:") and _statis_ada(sumber[7:]):
         return redirect(f"{tema.STATIS}/{sumber[7:]}")
-    svg = tema.svg_favicon(n) if nama == "favicon" else tema.svg_logo(n, putih=nama == "logo_putih")
+    svg =tema.svg_favicon(n) if nama == "favicon" else tema.svg_logo(n, putih=nama == "logo_putih")
     return _tembolok(Response(svg, mimetype="image/svg+xml"))
 
 

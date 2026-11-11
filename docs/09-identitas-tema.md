@@ -56,6 +56,11 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 | `djp` | navy `#1F2F5F` / emas `#F2B705` | gelombang; nama, logo & halaman depan DJP |
 
 Preset selain `netral` dan `djp` hanya mengganti warna & motif; nama dan logo Anda tetap.
+
+Logo resmi DJP **tidak disertakan** di repo (merek milik instansi). Preset `djp` mencari `logo-djp.png`,
+`logo-djp-putih.png`, dan `favicon-djp-32.png` di folder `branding\`; bila tidak ada, logo dibuat otomatis
+dari nama & warna. Instalasi DJP cukup menyalin berkas logo resmi ke `branding\` (diabaikan git) atau
+mengunggahnya di tab ini.
 Menambah preset: satu entri di `PRESET` dalam `config\sps_identitas\skema.py`.
 
 ## 4. Halaman login beranimasi

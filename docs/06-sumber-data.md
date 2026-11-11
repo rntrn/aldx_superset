@@ -24,7 +24,7 @@ Tutorial bergambar: [tutorial Level 3 §1](tutorial/level-3-admin-data.md#1-meng
 | | Databricks SQL | server hostname, HTTP path, access token, catalog, schema | |
 | | Trino / Starburst / Presto | alamat, port, user, catalog, schema, HTTPS | |
 | | Amazon Athena | region, S3 staging dir, access key, secret key, database | |
-| | SAP HANA | alamat, port 30015, tenant, user, password | |
+| | SAP HANA (opsional) | alamat, port 30015, tenant, user, password | driver SAP diunduh sendiri (§4) |
 | | Vertica | alamat, port 5433, database, user, password | |
 | | Apache Druid | alamat, port 8082, HTTPS | |
 | Lainnya | URI SQLAlchemy | `dialek+driver://user:pass@host:port/db` | untuk admin berpengalaman |
@@ -71,6 +71,12 @@ centang skema yang berisi data Anda (mis. `genapp`), lalu **Simpan**. Skema lain
    ([README](../docker/wheels/README.md)), lalu `docker compose build` dan `scripts\start.ps1`.
 2. Tambah satu `Jenis(...)` di `config\sps_koneksi\katalog.py`: isian formulir + templat URI.
 3. `scripts\uji.ps1` memeriksa semua driver di katalog terpasang.
+   Driver yang lisensinya tidak boleh ikut dibagikan diberi `opsional="<cara memasang>"`: tidak dihitung gagal
+   dan cara memasangnya tampil di kartu wizard.
+
+**SAP HANA**: driver `hdbcli` berlisensi SAP sehingga tidak disertakan. Unduh `hdbcli-*.whl` (Linux x86-64,
+Python 3.10) dari pypi.org, taruh di `docker\wheels\`, lalu `scripts\init.ps1`. `sqlalchemy-hana` ikut terpasang
+otomatis ([README wheels](../docker/wheels/README.md#sap-hana-opsional)).
 
 ## 5. Koneksi dari `.env` (profil DJP, opsional)
 

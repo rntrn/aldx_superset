@@ -432,13 +432,15 @@ def jalankan_semua() -> None:
     @uji("Hubungkan data", "driver database & berkas terpasang")
     def _():
         from sps_koneksi import katalog
-        kurang = [j.nama for j in katalog.KATALOG if not j.driver_ada()]
+        kurang = [j.nama for j in katalog.KATALOG if not j.driver_ada() and not j.opsional]
         for modul in ("access_parser", "xlrd", "openpyxl", "duckdb"):
             if importlib.util.find_spec(modul) is None:
                 kurang.append(modul)
         if kurang:
             raise RuntimeError("belum terpasang: " + ", ".join(kurang) + " (lihat docker/wheels/README.md)")
-        return f"{len(katalog.KATALOG)} jenis database + Access/Excel/CSV/SQLite/DuckDB/Parquet"
+        opsional = [j.nama for j in katalog.KATALOG if j.opsional and not j.driver_ada()]
+        ket = f"; opsional belum dipasang: {', '.join(opsional)}" if opsional else ""
+        return f"{len(katalog.KATALOG)} jenis database + Access/Excel/CSV/SQLite/DuckDB/Parquet{ket}"
 
     # ---- Fitur 10 November 2026 (QA putaran 2)
     @uji("2026.11.10", "Role pendamping lengkap & tersimpan (Pengguna+Gamma, Superadmin+Admin)")
