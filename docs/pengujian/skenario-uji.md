@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **132 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **133 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -133,6 +133,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | G10 | 4 Admin server | Tinggi | Batas data: rekomendasi, angka, tanpa batas | Akun Superadmin | Pusat Kendali → Batas data → Impor berkas: baris maksimal = 3 → Simpan; impor CSV 10 baris; lalu klik auto → Simpan | Rekomendasi & rumus tampil; impor ditolak dengan pesan 'melebihi batas 3 baris' tanpa dataset terbentuk; setelah auto impor berhasil |
 | G11 | 4 Admin server | Tinggi | Usulan /hw-engineer & /ahli-ui-ux | Akun Superadmin; model AI aktif | Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru | Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat |
 | G12 | 4 Admin server | Sedang | Preset djp memakai logo ALDx | Akun Admin | Identitas & Tema → preset djp → Terapkan; lihat navbar, halaman login, tab browser; lalu preset netral | Logo ALDx (tanda batang + tulisan ALDx) di latar terang & gelap, favicon ALDx; tidak ada gambar rusak; netral mengembalikan logo otomatis |
+| G13 | 4 Admin server | Sedang | Tema bawaan Tinta & Sakura | Akun Admin | Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom isian login; lalu preset navy | Panggung login bergradasi hitam → abu dengan semburat pink & motif tinta; tombol utama hitam; fokus & tautan pink; teks terbaca (kontras ≥ 4,5:1); navy mengembalikan tampilan lama |
 
 ## H. Keamanan
 

@@ -8,7 +8,7 @@ Sumber tetap berkas .md; PDF hanya hasil cetak. Jalankan setelah dokumen diubah:
 Butuh Python 3.10+ dengan:  pip install markdown pypdf playwright  lalu  playwright install chromium
 (atau isi ALDX_CHROMIUM dengan jalur Chromium yang sudah ada).
 
-Alur:  Markdown -> HTML (gaya ALDx: Plus Jakarta Sans, navy, garis emas) -> PDF A4 lewat Chromium.
+Alur:  Markdown -> HTML (gaya ALDx "Tinta & Sakura": hitam, abu, putih + pink) -> PDF A4 lewat Chromium.
 Berkas gabungan (manual, tutorial, bahan ajar) mendapat sampul, daftar isi, bookmark, dan tautan antar-dokumen
 di dalam PDF. presentasi-sosialisasi.pdf dibuat terpisah (sumber slide di luar repo) dan tidak disentuh skrip ini.
 """
@@ -148,55 +148,68 @@ def md_ke_html(md: Path, dalam_paket: set[Path]) -> str:
 GAYA = """
 @import url("{font}");
 @page {{ size: A4; margin: 18mm 18mm 16mm 18mm; }}
-:root {{ --navy:#1A2238; --biru:#1F4E79; --emas:#F2A900; --teks:#272B32; --garis:#DCE2EC; --muda:#F4F6F9; }}
+:root {{ --utama:#18181B; --abu:#3F3F46; --aksen:#E11D74; --aksen-muda:#FDE8F1; --teks:#27272A;
+         --garis:#E4E4E7; --muda:#F4F4F5; }}
 * {{ box-sizing: border-box; }}
 body {{ font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif; color: var(--teks); font-size: 10.5pt;
         line-height: 1.5; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
-h1 {{ color: var(--navy); font-size: 22pt; line-height: 1.2; margin: 0 0 14pt; padding-bottom: 8pt;
-      border-bottom: 2.2pt solid var(--emas); }}
-h2 {{ color: var(--biru); font-size: 15pt; margin: 20pt 0 8pt; break-after: avoid; }}
-h3 {{ color: var(--navy); font-size: 12pt; margin: 16pt 0 6pt; break-after: avoid; }}
-h4 {{ color: var(--navy); font-size: 10.5pt; margin: 12pt 0 4pt; break-after: avoid; }}
+h1 {{ color: var(--utama); font-size: 22pt; line-height: 1.2; margin: 0 0 14pt; padding-bottom: 8pt;
+      border-bottom: 2.2pt solid var(--aksen); }}
+h2 {{ color: var(--utama); font-size: 15pt; padding-left: 8pt; border-left: 3pt solid var(--aksen); margin: 20pt 0 8pt; break-after: avoid; }}
+h3 {{ color: var(--utama); font-size: 12pt; margin: 16pt 0 6pt; break-after: avoid; }}
+h4 {{ color: var(--utama); font-size: 10.5pt; margin: 12pt 0 4pt; break-after: avoid; }}
 p, li {{ orphans: 3; widows: 3; }}
-a {{ color: var(--biru); text-decoration: none; }}
+a {{ color: var(--aksen); text-decoration: none; }}
 a[data-luar] {{ color: inherit; }}
 code {{ font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.8pt; background: var(--muda);
         border-radius: 3pt; padding: 0 2.5pt; }}
-pre {{ background: #F7F8FB; border: 0.75pt solid var(--garis); border-left: 3pt solid var(--biru); border-radius: 4pt;
+pre {{ background: #FAFAFA; border: 0.75pt solid var(--garis); border-left: 3pt solid var(--abu); border-radius: 4pt;
        padding: 7pt 9pt; white-space: pre; overflow: hidden; break-inside: avoid; }}
 pre.lipat {{ white-space: pre-wrap; word-break: break-word; }}
 pre code {{ background: none; padding: 0; font-size: inherit; }}
 table {{ width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 9pt; }}
 thead {{ display: table-header-group; }}
-th {{ background: var(--biru); color: #fff; text-align: left; font-weight: 700; padding: 5pt 7pt; }}
+th {{ background: var(--utama); color: #fff; text-align: left; font-weight: 700; padding: 5pt 7pt; }}
 td {{ padding: 5pt 7pt; border-bottom: 0.75pt solid var(--garis); vertical-align: top; }}
+th, td {{ overflow-wrap: break-word; }}
+table.padat {{ table-layout: fixed; font-size: 7.8pt; }}
+table.padat th, table.padat td {{ overflow-wrap: anywhere; padding: 4pt 5pt; }}
+li code, p code {{ overflow-wrap: anywhere; }}   /* jalur/perintah panjang di paragraf boleh dipenggal */
 tr {{ break-inside: avoid; }}
 tbody tr:nth-child(even) td {{ background: var(--muda); }}
 img {{ max-width: 100%; max-height: 210mm; display: block; margin: 8pt auto; border: 0.75pt solid var(--garis);
        border-radius: 4pt; break-inside: avoid; }}
-blockquote {{ margin: 8pt 0; padding: 6pt 10pt; background: #FFF8E6; border-left: 3pt solid var(--emas);
+blockquote {{ margin: 8pt 0; padding: 6pt 10pt; background: var(--aksen-muda); border-left: 3pt solid var(--aksen);
               border-radius: 3pt; }}
 blockquote p {{ margin: 0; }}
 hr {{ border: 0; border-top: 0.75pt solid var(--garis); margin: 14pt 0; }}
 .dok + .dok {{ break-before: page; }}
-.sampul {{ height: 255mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }}
-.sampul img {{ border: 0; margin: 0 0 18mm; width: 52mm; }}
-.sampul h1 {{ font-size: 34pt; border-bottom-width: 3pt; margin: 0 0 10pt; padding-bottom: 10pt; }}
-.sampul .ket {{ font-size: 12pt; color: #4A5468; max-width: 150mm; }}
-.sampul .tgl {{ margin-top: 16mm; font-size: 10pt; color: #6B7488; }}
+.sampul {{ height: 255mm; display: flex; flex-direction: column; justify-content: flex-end; break-after: page;
+           padding: 22mm 18mm 20mm; border-radius: 8pt; color: #fff; position: relative; overflow: hidden;
+           background: radial-gradient(circle at 88% 92%, rgba(225,29,116,.55), transparent 42%),
+                       linear-gradient(160deg, #0B0B0D 0%, #18181B 45%, #52525B 100%); }}
+.sampul img {{ border: 0; margin: 0; width: 48mm; position: absolute; top: 22mm; left: 18mm; }}
+.sampul h1 {{ color: #fff; font-size: 36pt; border-bottom: 3pt solid var(--aksen); margin: 0 0 10pt;
+              padding-bottom: 10pt; }}
+.sampul .ket {{ font-size: 12pt; color: #E4E4E7; max-width: 150mm; }}
+.sampul .tgl {{ margin-top: 14mm; font-size: 10pt; color: #A1A1AA; }}
 .isi {{ break-after: page; }}
 .isi h2 {{ margin-top: 0; }}
 .isi ol {{ padding-left: 16pt; }}
 .isi li {{ margin: 2.5pt 0; }}
 """
 
-# Blok kode lebar: perkecil huruf sampai muat (diagram ASCII tetap utuh); bila tetap tidak muat, lipat baris.
+# Agar tidak ada yang lebih lebar dari kertas (Chromium akan mengecilkan SELURUH halaman):
+# blok kode diperkecil sampai muat (diagram ASCII tetap utuh), bila tetap tidak muat dilipat;
+# tabel yang terlalu lebar diberi mode "padat" (kolom rata, huruf lebih kecil).
 PAS_KODE = """() => { for (const pre of document.querySelectorAll('pre')) {
   let ukuran = 8.8;
   while (pre.scrollWidth > pre.clientWidth && ukuran > 6.4) { ukuran -= 0.2; pre.style.fontSize = ukuran + 'pt'; }
-  if (pre.scrollWidth > pre.clientWidth) { pre.style.fontSize = ''; pre.classList.add('lipat'); } } }"""
+  if (pre.scrollWidth > pre.clientWidth) { pre.style.fontSize = ''; pre.classList.add('lipat'); } }
+  for (const t of document.querySelectorAll('table')) {
+    if (t.getBoundingClientRect().width > t.parentElement.clientWidth + 1) t.classList.add('padat'); } }"""
 
-KAKI = ('<div style="width:100%;font-family:Arial,sans-serif;font-size:7pt;color:#6B7488;padding:0 18mm;'
+KAKI = ('<div style="width:100%;font-family:Arial,sans-serif;font-size:7pt;color:#71717A;padding:0 18mm;'
         'display:flex;justify-content:space-between"><span>{judul}</span>'
         '<span><span class="pageNumber"></span> / <span class="totalPages"></span></span></div>')
 
@@ -207,7 +220,7 @@ def halaman_html(berkas: Berkas) -> str:
     awal = ""
     if berkas.gabungan:
         hari = date.today()
-        logo = (AKAR / "branding" / "logo-aldx.svg").as_uri()
+        logo = (AKAR / "branding" / "logo-aldx-putih.svg").as_uri()
         daftar = "".join(f'<li><a href="#{_id_dokumen(p)}">{html.escape(_judul(p))}</a></li>' for p in berkas.sumber)
         awal = (f'<section class="sampul"><img src="{logo}" alt="ALDx"><h1>{html.escape(berkas.judul)}</h1>'
                 f'<p class="ket">{html.escape(berkas.keterangan)}</p>'
@@ -247,7 +260,10 @@ def cetak(daftar: list[Berkas]) -> None:
 
 def _rapikan_metadata(pdf: Path, judul: str) -> None:
     """Judul & pembuat PDF = ALDx (bukan nama alat cetak)."""
+    import logging
     from pypdf import PdfReader, PdfWriter
+
+    logging.getLogger("pypdf").setLevel(logging.ERROR)     # peringatan trailer PDF bertag Chromium: tidak berbahaya
 
     tulis = PdfWriter(clone_from=PdfReader(pdf))
     tulis.add_metadata({"/Title": judul, "/Author": "ALDx", "/Creator": "ALDx", "/Producer": "ALDx"})

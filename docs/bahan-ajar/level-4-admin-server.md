@@ -15,7 +15,7 @@
 3. memantau dan mengatur kapasitas di Pusat Kendali; menerapkan auto-tuning;
 4. mencadangkan & memulihkan (metadb, engine), menjadwalkan cadangan;
 5. melakukan upgrade/downgrade aman;
-6. mengatur identitas & tema (nama, logo, warna) tanpa restart, termasuk preset `djp` dengan logo ALDx;
+6. mengatur identitas & tema (nama, logo, warna) tanpa restart: tema bawaan *Tinta & Sakura*, preset `navy` (tampilan lama), dan preset `djp` dengan logo ALDx;
 7. membedakan Superadmin & Admin, mengatur **Batas data**, dan memakai saran AI `/hw-engineer` dengan aman;
 8. menangani gangguan dengan prosedur 7 langkah (pendalaman: [modul runbook admin](modul-runbook-admin.md)).
 

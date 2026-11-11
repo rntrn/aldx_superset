@@ -31,7 +31,7 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 | Sumber data | **Hubungkan data**: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery, Redshift, Databricks, Trino, Athena, SAP HANA (driver opsional), Vertica, Druid + berkas Access/Excel/CSV |
 | Login | akun lokal ber-email (Superadmin wajib, pengguna lain diisi di installer) + LDAP / Active Directory **opsional** untuk NIP; halaman login beranimasi |
 | HTTPS | opsional (centang di installer): sertifikat dibuat otomatis, `http://` dialihkan; sertifikat kantor bisa dipakai. Lihat [docs/11 §9b](docs/11-pusat-kendali-server.md#https) |
-| Identitas & tema | nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
+| Identitas & tema | bawaan **Tinta & Sakura** (hitam → abu → putih, semburat pink); nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
 | Hak akses data | RLS per role (semua perusahaan) atau otomatis dari profil pengguna (profil DJP) |
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |

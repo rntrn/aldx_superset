@@ -51,8 +51,8 @@ $sudahTerpasang = -not $perluPindah -and ((docker volume ls -q 2>$null) -contain
 $dataYatim = $sudahTerpasang -and -not $envAda
 if ($dataYatim) { $sudahTerpasang = $false }
 
-$NAVY = [System.Drawing.Color]::FromArgb(30, 42, 68)       # warna preset "netral" (elegan)
-$EMAS = [System.Drawing.Color]::FromArgb(79, 124, 247)     # aksen biru
+$UTAMA = [System.Drawing.Color]::FromArgb(24, 24, 27)       # warna utama preset bawaan "Tinta & Sakura" (#18181B)
+$AKSEN = [System.Drawing.Color]::FromArgb(225, 29, 116)     # aksen pink (#E11D74)
 $REDUP = [System.Drawing.Color]::FromArgb(95, 107, 122)
 $HIJAU = [System.Drawing.Color]::FromArgb(11, 122, 82)
 $MERAH = [System.Drawing.Color]::FromArgb(180, 35, 24)
@@ -77,26 +77,26 @@ $form.FormBorderStyle = "FixedDialog"; $form.MaximizeBox = $false
 $form.Font = $HURUF; $form.BackColor = [System.Drawing.Color]::White
 
 $kepala = New-Object System.Windows.Forms.Panel
-$kepala.Dock = "Top"; $kepala.Height = 70; $kepala.BackColor = $NAVY
+$kepala.Dock = "Top"; $kepala.Height = 70; $kepala.BackColor = $UTAMA
 $lblJudul = New-Object System.Windows.Forms.Label
 $lblJudul.ForeColor = [System.Drawing.Color]::White; $lblJudul.Font = $JUDUL
 $lblJudul.Location = "24,12"; $lblJudul.AutoSize = $true
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(200, 210, 230); $lblSub.Location = "26,42"; $lblSub.AutoSize = $true
+$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(212, 212, 216); $lblSub.Location = "26,42"; $lblSub.AutoSize = $true
 $kepala.Controls.AddRange(@($lblJudul, $lblSub))
 $garis = New-Object System.Windows.Forms.Panel
-$garis.Dock = "Top"; $garis.Height = 4; $garis.BackColor = $EMAS
+$garis.Dock = "Top"; $garis.Height = 4; $garis.BackColor = $AKSEN
 
 $isi = New-Object System.Windows.Forms.Panel
 $isi.Location = "24,90"; $isi.Size = "712,380"
 
 $bawah = New-Object System.Windows.Forms.Panel
-$bawah.Dock = "Bottom"; $bawah.Height = 58; $bawah.BackColor = [System.Drawing.Color]::FromArgb(245, 247, 250)
+$bawah.Dock = "Bottom"; $bawah.Height = 58; $bawah.BackColor = [System.Drawing.Color]::FromArgb(244, 244, 245)
 $btnKembali = New-Object System.Windows.Forms.Button
 $btnKembali.Text = "< Kembali"; $btnKembali.Size = "100,32"; $btnKembali.Location = "430,13"
 $btnLanjut = New-Object System.Windows.Forms.Button
 $btnLanjut.Text = "Lanjut >"; $btnLanjut.Size = "110,32"; $btnLanjut.Location = "536,13"
-$btnLanjut.BackColor = $NAVY; $btnLanjut.ForeColor = [System.Drawing.Color]::White; $btnLanjut.FlatStyle = "Flat"
+$btnLanjut.BackColor = $UTAMA; $btnLanjut.ForeColor = [System.Drawing.Color]::White; $btnLanjut.FlatStyle = "Flat"
 $btnBatal = New-Object System.Windows.Forms.Button
 $btnBatal.Text = "Batal"; $btnBatal.Size = "90,32"; $btnBatal.Location = "652,13"
 $lblLangkah = New-Object System.Windows.Forms.Label
@@ -258,7 +258,8 @@ $HALAMAN += @{ Judul = "Pemeriksaan komputer"; Sub = "Docker, CPU, RAM, disk, po
 
 # --- 3.2 Identitas, alamat & HTTPS ------------------------------------------------------
 # Nilai awal saja: setelah terpasang, identitas diubah di Pusat Kendali > Identitas & Tema.
-$PRESET = [ordered]@{ "netral" = @("Elegan (navy & biru)", "#1E2A44", "#4F7CF7"); "hijau" = @("Hijau segar", "#0F6E56", "#F4B400")
+$PRESET = [ordered]@{ "netral" = @("Tinta & Sakura (bawaan)", "#18181B", "#E11D74"); "navy" = @("Navy & biru (klasik)", "#1E2A44", "#4F7CF7")
+    "hijau" = @("Hijau segar", "#0F6E56", "#F4B400")
     "marun" = @("Merah marun", "#7A1F2B", "#E0A100"); "ungu" = @("Ungu modern", "#4B2E83", "#19B5A5")
     "grafit" = @("Grafit & toska", "#263238", "#26A69A") }
 # Preset & halaman khusus DJP hanya untuk instalasi DJP (U20): PASANG.cmd djp, SPS_PROFIL_DJP=1, atau instalasi DJP lama.
@@ -632,7 +633,7 @@ $pSelesai = New-Object System.Windows.Forms.Panel; $pSelesai.Dock = "Fill"
 $lblSelesai = Teks "" 0 10 700 $null $TEBAL
 $btnBuka = New-Object System.Windows.Forms.Button
 $btnBuka.Text = "Buka aplikasi"; $btnBuka.Size = "180,36"; $btnBuka.Location = "0,300"
-$btnBuka.BackColor = $NAVY; $btnBuka.ForeColor = [System.Drawing.Color]::White; $btnBuka.FlatStyle = "Flat"
+$btnBuka.BackColor = $UTAMA; $btnBuka.ForeColor = [System.Drawing.Color]::White; $btnBuka.FlatStyle = "Flat"
 $btnSalin = New-Object System.Windows.Forms.Button
 $btnSalin.Text = "Salin alamat"; $btnSalin.Size = "130,36"; $btnSalin.Location = "190,300"
 $pSelesai.Controls.AddRange(@($lblSelesai, $btnBuka, $btnSalin))

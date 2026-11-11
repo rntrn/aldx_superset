@@ -259,6 +259,11 @@ SKENARIO = [
      "Identitas & Tema → preset djp → Terapkan; lihat navbar, halaman login, tab browser; lalu preset netral",
      "Logo ALDx (tanda batang + tulisan ALDx) di latar terang & gelap, favicon ALDx; tidak ada gambar rusak; "
      "netral mengembalikan logo otomatis"),
+    ("G13", 4, "Sedang", "Tema bawaan Tinta & Sakura", "Akun Admin",
+     "Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom "
+     "isian login; lalu preset navy",
+     "Panggung login bergradasi hitam → abu dengan semburat pink & motif tinta; tombol utama hitam; fokus & tautan pink; "
+     "teks terbaca (kontras ≥ 4,5:1); navy mengembalikan tampilan lama"),
 
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",

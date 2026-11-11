@@ -56,7 +56,7 @@ def siapkan() -> list[str]:
 
     Isi awal dipakai bila database belum punya identitas, atau SPS_IDENTITAS_TERAPKAN=1
     (diisi installer ketika admin mengubah halaman Identitas).
-      SPS_PRESET           netral | djp | hijau | marun | ungu | grafit
+      SPS_PRESET           netral (Tinta & Sakura) | navy | hijau | marun | ungu | grafit | djp
       SPS_NAMA_APLIKASI, SPS_NAMA_PERUSAHAAN, SPS_HALAMAN_DEPAN
       SPS_LOGO             nama berkas di folder branding/ (mis. logo-kustom.png)
     """
