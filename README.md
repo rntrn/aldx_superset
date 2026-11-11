@@ -82,7 +82,7 @@ D:\superset
 ├── installer/              # Kode wizard + log instalasi
 ├── server/                 # gateway.conf (otomatis), engine/ & metadb/ (konfigurasi & skrip perawatan)
 ├── backup/                 # Cadangan metadb (*.dump) & engine (engine\*.zip)
-├── branding/               # Font lokal; logo kustom (logo diunggah lewat Pusat Kendali)
+├── branding/               # Font lokal + logo ALDx (logo lain diunggah lewat Pusat Kendali)
 ├── certs/                  # (opsional) sertifikat CA kantor untuk model AI via API
 ├── docker/
 │   ├── Dockerfile          # Image resmi + driver semua jenis database (offline)

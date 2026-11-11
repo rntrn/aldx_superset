@@ -96,8 +96,8 @@ PRESET: dict[str, dict[str, Any]] = {
             "nama_perusahaan": "Direktorat Jenderal Pajak", "slogan": "Data penerimaan untuk keputusan",
             "halaman_depan": "/superset/dashboard/beranda/",
             "warna_utama": "#1F2F5F", "warna_aksen": "#F2B705", "warna_latar": "#F4F6F9", "hiasan": "gelombang",
-            "logo": "statis:logo-djp.png", "logo_putih": "statis:logo-djp-putih.png",
-            "favicon": "statis:favicon-djp-32.png"},
+            "logo": "statis:logo-aldx.svg", "logo_putih": "statis:logo-aldx-putih.svg",
+            "favicon": "statis:favicon-aldx.svg"},
 }
 
 

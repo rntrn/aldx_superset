@@ -53,15 +53,16 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 | `marun` | `#7A1F2B` / `#E0A100` | garis |
 | `ungu` | `#4B2E83` / `#19B5A5` | gelombang |
 | `grafit` | `#263238` / `#26A69A` | titik |
-| `djp` | navy `#1F2F5F` / emas `#F2B705` | gelombang; nama, logo & halaman depan DJP |
+| `djp` | navy `#1F2F5F` / emas `#F2B705` | gelombang; nama & halaman depan DJP, logo ALDx |
 
 Preset selain `netral` dan `djp` hanya mengganti warna & motif; nama dan logo Anda tetap.
 
-Logo resmi DJP **tidak disertakan** di repo (merek milik instansi). Preset `djp` mencari `logo-djp.png`,
-`logo-djp-putih.png`, dan `favicon-djp-32.png` di folder `branding\`; bila tidak ada, logo dibuat otomatis
-dari nama & warna. Instalasi DJP cukup menyalin berkas logo resmi ke `branding\` (diabaikan git) atau
-mengunggahnya di tab ini.
-Menambah preset: satu entri di `PRESET` dalam `config\sps_identitas\skema.py`.
+Logo resmi DJP **tidak disertakan** di repo (merek milik instansi). Preset `djp` memakai logo ALDx
+(`branding\logo-aldx.svg`, `logo-aldx-putih.svg`, `favicon-aldx.svg`). Logo lain bisa diunggah di tab ini
+kapan saja. Bila berkas logo `statis:` tidak ditemukan, logo dibuat otomatis dari nama & warna (tidak ada gambar rusak).
+
+Berkas logo ALDx dibuat dari generator yang sama dengan logo otomatis (`tema.svg_logo()`, warna bawaan),
+jadi identitasnya konsisten. Bila bentuk tanda di `tema.py` diubah, buat ulang ketiga berkas itu.
 
 ## 4. Halaman login beranimasi
 
