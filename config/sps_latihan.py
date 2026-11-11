@@ -238,6 +238,8 @@ def siapkan(database=None) -> list[str]:
     import os
     hasil.append(buat_dashboard(ids["latihan_penjualan"], ids["latihan_lokasi_pelanggan"],
                                 os.environ.get("ADMIN_USERNAME", "admin")))
+    import sps_warna                    # warna kategori tetap & berurutan sesuai palet sejak awal
+    hasil.append(sps_warna.kunci_semua())
     return hasil
 
 

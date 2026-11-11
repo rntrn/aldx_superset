@@ -46,11 +46,14 @@
     html.sps-bingkai body > .navbar.navbar-inverse{display:none!important}
     html.sps-bingkai body > .container, html.sps-bingkai body > .container-fluid{padding-top:12px}
     html.sps-bingkai body::before{display:none!important}
-    html.sps-bingkai, html.sps-bingkai body{background:var(--sps-latar,#F5F6F8)}
+    html.sps-bingkai, html.sps-bingkai body{background:var(--sps-latar,#F4F4F5)}
     /* Tombol sekunder Superset (Pilih banyak, Ubah dashboard): garis tepi, bukan abu gelap yang tampak nonaktif */
-    html.sps-bingkai .superset-button-secondary:not(:disabled){background:#fff!important;color:var(--sps-utama,#1F4E79)!important;
-      border:1px solid var(--sps-utama,#1F4E79)!important}
-    html.sps-bingkai .superset-button-secondary:not(:disabled):hover{background:var(--sps-muda,#EAF1FB)!important}
+    html.sps-bingkai .superset-button-secondary:not(:disabled){background:#fff!important;color:var(--sps-utama,#18181B)!important;
+      border:1px solid var(--sps-utama,#18181B)!important}
+    html.sps-bingkai .superset-button-secondary:not(:disabled):hover{background:var(--sps-utama-muda,#E8E8E8)!important}
+    /* Tombol tambahan ALDx di kepala dashboard (Riwayat versi, Tata ponsel): ukuran sama dengan tombol Superset */
+    html.sps-bingkai .sps-versi, html.sps-bingkai .sps-ponsel-atur{height:32px;padding:0 14px;border-radius:var(--sps-sudut,8px);
+      font:600 13px/30px var(--sps-font,inherit);cursor:pointer;white-space:nowrap}
     /* Judul dashboard memakai ruang yang ada (tidak terpotong lebih awal) */
     html.sps-bingkai .title-panel > div:first-child{flex:0 1 auto!important;max-width:none!important;min-width:120px}
     html.sps-bingkai .title-panel input.ant-input{field-sizing:content;width:auto!important;max-width:100%!important;text-overflow:ellipsis}
@@ -149,7 +152,7 @@
       if (!j || panel.querySelector(".sps-versi")) return;
       const b = document.createElement("button");
       b.type = "button"; b.className = "ant-btn superset-button superset-button-secondary sps-versi";
-      b.style.marginRight = "8px";
+      b.style.marginRight = "8px"; b.style.whiteSpace = "nowrap";   // satu baris, sejajar tombol Superset
       b.textContent = BHS === "en" ? "Version history" : BHS === "ja" ? "バージョン履歴" : "Riwayat versi";
       b.onclick = () => induk.SPS.buka(`/versi-dashboard/?id=${j.result.id}`);
       panel.prepend(b);

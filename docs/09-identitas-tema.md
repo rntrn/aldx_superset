@@ -86,10 +86,11 @@ jadi identitasnya konsisten. Bila bentuk tanda di `tema.py` diubah, buat ulang k
 
 ## 4. Halaman login beranimasi
 
-Halaman `/login/` bergaya **poster editorial ("Poster Tebasan")**: kanvas tinta bertekstur dengan nama aplikasi dalam
-tipografi raksasa (huruf muncul bergantian), garis data tipis yang melesat, lalu panel formulir yang dipotong diagonal
-oleh sayatan warna aksen. Formulir minimal bergaris bawah, tombol dengan sapuan aksen saat disorot. Di ponsel, kanvas
-menjadi kepala bermiring di atas formulir. Semua warna mengikuti preset. Keamanan tidak berubah: formulir tetap
+Halaman `/login/` dibuat **bersih**: kanvas gradasi hitam → abu (tanpa motif) dengan logo di kiri atas, nama perusahaan
+dan slogan di kiri bawah, lalu panel formulir yang dipotong diagonal oleh sayatan warna aksen. Animasinya halus: tiga
+garis data tergambar bergantian, satu titik cahaya terus melaju di garis aksen, dan kilau lembut melintas perlahan.
+Formulir minimal bergaris bawah, tombol dengan sapuan aksen saat disorot. Di ponsel, kanvas menjadi kepala bermiring
+di atas formulir. Semua warna mengikuti preset. Keamanan tidak berubah: formulir tetap
 dikirim ke Superset (LDAP / akun lokal, CSRF, batas percobaan). Pesan galat berbahasa Indonesia.
 
 Bila tampilan bermasalah (mis. browser sangat lama), buka **`/login/?klasik=1`** untuk halaman login bawaan Superset.

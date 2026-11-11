@@ -7,38 +7,41 @@
 <link rel="icon" href="/identitas/berkas/favicon?v={{ v }}">
 <link id="sps-tema" rel="stylesheet" href="/identitas/tema.css?v={{ v }}">
 <style>
-/* Halaman login ALDx "Poster Tebasan": kanvas tinta + tipografi raksasa, dipotong diagonal oleh sayatan aksen.
+/* Halaman login ALDx "Tebasan": kanvas gradasi hitam -> abu yang bersih, dipotong diagonal oleh sayatan aksen.
    Semua warna dari /identitas/tema.css (Pusat Kendali > Identitas & Tema), jadi berlaku untuk setiap preset. */
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{font-family:var(--sps-font);color:#18181B;background:var(--sps-utama-gelap);min-height:100vh;overflow-x:hidden;
   --panel:42vw;--miring:9vw}                     /* lebar panel formulir & lebar kemiringan potongan diagonal */
 
-/* ---------- Kanvas kiri ---------- */
+/* ---------- Kanvas kiri: bersih. Gradasi hitam -> abu, kilau lembut yang melintas, dan garis data yang hidup. ---------- */
 .kanvas{position:fixed;inset:0;color:#fff;isolation:isolate;overflow:hidden;
-  background:linear-gradient(155deg,var(--sps-utama-gelap) 0%,var(--sps-utama) 55%,var(--sps-utama-terang) 130%)}
-.kanvas::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.14;mix-blend-mode:overlay;    /* butiran kertas */
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
-.kanvas::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.3;background-image:var(--sps-pola);
-  background-size:var(--sps-pola-ukuran)}
-.logo{position:absolute;top:36px;left:48px;height:40px;max-width:220px;object-fit:contain;object-position:left}
-.meta{position:absolute;top:48px;right:calc(var(--panel) + var(--miring) + 16px);font-size:11px;letter-spacing:.32em;
-  text-transform:uppercase;color:rgba(255,255,255,.5);font-weight:600}
-.judul{position:absolute;left:44px;bottom:124px;width:calc(100vw - var(--panel) - var(--miring) - 60px);margin:0}
-.perusahaan{display:block;font-size:12px;letter-spacing:.34em;text-transform:uppercase;font-weight:700;
-  color:var(--sps-aksen-terang,var(--sps-aksen));margin:0 0 18px 4px}
-.nama{display:block;font-weight:800;line-height:.86;letter-spacing:-.045em;margin:0;
-  font-size:clamp(48px,calc(80vw / var(--panjang)),230px)}
-.nama .kata{display:inline-block;white-space:nowrap}
-.nama .kata span{display:inline-block;animation:huruf .9s cubic-bezier(.16,1,.3,1) both}
-@keyframes huruf{from{opacity:0;transform:translateY(.42em) skewX(-8deg)}}
-.slogan{margin:22px 0 0 4px;font-size:clamp(15px,1.25vw,19px);color:rgba(255,255,255,.72);max-width:520px;line-height:1.5}
-.arus{position:absolute;left:0;width:calc(100vw - var(--panel) - var(--miring) / 2);bottom:64px;height:40px}
-.arus path{fill:none;stroke:var(--sps-aksen);stroke-width:1.6;stroke-dasharray:1400;stroke-dashoffset:1400;
-  vector-effect:non-scaling-stroke;animation:arus 2.4s cubic-bezier(.65,0,.35,1) .5s forwards}
-@keyframes arus{to{stroke-dashoffset:0}}
+  background:linear-gradient(150deg,var(--sps-utama-gelap) 0%,var(--sps-utama) 42%,var(--sps-utama-terang) 100%)}
+.kanvas::before{content:"";position:absolute;top:-20%;bottom:-20%;left:-40%;width:34%;z-index:-1;      /* kilau diagonal */
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);transform:skewX(-12deg);
+  animation:kilau 9s cubic-bezier(.45,0,.55,1) 1.2s infinite}
+@keyframes kilau{to{left:110%}}
+.logo{position:absolute;top:36px;left:48px;height:40px;max-width:340px;object-fit:contain;object-position:left;
+  animation:muncul .9s cubic-bezier(.16,1,.3,1) both}
+.pesan{position:absolute;left:48px;bottom:72px;width:min(460px,calc(100vw - var(--panel) - var(--miring) - 96px));
+  animation:muncul .9s cubic-bezier(.16,1,.3,1) .25s both}
+@keyframes muncul{from{opacity:0;transform:translateY(14px)}}
+.perusahaan{display:block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;
+  color:var(--sps-aksen-terang,var(--sps-aksen));margin-bottom:12px}
+.slogan{margin:0;font-size:clamp(22px,2.1vw,32px);font-weight:700;line-height:1.25;letter-spacing:-.02em;color:#fff}
+/* Garis data: tiga kurva tipis tergambar bergantian; satu titik cahaya terus melaju di kurva aksen. */
+.arus{position:absolute;left:0;top:22%;width:calc(100vw - var(--panel) - var(--miring) / 2);height:46%}
+.arus path{fill:none;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;
+  animation:gambar 2.6s cubic-bezier(.65,0,.35,1) forwards}
+.arus .a1{stroke:rgba(255,255,255,.14);stroke-width:1.2;animation-delay:.3s}
+.arus .a2{stroke:rgba(255,255,255,.26);stroke-width:1.2;animation-delay:.55s}
+.arus .a3{stroke:var(--sps-aksen);stroke-width:2;animation-delay:.8s}
+.arus .komet{stroke:#fff;stroke-width:3;stroke-dasharray:.035 .965;stroke-dashoffset:1.035;opacity:0;
+  filter:drop-shadow(0 0 6px var(--sps-aksen));animation:komet 5.5s linear 3.4s infinite}
+@keyframes gambar{to{stroke-dashoffset:0}}
+@keyframes komet{0%{stroke-dashoffset:1.035;opacity:0}6%{opacity:1}94%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
 .tepi{display:none}
-.kaki{position:absolute;left:48px;bottom:26px;font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.02em}
+.kaki{position:absolute;left:48px;bottom:26px;font-size:12px;color:rgba(255,255,255,.45);letter-spacing:.02em}
 
 /* ---------- Panel kanan, dipotong diagonal ---------- */
 .panel{position:relative;margin-left:auto;width:calc(var(--panel) + var(--miring));min-height:100vh;display:flex;
@@ -91,48 +94,37 @@ input:focus{outline:none}
 /* ---------- Layar kecil: kanvas jadi kepala bermiring, formulir di bawah ---------- */
 @media (max-width:900px){
   body{background:var(--sps-latar)}
-  .kanvas{position:relative;height:300px;clip-path:polygon(0 0,100% 0,100% 84%,0 100%)}
+  .kanvas{position:relative;clip-path:polygon(0 0,100% 0,100% 84%,0 100%)}
   .logo{top:24px;left:24px;height:34px}
-  .meta,.arus,.kaki,.sayatan{display:none}
+  .arus,.kaki,.sayatan{display:none}
+  .kanvas{height:220px}
   .tepi{display:block;position:absolute;left:0;bottom:0;width:100%;height:16%}
   .tepi line{stroke:var(--sps-aksen);stroke-width:9;vector-effect:non-scaling-stroke}
-  .judul{left:24px;right:24px;width:auto;bottom:62px}
-  .nama{font-size:clamp(40px,calc(130vw / var(--panjang)),88px)}
-  .slogan{font-size:14px;margin-top:12px}
+  .pesan{left:24px;right:24px;width:auto;bottom:56px}
+  .slogan{font-size:20px}
   .panel{width:100%;min-height:auto;clip-path:none;padding:28px 24px 44px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .arus path,.sayatan line{stroke-dashoffset:0}
+  .arus path,.sayatan line{stroke-dashoffset:0}.arus .komet{display:none}
 }
-{% if not n.animasi %}*,*::before,*::after{animation:none!important}.arus path,.sayatan line{stroke-dashoffset:0}{% endif %}
+{% if not n.animasi %}*,*::before,*::after{animation:none!important}.arus path,.sayatan line{stroke-dashoffset:0}.arus .komet{display:none}{% endif %}
 </style>
 </head>
 <body>
 <section class="kanvas" aria-label="{{ n.nama_aplikasi }}">
-  <img class="logo" src="/identitas/berkas/logo_putih?v={{ v }}" alt="{{ n.nama_perusahaan or n.nama_aplikasi }}">
-  <span class="meta" aria-hidden="true">Data · Analitik · {{ tahun }}</span>
-  <div class="judul">
+  <img class="logo" src="/identitas/berkas/logo_putih?v={{ v }}" alt="{{ n.nama_aplikasi }}">
+  <!-- Garis data abstrak (tanpa angka: tidak boleh terbaca sebagai data nyata). -->
+  <svg class="arus" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+    <path class="a1" pathLength="1" d="M0 330 C140 310 220 350 340 300 S560 250 660 270 S860 190 1000 170"/>
+    <path class="a2" pathLength="1" d="M0 290 C120 300 240 240 360 250 S540 170 680 190 S880 110 1000 90"/>
+    <path class="a3" pathLength="1" d="M0 250 C150 230 230 260 350 190 S570 150 670 110 S870 60 1000 20"/>
+    <path class="komet" pathLength="1" d="M0 250 C150 230 230 260 350 190 S570 150 670 110 S870 60 1000 20"/>
+  </svg>
+  <div class="pesan">
     {% if n.nama_perusahaan %}<span class="perusahaan">{{ n.nama_perusahaan }}</span>{% endif %}
-    {#- Huruf dikelompokkan per kata: baris hanya pindah di antara kata. Ukuran dari kata terpanjang. -#}
-    {%- set kata = n.nama_aplikasi.split() -%}
-    {%- set ns = namespace(urut=0, terpanjang=4) -%}
-    {%- for k in kata %}{% if k|length > ns.terpanjang %}{% set ns.terpanjang = k|length %}{% endif %}{% endfor -%}
-    <h1 class="nama" style="--panjang: {{ ns.terpanjang + 1 }}" aria-label="{{ n.nama_aplikasi }}">
-      {%- for k in kata -%}
-      <span class="kata" aria-hidden="true">
-        {%- for h in k -%}
-        <span style="animation-delay:{{ '%.2f' % (0.25 + ns.urut * 0.05) }}s">{{ h }}</span>{% set ns.urut = ns.urut + 1 %}
-        {%- endfor -%}
-      </span>{% if not loop.last %} {% endif %}
-      {%- endfor -%}
-    </h1>
     <p class="slogan">{{ n.slogan }}</p>
   </div>
-  <!-- Garis data abstrak (tanpa angka: tidak boleh terbaca sebagai data nyata). -->
-  <svg class="arus" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
-    <path pathLength="1400" d="M0 32 L120 30 L180 33 L260 24 L330 27 L410 18 L470 22 L560 14 L640 19 L720 11 L800 15 L880 8 L1000 4"/>
-  </svg>
   <div class="kaki">{{ kaki }}</div>
   <svg class="tepi" viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true"><line x1="0" y1="16" x2="100" y2="0"/></svg>
 </section>

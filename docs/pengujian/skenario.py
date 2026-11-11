@@ -262,9 +262,9 @@ SKENARIO = [
     ("G13", 4, "Sedang", "Tema bawaan Tinta & Sakura", "Akun Admin",
      "Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom "
      "isian login; lalu preset navy",
-     "Login gaya poster: kanvas hitam bertekstur, nama raksasa, garis data pink melesat, panel dipotong sayatan pink; "
-     "tombol hitam berubah pink saat disorot; fokus & tautan pink; nama panjang pindah baris per kata; di ponsel kanvas "
-     "jadi kepala bermiring; navy mengembalikan warna lama"),
+     "Login bersih: kanvas gradasi hitam → abu tanpa motif, hanya logo di kiri atas + slogan di kiri bawah, garis data "
+     "tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan "
+     "pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama"),
 
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",

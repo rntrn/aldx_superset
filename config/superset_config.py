@@ -234,6 +234,8 @@ def _pasang_tambahan(app) -> None:
     sps_app.daftarkan(app)
     import sps_panduan
     sps_panduan.daftarkan(app)              # /panduan/: dokumentasi docs/ di dalam aplikasi
+    import sps_tolak
+    sps_tolak.daftarkan(app)                # halaman 404 bermerek (bukan halaman bawaan Superset)
 
 
 FLASK_APP_MUTATOR = _pasang_tambahan
