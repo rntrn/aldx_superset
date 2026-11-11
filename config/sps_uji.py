@@ -180,6 +180,22 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"{len(jenis)} jenis; gagal: {gagal[:3]}")
                 return f"{len(jenis)} jenis chart diusulkan, semua bisa dibangun"
 
+    @uji("Studio", "Kolom desimal ClickHouse jadi ukuran & tanggal ISO (syarat ramalan)")
+    def _():
+        from superset.db_engine_specs.clickhouse import ClickHouseConnectEngineSpec as C
+        from superset.utils.core import GenericDataType as G
+        salah = [t for t in ("Nullable(Float64)", "NULLABLE(FLOAT64)", "Float32", "LowCardinality(Nullable(Float64))",
+                             "Nullable(Int64)", "Decimal(18, 2)") if getattr(C.get_column_spec(t), "generic_type", None) != G.NUMERIC]
+        teks = C.get_column_spec("LowCardinality(Nullable(String))")
+        if salah or teks is None or teks.generic_type != G.STRING:
+            raise RuntimeError(f"tipe tidak dikenali sebagai angka: {salah}")
+        from datetime import date as _d, datetime as _dt
+        from sps_ai.alat import _iso
+        if (_iso(_d(2025, 3, 1)), _iso(_dt(2025, 3, 1)), _iso(_dt(2025, 3, 1, 8, 30)), _iso(5)) != \
+                ("2025-03-01", "2025-03-01", "2025-03-01T08:30:00", 5):
+            raise RuntimeError("tanggal tidak dikirim sebagai ISO")
+        return "Float32/64, Double, Int, Decimal = angka; String tetap teks; tanggal ISO"
+
     @uji("Studio", "Objek dashboard: teks aman, huruf lokal, gambar hanya raster")
     def _():
         from pathlib import Path as _P

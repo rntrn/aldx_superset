@@ -12,6 +12,10 @@ Dipasang sekali saat start (FLASK_APP_MUTATOR, juga di backgrounder):
        bisa menyarankan ukuran (SUM, AVG, ...). Sebelumnya tampil sebagai tipe "?".
     4. Chart berat (Tree, Graph, Sankey, Sunburst, Treemap, Word cloud, ...) dibatasi
        Pusat Kendali › Pengaturan › "Baris maksimal chart berat" (bawaan 1.000) agar browser tidak macet.
+    5. ClickHouse (termasuk ALDx Engine): kolom Float32/Float64/Double (juga di dalam Nullable(...) /
+       LowCardinality(...)) dikenali sebagai ANGKA. Superset 6.1 hanya mengenali Int & Decimal, sehingga kolom
+       desimal seperti `total` tampil sebagai teks: masuk Dimensi di Studio, tidak bisa dijumlah, dan
+       Ramalan/Tren/Anomali tidak bisa dipakai.
 """
 
 from __future__ import annotations
@@ -75,6 +79,21 @@ def _oracle_spec() -> None:
     OracleEngineSpec._sps = True
 
 
+# --- 5. ClickHouse: Float/Double = angka ------------------------------------------------------------
+def _clickhouse_spec() -> None:
+    from sqlalchemy import types
+    from superset.db_engine_specs import clickhouse as ch
+    from superset.utils.core import GenericDataType
+
+    angka = (re.compile(r"^(Nullable\(|LowCardinality\()*(Float(32|64)?|Double)\b", re.I), types.Float(),
+             GenericDataType.NUMERIC)
+    for kelas in (ch.ClickHouseBaseEngineSpec, ch.ClickHouseEngineSpec, ch.ClickHouseConnectEngineSpec):
+        # Ditempel di setiap kelas yang punya daftar sendiri (bukan warisan), sekali saja.
+        if "_sps" not in kelas.__dict__ and ("column_type_mappings" in kelas.__dict__ or kelas is ch.ClickHouseBaseEngineSpec):
+            kelas.column_type_mappings = (angka,) + tuple(kelas.column_type_mappings)
+            kelas._sps = True
+
+
 # --- 4. Chart berat -----------------------------------------------------------------------------------
 def _batas_chart_berat(app) -> None:
     from superset.common.query_context_factory import QueryContextFactory
@@ -99,6 +118,7 @@ def _batas_chart_berat(app) -> None:
 
 def pasang(app) -> None:
     for nama, fungsi in (("batas Oracle", _batas_oracle), ("spesifikasi Oracle", _oracle_spec),
+                         ("tipe angka ClickHouse", _clickhouse_spec),
                          ("chart berat", lambda: _batas_chart_berat(app))):
         try:
             fungsi()

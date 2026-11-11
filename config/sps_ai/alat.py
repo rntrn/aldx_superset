@@ -151,8 +151,19 @@ def jalankan_objek(t, metrics: list, columns: list, filters: list[dict], orderby
     command = ChartDataCommand(ctx)
     command.validate()                         # cek akses -> SupersetSecurityException
     hasil = command.run()["queries"][0]
-    return {"dataset": t.table_name, "kolom": hasil.get("colnames") or [],
-            "baris": hasil.get("data") or [], "sql_dipotong": False}
+    baris = [{k: _iso(v) for k, v in b.items()} for b in hasil.get("data") or []]
+    return {"dataset": t.table_name, "kolom": hasil.get("colnames") or [], "baris": baris, "sql_dipotong": False}
+
+
+def _iso(v):
+    """Tanggal -> teks ISO. Tanpa ini kolom Date/Date32 (mis. ClickHouse) dikirim Flask sebagai
+    "Sat, 01 Mar 2025 00:00:00 GMT": label sumbu jadi panjang dan urutan periode bisa salah."""
+    from datetime import date, datetime
+    if isinstance(v, datetime):
+        return v.date().isoformat() if (v.hour, v.minute, v.second, v.microsecond) == (0, 0, 0, 0) else v.isoformat(timespec="seconds")
+    if isinstance(v, date):
+        return v.isoformat()
+    return v
 
 
 # --- Chart & dashboard ------------------------------------------------------------
