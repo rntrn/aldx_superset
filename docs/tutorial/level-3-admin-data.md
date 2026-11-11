@@ -219,6 +219,10 @@ minta Superadmin menaikkan batas ([24](../24-superadmin-dan-batas-data.md)).
 5. Jelaskan dengan kata-kata sendiri kapan memakai ekstrak **penuh** dan **inkremental**.
 6. Dengan **Lihat sebagai…**, bandingkan dashboard latihan untuk akun Cabang Bandung dan Cabang Jakarta. Aturan apa
    yang berlaku pada masing-masing?
+7. Impor berkas besar-kompleks [`contoh-penerbangan-sedang.xlsx`](../bahan-ajar/berkas/contoh-penerbangan-sedang.xlsx)
+   (6 lembar, 150.000 tiket) dengan awalan `terbang`. Di Kueri Visual gabungkan tiket + jadwal + penerbangan + maskapai:
+   maskapai mana yang pendapatannya terbesar (tanpa tiket Refund)? Berapa jadwal dari/ke DPS yang batal pada
+   12–13 November 2024? Kamus data: [bahan-ajar/berkas/README.md](../bahan-ajar/berkas/README.md).
 
 Kunci jawaban: [bahan ajar Level 3](../bahan-ajar/level-3-admin-data.md#kunci-jawaban).
 
