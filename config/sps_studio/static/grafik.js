@@ -504,13 +504,18 @@
       }
       if (el._anak) hapusSemua(el);
       const [option, catatan] = PETA[tanda](hasil, opsi);
-      pakaiEcharts(el, option);
+      pasangKlik(pakaiEcharts(el, option), opsi);
       return {catatan};
     }
     if (el._anak) hapusSemua(el);
-    pakaiEcharts(el, (ECHARTS[tanda] || ECHARTS.batang)(hasil, opsi));
+    pasangKlik(pakaiEcharts(el, (ECHARTS[tanda] || ECHARTS.batang)(hasil, opsi)), opsi);
     return {};
   };
+  // Klik batang/irisan/kotak -> opsi.klik(nama kategori), dipakai untuk menelusuri hierarki
+  function pasangKlik(c, opsi) {
+    c.off("click");
+    if (opsi.klik) c.on("click", e => { const nama = e.name ?? e.data?.name; if (nama !== undefined && nama !== "") opsi.klik(nama); });
+  }
 
   /* Gambar kecil "Tampilkan Saya" (garis tipis, satu warna) */
   Studio.ikonTanda = {

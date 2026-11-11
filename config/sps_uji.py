@@ -145,6 +145,24 @@ def jalankan_semua() -> None:
                     raise RuntimeError(s["ramalan"]["metode"])
                 return f"{s['ramalan']['metode']}, R² {s['tren']['r2']}, {len(s['anomali'])} anomali"
 
+            @uji("Studio", "Hierarki dimensi: simpan, baca, telusuri (filter jalur), hapus")
+            def _():
+                from sps_studio import hierarki
+                nama = "uji__hierarki"
+                hierarki.simpan(P, nama, ["provinsi", "nm_cabang", "kategori"])
+                if not any(h["nama"] == nama for h in hierarki.daftar(P)):
+                    raise RuntimeError("hierarki tidak tersimpan")
+                atas = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("provinsi")],
+                                                          "baris": [U("jumlah_transaksi")]}))
+                prov = str(atas["baris"][0]["provinsi"])
+                dalam = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("nm_cabang")],
+                                                           "baris": [U("jumlah_transaksi")],
+                                                           "filter": [{"field": "provinsi", "op": "IN", "nilai": [prov]}]}))
+                hierarki.hapus(P, nama)
+                if any(h["nama"] == nama for h in hierarki.daftar(P)) or not dalam["baris"]:
+                    raise RuntimeError("telusur/hapus gagal")
+                return f"{len(atas['baris'])} provinsi -> {len(dalam['baris'])} cabang di {prov}"
+
             @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
             def _():
                 from sps_ai import auto

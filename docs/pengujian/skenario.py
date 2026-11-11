@@ -165,6 +165,10 @@ SKENARIO = [
     ("D17", 2, "Tinggi", "Chart berat tidak membuat browser macet", "Dataset ≥ 10.000 baris",
      "Explore → Tree Chart (atau Graph/Sankey) → isi Id & Parent → Update chart",
      "Data dibatasi 1.000 baris (Pusat Kendali → Baris maksimal chart berat); halaman tetap responsif; petunjuk Explore tampil"),
+    ("D18", 2, "Tinggi", "Hierarki dimensi: buat & telusuri", "A10; peran Analis",
+     "Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, "
+     "jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂",
+     "Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi"),
     ("E01", 2, "Tinggi", "Peta titik", "A10", "latihan_lokasi_pelanggan → lon ke Kolom, lat ke Baris, saluran ke Warna",
      "Rekomendasi Peta titik; titik di 6 wilayah Indonesia, warna per saluran"),
     ("E02", 2, "Tinggi", "Peta provinsi", "A10", "provinsi ke Kolom, belanja ke Baris",

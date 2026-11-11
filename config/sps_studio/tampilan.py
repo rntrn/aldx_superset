@@ -77,6 +77,30 @@ def api_nilai(dataset_id: int):
     return jsonify(lembar.nilai_unik(alat._dataset(dataset_id), request.args.get("kolom", "")))
 
 
+@bp.route("/api/hierarki/<int:dataset_id>")
+@_login()
+def api_hierarki(dataset_id: int):
+    from sps_studio import hierarki
+    return jsonify(hierarki=hierarki.daftar(dataset_id))
+
+
+@bp.route("/api/hierarki/<int:dataset_id>", methods=["POST"])
+@_login()
+def api_hierarki_simpan(dataset_id: int):
+    from sps_studio import hierarki
+    d = _data()
+    hierarki.simpan(dataset_id, d.get("nama", ""), d.get("kolom") or [])
+    return jsonify(hierarki=hierarki.daftar(dataset_id))
+
+
+@bp.route("/api/hierarki/<int:dataset_id>/hapus", methods=["POST"])
+@_login()
+def api_hierarki_hapus(dataset_id: int):
+    from sps_studio import hierarki
+    hierarki.hapus(dataset_id, _data().get("nama", ""))
+    return jsonify(hierarki=hierarki.daftar(dataset_id))
+
+
 @bp.route("/api/saran/<int:dataset_id>")
 @_login()
 def api_saran(dataset_id: int):

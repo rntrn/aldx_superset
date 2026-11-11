@@ -75,6 +75,24 @@ Urutan rekomendasi (yang pertama cocok dipakai):
 Ramalan (Holt-Winters, pita 80/95%), garis tren (R²), dan tanda anomali untuk Garis/Area/Batang
 dengan satu dimensi berurutan. Penjelasan: [17 bagian 4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif).
 
+### Hierarki dimensi (telusur bertingkat)
+
+Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provinsi › kabupaten › kecamatan › kelurahan.
+
+| Langkah | Cara |
+|---|---|
+| Buat | Panel Data → **Hierarki → ＋**, beri nama, centang kolom **berurutan dari yang paling umum** (2–8 level). Atau menu pil → *Buat hierarki dari kolom ini…* |
+| Pakai | Seret/dobel klik hierarki ke rak. Tampil di level teratas (teragregasi). |
+| Masuk ke satu nilai | **Klik** batang/titik/wilayah di chart → level berikutnya, difilter ke nilai itu (jalur tampil di pil, mis. `ID-JK › kategori`). |
+| Turun / naik level | Tombol **▸** (level berikutnya, semua nilai) dan **◂** (kembali satu level) di pil. |
+| Hapus | Tombol 🗑 di daftar Hierarki. |
+
+- Disimpan **per dataset di server** (tabel `sps_hierarki`), dipakai semua orang yang boleh membuka dataset itu.
+  Membuat/menghapus butuh izin membuat chart (Alpha/Admin).
+- Chart yang disimpan memakai **level yang sedang tampil** (beserta filter jalurnya).
+- API: `GET/POST /studio/api/hierarki/<dataset_id>`, `POST /studio/api/hierarki/<dataset_id>/hapus`
+  (modul `config/sps_studio/hierarki.py`).
+
 ### Saran dari data
 
 Memakai mesin Auto Chart (`sps_ai/auto.py`: tren R², konsentrasi, korelasi, k-means). Hingga 16 saran dari

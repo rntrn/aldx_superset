@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **135 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **136 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -80,6 +80,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D15 | 2 Analis | Sedang | Menu Asisten AI hanya bila model aktif | LM Studio/Ollama terpasang | Matikan server model, tunggu 1 menit, muat ulang; nyalakan lagi, tunggu 1 menit, muat ulang | Saat mati menu Asisten AI hilang (Story tetap di Dashboard & Story); saat menyala menu & model muncul |
 | D16 | 2 Analis | Sedang | Story hanya dashboard selesai | Ada dashboard draf kosong milik orang lain | Dashboard & Story → Story → Story baru → buka pilihan dashboard | Hanya dashboard berisi chart yang terbit atau milik sendiri (ditandai draf) yang tampil |
 | D17 | 2 Analis | Tinggi | Chart berat tidak membuat browser macet | Dataset ≥ 10.000 baris | Explore → Tree Chart (atau Graph/Sankey) → isi Id & Parent → Update chart | Data dibatasi 1.000 baris (Pusat Kendali → Baris maksimal chart berat); halaman tetap responsif; petunjuk Explore tampil |
+| D18 | 2 Analis | Tinggi | Hierarki dimensi: buat & telusuri | A10; peran Analis | Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂ | Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi |
 
 ## E. Peta & analitik prediktif
 

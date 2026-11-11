@@ -90,6 +90,14 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .daftarKecil div:hover{background:var(--bg)}
 .daftarKecil b{font-weight:600;display:block}
 #saranData{max-height:340px;overflow:auto}
+.judulAksi{display:flex;align-items:center;justify-content:space-between}
+.bidang.hierarki .tag{background:var(--sps-aksen-muda,#FDE8F1);color:var(--sps-utama,#18181B)}
+.bidang.hierarki small{display:block;color:var(--redup,#71717A);font-size:10.5px;margin-left:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pil .telusur{border:0;background:none;cursor:pointer;font:700 12px/1 inherit;padding:0 3px;color:inherit;opacity:.75}
+.pil .telusur:hover{opacity:1}.pil .telusur:disabled{opacity:.25;cursor:default}
+.urutHierarki label{display:flex;gap:8px;align-items:center;padding:4px 2px;cursor:pointer}
+.urutHierarki .no{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;
+  background:var(--sps-utama,#18181B);color:#fff;visibility:hidden}.urutHierarki .no.ada{visibility:visible}
 .lencanaJenis{display:inline-block;font-size:10.5px;font-weight:700;padding:0 6px;border-radius:8px;margin-right:4px;
   background:var(--sps-aksen-muda,#FDE8F1);color:var(--sps-utama,#18181B)}
 
@@ -174,6 +182,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <div class="judulPanel">Sumber data</div>
     <select id="pilihDataset"></select>
     <input type="text" id="cariBidang" placeholder="Cari kolom" style="margin-top:8px">
+    <div class="judulPanel judulAksi">Hierarki <button class="kecil" id="tambahHierarki" title="Gabungkan beberapa kolom bertingkat, mis. Provinsi › Kab/Kota › Kecamatan › Kelurahan">+ Hierarki</button></div>
+    <div id="daftarHierarki"><div class="ket">Belum ada. Contoh: Provinsi › Kab/Kota › Kecamatan.</div></div>
     <div class="judulPanel">Dimensi</div><div id="daftarDimensi"></div>
     <div class="judulPanel">Ukuran</div><div id="daftarUkuran"></div>
     <p class="ket" style="margin-top:14px">Seret kolom ke rak. Klik dua kali untuk menambah cepat. Seret pil kembali ke sini untuk membuang.</p>
