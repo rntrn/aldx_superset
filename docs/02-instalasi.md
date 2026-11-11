@@ -23,10 +23,9 @@ di Docker. Instalasi lama (metadata di MySQL XAMPP atau MariaDB) dipindah otomat
 
 ```powershell
 cd D:\superset
-Copy-Item .env.example .env       # buka .env: isi ADMIN_PASSWORD (LDAP & profil DJP opsional)
+Copy-Item .env.example .env       # buka .env: isi ADMIN_PASSWORD (LDAP opsional)
 powershell -ExecutionPolicy Bypass -File scripts\init.ps1             # password container, image, database, admin
 powershell -ExecutionPolicy Bypass -File scripts\start.ps1            # nyalakan semua
-powershell -ExecutionPolicy Bypass -File scripts\add-connections.ps1  # koneksi dari .env (profil DJP; dilewati bila kosong)
 powershell -ExecutionPolicy Bypass -File scripts\build-dashboards.ps1 # menu, izin, dashboard, ALDx Engine
 powershell -ExecutionPolicy Bypass -File scripts\data-latihan.ps1     # data latihan (pelatihan & uji)
 powershell -ExecutionPolicy Bypass -File scripts\uji.ps1              # uji otomatis

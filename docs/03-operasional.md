@@ -24,7 +24,7 @@ Container memakai `restart: unless-stopped`: ikut menyala otomatis saat Docker D
 | Log Superset (server) | Error, login (`ALDx login ... BERHASIL/GAGAL`), hak akses (`ALDx akses ...`) | `scripts\logs.ps1`, atau Docker Desktop → Containers → `sps_superset` → Logs |
 | Laporan diagnosa | Status, user, jaringan AD, 400 baris log | `scripts\diagnose.ps1` → `D:\superset\diagnosa.txt` |
 | Action Log (aktivitas user) | Siapa membuka dashboard/chart apa, kapan | Superset → **Settings → Action Log** (khusus Admin) |
-| Profil hak akses (profil DJP) | Profil pegawai terakhir saat login | tabel `sps_akses_profil` di metadb ([14](14-akun-dan-akses.md)) |
+| Profil hak akses (opsional) | Profil pengguna terakhir saat login | tabel `sps_profil_pengguna` di metadb ([14](14-akun-dan-akses.md)) |
 | Log komponen lain | metadb, engine, redis, gateway | `docker compose logs --tail 100 <nama>` |
 
 Log server ikut terhapus bila container dibuat ulang. Untuk jejak jangka panjang
@@ -56,7 +56,6 @@ Rincian: [`05-login-ldap.md`](05-login-ldap.md).
 1. **Data → Hubungkan data**: pilih jenis database/data warehouse atau unggah berkas
    Access/Excel/CSV, uji, simpan ([06](06-sumber-data.md)).
 2. Database di komputer Windows yang sama (bukan container) dijangkau dengan alamat `host.docker.internal`.
-3. Profil DJP: koneksi standar (Oracle, ClickHouse DMP) cukup diisi di `.env` lalu `scripts\add-connections.ps1`.
 
 ## Menambah driver database
 

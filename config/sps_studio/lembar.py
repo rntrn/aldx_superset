@@ -35,8 +35,7 @@ SKEMA_WARNA = "aldxWarna"         # didaftarkan di superset_config (EXTRA_CATEGO
 WARNA = ["#E11D74", "#5062D8", "#0F9488", "#8B47C9", "#B7791F", "#B03A62", "#2E86C1", "#6B8E23"]
 SKEMA_RUNTUN = "aldxRuntun"        # satu hue (pink) terang -> gelap, untuk peta panas
 RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
-# Versi sebelumnya: id skema tetap didaftarkan (dashboard lama menyimpannya) dan warnanya dipetakan ke palet baru.
-SKEMA_LAMA = {"djpWarna": SKEMA_WARNA, "djpBiru": SKEMA_RUNTUN}
+# Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
 WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
 

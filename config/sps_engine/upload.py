@@ -1,8 +1,8 @@
 """Upload Excel/CSV langsung ke ALDx Engine (ClickHouse internal).
 
 Superset bawaan tidak mendukung upload ke ClickHouse. Modul ini menambahkannya
-HANYA untuk koneksi "ALDx Engine (ClickHouse)"; koneksi ClickHouse lain (mis. DMP_OLAP
-milik DJP) tetap tidak bisa ditulisi. Tabel dibuat dengan tipe hasil tebakan
+HANYA untuk koneksi "ALDx Engine (ClickHouse)"; koneksi ClickHouse lain (mis. milik
+sistem sumber) tetap tidak bisa ditulisi. Tabel dibuat dengan tipe hasil tebakan
 (tabel.py) dan ENGINE MergeTree.
 """
 

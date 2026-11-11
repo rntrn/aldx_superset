@@ -82,7 +82,7 @@ def bawaan() -> dict[str, Any]:
 
 # --- Preset --------------------------------------------------------------------------------
 # Hanya kunci yang disebut yang berubah; nama perusahaan dll. tetap milik admin
-# kecuali preset menyebutnya (preset DJP mengisi identitas DJP lengkap).
+# kecuali preset menyebutnya.
 PRESET: dict[str, dict[str, Any]] = {
     # "netral" = kembali ke SEMUA nilai bawaan (nama, teks, warna, logo otomatis).
     "netral": {"label": "Tinta & Sakura / bawaan (hitam, abu, putih + pink)", **{i.kunci: i.bawaan for i in ISIAN}},
@@ -96,17 +96,11 @@ PRESET: dict[str, dict[str, Any]] = {
              "warna_latar": "#F5F4FA", "hiasan": "gelombang"},
     "grafit": {"label": "Grafit & toska", "warna_utama": "#263238", "warna_aksen": "#26A69A",
                "warna_latar": "#F3F5F6", "hiasan": "titik"},
-    "djp": {"label": "Direktorat Jenderal Pajak", "nama_aplikasi": "DJP Analytics",
-            "nama_perusahaan": "Direktorat Jenderal Pajak", "slogan": "Data penerimaan untuk keputusan",
-            "halaman_depan": "/superset/dashboard/beranda/",
-            "warna_utama": "#1F2F5F", "warna_aksen": "#F2B705", "warna_latar": "#F4F6F9", "hiasan": "gelombang",
-            "logo": "statis:logo-aldx.svg", "logo_putih": "statis:logo-aldx-putih.svg",
-            "favicon": "statis:favicon-aldx.svg"},
 }
 
 
 # Teks lama yang dibersihkan otomatis saat build-dashboards (kembali ke teks bawaan).
-TEKS_LOGIN_USANG = ("Masuk dengan akun intranet DJP (sama seperti engineN).",)
+TEKS_LOGIN_USANG: tuple[str, ...] = ()
 NAMA_APLIKASI_USANG = ("SPS Analytics",)                   # nama lama -> nama bawaan baru (ALDx)
 
 

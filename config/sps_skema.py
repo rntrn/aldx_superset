@@ -3,7 +3,7 @@
 Disimpan di extra koneksi:  {"sps_skema": ["genapp", "iku"]}   (kosong / tidak ada = semua skema)
 Diatur di Data › Hubungkan data (saat menyimpan koneksi, atau tombol "Atur skema" di Koneksi tersimpan).
 
-Database besar (mis. Oracle DJP) punya ratusan skema milik pengguna lain; tanpa pilihan ini daftar skema
+Database besar (mis. Oracle perusahaan) punya ratusan skema milik pengguna lain; tanpa pilihan ini daftar skema
 memenuhi layar dan pengguna mudah salah memilih (tabel "tidak ditemukan").
 """
 

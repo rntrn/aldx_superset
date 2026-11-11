@@ -61,35 +61,11 @@ function Initialize-ServerEnv {
         $n, $v = $k -split "=", 2
         if (-not (Get-EnvValue $n)) { Set-EnvValue $n $v }
     }
-    # Role dasar semua pengguna: instalasi DJP lama tetap "DJP Pegawai", instalasi baru "Pengguna".
-    if (-not (Get-EnvValue "SPS_ROLE_PENGGUNA")) {
-        $djp = (Get-EnvValue "APP_NAME") -eq "DJP Analytics" -or (Get-EnvValue "SPS_PRESET") -eq "djp"
-        Set-EnvValue "SPS_ROLE_PENGGUNA" $(if ($djp) { "DJP Pegawai" } else { "Pengguna" })
-    }
+    # Role dasar semua pengguna (nama role yang sudah ada di .env tidak diubah).
+    if (-not (Get-EnvValue "SPS_ROLE_PENGGUNA")) { Set-EnvValue "SPS_ROLE_PENGGUNA" "Pengguna" }
     if (-not (Get-EnvValue "NODE_NAMA")) {
         Set-EnvValue "NODE_NAMA" $env:COMPUTERNAME
         Write-Host "NODE_NAMA = $env:COMPUTERNAME" -ForegroundColor Green
-    }
-}
-
-function Set-AlamatSumberDjp {
-    <# Profil DJP: bila password sumber DJP diisi tetapi alamatnya kosong, pakai alamat bawaan DJP. #>
-    $bawaan = [ordered]@{
-        "ORACLE_DMP"     = @("10.245.3.57", "1521", "DBDMP", "genapp")
-        "ORACLE_IKU"     = @("10.245.3.104", "1526", "DBDASHBD", "iku")
-        "ORACLE_DASHBD"  = @("10.245.3.104", "1526", "DBDASHBD", "tableau")
-        "CLICKHOUSE"     = @("10.244.65.120", "8123", "DMP_OLAP", "semesta")
-    }
-    # Versi lama memakai awalan ORACLE_TABLEAU_*: pindahkan ke ORACLE_DASHBD_* (sekali).
-    foreach ($f in @("HOST", "PORT", "DB", "USER", "PASSWORD")) {
-        $lama = Get-EnvValue "ORACLE_TABLEAU_$f"
-        if ($lama -and -not (Get-EnvValue "ORACLE_DASHBD_$f")) { Set-EnvValue "ORACLE_DASHBD_$f" $lama }
-    }
-    foreach ($s in $bawaan.Keys) {
-        if (-not (Get-EnvValue "${s}_PASSWORD") -or (Get-EnvValue "${s}_HOST")) { continue }
-        $n = $bawaan[$s]
-        Set-EnvValue "${s}_HOST" $n[0]; Set-EnvValue "${s}_PORT" $n[1]; Set-EnvValue "${s}_DB" $n[2]; Set-EnvValue "${s}_USER" $n[3]
-        if ($s -eq "ORACLE_DMP" -and -not (Get-EnvValue "AKSES_DATABASE")) { Set-EnvValue "AKSES_DATABASE" "Oracle DMP (GENAPP)" }
     }
 }
 

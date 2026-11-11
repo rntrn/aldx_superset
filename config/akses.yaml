@@ -1,49 +1,56 @@
 # =============================================================================
-#  ATURAN HAK AKSES DATA (dibaca config/sps_akses.py)
+#  ATURAN HAK AKSES DATA BERBASIS PROFIL (OPSIONAL, dibaca config/sps_akses.py)
 #
-#  Setiap pegawai yang login diambil profilnya dari Oracle (PEGAWAI + DIM_KANTOR,
-#  sama seperti engineN). Profil itu dicocokkan ke aturan di bawah, dari ATAS ke
-#  BAWAH; aturan PERTAMA yang cocok dipakai.
+#  Bawaan: TIDAK dipakai. Hak akses data diatur per role lewat
+#  Settings > Row Level Security (lihat docs/08-hak-akses-data.md).
+#
+#  Dipakai bila perusahaan punya tabel profil (mis. karyawan + cabang) dan ingin
+#  setiap orang otomatis hanya melihat data miliknya:
+#    1. Hubungkan database sumber profil (Pusat Kendali > Hubungkan data).
+#    2. Isi `profil` di bawah: nama koneksi + query 1 baris dengan parameter :username
+#       (username login). Nama kolom hasil query = nama atribut (huruf kecil).
+#    3. Tulis `aturan`: dicocokkan dari ATAS ke BAWAH; aturan PERTAMA yang cocok dipakai.
 #
 #  kapan   : syarat profil. Semua syarat harus cocok (DAN). Nilai boleh daftar
-#            (cukup salah satu cocok). Huruf besar/kecil tidak dibedakan.
-#            Kosong ({}) = cocok untuk semua orang.
+#            (cukup salah satu cocok). Huruf besar/kecil tidak dibedakan. Kosong ({}) = semua orang.
 #  lingkup : data apa yang boleh dilihat.
-#            semua                 -> tanpa batas
-#            [kd_kanwil, kd_kpp]   -> dibatasi nilai atribut itu MILIK PEGAWAI
-#            {kd_kanwil: ["090","091"]} -> dibatasi nilai tetap (untuk pengecualian)
-#  peran   : role Superset tambahan (dipakai hak akses dashboard).
+#            semua                    -> tanpa batas
+#            [wilayah, cabang]        -> dibatasi nilai atribut itu MILIK PENGGUNA
+#            {wilayah: ["W1", "W2"]}  -> dibatasi nilai tetap (untuk pengecualian)
+#  peran   : role Superset tambahan (hak akses dashboard). Role berawalan `awalan_peran`
+#            dikelola otomatis setiap login.
 #
-#  Atribut profil yang tersedia:
-#    nip (NIP9), nip18, nama, kd_kantor, kd_kpp (KPPADM), kd_kanwil, tp_kantor,
-#    kd_unor (KD_UNIT_ORGANISASI), kd_jabatan (KD_JAB_STRUKTURAL),
-#    kd_jabatan_fung (KD_JAB_FUNGSIONAL), jabatan (NAMA_JABATAN)
-#
+#  Di dataset, pasang aturan RLS:  {{ sps_akses(wilayah='KD_WILAYAH', cabang='KD_CABANG') }}
 #  Perubahan file ini berlaku untuk login BERIKUTNYA (tanpa restart).
 #  Tidak ada aturan yang cocok -> tidak melihat data apa pun (aman secara default).
 # =============================================================================
 
-# Per orang (NIP9). Menimpa aturan umum. Contoh:
-#   "123456789": {lingkup: {kd_kanwil: ["090", "091"]}, peran: ["DJP Kanwil"]}
+profil:
+  database: ""        # nama koneksi di Superset, mis. "HR Karyawan" (bisa juga AKSES_DATABASE di .env)
+  sql: ""             # contoh:
+  #   SELECT ID_KARYAWAN AS id, NAMA AS nama, KD_WILAYAH AS wilayah, KD_CABANG AS cabang,
+  #          TIPE_KANTOR AS tipe_kantor, JABATAN AS jabatan
+  #   FROM KARYAWAN WHERE ID_KARYAWAN = :username
+
+awalan_peran: "Akses "
+
+# Per orang (username login). Menimpa aturan umum. Contoh:
+#   "budi.santoso": {lingkup: {wilayah: ["W1", "W2"]}, peran: ["Akses Wilayah"]}
 pengecualian: {}
 
-aturan:
-  - nama: Kantor Pusat
-    kapan: {tp_kantor: KPDJP}
-    lingkup: semua
-    peran: ["DJP Pusat"]
-
-  - nama: Account Representative
-    kapan: {jabatan: Account Representative}
-    lingkup: [kd_kpp, nip]
-    peran: ["DJP KPP"]
-
-  - nama: Pegawai Kanwil
-    kapan: {tp_kantor: KANWIL}
-    lingkup: [kd_kanwil]
-    peran: ["DJP Kanwil"]
-
-  - nama: Pegawai KPP
-    kapan: {tp_kantor: KPP}
-    lingkup: [kd_kanwil, kd_kpp]
-    peran: ["DJP KPP"]
+aturan: []
+# Contoh (hapus tanda # dan sesuaikan dengan atribut profil Anda):
+#  - nama: Kantor pusat
+#    kapan: {tipe_kantor: PUSAT}
+#    lingkup: semua
+#    peran: ["Akses Pusat"]
+#
+#  - nama: Kepala wilayah
+#    kapan: {tipe_kantor: WILAYAH}
+#    lingkup: [wilayah]
+#    peran: ["Akses Wilayah"]
+#
+#  - nama: Staf cabang
+#    kapan: {tipe_kantor: CABANG}
+#    lingkup: [wilayah, cabang]
+#    peran: ["Akses Cabang"]

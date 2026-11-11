@@ -5,8 +5,8 @@
 .DESCRIPTION
     Menjalankan config/sps_build_dashboards.py di dalam container.
     Aman dijalankan berulang: objek yang sama diperbarui, bukan diduplikasi.
-    Syarat: Superset menyala (scripts\start.ps1). Dashboard profil DJP hanya dibuat bila
-    koneksi sumber DJP ada (scripts\add-connections.ps1).
+    Syarat: Superset menyala (scripts\start.ps1). Dashboard "as code" (config\sps_dash_*.py)
+    dilewati bila koneksi sumbernya belum ada.
 
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File scripts\build-dashboards.ps1

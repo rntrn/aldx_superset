@@ -19,7 +19,6 @@ x-superset: &superset
   volumes:
     - ./config:/app/pythonpath:ro
     - ./branding:/app/superset/static/assets/images/sps:ro
-    - ./branding:/app/superset/static/assets/images/djp:ro
     - ./certs:/app/certs:ro
     # Panduan di dalam aplikasi (/panduan/): dokumentasi Markdown, gambar & PDF (hanya-baca).
     - ./docs:/app/docs:ro

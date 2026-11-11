@@ -30,7 +30,7 @@ Setiap perubahan tercatat di tab **Riwayat** (siapa, kapan, nilai lama/baru).
 | Nama & teks | Nama aplikasi | judul tab browser, navbar, login (maks 40 huruf) |
 | | Nama perusahaan / instansi | login, kaki halaman, Asisten AI. Boleh kosong: login & kaki halaman memakai nama aplikasi |
 | | Slogan, Sapaan login, Teks kaki | teks di halaman login; `{tahun}` & `{perusahaan}` diganti otomatis |
-| | Halaman pertama setelah login | bawaan `/app/` (Beranda); bisa juga `/superset/dashboard/latihan/`. Bila dashboard tujuannya belum ada (mis. `beranda` profil DJP sebelum koneksi Oracle DMP dibuat), pengguna diarahkan ke daftar dashboard |
+| | Halaman pertama setelah login | bawaan `/app/` (Beranda); bisa juga `/superset/dashboard/latihan/`. Bila dashboard tujuannya belum ada atau sudah dihapus, pengguna diarahkan ke daftar dashboard |
 | Warna | Warna utama | navbar, tombol, header |
 | | Warna aksen | garis hiasan, sorotan, tab aktif |
 | | Warna latar halaman | latar belakang |
@@ -54,9 +54,8 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 | `marun` | `#7A1F2B` / `#E0A100` | garis |
 | `ungu` | `#4B2E83` / `#19B5A5` | gelombang |
 | `grafit` | `#263238` / `#26A69A` | titik |
-| `djp` | navy `#1F2F5F` / emas `#F2B705` | gelombang; nama & halaman depan DJP, logo ALDx |
 
-Preset selain `netral` dan `djp` hanya mengganti warna & motif; nama dan logo Anda tetap.
+Preset selain `netral` hanya mengganti warna & motif; nama dan logo Anda tetap.
 
 ### Tinta & Sakura (bawaan)
 
@@ -79,9 +78,8 @@ dan animasi pemuatan (sayatan melesat).
 Instalasi yang sudah berjalan tidak berubah otomatis: pilih preset **netral** di tab ini untuk memakai tampilan baru,
 atau **navy** untuk kembali ke tampilan lama.
 
-Logo resmi DJP **tidak disertakan** di repo (merek milik instansi). Preset `djp` memakai logo ALDx
-(`branding\logo-aldx.svg`, `logo-aldx-putih.svg`, `favicon-aldx.svg`). Logo lain bisa diunggah di tab ini
-kapan saja. Bila berkas logo `statis:` tidak ditemukan, logo dibuat otomatis dari nama & warna (tidak ada gambar rusak).
+Logo ALDx tersedia sebagai berkas di `branding\` (`logo-aldx.svg`, `logo-aldx-putih.svg`, `favicon-aldx.svg`) untuk
+dipakai lewat `statis:`. Logo perusahaan Anda bisa diunggah di tab ini kapan saja. Bila berkas logo `statis:` tidak ditemukan, logo dibuat otomatis dari nama & warna (tidak ada gambar rusak).
 
 Berkas logo ALDx (hitam dengan titik pink) dibuat dari generator yang sama dengan logo otomatis (`tema.svg_logo()`, warna bawaan),
 jadi identitasnya konsisten. Bila bentuk tanda di `tema.py` diubah, buat ulang ketiga berkas itu.
@@ -103,7 +101,7 @@ Dibaca **sekali** oleh `scripts\build-dashboards.ps1` bila database belum punya 
 
 | Variabel | Contoh |
 |---|---|
-| `SPS_PRESET` | `netral`, `hijau`, `marun`, `ungu`, `grafit`, `djp` |
+| `SPS_PRESET` | `netral`, `navy`, `hijau`, `marun`, `ungu`, `grafit` |
 | `SPS_NAMA_APLIKASI` | `Analitik Penjualan` |
 | `SPS_NAMA_PERUSAHAAN` | `PT Contoh Sejahtera` |
 | `SPS_LOGO` | nama berkas di folder `branding\`, mis. `logo-kustom.png` |

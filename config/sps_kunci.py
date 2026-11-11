@@ -4,7 +4,7 @@ Aturan (Pusat Kendali › Pengaturan › Gateway & keamanan):
     keamanan.login_maks_gagal   salah password berturut-turut sebelum dikunci (bawaan 5; 0 = mati)
     keamanan.login_kunci_menit  lama terkunci (bawaan 15 menit)
 
-Berlaku untuk akun lokal (email) DAN login LDAP (NIP). Hitungan per username, jadi tidak bisa
+Berlaku untuk akun lokal (email) DAN login LDAP (username jaringan). Hitungan per username, jadi tidak bisa
 dielakkan dengan berganti komputer. Selama terkunci, password yang benar pun ditolak.
 Login berhasil = hitungan kembali 0. Kunci habis sendiri, dibuka Admin di Pusat Kendali › Riwayat,
 atau darurat lewat scripts\\buka-kunci.ps1 (mis. Superadmin satu-satunya terkunci).

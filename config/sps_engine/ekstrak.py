@@ -1,4 +1,4 @@
-"""Ekstrak: salinan dataset sumber (Oracle/ClickHouse DMP/MySQL) di ALDx Engine.
+"""Ekstrak: salinan dataset sumber (Oracle/ClickHouse/MySQL/dll.) di ALDx Engine.
 
 Siklus:
     buat()       daftarkan ekstrak (status "baru") -> penyegaran pertama dijadwalkan

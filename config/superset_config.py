@@ -7,7 +7,7 @@ Bagian:
     1. Helper   - membaca environment variable dengan pesan error yang jelas
     2. Keamanan - SECRET_KEY
     3. Metadata - koneksi ke PostgreSQL container metadb (database sps_superset)
-    4. Login    - LDAP DJP (sps_security.py + sps_ldap.py)
+    4. Login    - akun lokal + LDAP/Active Directory opsional (sps_security.py + sps_ldap.py)
     5. Driver   - Oracle lewat oracledb (pengganti cx_Oracle)
     6. Tampilan - identitas & tema (diatur di Pusat Kendali; sps_identitas/)
     7. Fitur    - feature flag + fungsi template SQL (sps_jinja.py, sps_akses.py)
@@ -32,7 +32,7 @@ from sps_jinja import sps_periode
 from sps_security import SpsSecurityManager
 from sps_server import konfig as sps_server_konfig
 from sps_server.lingkungan import uri_metadata, wajib
-from sps_studio.lembar import RUNTUN, SKEMA_LAMA, SKEMA_RUNTUN, SKEMA_WARNA, WARNA
+from sps_studio.lembar import RUNTUN, SKEMA_RUNTUN, SKEMA_WARNA, WARNA
 
 
 # --- 1. Helper ---------------------------------------------------------------
@@ -143,16 +143,15 @@ globals().update(sps_identitas.tema_awal(_TOKENS))
 # untuk cangkang & halaman ALDx ada di config/sps_app/static/bahasa/ (pilih lewat menu Bahasa di sidebar).
 LANGUAGES = {"en": {"flag": "us", "name": "English"}, "ja": {"flag": "jp", "name": "日本語"}}
 
-# Markdown dashboard boleh memakai style/class (untuk banner DJP).
+# Markdown dashboard boleh memakai style/class (untuk banner/judul berwarna).
 HTML_SANITIZATION_SCHEMA_EXTENSIONS = {"attributes": {"*": ["style", "className"]}}
 
 
 def _arahkan_halaman_depan(app) -> None:
     """'/' dan halaman Welcome bawaan diarahkan ke halaman depan pilihan admin (Identitas & Tema).
 
-    Bila halaman depan berupa dashboard (/superset/dashboard/<slug>/) yang belum ada, mis. "beranda"
-    profil DJP yang belum dibangun karena koneksinya belum dibuat, pengguna diarahkan ke daftar
-    dashboard, bukan halaman 404.
+    Bila halaman depan berupa dashboard (/superset/dashboard/<slug>/) yang belum ada atau sudah dihapus,
+    pengguna diarahkan ke daftar dashboard, bukan halaman 404.
     """
     import re
     import time
@@ -242,7 +241,7 @@ FLASK_APP_MUTATOR = _pasang_tambahan
 
 # --- 7. Feature flags --------------------------------------------------------
 FEATURE_FLAGS = {
-    "DASHBOARD_RBAC": True,              # akses dashboard diatur per role (DJP Pusat, dst.)
+    "DASHBOARD_RBAC": True,              # akses dashboard diatur per role
     "TAGGING_SYSTEM": True,              # beri tag pada chart/dashboard
     "ENABLE_TEMPLATE_PROCESSING": True,  # Jinja di SQL & RLS: {{ sps_akses() }}, {{ sps_periode() }}
     "RLS_IN_SQLLAB": True,               # aturan hak akses juga berlaku di SQL Lab
@@ -267,7 +266,7 @@ EMAIL_REPORTS_SUBJECT_PREFIX = os.environ.get("SMTP_AWALAN_SUBJEK", "[ALDx] ")
 # Fungsi tambahan yang bisa dipanggil di SQL dataset / aturan RLS:
 #   sps_periode(...) - tahun & bulan dari filter dashboard   (sps_jinja.py)
 #   sps_akses(...)   - kondisi hak akses user yang login      (sps_akses.py)
-#   sps_profil(...)  - profil pegawai yang login (nip, kd_kanwil, ...)
+#   sps_profil(...)  - profil pengguna yang login (atribut dari akses.yaml)
 #   sps_sidik()      - sidik lingkup akses user (RLS dataset ramalan Studio)
 JINJA_CONTEXT_ADDONS = {"sps_periode": sps_periode, "sps_akses": sps_akses, "sps_profil": sps_profil,
                         "sps_sidik": sps_sidik}
@@ -287,23 +286,19 @@ D3_TIME_FORMAT = {
 }
 
 # Skema warna kategori (sama dengan pratinjau Studio Visual; config/sps_studio/lembar.py).
-# Id lama tetap terdaftar dengan warna baru, agar dashboard versi sebelumnya ikut memakai palet baru.
+# Dashboard/chart versi sebelumnya dialihkan ke skema ini oleh sps_warna.py (build-dashboards & tugas malam).
 EXTRA_CATEGORICAL_COLOR_SCHEMES = [
     {"id": SKEMA_WARNA, "description": "Palet ALDx Tinta & Sakura (aman buta warna)", "label": "ALDx",
      "isDefault": True, "colors": WARNA},
-    *({"id": lama, "description": "Palet ALDx (id versi sebelumnya)", "label": "ALDx (lama)", "colors": WARNA}
-      for lama, baru in SKEMA_LAMA.items() if baru == SKEMA_WARNA),
 ]
 EXTRA_SEQUENTIAL_COLOR_SCHEMES = [
     {"id": SKEMA_RUNTUN, "description": "Pink terang ke gelap", "label": "ALDx Pink",
      "isDiverging": False, "isDefault": True, "colors": RUNTUN},
-    *({"id": lama, "description": "Palet ALDx (id versi sebelumnya)", "label": "ALDx Pink (lama)",
-       "isDiverging": False, "colors": RUNTUN} for lama, baru in SKEMA_LAMA.items() if baru == SKEMA_RUNTUN),
 ]
 
 # Peta (deck.gl: Peta titik & Peta kepadatan). Ubin peta dasar diambil BROWSER pengguna.
 # Jaringan tanpa internet: isi SPS_PETA_UBIN dengan server ubin lokal, mis.
-#   http://10.245.1.20:8080/tile/{z}/{x}/{y}.png
+#   http://server-peta.kantor.local:8080/tile/{z}/{x}/{y}.png
 # Peta provinsi & pratinjau Studio memakai GeoJSON lokal (tidak butuh internet).
 # Tanpa telemetri pihak ketiga (pixel scarf.sh) - data perusahaan tetap di dalam.
 SCARF_ANALYTICS = False

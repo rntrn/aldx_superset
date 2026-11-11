@@ -105,7 +105,7 @@ dengan versi lain. Ketiganya dipasang apa adanya sebagai paket terpisah, jadi sy
 |---|---|---|---|
 | Oracle Instant Client | lisensi Oracle (Free Use Terms) | ukuran besar dan wajib dari sumber resmi Oracle; hanya perlu untuk Oracle < 12.1 | `docker/oracle/README.md` |
 | SAP HANA driver `hdbcli` | SAP Developer License (proprietary) | lisensi SAP melarang dibagikan ulang | `docker/wheels/README.md` § SAP HANA |
-| Logo instansi (mis. DJP) | merek milik instansi | bukan milik proyek ini | taruh di `branding/` atau unggah di Pusat Kendali → Identitas ([09](docs/09-identitas-tema.md)) |
+| Logo perusahaan/instansi pengguna | merek milik pemiliknya | bukan milik proyek ini | taruh di `branding/` atau unggah di Pusat Kendali → Identitas ([09](docs/09-identitas-tema.md)) |
 
 Berkas-berkas ini diabaikan git (`.gitignore`), jadi salinan lokal tetap ada saat repo diperbarui.
 

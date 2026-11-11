@@ -18,10 +18,10 @@
          dari CPU/RAM komputer ini = auto-tuning saat bergabung)
 
 .PARAMETER Utama
-    Alamat IP node utama, mis. 10.245.1.20
+    Alamat IP node utama, mis. 192.168.1.20
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File scripts\gabung-node.ps1 -Utama 10.245.1.20
+    powershell -ExecutionPolicy Bypass -File scripts\gabung-node.ps1 -Utama 192.168.1.20
 #>
 param([Parameter(Mandatory = $true)][string]$Utama)
 

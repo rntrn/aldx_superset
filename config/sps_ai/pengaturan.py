@@ -102,7 +102,7 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
     return Pengaturan(
         model=aktif,
         bawaan=tersimpan.get(kunci_api.BAWAAN) or str(data.get("bawaan", "")),
-        peran_boleh=[str(p).replace("{role_pengguna}", os.environ.get("SPS_ROLE_PENGGUNA") or "DJP Pegawai")
+        peran_boleh=[str(p).replace("{role_pengguna}", os.environ.get("SPS_ROLE_PENGGUNA") or "Pengguna")
                      for p in data.get("peran_boleh") or []],
         langkah_maks=int(data.get("langkah_maks", 6)),
         baris_maks=int(data.get("baris_maks", 500)),

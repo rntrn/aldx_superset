@@ -48,7 +48,7 @@ class Dataset:
 
     akses: kolom hak akses -> dipasang sebagai RLS wajib (lihat sps_akses.py)
         {}                                    data nasional: hanya lingkup "semua"
-        {"kd_kanwil": "KD_KANWIL", ...}       atribut profil -> kolom di dataset
+        {"cabang": "KD_CABANG", ...}          atribut profil -> kolom di dataset
         None                                  data referensi, tanpa pembatasan
     """
     key: str
@@ -249,7 +249,7 @@ def _validate(dash: Dashboard) -> None:
 
 
 def rls_clause(akses: dict[str, str]) -> str:
-    """Klausa RLS untuk satu dataset, mis. {{ sps_akses(kd_kanwil='KD_KANWIL') }}."""
+    """Klausa RLS untuk satu dataset, mis. {{ sps_akses(cabang='KD_CABANG') }}."""
     args = ", ".join(f"{atribut}='{kolom}'" for atribut, kolom in sorted(akses.items()))
     return "{{ sps_akses(" + args + ") }}"
 
@@ -275,11 +275,11 @@ def _sync_rls(table, ds: Dataset) -> None:
     db.session.add(rls)
 
 
-ROLE_PEMBACA_DATASET = [os.environ.get("SPS_ROLE_PENGGUNA") or "DJP Pegawai"]  # baca dataset (baris tetap dibatasi RLS)
+ROLE_PEMBACA_DATASET = [os.environ.get("SPS_ROLE_PENGGUNA") or "Pengguna"]  # baca dataset (baris tetap dibatasi RLS)
 
 
 def _beri_akses_dataset(table) -> None:
-    """Role pegawai boleh memakai dataset (Asisten AI / Auto Chart); RLS tetap membatasi baris."""
+    """Role pengguna boleh memakai dataset (Asisten AI / Auto Chart); RLS tetap membatasi baris."""
     from superset import security_manager as sm
 
     pv = sm.add_permission_view_menu("datasource_access", table.get_perm())
@@ -313,7 +313,7 @@ def build(dash: Dashboard, owner_username: str = "admin") -> str:
     database = db.session.query(Database).filter_by(database_name=dash.database_name).one_or_none()
     if database is None:
         raise RuntimeError(
-            f"Koneksi '{dash.database_name}' belum ada. Jalankan scripts\\add-connections.ps1 dulu."
+            f"Koneksi '{dash.database_name}' belum ada. Buat lewat Pusat Kendali > Hubungkan data dulu."
         )
 
     with override_user(owner):

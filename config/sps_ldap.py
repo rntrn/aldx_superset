@@ -1,10 +1,10 @@
 """Autentikasi ke Active Directory / LDAP memakai ldap3 (Python murni). Opsional: aktif bila LDAP_SERVERS terisi.
 
-Cara kerjanya (sama dengan aplikasi intranet DJP "engineN", ldap_auth):
+Cara kerjanya (pola umum login Active Directory):
     1. Bind ke AD sebagai  DOMAIN\\username  dengan password pengguna sendiri
        (tanpa akun layanan / service account).
     2. Bila bind berhasil, cari data pegawai di LDAP_SEARCH_BASE
-       untuk mengambil nama (displayName), NIP (employeeNumber), dan email.
+       untuk mengambil nama (displayName), nomor pegawai (employeeNumber), dan email.
     3. Server dicoba berurutan; server cadangan hanya dipakai bila server
        sebelumnya TIDAK BISA DIHUBUNGI. Password salah tidak dicoba ulang ke
        server lain, supaya akun AD tidak cepat terkunci.
@@ -32,7 +32,7 @@ ATTRIBUTES = ["displayName", "employeeNumber", "mail", "sAMAccountName"]
 
 @dataclass(frozen=True)
 class LdapSettings:
-    """Pengaturan LDAP; nilainya dari .env (default = nilai engineN)."""
+    """Pengaturan LDAP dari .env (semua kosong = LDAP tidak dipakai)."""
 
     servers: tuple[str, ...]
     domain: str
@@ -59,7 +59,7 @@ class LdapUser:
 
     username: str
     display_name: str
-    nip: str
+    nomor_pegawai: str
     email: str
 
 
@@ -99,7 +99,7 @@ def authenticate(username: str, password: str, settings: LdapSettings | None = N
 
 
 def _read_user(conn: Connection, username: str, search_base: str) -> LdapUser | None:
-    """Cari data pegawai; wajib tepat satu hasil (sama seperti engineN)."""
+    """Cari data pengguna; wajib tepat satu hasil (hindari salah orang)."""
     name = escape_filter_chars(username)
     search_filter = (
         "(&(objectCategory=person)(objectClass=user)"
@@ -115,7 +115,7 @@ def _read_user(conn: Connection, username: str, search_base: str) -> LdapUser | 
     return LdapUser(
         username=username,
         display_name=_value(entry, "displayName") or username,
-        nip=_value(entry, "employeeNumber"),
+        nomor_pegawai=_value(entry, "employeeNumber"),
         email=_value(entry, "mail"),
     )
 

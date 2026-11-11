@@ -27,10 +27,8 @@ x-superset: &superset
   volumes:
     # Seluruh folder config/ (superset_config.py + modul sps_*).
     - ./config:/app/pythonpath:ro
-    # Logo bawaan (preset), logo unggahan installer & font -> /static/assets/images/sps/
-    # (alamat lama .../images/djp tetap ada untuk dashboard versi sebelumnya).
+    # Logo ALDx, logo unggahan installer & font -> /static/assets/images/sps/
     - ./branding:/app/superset/static/assets/images/sps:ro
-    - ./branding:/app/superset/static/assets/images/djp:ro
     # Sertifikat CA kantor untuk Asisten AI ke model API (lihat certs/README.md).
     - ./certs:/app/certs:ro
     # Panduan di dalam aplikasi (/panduan/): dokumentasi Markdown, gambar & PDF (hanya-baca).

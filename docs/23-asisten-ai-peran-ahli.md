@@ -81,7 +81,7 @@ membuat **kartu usulan**: nilai lama → nilai baru, alasan, dan (untuk tema) ha
 | Hak akses tetap berlaku | semua alat berjalan sebagai pengguna yang login; data tetap disaring RLS |
 | Alat dibatasi per peran | model hanya diberi alat milik peran itu; alat lain ditolak server |
 | Model cloud tanpa data | `kirim_data: false` di `config/ai.yaml`: angka hasil kueri tidak dikirim ke model, hanya tampil di layar |
-| Konfigurasi bukan data pajak | `/ahli-ui-ux` & `/hw-engineer` hanya membaca tema & pengaturan server, bukan data pegawai/wajib pajak |
+| Konfigurasi, bukan data bisnis | `/ahli-ui-ux` & `/hw-engineer` hanya membaca tema & pengaturan server, bukan data bisnis/pribadi |
 | Tanpa rahasia | password, API key, dan `.env` tidak pernah dibaca alat mana pun |
 | Audit | setiap pertanyaan tercatat di tabel `sps_ai_log` dengan awalan peran, mis. `[/hw-engineer] ...` |
 

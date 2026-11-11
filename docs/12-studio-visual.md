@@ -190,7 +190,7 @@ config/sps_studio/
 | Menu Studio Visual tidak ada | Izin belum dibuat | `scripts\build-dashboards.ps1`, login ulang |
 | Jenis grafik abu-abu di "Tampilkan saya" | Jumlah dimensi/ukuran tidak cocok | Arahkan kursor ke jenis itu untuk melihat kebutuhannya |
 | "Simpan" memberi tautan Explore | Belum punya izin simpan chart | Pusat Kendali → Hak akses |
-| "Kolom hak akses … harus tetap ada" | Kolom wilayah/NIP dibuang atau diubah di persiapan data | Pertahankan kolom tsb. tanpa diubah (boleh disembunyikan di chart) |
+| "Kolom hak akses … harus tetap ada" | Kolom wilayah/cabang dibuang atau diubah di persiapan data | Pertahankan kolom tsb. tanpa diubah (boleh disembunyikan di chart) |
 | "ada di database lain; gabung hanya bisa…" | Dataset kanan di koneksi berbeda | Gabung hanya sesama database; untuk lintas database minta Admin membuat view |
 | Filter dashboard tidak menyaring sebuah chart | Dataset chart itu tidak punya kolom bernama sama | Samakan nama kolom (persiapan data → Ganti nama) |
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |

@@ -96,7 +96,7 @@ def redis() -> Redis:
 class Node:
     """Identitas container ini dalam cluster.
 
-    nama    : nama komputer (node), mis. SRV-DJP-01
+    nama    : nama komputer (node), mis. SRV-BI-01
     peran   : "utama" (web + backgrounder + cache + gateway) | "tambahan" (web + backgrounder)
     layanan : web | worker | beat  (diisi docker-compose per container)
     alamat  : host:port web node ini yang bisa dijangkau gateway node utama

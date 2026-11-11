@@ -9,7 +9,7 @@ di SQL dataset seperti ini:
 
 Nilai filter dari dashboard DIVALIDASI di sini (hanya angka), sehingga
 tidak bisa dipakai untuk menyisipkan SQL. Bila filter kosong, dipakai
-tahun & bulan berjalan - sama seperti halaman Home engineN.
+tahun & bulan berjalan.
 """
 
 from __future__ import annotations
@@ -26,15 +26,10 @@ def _first_valid(values, length: int, low: int, high: int) -> int | None:
     return None
 
 
-# Kolom PDB kumulatif per triwulan di tabel REF_BI_GDP (sama dengan Mpemby::getKat).
-_KOLOM_PDB_KUMULATIF = ("TWI", "(TWI+TWII)", "(TWI+TWII+TWIII)", "(TWI+TWII+TWIII+TWIV)")
-
-
 def sps_periode(tahun_values=None, bulan_values=None) -> dict[str, str]:
     """Kembalikan periode laporan yang sudah aman dipakai di SQL.
 
-    Hasil: {"tahun": "2026", "tahun_lalu": "2025", "bulan": "10",
-            "kolom_pdb": "(TWI+TWII+TWIII+TWIV)"}
+    Hasil: {"tahun": "2026", "tahun_lalu": "2025", "bulan": "10", "triwulan": "4"}
     """
     today = date.today()
     tahun = _first_valid(tahun_values, 4, 2000, 2100) or today.year
@@ -43,5 +38,5 @@ def sps_periode(tahun_values=None, bulan_values=None) -> dict[str, str]:
         "tahun": str(tahun),
         "tahun_lalu": str(tahun - 1),
         "bulan": f"{bulan:02d}",
-        "kolom_pdb": _KOLOM_PDB_KUMULATIF[(bulan - 1) // 3],
+        "triwulan": str((bulan - 1) // 3 + 1),
     }

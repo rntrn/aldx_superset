@@ -12,7 +12,7 @@ Setiap percobaan login tercatat di log sebagai `ALDx login ... BERHASIL/GAGAL`.
 | `powershell : The term 'powershell' is not recognized` saat menjalankan perintah `powershell -ExecutionPolicy Bypass -File scripts\...` | folder Windows PowerShell tidak tercantum di PATH komputer itu (PowerShell tetap ada) | ganti `powershell` dengan `pwsh` (PowerShell 7) atau jalur lengkap `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`. Pintasan, `PASANG.cmd`, uninstall & jadwal cadangan ALDx sudah memakai jalur lengkap sejak 2026.11.10 |
 | Inno Setup: `EndUpdateResource failed ... excluding the Output folder from your antivirus` | antivirus memindai exe yang sedang ditulis | `buat-installer.ps1` mencoba ulang otomatis 3 kali; bila tetap gagal, kecualikan folder `installer\setup\Output` di antivirus. Potongan exe yang gagal dihapus otomatis |
 | SQL Lab: `Syntax error ... Expected end of query` (ClickHouse code 62), `ORA-00936`, atau galat sintaks dengan **dua `SELECT`** di editor | tabel diseret dari pohon kiri ke editor yang sudah berisi `SELECT * FROM`; Superset menyisipkan kueri lengkap `SELECT ... LIMIT 100` | Sejak 2026.11.10 ALDx otomatis mengganti sisipan setelah `FROM`/`JOIN` dengan nama tabel saja (muat ulang `Ctrl + F5`). Kueri lama: hapus bagian `SELECT * from` di depan, atau seret tabel ke editor kosong |
-| Login: "Akun dikunci sementara karena terlalu banyak salah password" | 5 kali salah password berturut-turut | Tunggu (bawaan 15 menit) atau minta Admin: Pusat Kendali › Riwayat › Buka kunci. Darurat: `scripts\buka-kunci.ps1 -Akun <email/NIP>` |
+| Login: "Akun dikunci sementara karena terlalu banyak salah password" | 5 kali salah password berturut-turut | Tunggu (bawaan 15 menit) atau minta Admin: Pusat Kendali › Riwayat › Buka kunci. Darurat: `scripts\buka-kunci.ps1 -Akun <email/username>` |
 | Impor `.aldx`: "Peran Anda tidak boleh memuat data dari berkas" | Pengaturan *Peran yang boleh memuat data* (bawaan Admin) | Hilangkan centang *Pakai data di berkas* (impor definisi saja), atau Superadmin menambah peran di Pengaturan › Batas data |
 | `running scripts is disabled on this system` | Kebijakan PowerShell | Jalankan skrip dengan `powershell -ExecutionPolicy Bypass -File ...` |
 | `docker: command not found` / `cannot connect to the Docker daemon` | Docker Desktop belum menyala | Buka Docker Desktop, tunggu status **Running** |
@@ -28,8 +28,8 @@ Setiap percobaan login tercatat di log sebagai `ALDx login ... BERHASIL/GAGAL`.
 | Saat build: `invalid peer certificate: UnknownIssuer` / `CERTIFICATE_VERIFY_FAILED` | Jaringan kantor (SSL inspection) memblokir pypi.org dari dalam Docker | Pasang driver offline: file `.whl` di `docker\wheels\` (lihat README di folder itu) |
 | Pindah metadata gagal di tengah | sumber lama mati / koneksi terputus | perbaiki penyebab di log, jalankan ulang `PASANG.cmd` (aman diulang: sumber hanya dibaca) |
 | Login LDAP: "Invalid login" padahal password benar | Container tidak menjangkau AD, atau username tidak ditemukan di `LDAP_SEARCH_BASE` | Jalankan `scripts\test-ldap.ps1` dan baca pesannya. Pastikan VPN/jaringan kantor tersambung |
-| test-ldap: `tidak bisa dihubungi` | Port 389 ke 10.254.28.x tidak terjangkau dari Docker | Cek dari Windows: `Test-NetConnection 10.254.28.50 -Port 389`. Bila Windows bisa tapi Docker tidak, restart Docker Desktop setelah VPN tersambung |
-| test-ldap: `ditemukan 0 data` / `2 data` | Pencarian pegawai tidak tepat satu | Periksa `LDAP_SEARCH_BASE`; username harus unik |
+| test-ldap: `tidak bisa dihubungi` | Port LDAP (389, atau 636 untuk `ldaps://`) ke server AD tidak terjangkau dari Docker | Cek dari Windows: `Test-NetConnection <server-AD> -Port 636` (atau `scripts\diagnose.ps1`). Bila Windows bisa tapi Docker tidak, restart Docker Desktop setelah VPN tersambung |
+| test-ldap: `ditemukan 0 data` / `2 data` | Pencarian pengguna tidak tepat satu | Periksa `LDAP_SEARCH_BASE`; username harus unik |
 | Tidak bisa login sama sekali (LDAP mati) | VPN/AD tidak tersedia | Login dengan akun lokal `admin` (lihat `AUTH_LOCAL_USERS`) |
 | Halaman login tampil rusak / tanpa gaya | berkas tema tidak termuat | buka `/login/?klasik=1`; Ctrl+F5; cek [09](09-identitas-tema.md) |
 | Hubungkan data: *Driver belum terpasang* | image lama | `docker compose build` lalu `scripts\start.ps1` |
@@ -38,8 +38,7 @@ Setiap percobaan login tercatat di log sebagai `ALDx login ... BERHASIL/GAGAL`.
 | Build: gagal di `apt-get` / `libaio` | Jaringan memblokir repositori Debian | Unduh `libaio*.deb` via browser ke `docker\oracle\` (link di README folder itu) |
 | Oracle: `DPI-1047: Cannot locate a 64-bit Oracle Client library` | Zip Instant Client salah (Windows/32-bit) atau rusak | Pakai **Linux x86-64**, Basic Package, versi 19 |
 | Oracle/ClickHouse: *timed out* / `DPY-6005` | Server DB tidak terjangkau dari Docker | Pastikan VPN tersambung; cek dari Windows: `Test-NetConnection HOST -Port PORT` |
-| `LEWAT ...: PASSWORD kosong` | Password di `.env` belum diisi | Isi lalu jalankan lagi `scripts\add-connections.ps1` |
-| Pengguna tidak melihat data apa pun | aturan RLS tidak cocok / (profil DJP) profil tidak ada di `akses.yaml` | cek Settings → Row Level Security; profil DJP: log `ALDx akses <NIP>`, lalu `docs\08-hak-akses-data.md` |
+| Pengguna tidak melihat data apa pun | aturan RLS tidak cocok / (profil pengguna aktif) profil tidak ditemukan atau tidak cocok aturan `akses.yaml` | cek Settings → Row Level Security; bila profil aktif: log `ALDx akses <username>`, lalu `docs\08-hak-akses-data.md` |
 | `'sps_akses' is undefined` | Konfigurasi lama | `docker compose restart` |
 | Logo/warna tidak berubah | perubahan identitas belum menyebar / cache browser | tunggu 1 menit lalu Ctrl+F5 |
 | `Forbidden` saat buka dashboard | role pengguna tidak diberi akses dashboard itu | atur di dashboard → *Edit properties → Roles*, atau Settings → List Users |

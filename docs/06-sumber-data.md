@@ -46,7 +46,7 @@ dari RAM server; `0` = tanpa batas). Lihat [24-superadmin-dan-batas-data.md](24-
 
 ## 2a. Skema yang ditampilkan
 
-Database besar (mis. Oracle DJP) berisi ratusan skema milik pengguna lain. Setelah **Uji koneksi** berhasil,
+Database besar (mis. Oracle perusahaan) berisi ratusan skema milik pengguna lain. Setelah **Uji koneksi** berhasil,
 centang skema yang berisi data Anda (mis. `genapp`), lalu **Simpan**. Skema lain disembunyikan di
 **Dataset**, **SQL Lab**, **Kueri Visual**, dan **Studio**; skema pertama dipilih otomatis di Kueri Visual.
 
@@ -78,21 +78,7 @@ centang skema yang berisi data Anda (mis. `genapp`), lalu **Simpan**. Skema lain
 Python 3.10) dari pypi.org, taruh di `docker\wheels\`, lalu `scripts\init.ps1`. `sqlalchemy-hana` ikut terpasang
 otomatis ([README wheels](../docker/wheels/README.md#sap-hana-opsional)).
 
-## 5. Koneksi dari `.env` (profil DJP, opsional)
-
-Untuk instalasi DJP, empat koneksi standar dibuat otomatis dari `.env` oleh
-`scripts\add-connections.ps1` (`config\sps_connections.py`). Koneksi dengan password kosong dilewati.
-
-| Nama di Superset | Jenis | Variabel `.env` |
-|---|---|---|
-| Oracle DMP (GENAPP) | Oracle | `ORACLE_DMP_*` (juga sumber profil pegawai: `AKSES_DATABASE`) |
-| Oracle Dashboard (IKU) | Oracle | `ORACLE_IKU_*` |
-| Oracle Dashboard (DASHBD) | Oracle | `ORACLE_DASHBD_*` (versi lama: `ORACLE_TABLEAU_*`, dipindah otomatis) |
-| ClickHouse DMP_OLAP | ClickHouse | `CLICKHOUSE_*` |
-
-Alamat bawaan DJP diisi otomatis oleh installer bila password sumber DJP diisi.
-
-## 6. Masalah umum
+## 5. Masalah umum
 
 | Pesan | Arti | Tindakan |
 |---|---|---|
