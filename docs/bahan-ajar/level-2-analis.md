@@ -66,7 +66,8 @@
    pelanggannya (ganti ukuran ke *Jumlah baris*)?
 4. **Ramalan 6 bulan** penjualan total per periode, dengan tren & anomali.
    Metode apa yang dipakai? Bulan mana yang ditandai anomali paling mencolok?
-5. Susun dashboard *Latihan – [nama]* berisi chart 1, 3, 4 dan filter **Cabang** (`nm_cabang`).
+5. Susun dashboard *Latihan – [nama]* berisi chart 1, 3, 4 dan filter **Cabang** (`nm_cabang`). Tambahkan objek **Teks** sebagai judul
+   (huruf *Montserrat*, 28 px, tebal) dan **Garis** pemisah di bawahnya.
 6. **Kueri Visual**: gabungkan `latihan_lokasi_pelanggan` dengan `latihan_cabang`. Ringkas `belanja` (Jumlah) dan
    `id_pelanggan` (Hitung) per **pulau**. Pulau mana terbesar? Lalu filter `saluran` = Online, kelompokkan per
    `kepala_cabang`: siapa yang pelanggan Online-nya paling sedikit?

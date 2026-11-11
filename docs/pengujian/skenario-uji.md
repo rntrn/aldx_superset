@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **137 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **138 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -81,6 +81,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D16 | 2 Analis | Sedang | Story hanya dashboard selesai | Ada dashboard draf kosong milik orang lain | Dashboard & Story → Story → Story baru → buka pilihan dashboard | Hanya dashboard berisi chart yang terbit atau milik sendiri (ditandai draf) yang tampil |
 | D17 | 2 Analis | Tinggi | Chart berat tidak membuat browser macet | Dataset ≥ 10.000 baris | Explore → Tree Chart (atau Graph/Sankey) → isi Id & Parent → Update chart | Data dibatasi 1.000 baris (Pusat Kendali → Baris maksimal chart berat); halaman tetap responsif; petunjuk Explore tampil |
 | D18 | 2 Analis | Tinggi | Hierarki dimensi: buat & telusuri | A10; peran Analis | Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂ | Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi |
+| D19 | 2 Analis | Tinggi | Objek desain dashboard: teks, gambar, garis | D09; berkas logo PNG | Susun dashboard → Objek: klik Teks → Atur: huruf Playfair Display, 34 px, warna pink, rata tengah; klik Garis; seret Gambar ke baris baru → unggah logo; seret satu chart ke samping logo → Simpan → buka dashboard; buka lagi di Studio & ubah teks → Simpan | Judul tampil dengan huruf & warna pilihan tanpa kartu putih; garis pemisah & logo tampil; SVG ditolak; perubahan teks tersimpan dan CSS buatan sendiri di Superset tidak hilang |
 
 ## E. Peta & analitik prediktif
 

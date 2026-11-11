@@ -5,6 +5,7 @@
 <title>Studio Visual · {{ app_name }}</title>
 <link rel="icon" href="/identitas/berkas/favicon">
 <link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<link rel="stylesheet" href="/studio/static/huruf/huruf.css">
 <style>
 :root{--navy:var(--sps-utama,#1F2F5F);--navy2:var(--sps-utama-terang,#2B4A8F);--emas:var(--sps-aksen,#F2B705);--bg:var(--sps-latar,#F4F6F9);--garis:#D5DCE4;--garis2:#E6EBF1;--teks:#1F2933;--redup:#5F6B7A;
       --merah:#C0392B;--hijau:#1E8E5A;--dim:#EAF1FB;--dimT:#1F3F7A;--uk:#E6F4EC;--ukT:#17603B;--panel:#fff}
@@ -127,6 +128,24 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .dtile .kepala span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dtile .kepala select{width:auto;padding:1px 4px;font-size:11.5px}
 .dtile .mini{height:190px;position:relative}
+/* Objek desain dashboard (teks, gambar, garis) */
+.objekList{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.objekList .bidang{flex-direction:column;justify-content:center;text-align:center;gap:4px;padding:8px 4px;font-size:12px;color:var(--teks)}
+.objekList .bidang svg{width:20px;height:20px;margin:0 auto;display:block;stroke:currentColor}
+.dtile.objek .mini{height:auto;overflow:hidden;background:repeating-conic-gradient(#f4f5f7 0 25%,#fff 0 50%) 0 0/14px 14px;border-radius:0 0 8px 8px}
+.dtile.objek .mini>div{height:100%}
+.drow.garis{min-height:0;align-items:center;gap:8px;padding:4px 6px}
+.drow.garis hr{flex:1;border:0;border-top:2px solid var(--garis);margin:0}
+.drow.garis span{font-size:11px;color:var(--redup)}
+.dlgObjek{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.dlgObjek .penuh{grid-column:1/-1}
+.dlgObjek label{display:flex;flex-direction:column;gap:3px;font-size:12px}
+.dlgObjek label.cek{flex-direction:row;align-items:center;gap:6px}
+.dlgObjek textarea{min-height:70px}
+.dlgObjek input[type=color]{width:100%;height:32px;padding:2px}
+.contohObjek{height:110px;border:1px solid var(--garis);border-radius:8px;overflow:hidden;
+  background:repeating-conic-gradient(#f4f5f7 0 25%,#fff 0 50%) 0 0/14px 14px}
+.swatch{display:flex;gap:4px;flex-wrap:wrap}.swatch button{width:20px;height:20px;border-radius:50%;border:1px solid var(--garis);padding:0;cursor:pointer}
 .dket{width:100%;max-width:720px;min-height:38px;margin-bottom:10px}
 .dfilter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 .dfilter .label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--redup)}
@@ -240,6 +259,16 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <input type="text" id="cariLembarD" placeholder="Cari lembar kerja">
     <div id="daftarLembarD" style="margin-top:8px"></div>
     <p class="ket" style="margin-top:12px">Seret lembar kerja ke kanvas. Seret ke baris yang ada untuk berdampingan, atau ke kotak bawah untuk baris baru.</p>
+    <div class="judulPanel" style="margin-top:14px">Objek</div>
+    <div class="objekList" id="daftarObjek">
+      <div class="bidang" draggable="true" data-objek="teks" title="Judul, label, atau catatan dengan huruf, ukuran & warna pilihan">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>Teks</div>
+      <div class="bidang" draggable="true" data-objek="gambar" title="Logo atau foto (PNG, JPEG, WebP, GIF; maks. 3 MB)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/></svg>Gambar</div>
+      <div class="bidang" draggable="true" data-objek="garis" title="Garis pemisah selebar dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18"/></svg>Garis</div>
+    </div>
+    <p class="ket" style="margin-top:8px">Seret objek ke kanvas, lalu klik <b>Atur</b> untuk mengubah teks, huruf, warna, atau gambar.</p>
   </div>
   <div class="dkanvas">
     <div class="dkepala">

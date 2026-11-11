@@ -15,7 +15,7 @@ from pathlib import Path
 from flask import Blueprint, g, jsonify, redirect, render_template_string, request
 
 from sps_ai import alat
-from sps_studio import bidang, dasbor, lembar, prep
+from sps_studio import bidang, dasbor, lembar, objek, prep
 
 log = logging.getLogger(__name__)
 FOLDER = Path(__file__).resolve().parent
@@ -60,6 +60,7 @@ def api_awal():
     from superset import security_manager as sm
     return jsonify(dataset=alat.daftar_dataset(batas=500), aturan=lembar.ATURAN_TANDA, warna=lembar.WARNA,
                    lembar=lembar.daftar(), dashboard=dasbor.daftar(), user=g.user.username,
+                   huruf=objek.daftar_huruf(),
                    izin={"chart": sm.can_access("can_write", "Chart"),
                          "dashboard": sm.can_access("can_write", "Dashboard"),
                          "dataset": sm.can_access("can_write", "Dataset")})
@@ -153,6 +154,35 @@ def api_simpan_dashboard():
 @_login()
 def api_buka_dashboard(dashboard_id: int):
     return jsonify(dasbor.buka(dashboard_id))
+
+
+@bp.route("/api/gambar", methods=["POST"])
+@_login()
+def api_unggah_gambar():
+    """{"data": "data:image/png;base64,...."} -> {"id": "<32 hex>"} (gambar untuk objek dashboard)."""
+    import base64
+    import binascii
+    teks = str(_data().get("data") or "")
+    try:
+        isi = base64.b64decode(teks.split(",", 1)[-1], validate=True)
+    except (binascii.Error, ValueError):
+        raise alat.InputSalah("Berkas gambar tidak terbaca.") from None
+    return jsonify(id=objek.simpan_gambar(isi))
+
+
+@bp.route("/gambar/<gid>")
+def gambar(gid: str):
+    """Sajikan gambar objek dashboard. Tanpa login agar tampil juga di dashboard sematan (id tak bisa ditebak)."""
+    from flask import Response
+    hasil = objek.baca_gambar(gid)
+    if hasil is None:
+        return Response("Tidak ada", status=404, mimetype="text/plain")
+    isi, mime = hasil
+    r = Response(isi, mimetype=mime)
+    r.headers["Cache-Control"] = "public, max-age=31536000, immutable"      # id = hash isi: tidak pernah berubah
+    r.headers["X-Content-Type-Options"] = "nosniff"
+    r.headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
+    return r
 
 
 @bp.route("/api/prep/pratinjau", methods=["POST"])

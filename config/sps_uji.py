@@ -180,6 +180,29 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"{len(jenis)} jenis; gagal: {gagal[:3]}")
                 return f"{len(jenis)} jenis chart diusulkan, semua bisa dibangun"
 
+    @uji("Studio", "Objek dashboard: teks aman, huruf lokal, gambar hanya raster")
+    def _():
+        from pathlib import Path as _P
+        from sps_studio import objek
+        o = objek.bersihkan({"jenis": "teks", "lebar": 12, "tinggi": 999, "teks": "<script>x</script>\nBaris 2",
+                             "huruf": "playfair-display", "ukuran": 500, "warna": "red;}", "rata": "tengah"})
+        h = objek.html_objek(o)
+        if "<script>" in h or "&lt;script&gt;" not in h or "<br>" not in h:
+            raise RuntimeError("teks objek tidak di-escape")
+        if (o["tinggi"], o["ukuran"], o["warna"], o["rata"]) != (10, 96, "#111827", "left"):
+            raise RuntimeError(f"nilai tidak sah lolos: {o}")
+        css = objek.gabung_css(".milik-saya{color:red}", {"playfair-display"}, True)
+        css2 = objek.gabung_css(css, set(), False)
+        if ".milik-saya" not in css2 or "ALDX-HURUF" in css2 or "playfair-display-latin-700" not in css:
+            raise RuntimeError("CSS huruf dashboard salah")
+        folder = _P(objek.__file__).parent / "static" / "huruf"
+        hilang = [k for k, v in objek.HURUF.items() if v[2] and not (folder / f"{k}-latin-400-normal.woff2").exists()]
+        if hilang:
+            raise RuntimeError(f"berkas huruf hilang: {hilang}")
+        if objek.jenis_gambar(b"\x89PNG\r\n\x1a\n....") != "image/png" or objek.jenis_gambar(b"<svg onload=x>") is not None:
+            raise RuntimeError("deteksi format gambar salah")
+        return f"{len(objek.HURUF) - 1} huruf lokal, escape & validasi ok"
+
     @uji("Analitik", "Label periode ramalan")
     def _():
         if prediksi.label_berikut(["2025-11-01", "2025-12-01"], 2) != ["2026-01-01", "2026-02-01"]:

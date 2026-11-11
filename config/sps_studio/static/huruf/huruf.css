@@ -1,0 +1,21 @@
+/* Huruf dashboard Studio (dibuat dari HURUF di sps_studio/objek.py). Lisensi: LISENSI-*.txt */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/inter-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/inter-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/jetbrains-mono-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/jetbrains-mono-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Lora';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/lora-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Lora';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/lora-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/montserrat-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/montserrat-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/oswald-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/oswald-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/playfair-display-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/playfair-display-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/plus-jakarta-sans-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/plus-jakarta-sans-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/poppins-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/poppins-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Roboto Slab';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/roboto-slab-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Roboto Slab';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/roboto-slab-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url(/studio/static/huruf/space-grotesk-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url(/studio/static/huruf/space-grotesk-latin-700-normal.woff2) format('woff2')}

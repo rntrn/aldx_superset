@@ -169,6 +169,12 @@ SKENARIO = [
      "Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, "
      "jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂",
      "Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi"),
+    ("D19", 2, "Tinggi", "Objek desain dashboard: teks, gambar, garis", "D09; berkas logo PNG",
+     "Susun dashboard → Objek: klik Teks → Atur: huruf Playfair Display, 34 px, warna pink, rata tengah; klik Garis; "
+     "seret Gambar ke baris baru → unggah logo; seret satu chart ke samping logo → Simpan → buka dashboard; "
+     "buka lagi di Studio & ubah teks → Simpan",
+     "Judul tampil dengan huruf & warna pilihan tanpa kartu putih; garis pemisah & logo tampil; SVG ditolak; "
+     "perubahan teks tersimpan dan CSS buatan sendiri di Superset tidak hilang"),
     ("E01", 2, "Tinggi", "Peta titik", "A10", "latihan_lokasi_pelanggan → lon ke Kolom, lat ke Baris, saluran ke Warna",
      "Rekomendasi Peta titik; titik di 6 wilayah Indonesia, warna per saluran"),
     ("E02", 2, "Tinggi", "Peta provinsi", "A10", "provinsi ke Kolom, belanja ke Baris",

@@ -118,6 +118,27 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
 
 Dashboard tersimpan sebagai *Draft* di Superset (publikasikan dari menu **Dashboard & Story → Daftar dashboard** bila siap).
 
+### Objek desain: teks, gambar, garis
+
+Panel kiri bagian **Objek** (padanan *Objects* di Tableau / Power BI). Seret ke kanvas, atau klik untuk menambah di
+baris paling bawah. Kotak teks & gambar punya tombol **Atur**.
+
+| Objek | Yang bisa diatur |
+|---|---|
+| **Teks** | isi (Enter = baris baru), **huruf** (10 pilihan + bawaan), ukuran 10–96 px, tebal, miring, warna teks, latar (atau tanpa latar), rata kiri/tengah/kanan, posisi tegak, tinggi kotak |
+| **Gambar** | unggah PNG/JPEG/WebP/GIF (maks. 3 MB), teks alternatif, rata, *Utuh* atau *Penuhi kotak*, tinggi kotak |
+| **Garis** | garis pemisah selebar dashboard; seret untuk memindah |
+
+Pilihan huruf (berkas tersimpan lokal, jalan tanpa internet): Inter, Plus Jakarta Sans, Montserrat, Poppins,
+Space Grotesk, Oswald, Playfair Display, Lora, Roboto Slab, JetBrains Mono.
+
+Catatan:
+- Objek tampil tanpa kartu putih, menyatu dengan latar dashboard; warna latar teks diatur objek itu sendiri.
+- Gambar disimpan di server (tabel `sps_gambar`, ikut cadangan metadb). Alamatnya `/studio/gambar/<id>` terbuka tanpa
+  login agar tampil juga di dashboard sematan; id = sidik isi berkas, tidak bisa ditebak. Jangan unggah gambar rahasia.
+- SVG tidak diterima (bisa berisi skrip). Format dicek dari isi berkas, bukan dari namanya.
+- Huruf dipasang lewat CSS dashboard (bagian bertanda `ALDX-HURUF`); CSS yang Anda tulis sendiri di Superset tetap utuh.
+
 ### Filter dashboard
 
 1. **Tambah filter** → pilih dataset & kolom, nama, jenis:
@@ -190,6 +211,8 @@ config/sps_studio/
 ├── ramalan.py    simpan ramalan ke ALDx Engine + RLS lingkup pembuat + penyegaran harian
 ├── bidang.py     panel Data: Dimensi & Ukuran
 ├── dasbor.py     penyusun dashboard -> position_json Superset
+├── objek.py      objek desain dashboard (teks, gambar, garis), daftar HURUF, tabel sps_gambar
+├── hierarki.py   hierarki dimensi per dataset (tabel sps_hierarki)
 ├── prep.py       persiapan data -> dataset virtual + warisan RLS
 ├── tampilan.py   halaman & API /studio/
 ├── halaman.html  tata letak & gaya
@@ -200,6 +223,7 @@ config/sps_studio/
     ├── lembar.js   lembar kerja (drag & drop, Tampilkan saya)
     ├── dasbor.js   penyusun dashboard
     ├── prep.js     persiapan data
+    ├── huruf/      10 huruf woff2 (OFL/Apache-2.0) + huruf.css + LISENSI-*.txt
     └── echarts.min.js  ECharts 5.6.1 (Apache-2.0), disimpan lokal: tidak butuh internet
 ```
 
