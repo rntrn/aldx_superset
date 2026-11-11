@@ -266,6 +266,10 @@ SKENARIO = [
      "tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan "
      "pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama"),
 
+    ("G15", 4, "Sedang", "Preset Neon & warna manual", "Akun Admin",
+     "Identitas & Tema → preset Neon malam → Simpan; buka /login/ & satu dashboard; lalu ubah Warna aksen kedua manual",
+     "Login gelap dengan garis pink & cyan, tombol pink bertulisan gelap saat disorot; pratinjau berubah langsung saat "
+     "warna diubah; teks di atas setiap warna tetap terbaca; chart bisa memakai skema ALDx Neon"),
     ("G14", 4, "Tinggi", "Sematkan dashboard ke web lain", ".env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu",
      "Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe "
      "/sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';'",

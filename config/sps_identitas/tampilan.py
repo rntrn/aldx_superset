@@ -120,7 +120,8 @@ def _preset_tampil() -> dict:
 @_admin
 def api_baca():
     return jsonify(grup=list(skema.GRUP.items()), isian=[i.publik for i in skema.ISIAN],
-                   preset=[{"nama": k, "label": v["label"], "utama": v["warna_utama"], "aksen": v["warna_aksen"]}
+                   preset=[{"nama": k, "label": v["label"], "utama": v["warna_utama"], "aksen": v["warna_aksen"],
+                           "aksen2": v.get("warna_aksen2")}
                            for k, v in _preset_tampil().items()],
                    nilai=nilai(), versi=versi())
 

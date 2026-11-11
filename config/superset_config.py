@@ -32,7 +32,7 @@ from sps_jinja import sps_periode
 from sps_security import SpsSecurityManager
 from sps_server import konfig as sps_server_konfig
 from sps_server.lingkungan import uri_metadata, wajib
-from sps_studio.lembar import RUNTUN, SKEMA_RUNTUN, SKEMA_WARNA, WARNA
+from sps_studio.lembar import RUNTUN, SKEMA_NEON, SKEMA_RUNTUN, SKEMA_WARNA, WARNA, WARNA_NEON
 
 
 # --- 1. Helper ---------------------------------------------------------------
@@ -303,6 +303,8 @@ D3_TIME_FORMAT = {
 EXTRA_CATEGORICAL_COLOR_SCHEMES = [
     {"id": SKEMA_WARNA, "description": "Palet ALDx Tinta & Sakura (aman buta warna)", "label": "ALDx",
      "isDefault": True, "colors": WARNA},
+    {"id": SKEMA_NEON, "description": "Palet ALDx Neon: cyan & pink (aman buta warna)", "label": "ALDx Neon",
+     "colors": WARNA_NEON},
 ]
 EXTRA_SEQUENTIAL_COLOR_SCHEMES = [
     {"id": SKEMA_RUNTUN, "description": "Pink terang ke gelap", "label": "ALDx Pink",

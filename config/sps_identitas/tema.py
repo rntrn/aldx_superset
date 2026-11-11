@@ -57,15 +57,17 @@ def warna_tautan(p: dict[str, str]) -> str:
 
 
 def teks_di_atas(hex_: str) -> str:
-    """Putih atau hitam, mana yang lebih kontras di atas warna ini."""
-    return "#FFFFFF" if terang(hex_) < 0.42 else "#111827"
+    """Putih atau hitam, mana yang lebih kontras di atas warna ini (mis. pink neon -> teks gelap)."""
+    return "#FFFFFF" if kontras("#FFFFFF", hex_) >= kontras("#111827", hex_) else "#111827"
 
 
 def palet(n: dict[str, Any]) -> dict[str, str]:
     u, a = n["warna_utama"], n["warna_aksen"]
+    a2 = n.get("warna_aksen2") or a
     return {"utama": u, "utama_gelap": campur(u, "#000000", .25), "utama_terang": campur(u, "#FFFFFF", .22),
             "utama_muda": campur(u, "#FFFFFF", .9), "aksen": a, "aksen_muda": campur(a, "#FFFFFF", .82),
             "aksen_terang": campur(a, "#FFFFFF", .25),          # aksen untuk teks di latar gelap (kontras >= 4,5:1)
+            "aksen2": a2, "aksen2_muda": campur(a2, "#FFFFFF", .82),
             "teks_utama": teks_di_atas(u), "teks_aksen": teks_di_atas(a), "latar": n["warna_latar"]}
 
 

@@ -11,6 +11,8 @@
   const terang = h => { const k = v => (v /= 255) <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
     const [r, g, b] = rgb(h).map(k); return .2126 * r + .7152 * g + .0722 * b; };
   const sah = h => /^#[0-9A-Fa-f]{6}$/.test(h);
+  const kontras = (x, y) => { const [p, q] = [terang(x), terang(y)].sort((m, n) => n - m); return (p + .05) / (q + .05); };
+  const kontrasTeks = h => kontras("#FFFFFF", h) >= kontras("#111827", h) ? "#FFFFFF" : "#111827";   // = tema.teks_di_atas
 
   const nilai = () => ({...DATA.nilai, ...UBAH});
 
@@ -20,8 +22,8 @@
     const u = n.warna_utama, a = n.warna_aksen;
     Object.entries({"--sps-utama": u, "--sps-utama-gelap": campur(u, "#000000", .25), "--sps-utama-terang": campur(u, "#FFFFFF", .22),
       "--sps-utama-muda": campur(u, "#FFFFFF", .9), "--sps-aksen": a, "--sps-aksen-terang": campur(a, "#FFFFFF", .25),
-      "--sps-latar": n.warna_latar,
-      "--sps-teks-utama": terang(u) < .42 ? "#FFFFFF" : "#111827"}).forEach(([k, v]) => el.style.setProperty(k, v));
+      "--sps-aksen2": sah(n.warna_aksen2 || "") ? n.warna_aksen2 : a, "--sps-latar": n.warna_latar,
+      "--sps-teks-utama": kontrasTeks(u)}).forEach(([k, v]) => el.style.setProperty(k, v));
     $("#idnPNama").textContent = n.nama_aplikasi;
     $("#idnPPerusahaan").textContent = n.nama_perusahaan;
     $("#idnPSlogan").textContent = n.slogan;
@@ -56,7 +58,7 @@
         Berlaku tanpa restart (pengguna lain melihatnya dalam ±1 menit, cukup muat ulang halaman).</div>
       <h2>Preset cepat</h2>
       <div class="idnPreset">${DATA.preset.map(p => `<button class="kedua" data-preset="${p.nama}">
-        <span class="idnChip" style="background:${p.utama}"></span><span class="idnChip" style="background:${p.aksen}"></span>${esc(p.label)}</button>`).join("")}</div>
+        <span class="idnChip" style="background:${p.utama}"></span><span class="idnChip" style="background:${p.aksen}"></span>${p.aksen2 ? `<span class="idnChip" style="background:${p.aksen2}"></span>` : ""}${esc(p.label)}</button>`).join("")}</div>
       <div class="idnTata"><div>${grup}</div>
         <div class="idnSamping"><h2 style="margin-top:0">Pratinjau</h2>
           <div id="idnPratinjau" class="idnP">

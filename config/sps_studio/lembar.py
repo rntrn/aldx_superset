@@ -33,6 +33,9 @@ SKEMA_WARNA = "aldxWarna"         # didaftarkan di superset_config (EXTRA_CATEGO
 # Lolos validator dataviz (terang & gelap #18181B): pisah buta warna ΔE 14, normal ΔE 18,5, kontras >= 3:1.
 # Urutan TETAP (bagian dari keamanan buta warna), jangan diputar.
 WARNA = ["#E11D74", "#5062D8", "#0F9488", "#8B47C9", "#B7791F", "#B03A62", "#2E86C1", "#6B8E23"]
+# Palet tambahan "Neon" (cyan & pink lebih dulu), lolos validator yang sama; dipilih di chart: Color scheme > ALDx Neon.
+SKEMA_NEON = "aldxNeon"
+WARNA_NEON = ["#0891B2", "#DB2777", "#7C3AED", "#059669", "#2563EB", "#D97706", "#BE185D", "#65A30D"]
 SKEMA_RUNTUN = "aldxRuntun"        # satu hue (pink) terang -> gelap, untuk peta panas
 RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
 # Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
