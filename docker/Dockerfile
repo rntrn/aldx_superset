@@ -4,7 +4,9 @@
 #  Tambah: semua paket di docker/wheels/paket.txt:
 #          psycopg2 (metadata PostgreSQL), LDAP, ClickHouse (SPS Engine), Oracle,
 #          serta driver wizard "Hubungkan data" (SQL Server, Snowflake, BigQuery,
-#          Redshift, Databricks, Trino, Athena, DuckDB, SAP HANA, Vertica, Druid, Access)
+#          Redshift, Databricks, Trino, Athena, DuckDB, Vertica, Druid, Access)
+#          SAP HANA (opsional): hanya bila hdbcli-*.whl ditaruh sendiri di docker/wheels/
+#            (driver SAP berlisensi proprietary, tidak boleh ikut dibagikan)
 #          Oracle Instant Client (opsional, dari docker/oracle/) - mode thick
 #            untuk Oracle < 12.1. Lihat docker/oracle/README.md
 #
@@ -28,6 +30,7 @@ USER root
 RUN --mount=type=bind,source=wheels,target=/tmp/wheels \
     . /app/.venv/bin/activate && \
     sed 's/#.*//' /tmp/wheels/paket.txt | tr -s ' \t' '\n' | grep -v '^$' > /tmp/paket.txt && \
+    if ls /tmp/wheels/hdbcli-*.whl >/dev/null 2>&1; then echo sqlalchemy-hana >> /tmp/paket.txt; fi && \
     uv pip install --no-cache --no-index --find-links /tmp/wheels -r /tmp/paket.txt
 
 # Oracle Instant Client: hanya terpasang bila zip-nya ada di docker/oracle/.

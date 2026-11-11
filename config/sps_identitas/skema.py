@@ -6,7 +6,8 @@ nilai dari sini lewat sps_identitas.muat(). Menambah isian baru = tambah satu ba
 Nilai isian berkas (logo, logo_putih, favicon):
     ""               -> dibuat otomatis (SVG dari nama & warna)
     "unggah"         -> berkas yang diunggah admin (tabel sps_identitas_berkas)
-    "statis:<nama>"  -> berkas bawaan di folder branding/ (mis. statis:logo-djp.png)
+    "statis:<nama>"  -> berkas di folder branding/ (mis. statis:logo-kustom.png);
+                        bila berkasnya tidak ada, logo dibuat otomatis
 """
 
 from __future__ import annotations
@@ -95,8 +96,8 @@ PRESET: dict[str, dict[str, Any]] = {
             "nama_perusahaan": "Direktorat Jenderal Pajak", "slogan": "Data penerimaan untuk keputusan",
             "halaman_depan": "/superset/dashboard/beranda/",
             "warna_utama": "#1F2F5F", "warna_aksen": "#F2B705", "warna_latar": "#F4F6F9", "hiasan": "gelombang",
-            "logo": "statis:logo-djp.png", "logo_putih": "statis:logo-djp-putih.png",
-            "favicon": "statis:favicon-djp-32.png"},
+            "logo": "statis:logo-aldx.svg", "logo_putih": "statis:logo-aldx-putih.svg",
+            "favicon": "statis:favicon-aldx.svg"},
 }
 
 

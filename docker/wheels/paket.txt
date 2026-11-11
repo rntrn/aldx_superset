@@ -22,7 +22,8 @@ databricks-sql-connector
 trino                    # Trino / Starburst / Presto
 pyathena                 # Amazon Athena
 duckdb-engine            # DuckDB (berkas .duckdb)
-sqlalchemy-hana          # SAP HANA
+# SAP HANA (opsional): driver hdbcli berlisensi SAP, tidak disertakan. Taruh hdbcli-*.whl di folder
+# ini, maka sqlalchemy-hana ikut dipasang otomatis oleh docker/Dockerfile (lihat README.md).
 sqlalchemy-vertica-python  # Vertica
 pydruid                  # Apache Druid
 access-parser            # impor Microsoft Access (.mdb/.accdb)

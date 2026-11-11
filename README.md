@@ -28,7 +28,7 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 | Versi | Superset 6.1.0 · PostgreSQL 17 · ClickHouse 25.8 · Redis 7.4 · nginx 1.28 (atur di `.env`) |
 | Metadata | container `metadb` (PostgreSQL), database `sps_superset` |
 | ALDx Engine | container `engine`, database `sps_engine`: ekstrak, impor berkas, upload, ramalan |
-| Sumber data | **Hubungkan data**: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery, Redshift, Databricks, Trino, Athena, SAP HANA, Vertica, Druid + berkas Access/Excel/CSV |
+| Sumber data | **Hubungkan data**: PostgreSQL, MySQL, SQL Server, Oracle, ClickHouse, Snowflake, BigQuery, Redshift, Databricks, Trino, Athena, SAP HANA (driver opsional), Vertica, Druid + berkas Access/Excel/CSV |
 | Login | akun lokal ber-email (Superadmin wajib, pengguna lain diisi di installer) + LDAP / Active Directory **opsional** untuk NIP; halaman login beranimasi |
 | HTTPS | opsional (centang di installer): sertifikat dibuat otomatis, `http://` dialihkan; sertifikat kantor bisa dipakai. Lihat [docs/11 §9b](docs/11-pusat-kendali-server.md#https) |
 | Identitas & tema | nama, perusahaan, logo, warna, huruf, hiasan, animasi: Pusat Kendali, tanpa restart |
@@ -77,10 +77,12 @@ D:\superset
 ├── .env                    # Konfigurasi + password (RAHASIA, jangan dibagikan/di-commit)
 ├── docker-compose.yml      # Node utama: gateway, web, backgrounder, penjadwal, metadb, engine, redis
 ├── docker-compose.node.yml # Node tambahan (scale-out): web + backgrounder
+├── LICENSE, NOTICE         # Lisensi Apache 2.0 + pemberitahuan hak cipta
+├── THIRD-PARTY-LICENSES.md # Lisensi semua komponen pihak ketiga
 ├── installer/              # Kode wizard + log instalasi
 ├── server/                 # gateway.conf (otomatis), engine/ & metadb/ (konfigurasi & skrip perawatan)
 ├── backup/                 # Cadangan metadb (*.dump) & engine (engine\*.zip)
-├── branding/               # Font lokal + logo bawaan preset (logo lain diunggah lewat Pusat Kendali)
+├── branding/               # Font lokal + logo ALDx (logo lain diunggah lewat Pusat Kendali)
 ├── certs/                  # (opsional) sertifikat CA kantor untuk model AI via API
 ├── docker/
 │   ├── Dockerfile          # Image resmi + driver semua jenis database (offline)
@@ -154,3 +156,10 @@ D:\superset
 3. **Cadangkan sebelum mengubah apa pun**: `scripts\cadangkan.ps1 -Engine`.
 4. **Uji setelah mengubah apa pun**: `scripts\uji.ps1`.
 5. Prefix **`sps_`** dipakai untuk database, tabel, dan modul tambahan proyek ini.
+
+## Lisensi
+
+ALDx dilisensikan dengan [Apache License 2.0](LICENSE): bebas dipakai, diubah, dan dibagikan ulang, asalkan
+[`LICENSE`](LICENSE) dan [`NOTICE`](NOTICE) ikut disertakan. Komponen pihak ketiga beserta lisensinya, dan
+komponen yang harus diunduh sendiri (Oracle Instant Client, driver SAP HANA, logo instansi):
+[THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).

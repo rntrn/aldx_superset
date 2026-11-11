@@ -44,3 +44,8 @@ dist/
 # Data latihan penerbangan ukuran besar: dibuat sendiri (scripts\data-penerbangan.ps1)
 docs/bahan-ajar/berkas/contoh-penerbangan-besar*
 docs/bahan-ajar/berkas/contoh-penerbangan-[0-9]*
+
+# Berkas pihak ketiga yang lisensinya melarang ikut dibagikan: disimpan lokal saja (THIRD-PARTY-LICENSES.md)
+docker/wheels/hdbcli-*.whl
+branding/logo-djp*.png
+branding/favicon-djp*.png
