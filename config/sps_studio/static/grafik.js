@@ -16,8 +16,8 @@
 "use strict";
 
 (() => {
-  const ABU = "#9AA5B1", TEKS = "#5F6B7A", GARIS = "#E6EBF1", SUMBU = "#D5DCE4";
-  const RUNTUN = ["#EAF1FB", "#7FA3DE", "#2a5bb8", "#1F2F5F"];        // = skema djpBiru di Superset
+  const ABU = "#A1A1AA", TEKS = "#52525B", GARIS = "#E4E4E7", SUMBU = "#D4D4D8";   // abu netral (tema Tinta & Sakura)
+  const RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"];        // = skema aldxRuntun di Superset
   const instans = new Set();
   window.addEventListener("resize", Studio.tunda(() => instans.forEach(c => c.resize()), 120));
 

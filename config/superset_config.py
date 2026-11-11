@@ -32,7 +32,7 @@ from sps_jinja import sps_periode
 from sps_security import SpsSecurityManager
 from sps_server import konfig as sps_server_konfig
 from sps_server.lingkungan import uri_metadata, wajib
-from sps_studio.lembar import RUNTUN as RUNTUN_DJP, SKEMA_RUNTUN, SKEMA_WARNA, WARNA as WARNA_DJP
+from sps_studio.lembar import RUNTUN, SKEMA_LAMA, SKEMA_RUNTUN, SKEMA_WARNA, WARNA
 
 
 # --- 1. Helper ---------------------------------------------------------------
@@ -287,13 +287,18 @@ D3_TIME_FORMAT = {
 }
 
 # Skema warna kategori (sama dengan pratinjau Studio Visual; config/sps_studio/lembar.py).
+# Id lama tetap terdaftar dengan warna baru, agar dashboard versi sebelumnya ikut memakai palet baru.
 EXTRA_CATEGORICAL_COLOR_SCHEMES = [
-    {"id": SKEMA_WARNA, "description": "Palet ALDx (aman buta warna)", "label": "ALDx",
-     "isDefault": True, "colors": WARNA_DJP},
+    {"id": SKEMA_WARNA, "description": "Palet ALDx Tinta & Sakura (aman buta warna)", "label": "ALDx",
+     "isDefault": True, "colors": WARNA},
+    *({"id": lama, "description": "Palet ALDx (id versi sebelumnya)", "label": "ALDx (lama)", "colors": WARNA}
+      for lama, baru in SKEMA_LAMA.items() if baru == SKEMA_WARNA),
 ]
 EXTRA_SEQUENTIAL_COLOR_SCHEMES = [
-    {"id": SKEMA_RUNTUN, "description": "Biru terang ke gelap", "label": "ALDx Biru",
-     "isDiverging": False, "isDefault": True, "colors": RUNTUN_DJP},
+    {"id": SKEMA_RUNTUN, "description": "Pink terang ke gelap", "label": "ALDx Pink",
+     "isDiverging": False, "isDefault": True, "colors": RUNTUN},
+    *({"id": lama, "description": "Palet ALDx (id versi sebelumnya)", "label": "ALDx Pink (lama)",
+       "isDiverging": False, "colors": RUNTUN} for lama, baru in SKEMA_LAMA.items() if baru == SKEMA_RUNTUN),
 ]
 
 # Peta (deck.gl: Peta titik & Peta kepadatan). Ubin peta dasar diambil BROWSER pengguna.

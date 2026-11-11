@@ -165,16 +165,20 @@ def css(n: dict[str, Any], versi: str) -> str:
 
 
 # --- SVG otomatis -----------------------------------------------------------------------------
-def _tanda(p: dict[str, str], putih: bool = False) -> str:
-    """Tanda (mark) 40x40: kotak membulat berisi tiga batang naik + titik aksen.
+# Tanda "Tebasan": huruf A tajam yang condong (ambisi, cepat) dibelah sayatan warna aksen yang naik ke kanan
+# dan menembus bingkai (presisi, tumbuh, futuristik). Geometri pada kisi 40x40, terbaca sampai 16 px.
+_HURUF_A = "M7.5 32.5 L20 10 L32.5 32.5"
+_SAYATAN = "M13 26.6 L39.5 19.9"
 
-    putih=True (untuk latar gelap): kotak putih, batang warna utama.
-    """
-    kotak, isi = ("#FFFFFF", p["utama"]) if putih else (p["utama"], p["teks_utama"])
-    batang = "".join(f'<rect x="{9 + i * 8}" y="{28 - t}" width="5" height="{t + 4}" rx="1.5" fill="{isi}"/>'
-                     for i, t in enumerate((6, 11, 16)))
-    return (f'<rect width="40" height="40" rx="9" fill="{kotak}"/>{batang}'
-            f'<circle cx="31" cy="9" r="3.5" fill="{p["aksen"]}"/>')
+
+def _tanda(p: dict[str, str], putih: bool = False) -> str:
+    """Tanda (mark) 40x40. putih=True (untuk latar gelap): kotak putih, huruf warna utama."""
+    kotak, huruf = ("#FFFFFF", p["utama"]) if putih else (p["utama"], p["teks_utama"])
+    return (f'<rect width="40" height="40" rx="10" fill="{kotak}"/>'
+            f'<path d="{_HURUF_A}" fill="none" stroke="{huruf}" stroke-width="4" stroke-linejoin="miter" '
+            f'stroke-miterlimit="10"/>'
+            f'<path d="{_SAYATAN}" stroke="{kotak}" stroke-width="6.2"/>'          # celah: A tampak terbelah
+            f'<path d="{_SAYATAN}" stroke="{p["aksen"]}" stroke-width="3.4"/>')
 
 
 def svg_logo(n: dict[str, Any], putih: bool = False) -> str:
@@ -184,7 +188,7 @@ def svg_logo(n: dict[str, Any], putih: bool = False) -> str:
     warna = "#FFFFFF" if putih else p["utama"]
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{lebar}" height="40" viewBox="0 0 {lebar} 40" '
             f'role="img" aria-label="{nama}">{_tanda(p, putih)}'
-            f'<text x="50" y="27" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" '
+            f'<text x="50" y="27" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800" letter-spacing="-.3" '
             f'fill="{warna}">{nama}</text></svg>')
 
 
@@ -193,13 +197,12 @@ def svg_favicon(n: dict[str, Any]) -> str:
 
 
 def svg_spinner(n: dict[str, Any]) -> str:
-    """Spinner pemuatan Superset: tiga batang naik-turun bergantian (SVG animasi, tanpa skrip)."""
+    """Spinner pemuatan Superset: huruf A tanda ALDx yang dibelah sayatan aksen berulang (SVG animasi, tanpa skrip)."""
     p = palet(n)
-    batang = []
-    for i, w in enumerate((p["utama"], p["aksen"], p["utama_terang"])):
-        mulai = f"{i * 0.15:.2f}s"
-        batang.append(
-            f'<rect x="{6 + i * 18}" y="14" width="12" height="36" rx="3" fill="{w}">'
-            f'<animate attributeName="height" values="12;36;12" dur="0.9s" begin="{mulai}" repeatCount="indefinite"/>'
-            f'<animate attributeName="y" values="38;14;38" dur="0.9s" begin="{mulai}" repeatCount="indefinite"/></rect>')
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">{"".join(batang)}</svg>'
+    return ('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 40 40">'
+            f'<path d="{_HURUF_A}" fill="none" stroke="{p["utama"]}" stroke-width="4" stroke-linejoin="miter" '
+            'stroke-miterlimit="10" opacity=".9"/>'
+            '<clipPath id="k"><rect width="40" height="40"/></clipPath><g clip-path="url(#k)">'
+            f'<path d="M-30 33 L6 23.6" stroke="{p["aksen"]}" stroke-width="3.4" stroke-linecap="round">'
+            '<animateTransform attributeName="transform" type="translate" values="0 0;66 -17" dur="0.9s" '
+            'calcMode="spline" keySplines=".6 0 .2 1" repeatCount="indefinite"/></path></g></svg>')

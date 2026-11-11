@@ -255,15 +255,16 @@ SKENARIO = [
     ("G11", 4, "Tinggi", "Usulan /hw-engineer & /ahli-ui-ux", "Akun Superadmin; model AI aktif",
      "Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru",
      "Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat"),
-    ("G12", 4, "Sedang", "Preset djp memakai logo ALDx", "Akun Admin",
-     "Identitas & Tema → preset djp → Terapkan; lihat navbar, halaman login, tab browser; lalu preset netral",
-     "Logo ALDx (tanda batang + tulisan ALDx) di latar terang & gelap, favicon ALDx; tidak ada gambar rusak; "
-     "netral mengembalikan logo otomatis"),
+    ("G12", 4, "Sedang", "Logo ALDx \"Tebasan\" & animasi pemuatan", "Akun Admin",
+     "Lihat navbar, halaman login, tab browser; buka dashboard berat; ganti preset ke hijau lalu kembali ke netral",
+     "Logo huruf A dibelah sayatan pink di latar terang & gelap, favicon tajam; pemuatan menampilkan sayatan melesat; "
+     "di preset lain tanda mengikuti warna preset; tidak ada gambar rusak"),
     ("G13", 4, "Sedang", "Tema bawaan Tinta & Sakura", "Akun Admin",
      "Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom "
      "isian login; lalu preset navy",
-     "Panggung login bergradasi hitam → abu dengan semburat pink & motif tinta; tombol utama hitam; fokus & tautan pink; "
-     "teks terbaca (kontras ≥ 4,5:1); navy mengembalikan tampilan lama"),
+     "Login gaya poster: kanvas hitam bertekstur, nama raksasa, garis data pink melesat, panel dipotong sayatan pink; "
+     "tombol hitam berubah pink saat disorot; fokus & tautan pink; nama panjang pindah baris per kata; di ponsel kanvas "
+     "jadi kepala bermiring; navy mengembalikan warna lama"),
 
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",

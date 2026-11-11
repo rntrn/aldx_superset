@@ -28,11 +28,16 @@ from sps_ai import alat
 AGREGAT = ("SUM", "AVG", "COUNT", "COUNT_DISTINCT", "MIN", "MAX")
 BARIS = "__baris__"
 LABEL_BARIS = "Jumlah baris"
-SKEMA_WARNA = "djpWarna"          # didaftarkan di superset_config (EXTRA_CATEGORICAL_COLOR_SCHEMES)
-# Palet kategori DJP: lolos uji buta warna (dataviz validate_palette). Urutan TETAP, jangan diputar.
-WARNA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
-SKEMA_RUNTUN = "djpBiru"           # satu hue terang -> gelap, untuk peta panas
-RUNTUN = ["#EAF1FB", "#7FA3DE", "#2a5bb8", "#1F2F5F"]
+SKEMA_WARNA = "aldxWarna"         # didaftarkan di superset_config (EXTRA_CATEGORICAL_COLOR_SCHEMES)
+# Palet kategori "Tinta & Sakura": pink sebagai warna pertama, lalu batu permata gelap yang elegan.
+# Lolos validator dataviz (terang & gelap #18181B): pisah buta warna ΔE 14, normal ΔE 18,5, kontras >= 3:1.
+# Urutan TETAP (bagian dari keamanan buta warna), jangan diputar.
+WARNA = ["#E11D74", "#5062D8", "#0F9488", "#8B47C9", "#B7791F", "#B03A62", "#2E86C1", "#6B8E23"]
+SKEMA_RUNTUN = "aldxRuntun"        # satu hue (pink) terang -> gelap, untuk peta panas
+RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
+# Versi sebelumnya: id skema tetap didaftarkan (dashboard lama menyimpannya) dan warnanya dipetakan ke palet baru.
+SKEMA_LAMA = {"djpWarna": SKEMA_WARNA, "djpBiru": SKEMA_RUNTUN}
+WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
 
 # Aturan "Tampilkan Saya": kebutuhan tiap jenis tanda. Dikirim apa adanya ke browser.

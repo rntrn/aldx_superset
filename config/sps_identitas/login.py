@@ -7,6 +7,7 @@ Hanya TAMPILAN yang diganti: formulir tetap dikirim ke POST /login/ milik Supers
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 from flask import get_flashed_messages, redirect, render_template_string, request
@@ -36,7 +37,7 @@ def daftarkan(app) -> None:
         lanjut = request.args.get("next", "")
         return render_template_string(
             HTML.read_text(encoding="utf-8"), n=n, p=tema.palet(n), v=app.config["SPS_IDENTITAS_VERSI"],
-            kaki=tema.teks_kaki(n), pesan=pesan, csrf=generate_csrf(),
+            kaki=tema.teks_kaki(n), pesan=pesan, csrf=generate_csrf(), tahun=date.today().year,
             aksi="/login/" + (f"?next={_aman(lanjut)}" if lanjut else ""))
 
 

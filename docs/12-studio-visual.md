@@ -82,8 +82,11 @@ rak terisi otomatis.
 
 ### Warna
 
-Palet kategori 8 warna (`WARNA` di `lembar.py`) lolos uji buta warna dan didaftarkan ke
-Superset sebagai skema **"ALDx"**; peta panas memakai **"ALDx Biru"** (satu hue terang→gelap).
+Palet kategori 8 warna *Tinta & Sakura* (`WARNA` di `lembar.py`): pink `#E11D74` sebagai warna pertama, lalu indigo,
+toska, ungu, emas, anggur, biru baja, zaitun. Lolos validator buta warna (terang & gelap: pisah ΔE 14, kontras ≥ 3:1)
+dan didaftarkan ke Superset sebagai skema **"ALDx"**; peta panas memakai **"ALDx Pink"** (satu hue terang→gelap).
+Dashboard versi sebelumnya ikut berganti: id skema lama tetap terdaftar, dan warna kategori dari palet lama dipetakan
+ke palet baru saat `build-dashboards` / tugas malam (`sps_warna.py`); warna pilihan sendiri tidak diubah.
 Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = hasil di dashboard.
 
 ## 2. Susun dashboard

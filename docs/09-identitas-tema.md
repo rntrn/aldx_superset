@@ -70,7 +70,11 @@ Gradasi **hitam → abu → putih** dengan **semburat pink**, proporsi 60-30-10:
 
 Kontras (WCAG): putih di atas hitam 17,7:1; pink di atas putih 4,5:1 (AA); pink terang di atas hitam 5,5:1.
 Tautan memakai pink hanya bila kontrasnya ≥ 4,5:1 (`tema.warna_tautan()`); preset lain tidak berubah.
-Palet **chart** tetap palet ALDx yang aman buta warna (warna kategori harus mudah dibedakan).
+Palet **chart** ikut tema: pink lebih dulu, lalu batu permata gelap yang tetap aman buta warna ([12 §1](12-studio-visual.md)).
+
+**Logo "Tebasan"**: huruf A tajam yang condong ke depan dibelah sayatan warna aksen yang naik ke kanan dan menembus
+bingkai, melambangkan ambisi, kecepatan, presisi. Tanda yang sama dipakai untuk logo otomatis setiap preset, ikon tab,
+dan animasi pemuatan (sayatan melesat).
 
 Instalasi yang sudah berjalan tidak berubah otomatis: pilih preset **netral** di tab ini untuk memakai tampilan baru,
 atau **navy** untuk kembali ke tampilan lama.
@@ -84,9 +88,11 @@ jadi identitasnya konsisten. Bila bentuk tanda di `tema.py` diubah, buat ulang k
 
 ## 4. Halaman login beranimasi
 
-Halaman `/login/` memakai identitas di atas: panggung warna yang bergerak perlahan, motif hiasan,
-dan contoh grafik "hidup". Keamanan tidak berubah: formulir tetap dikirim ke Superset (LDAP / akun
-lokal, CSRF, batas percobaan). Pesan galat berbahasa Indonesia.
+Halaman `/login/` bergaya **poster editorial ("Poster Tebasan")**: kanvas tinta bertekstur dengan nama aplikasi dalam
+tipografi raksasa (huruf muncul bergantian), garis data tipis yang melesat, lalu panel formulir yang dipotong diagonal
+oleh sayatan warna aksen. Formulir minimal bergaris bawah, tombol dengan sapuan aksen saat disorot. Di ponsel, kanvas
+menjadi kepala bermiring di atas formulir. Semua warna mengikuti preset. Keamanan tidak berubah: formulir tetap
+dikirim ke Superset (LDAP / akun lokal, CSRF, batas percobaan). Pesan galat berbahasa Indonesia.
 
 Bila tampilan bermasalah (mis. browser sangat lama), buka **`/login/?klasik=1`** untuk halaman login bawaan Superset.
 
