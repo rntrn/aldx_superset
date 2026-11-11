@@ -63,7 +63,6 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Bahan ajar per level (rencana sesi, latihan, kuis, kunci jawaban) | [bahan-ajar/](bahan-ajar/README.md) |
 | Pelatihan admin: runbook & simulasi gangguan | [bahan-ajar/modul-runbook-admin.md](bahan-ajar/modul-runbook-admin.md) |
 | Skenario uji (UAT) & lembar isian Excel | [pengujian/](pengujian/README.md) |
-| **Laporan QA** (temuan & urutan perbaikan) | [pengujian/laporan-qa.md](pengujian/laporan-qa.md) |
 
 ## Profil DJP (opsional)
 

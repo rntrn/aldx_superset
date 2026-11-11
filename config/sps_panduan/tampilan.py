@@ -10,6 +10,8 @@ from pathlib import Path
 
 from flask import Blueprint, abort, jsonify, redirect, render_template_string, request, send_from_directory
 
+from sps_panduan.bersih import tanpa_khusus_pengembang
+
 FOLDER = Path(__file__).resolve().parent
 DOCS = Path(os.environ.get("SPS_DOCS_DIR", "/app/docs"))
 AKAR = Path(os.environ.get("SPS_DOCS_AKAR", "/app/docs-akar"))      # CARA-PASANG.md
@@ -153,7 +155,7 @@ def _tautan(html_isi: str, halaman: str) -> str:
 @lru_cache(maxsize=256)
 def _render(jalur: str, diubah: float, halaman: str) -> tuple[str, str, list]:
     import markdown
-    teks = Path(jalur).read_text(encoding="utf-8")
+    teks = tanpa_khusus_pengembang(Path(jalur).read_text(encoding="utf-8"))   # baris khusus pengembang tidak tampil
     md = markdown.Markdown(extensions=["tables", "fenced_code", "sane_lists", "attr_list", "toc"],
                            extension_configs={"toc": {"slugify": _slug, "toc_depth": "2-3"}})
     isi = md.convert(_amankan_placeholder(teks))
@@ -225,7 +227,7 @@ def _indeks_cari() -> list[tuple[str, str, str]]:
         for p, nama in daftar:
             if nama in ("index", "cara-pasang", "catatan-versi") and p.parent == DOCS:
                 continue
-            teks = p.read_text(encoding="utf-8")
+            teks = tanpa_khusus_pengembang(p.read_text(encoding="utf-8"))
             judul = (re.search(r"^#\s+(.+)$", teks, re.M) or [None, nama])[1]
             isi.append((nama[:-6] if nama.endswith("README") else nama, judul, teks))
         _indeks.update(kunci=kunci, isi=isi)

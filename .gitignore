@@ -39,4 +39,3 @@ unins*.exe
 unins*.dat
 docs/node_modules/
 dist/
-.claude/

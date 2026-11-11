@@ -8,7 +8,6 @@ Tiga lapis pengujian, dari yang otomatis sampai uji oleh pengguna.
 | 2. **Uji asap** | 12 skenario manual inti (± 20 menit) | admin server | setelah lapis 1 | skenario bertanda *asap* |
 | 3. **UAT** | 109 skenario per level & area | perwakilan pengguna tiap level | sebelum dipakai pengguna, dan setelah upgrade mayor | [skenario-uji.md](skenario-uji.md), [lembar-uji.xlsx](lembar-uji.xlsx) |
 
-Laporan QA terakhir (installer sampai seluruh menu, UI/UX, keamanan): [laporan-qa.md](laporan-qa.md) (PDF: `docs\pdf\laporan-qa.pdf`).
 
 ## 1. Uji otomatis
 

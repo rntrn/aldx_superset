@@ -8,7 +8,7 @@ Semua perintah dijalankan di folder `D:\superset` server, PowerShell.
 
 | No | Periksa | Cara | Hasil |
 |---|---|---|---|
-| 1.1 | Versi yang diaudit | `git log -1` dicatat di laporan | |
+| 1.1 | Versi yang diaudit | `git log -1` atau tanggal versi installer dicatat di laporan | |
 | 1.2 | Akun uji | 1 Superadmin, 1 Admin, 2 pengguna dari lingkup data berbeda (mis. dua cabang) | |
 | 1.3 | Uji otomatis | `scripts\uji.ps1` → semua LULUS | |
 

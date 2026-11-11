@@ -1,5 +1,6 @@
 # ALDx — Advanced Learning & Data eXperience
 
+
 Platform dashboard & BI **siap pakai untuk perusahaan/instansi mana pun**, berbasis Apache Superset.
 Semua komponen berjalan di **Docker**: web, backgrounder, metadata (PostgreSQL), **ALDx Engine**
 (ClickHouse), cache (Redis), dan gateway. Nama, logo, dan warna bisa diganti kapan saja (white-label).
@@ -57,7 +58,7 @@ Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; da
 Bagian di bawah ini teknis. Pengguna biasa cukup bagian *Memasang* di atas.
 
 ```text
-git clone https://github.com/rntrn/superset-ald.git D:\superset   # akhir baris otomatis benar (.gitattributes)
+git clone <alamat-repo-ALDx> D:\superset                          # akhir baris otomatis benar (.gitattributes)
 D:\superset\PASANG.cmd                                             # atau klik dua kali
 powershell -ExecutionPolicy Bypass -File scripts\uji.ps1           # setelah terpasang: semua LULUS
 ```

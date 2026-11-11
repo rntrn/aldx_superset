@@ -103,7 +103,7 @@ Lupa password? Menu Start › ALDx › **Atur ulang password**: ketik email & pa
 
 Bila hanya punya folder proyek atau ZIP dari GitHub (**Code › Download ZIP**):
 
-1. **Klik kanan** ZIP › **Extract All…** › isi `D:\` › *Extract*. Ganti nama folder hasil (`superset-ald-main`) menjadi **`superset`**.
+1. **Klik kanan** ZIP › **Extract All…** › isi `D:\` › *Extract*. Ganti nama folder hasil (berakhiran `-main`) menjadi **`superset`**.
    Folder dari flashdisk: salin seluruhnya ke `D:\superset`. Jangan di Desktop/OneDrive, nama folder tanpa spasi.
 2. Buka `D:\superset`, **klik dua kali `PASANG.cmd`** (tidak perlu *Run as administrator*). Wizard sama dengan langkah B.5.
 
