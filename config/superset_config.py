@@ -229,6 +229,8 @@ def _pasang_tambahan(app) -> None:
     sps_kueri.daftarkan(app)
     sps_berkas.daftarkan(app)
     sps_filter_global.daftarkan(app)
+    import sps_jejak
+    sps_jejak.daftarkan(app)                # Jejak data (lineage): sumber -> dataset -> chart -> dashboard
     sps_ulasan.daftarkan(app)
     sps_menu.daftarkan(app)
     sps_app.daftarkan(app)

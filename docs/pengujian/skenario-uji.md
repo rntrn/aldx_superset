@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **156 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **157 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -131,6 +131,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | F15 | 3 Admin data | Sedang | Impor Microsoft Access | Berkas .mdb/.accdb (mis. Northwind) | Hubungkan data → Berkas → pilih berkas → centang tabel → Impor | Tabel terbaca dengan contoh isi; kolom foto/lampiran dilewati; dataset terbentuk |
 | F18 | 3 Admin data | Tinggi | Impor data latihan Penerbangan (6 lembar) | berkas bahan-ajar/berkas/contoh-penerbangan-sedang.xlsx | Hubungkan data → Berkas → pilih berkas → centang 6 lembar, awalan terbang → Impor; Kueri Visual: gabung tiket + jadwal + penerbangan + maskapai, jumlahkan harga (status bukan Refund) per maskapai | 6 dataset terbang_*; tiket 150.000 baris; Nusa Air terbesar Rp151,25 miliar, total Rp323,94 miliar (angka kunci: bahan-ajar/berkas/README.md) |
 | F19 | 3 Admin data | Sedang | SAP HANA opsional | Image tanpa hdbcli-*.whl di docker\wheels | Hubungkan data → lihat kartu SAP HANA, arahkan kursor; jalankan scripts\uji.ps1 | Kartu SAP HANA nonaktif dengan petunjuk unduh driver SAP; uji 'driver database & berkas terpasang' LULUS dengan catatan 'opsional belum dipasang: SAP HANA'. Setelah hdbcli ditaruh & init.ps1: kartu aktif |
+| F25 | 3 Admin data | Sedang | Jejak data (lineage) | A10; akun Analis dengan akses terbatas | Data → Jejak data → pilih latihan_penjualan → arahkan kursor ke sebuah dashboard → klik sebuah chart; ulangi sebagai Analis | Empat kolom Sumber/Dataset/Chart/Dashboard terisi; chart pemakai tersorot; klik membuka chart; Analis hanya melihat dataset & chart yang boleh ia akses |
 
 ## G. Pusat Kendali (Level 4)
 

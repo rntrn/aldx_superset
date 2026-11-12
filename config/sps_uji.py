@@ -266,6 +266,21 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"urutan batang salah: {arah}")
                 return f"YoY bulan ke-13 = {yoy[12]:.1f}%; batang mendatar: terbesar di atas"
 
+            @uji("Data", "Jejak data: sumber, chart & dashboard sebuah dataset")
+            def _():
+                import sps_jejak
+                j = sps_jejak.jejak(P)
+                if j["sumber"]["tabel"] != ["latihan_penjualan"] or not j["chart"] or not j["dashboard"]:
+                    raise RuntimeError(f"jejak tidak lengkap: {j['sumber']}, {len(j['chart'])} chart, {len(j['dashboard'])} dashboard")
+                if any(d not in {x["id"] for x in j["dashboard"]} for c in j["chart"] for d in c["dashboard"]):
+                    raise RuntimeError("chart menunjuk dashboard yang tidak terdaftar")
+                sumber = sps_jejak.tabel_sumber("WITH a AS (SELECT * FROM toko.penjualan) SELECT * FROM a JOIN sdm.pegawai p ON 1=1")
+                if sumber != ["sdm.pegawai", "toko.penjualan"] or sps_jejak.tabel_sumber("SELECT {{ x }} FROM") != []:
+                    raise RuntimeError(f"tabel sumber SQL salah: {sumber}")
+                if not any(d["id"] == P and d["chart"] == len(j["chart"]) + j["tersembunyi"] for d in sps_jejak.daftar()):
+                    raise RuntimeError("jumlah chart di daftar tidak cocok")
+                return f"{len(j['chart'])} chart, {len(j['dashboard'])} dashboard; tabel sumber SQL terbaca"
+
             @uji("Studio", "Template dashboard: 3 template menghasilkan lembar kerja yang sah")
             def _():
                 from sps_ai import alat
@@ -462,7 +477,7 @@ def jalankan_semua() -> None:
         if r.status_code != 200:
             raise RuntimeError(r.status_code)
 
-    for url in ("/app/", "/studio/", "/pusat-kendali/", "/asisten/", "/kueri/"):
+    for url in ("/app/", "/studio/", "/pusat-kendali/", "/asisten/", "/kueri/", "/jejak-data/"):
         @uji("Halaman", f"{url} meminta login")
         def _(url=url):
             r = klien.get(url)
