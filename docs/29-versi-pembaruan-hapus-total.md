@@ -11,6 +11,10 @@ berbeda bisa menjalankan versi yang berbeda.
 | **ALDx-Setup.exe** | isi repo **saat exe dibangun** | `installer\setup\buat-installer.ps1` di komputer pengembang, atau GitHub Actions (`setup.yml`) |
 | **ALDx-Setup-Offline.exe** + `.bin` | isi repo + image Docker **saat dibangun** | `installer\setup\buat-installer.ps1 -Offline`, atau GitHub Actions (`setup-offline.yml`) |
 
+**Otomatis:** setiap perubahan di cabang `main` repo `aldx_superset` dibangun GitHub Actions
+(`.github/workflows/rilis.yml`): installer online, pembersih total, dan paket offline diterbitkan ke Releases dalam
+± 30 menit, tanpa komputer pengembang. Judul rilis memuat versinya, catatannya memuat kode commit.
+
 **Unduhan resmi:** halaman **Releases** repo: *ALDx terbaru* (`ALDx-Setup.exe`, `ALDx-HapusTotal.exe`) dan *ALDx offline*
 (`ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-1.bin` + `ALDx-HapusTotal.exe`). Ukuran berkas di Releases dicocokkan dengan
 hasil build sebelum diumumkan.

@@ -1,0 +1,137 @@
+# Membangun & menerbitkan installer ALDx di setiap perubahan cabang main (atau manual: Actions > rilis > Run workflow).
+#
+#   online   (Windows)  ALDx-Setup.exe + ALDx-HapusTotal.exe            -> Releases > "terbaru"
+#   image    (Linux)    image Docker ALDx + PostgreSQL/ClickHouse/Redis/nginx (docker save) + Docker Desktop Installer
+#   offline  (Windows)  ALDx-Setup-Offline.exe + ALDx-Setup-Offline-N.bin -> Releases > "offline" (pasang tanpa internet)
+#
+# Pembangunnya sama dengan di komputer pengembang: installer\setup\buat-installer.ps1 (periksa isi installer:
+# berkas wajib ada, .env/log/perkakas tidak ikut). Versi = VERSI di config/sps_versi_aplikasi.py.
+# Berkas rilis lama baru dihapus SETELAH berkas baru terunggah, jadi Releases tidak pernah kosong.
+name: rilis
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rilis
+  cancel-in-progress: true
+
+jobs:
+  online:
+    runs-on: windows-latest
+    outputs:
+      versi: ${{ steps.bangun.outputs.versi }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pasang Inno Setup bila belum ada
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Bangun ALDx-Setup.exe & ALDx-HapusTotal.exe
+        id: bangun
+        shell: pwsh
+        run: |
+          ./installer/setup/buat-installer.ps1
+          $v = (Select-String -Path config/sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"([\d.]+)"').Matches[0].Groups[1].Value
+          "versi=$v" >> $env:GITHUB_OUTPUT
+          Get-ChildItem installer/setup/Output | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: online
+          path: installer/setup/Output/*.exe
+          retention-days: 14
+
+      - name: Terbitkan ke rilis "terbaru"
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ steps.bangun.outputs.versi }}"; $c = "$env:GITHUB_SHA".Substring(0, 7)
+          $catatan = "ALDx $v (commit $c). Unduh ALDx-Setup.exe, klik dua kali, Next-Next. Memasang di atas versi lama: data & pengaturan tetap. ALDx-HapusTotal.exe = pembersih total. Panduan: CARA-PASANG.md; yang baru: docs/31-catatan-versi.md"
+          gh release view terbaru *> $null
+          if ($LASTEXITCODE -ne 0) { gh release create terbaru --title "ALDx terbaru ($v)" --notes $catatan --latest }
+          else { gh release edit terbaru --title "ALDx terbaru ($v)" --notes $catatan --target $env:GITHUB_SHA }
+          gh release upload terbaru installer/setup/Output/ALDx-Setup.exe installer/setup/Output/ALDx-HapusTotal.exe --clobber
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lapangkan disk runner
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL && df -h /
+
+      - name: Bangun & kumpulkan image (versi dari .env.example)
+        run: |
+          set -eu
+          v() { grep -E "^$1=" .env.example | cut -d= -f2 | tr -d '\r'; }
+          SS=$(v SUPERSET_VERSION)
+          docker build docker --build-arg SUPERSET_VERSION=$SS -t sps-superset:$SS
+          IMG="sps-superset:$SS redis:$(v REDIS_VERSI)-alpine postgres:$(v METADB_VERSI)-alpine clickhouse/clickhouse-server:$(v ENGINE_VERSI) nginx:$(v GATEWAY_VERSI)-alpine"
+          for i in $IMG; do case $i in sps-*) ;; *) docker pull -q $i ;; esac; done
+          mkdir -p offline
+          docker save $IMG | gzip -1 > offline/aldx-images.tar.gz
+          docker image rm $IMG >/dev/null
+          curl -fsSL -o offline/DockerDesktopInstaller.exe "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
+          ls -la offline
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: offline
+          path: offline/
+          compression-level: 0
+          retention-days: 3
+
+  offline:
+    needs: [image, online]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: offline
+          path: offline
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: online
+          path: online
+
+      - name: Pasang Inno Setup bila belum ada
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) { choco install innosetup -y --no-progress }
+
+      - name: Bangun ALDx-Setup-Offline (+ .bin)
+        shell: pwsh
+        run: |
+          ./installer/setup/buat-installer.ps1 -HanyaOffline -PakaiImageAda
+          Copy-Item online/ALDx-HapusTotal.exe installer/setup/Output/
+          Get-ChildItem installer/setup/Output | Format-Table Name, Length
+          if (-not (Get-ChildItem installer/setup/Output/ALDx-Setup-Offline-*.bin)) { throw "Berkas .bin tidak terbentuk: paket offline tidak lengkap." }
+
+      - name: Terbitkan ke rilis "offline"
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ needs.online.outputs.versi }}"; $c = "$env:GITHUB_SHA".Substring(0, 7)
+          $catatan = "ALDx offline $v (commit $c): pasang TANPA internet. Unduh SEMUA berkas (ALDx-Setup-Offline.exe dan semua ALDx-Setup-Offline-*.bin) ke SATU folder, lalu klik dua kali ALDx-Setup-Offline.exe. Termasuk Docker Desktop Installer (butuh hak admin). Panduan: CARA-PASANG.md"
+          gh release view offline *> $null
+          if ($LASTEXITCODE -ne 0) { gh release create offline --title "ALDx offline ($v)" --notes $catatan --latest=false }
+          else { gh release edit offline --title "ALDx offline ($v)" --notes $catatan --target $env:GITHUB_SHA }
+          $baru = Get-ChildItem installer/setup/Output/*
+          gh release upload offline $baru.FullName --clobber
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          # Berkas lama yang tidak ada lagi di rilis ini (mis. .bin ke-2 dari versi sebelumnya) dihapus setelah unggahan berhasil.
+          gh release view offline --json assets --jq '.assets[].name' | Where-Object { $_ -notin $baru.Name } | ForEach-Object { gh release delete-asset offline $_ -y }
