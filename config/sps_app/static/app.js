@@ -22,6 +22,7 @@
     {id: "beranda", grup: "", label: "Beranda", ikon: "rumah", alamat: "beranda"},
     {id: "hubungkan", grup: "Data", label: "Hubungkan data", ikon: "sambung", alamat: "/pusat-kendali/?tab=hubungkan", izin: "Hubungkan data", langkah: 1, admin: true, cocok: /^\/(pusat-kendali\/\?tab=hubungkan|databaseview)/},
     {id: "dataset", grup: "Data", label: "Dataset", ikon: "tabel", alamat: "/tablemodelview/list/", izin: "Datasets", langkah: 1, cocok: /^\/tablemodelview/},
+    {id: "jejak", grup: "Data", label: "Jejak data", ikon: "telusur", alamat: "/jejak-data/", izin: "Datasets", tetap: true, cocok: /^\/jejak-data/},
     {id: "prep", grup: "Data", label: "Persiapan data", ikon: "siapkan", alamat: "/studio/?tab=prep", izin: "Persiapan data", langkah: 2},
     {id: "ekstrak", grup: "Data", label: "Ekstrak ke ALDx Engine", ikon: "ekstrak", alamat: "/pusat-kendali/?tab=ekstrak", izin: "Ekstrak data", admin: true},
     {id: "kueri", grup: "Kueri", label: "Kueri Visual", ikon: "kueri", alamat: "/kueri/", izin: "Kueri Visual", cocok: /^\/kueri/},
@@ -32,9 +33,9 @@
     {id: "dashboard", grup: "Dashboard & Story", label: "Daftar dashboard", ikon: "dashboard", alamat: "/dashboard/list/", izin: "Dashboards",
      langkah: 4, cocok: /^\/(dashboard\/list|superset\/dashboard)/},
     {id: "story", grup: "Dashboard & Story", label: "Story", ikon: "story", alamat: "/asisten/?tab=story", izin: "Story", langkah: 5},
-    {id: "langganan", grup: "Dashboard & Story", label: "Langganan laporan", ikon: "riwayat", alamat: "/report/list/", izin: "Alerts & Report",
+    {id: "langganan", grup: "Dashboard & Story", label: "Langganan laporan", ikon: "riwayat", alamat: "/report/list/", izin: "Alerts & Report", tetap: true,
      cocok: /^\/report\//},
-    {id: "peringatan", grup: "Dashboard & Story", label: "Peringatan data", ikon: "riwayat", alamat: "/alert/list/", izin: "Alerts & Report",
+    {id: "peringatan", grup: "Dashboard & Story", label: "Peringatan data", ikon: "riwayat", alamat: "/alert/list/", izin: "Alerts & Report", tetap: true,   // tetap: alamat sendiri, bukan alamat menu Superset untuk izin itu
      cocok: /^\/alert\//},
     {id: "berkas", grup: "Dashboard & Story", label: "Berkas .ald / .aldx", ikon: "simpan", alamat: "/berkas/", izin: "Berkas ALDx", cocok: /^\/berkas/},
     {id: "sematkan", grup: "Dashboard & Story", label: "Sematkan ke web lain", ikon: "sambung", alamat: "/sematkan/", izin: "Sematkan", admin: true, cocok: /^\/sematkan\/?$/},
@@ -102,7 +103,7 @@
       if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;      // buka di tab baru: biarkan
       e.preventDefault();
       const n = NAV.find(x => x.id === a.dataset.rute);
-      buka(n.alamat === "beranda" ? "beranda" : (urlMenu[n.izin] && !n.alamat.includes("?") ? urlMenu[n.izin] : n.alamat));
+      buka(n.alamat === "beranda" ? "beranda" : (urlMenu[n.izin] && !n.alamat.includes("?") && !n.tetap ? urlMenu[n.izin] : n.alamat));
       document.body.classList.remove("laci-nav");
     }));
   }

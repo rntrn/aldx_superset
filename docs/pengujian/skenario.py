@@ -411,6 +411,10 @@ SKENARIO = [
      "Telusuri → klik 'Elektronik saja'; login akun lain; hapus dengan ×",
      "Dashboard terbuka tersaring Elektronik; tampilan tidak terlihat di akun lain; × menghapus; tanpa filter aktif "
      "kotak simpan tidak muncul"),
+    ("F25", 3, "Sedang", "Jejak data (lineage)", "A10; akun Analis dengan akses terbatas",
+     "Data → Jejak data → pilih latihan_penjualan → arahkan kursor ke sebuah dashboard → klik sebuah chart; ulangi sebagai Analis",
+     "Empat kolom Sumber/Dataset/Chart/Dashboard terisi; chart pemakai tersorot; klik membuka chart; Analis hanya melihat "
+     "dataset & chart yang boleh ia akses"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",

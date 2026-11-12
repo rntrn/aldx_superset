@@ -135,6 +135,7 @@ CANGKANG = [
     ('Lihat sebagai…', 'View as…', '別ユーザーとして表示…'),
     ('Langganan laporan', 'Report subscriptions', 'レポート配信'),
     ('Peringatan data', 'Data alerts', 'データアラート'),
+    ('Jejak data', 'Data lineage', 'データリネージ'),
     ('Tampilan tersimpan', 'Saved views', '保存したビュー'),
     ('Simpan tampilan ini', 'Save this view', 'このビューを保存'),
     ('Nama tampilan, mis. Elektronik Jawa', 'View name, e.g. Electronics Java', 'ビュー名（例：家電 ジャワ）'),

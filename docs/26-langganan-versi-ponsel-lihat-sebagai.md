@@ -101,7 +101,23 @@ Di Kueri Visual, isi nama lalu **Simpan kueri**: susunan kueri (tabel, gabung, k
 akun Anda. Buka lagi dari daftar **Kueri tersimpan…** di kiri atas, ubah, lalu simpan dengan nama yang sama untuk
 menimpa. Data selalu diambil sesuai hak akses orang yang membuka.
 
-## 7. Untuk pengembang
+## 7. Jejak data (lineage)
+
+Menu **Data › Jejak data**: pilih dataset → empat kolom **Sumber → Dataset → Chart → Dashboard**.
+Pakai sebelum mengubah atau menghapus dataset/kolom, untuk tahu chart dan dashboard mana yang terdampak.
+
+| Yang tampil | Penjelasan |
+|---|---|
+| Sumber | database, skema, dan tabel. Untuk dataset virtual (SQL): tabel-tabel yang dibaca SQL itu |
+| Dataset | fisik/virtual, jumlah kolom & metrik, pemilik, terakhir diubah |
+| Chart | semua chart dari dataset itu dan berapa dashboard yang memakainya |
+| Dashboard | dashboard yang memuat chart tersebut (terbit/draf) |
+| Sorot | arahkan kursor ke chart → dashboard pemakainya tersorot, dan sebaliknya |
+| Hak akses | hanya objek yang boleh Anda buka; chart orang lain dihitung "tersembunyi" tanpa nama |
+
+Hanya membaca; tidak mengubah apa pun. Kode: `config/sps_jejak.py`, `config/sps_jejak.html`.
+
+## 8. Untuk pengembang
 
 | Berkas | Isi |
 |---|---|

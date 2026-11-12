@@ -35,6 +35,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | Kalkulasi cepat **% vs tahun lalu (YoY)**; batang mendatar tersimpan kini terbesar di atas (sama dengan pratinjau) | [12](12-studio-visual.md) |
 | Dashboard | **Tampilan tersimpan** (bookmark): simpan keadaan filter dengan nama, buka lagi satu klik | [25 §2c](25-berkas-filter-global-ulasan.md) |
 | Dashboard | Menu **Peringatan data**: email bila angka melewati ambang | [26 §1b](26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
 | Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |
@@ -57,7 +58,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **74/74 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **76/76 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

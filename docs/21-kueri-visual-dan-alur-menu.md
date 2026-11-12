@@ -10,10 +10,10 @@ tercakup menu lain dipindah ke **Settings** untuk admin.
 
 | Menu | Isi | Untuk |
 |---|---|---|
-| **Data** | Hubungkan data · Dataset · Persiapan data · Ekstrak ke ALDx Engine | menyambung sumber, membuat & membersihkan dataset |
+| **Data** | Hubungkan data · Dataset · Jejak data · Persiapan data · Ekstrak ke ALDx Engine | menyambung sumber, membuat & membersihkan dataset |
 | **Kueri** | **Kueri Visual** (tanpa SQL) · SQL Lab · Kueri tersimpan | mengambil & menggabung tabel |
 | **Visual** (+ **Asisten**) | Studio Visual · Daftar chart · Asisten AI | membuat chart & analisis |
-| **Dashboard & Story** | Daftar dashboard · Story | melihat, menyusun & membagikan |
+| **Dashboard & Story** | Daftar dashboard · Story · Langganan laporan · Peringatan data | melihat, menyusun & membagikan |
 | **Settings** (kanan, admin) | Keamanan; Kelola: Pusat Kendali Server, Koneksi database (lanjutan), Riwayat kueri, … | pengelolaan |
 
 ![Menu Data](gambar/kueri/menu-data.png)
