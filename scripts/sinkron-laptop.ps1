@@ -140,6 +140,9 @@ Jalankan "git pull gagal" { git pull --ff-only origin $Cabang } "riwayat lokal b
 $sesudah = (git rev-parse --short HEAD)
 if ($sebelum -eq $sesudah) { Ok "sudah versi terbaru ($sesudah)" } else { Ok "diperbarui $sebelum -> $sesudah" }
 git log -1 --format="    ..  %h %s (%cd)" --date=short
+# Kode terpasang untuk Beranda (config/versi.json, tidak di-commit): "v2026.11.12 - a1b2c3d".
+$json = '{"commit": "' + (git rev-parse --short=12 HEAD) + '", "tanggal": "' + (git log -1 --format=%cs) + '"}'
+[IO.File]::WriteAllText("$Akar\config\versi.json", $json, (New-Object Text.UTF8Encoding $false))
 if (-not (Test-Path "$Akar\docs\31-catatan-versi.md")) {
     Write-Host "    !!  docs\31-catatan-versi.md tidak ada: perubahan terbaru belum di-merge ke $Cabang (PR masih terbuka?)." -ForegroundColor Yellow
 }

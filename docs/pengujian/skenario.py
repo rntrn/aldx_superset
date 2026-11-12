@@ -40,6 +40,10 @@ SKENARIO = [
      "Semua langkah selesai; halaman Selesai menampilkan alamat; browser membuka halaman login"),
     ("A02", 4, "Tinggi/asap", "Uji otomatis", "A01",
      "Jalankan scripts\\uji.ps1", "55/55 LULUS, kode keluar 0"),
+    ("A02b", 4, "Sedang", "Versi tampil & status pembaruan", "A01; komputer dengan internet",
+     "Buka /login/ (lihat kaki halaman); login → gulir ke bawah Beranda",
+     "Login menulis vYYYY.MM.DD; Beranda menulis ALDx vYYYY.MM.DD (+ kode commit bila dipasang dengan git) dan "
+     "'✓ Versi terbaru' atau 'Pembaruan tersedia' dengan tautan Unduh installer; tanpa internet tertulis 'Tidak bisa dicek'"),
     ("A03", 4, "Tinggi", "Pemeriksaan prasyarat menolak kondisi tidak layak", "Docker Desktop DIMATIKAN",
      "Jalankan PASANG.cmd", "Baris 'Docker Desktop menyala' GAGAL, tombol Lanjut nonaktif; setelah Docker dinyalakan & Periksa ulang: OK"),
     ("A04", 4, "Tinggi", "Pindah metadata lama ke PostgreSQL", "Instalasi lama (MYSQL_HOST=host.docker.internal + XAMPP menyala, atau MariaDB)",

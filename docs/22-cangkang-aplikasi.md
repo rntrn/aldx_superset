@@ -11,6 +11,7 @@ tampil di dalamnya. Navigasi, judul, pencarian, bantuan, dan bahasa sama di semu
 | Prinsip | Wujud di ALDx |
 |---|---|
 | Mulai dari pertanyaan | Beranda dibuka dengan kotak **Cari / Tanya AI** |
+| Tahu versi | bawah Beranda: versi terpasang & status **Versi terbaru / Pembaruan tersedia** (juga tertulis di halaman login). Rinci: [29](29-versi-pembaruan-hapus-total.md) |
 | Tunjukkan langkah berikutnya | Kartu **Bangun laporan** berisi jumlah & sorotan *Langkah berikutnya* |
 | Bantuan di tempat kerja | **Panel Asisten AI** (`Ctrl + I`) dengan peran ahli, lihat [23](23-asisten-ai-peran-ahli.md) |
 | Satu pilihan, semua laporan | Filter global dashboard & story ([25](25-berkas-filter-global-ulasan.md)) |

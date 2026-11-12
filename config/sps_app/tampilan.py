@@ -48,6 +48,17 @@ def bahasa_aktif() -> str:
     return terbaik or "id"
 
 
+@bp.route("/api/versi")
+def api_versi():
+    """Versi terpasang + versi terbaru di GitHub (Beranda). Login wajib."""
+    from flask import jsonify
+    from flask_login import current_user
+    import sps_versi_aplikasi as versi_app
+    if not current_user.is_authenticated:
+        return jsonify(error="Belum login"), 401
+    return jsonify({**versi_app.info(), "terbaru": versi_app.terbaru(request.args.get("segar") == "1")})
+
+
 @bp.route("/")
 def cangkang():
     from flask_login import current_user

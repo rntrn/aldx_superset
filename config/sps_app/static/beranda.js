@@ -109,7 +109,8 @@
           <div class="daftar" id="terakhir"><div class="kerangka-muat"></div><div class="kerangka-muat"></div><div class="kerangka-muat"></div></div></section>
         <section><div class="judul-bagian"><h2>${esc(t("Dashboard"))}</h2><a href="#" id="semuaDashboard">${esc(t("Lihat semua"))} →</a></div>
           <div class="daftar" id="dashboardBeranda"><div class="kerangka-muat"></div><div class="kerangka-muat"></div></div></section>
-      </div></div>`;
+      </div>
+      <footer class="versi-beranda" id="versiBeranda"></footer></div>`;
     $("#formTanya").onsubmit = e => { e.preventDefault(); cari($("#masukanTanya").value); };
     if (ai) $("#tombolAi").onclick = () => SPS.ai.tanya($("#masukanTanya").value.trim());
     $("#semuaDashboard").onclick = e => { e.preventDefault(); SPS.buka("/dashboard/list/"); };
@@ -162,6 +163,19 @@
       : `<div class="kosong">${esc(t("Belum ada dashboard."))}</div>`;
     pasangTautan("#dashboardBeranda");
   }
+  // Versi terpasang & status pembaruan (sps_versi_aplikasi.py). Gagal/tanpa internet = hanya versi terpasang.
+  async function isiVersi() {
+    const el = $("#versiBeranda");
+    const v = await ambil("/app/api/versi");
+    if (!el || !v) return;
+    const tr = v.terbaru || {}, admin = window.SPS_AWAL.pengguna.admin;
+    const status = tr.versi ? (tr.lebih_baru
+        ? `<span class="status-versi baru">${esc(t("Pembaruan tersedia"))}: v${esc(tr.versi)}</span>` +
+          (admin ? ` <a href="${esc(tr.url)}" target="_blank" rel="noopener">${esc(t("Unduh installer"))}</a> · <a href="${esc(tr.catatan)}" target="_blank" rel="noopener">${esc(t("Apa yang baru"))}</a>` : "")
+        : `<span class="status-versi ok">✓ ${esc(t("Versi terbaru"))}</span>`)
+      : `<span class="status-versi">${esc(t(tr.pesan || ""))}</span>`;
+    el.innerHTML = `ALDx <b>v${esc(v.versi)}</b>${v.commit ? ` · <code title="${esc(t("Kode terpasang"))}${v.tanggal ? " " + esc(v.tanggal) : ""}">${esc(v.commit.slice(0, 7))}</code>` : ""} · ${status}`;
+  }
   function pasangTautan(sel) {
     document.querySelectorAll(`${sel} [data-alamat]`).forEach(a => a.onclick = e => { e.preventDefault(); SPS.buka(a.dataset.alamat); });
   }
@@ -169,7 +183,7 @@
   SPS.beranda = {
     tampil() {
       if (!sudahDigambar) { kerangka(); sudahDigambar = true; }
-      isiPersiapan(); isiAngka(); isiTerakhir(); isiDashboard();
+      isiPersiapan(); isiAngka(); isiTerakhir(); isiDashboard(); isiVersi();
     },
   };
 })();

@@ -47,3 +47,6 @@ docs/bahan-ajar/berkas/contoh-penerbangan-[0-9]*
 
 # Berkas pihak ketiga yang lisensinya melarang ikut dibagikan: disimpan lokal saja (THIRD-PARTY-LICENSES.md)
 docker/wheels/hdbcli-*.whl
+
+# Versi kode terpasang (ditulis scripts\sinkron-laptop.ps1, dibaca Beranda)
+config/versi.json
