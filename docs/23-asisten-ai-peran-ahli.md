@@ -10,6 +10,7 @@ sesuai pekerjaan: analis data, pemandu aplikasi, data engineer, ahli UI/UX, atau
 | Cara | Keterangan |
 |---|---|
 | Tombol **✦** di bilah atas | muncul bila Anda boleh memakai Asisten AI. Belum ada model aktif? Panel menampilkan layar **Sambungkan AI** ([28](28-sambungkan-asisten-ai.md)) |
+| Tombol cepat di dashboard | saat sebuah dashboard terbuka, panel menawarkan **Ringkas dashboard ini dalam 5 poin** dan *Apa yang janggal atau perlu ditindaklanjuti…*: satu klik, jawaban memakai isi dashboard yang sedang tampil |
 | Ikon **sambung** (🔗) di kepala panel | buka layar Sambungkan AI: status model lokal, key cloud (Admin) |
 | `Ctrl + I` | buka / tutup panel (juga saat kursor ada di dalam halaman) |
 | Beranda › **Tanya AI** | pertanyaan dari kotak Cari langsung dikirim ke panel |

@@ -29,6 +29,10 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | **+ Ukuran / + Dimensi**: definisikan ukuran (rumus agregat) & dimensi (rumus per baris) seperti *measure / column* Power BI, dengan uji rumus | [12](12-studio-visual.md#ukuran--dimensi-terdefinisi-seperti-new-measure--new-column-power-bi) |
 | Dashboard | **Telusuri ke dashboard lain** (drill-through): filter & klik-filter aktif dibawa ke dashboard lain | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Studio | **N teratas** (Top N) | [12](12-studio-visual.md#n-teratas-top-n) |
+| Studio | **Kalkulasi cepat**: *% dari total* & *Kumulatif* (pilihan **Hitung**), ikut tersimpan ke chart | [12](12-studio-visual.md#kalkulasi-cepat--dari-total--kumulatif) |
+| Studio | **Skala warna sel** pada Tabel; **Kelompokkan nilai…** (klik kanan dimensi → kelompok bernama tanpa menulis rumus) | [12](12-studio-visual.md#skala-warna-tabel) |
+| Dashboard | **Dari template…**: Ringkasan eksekutif, Tren & ramalan, Perbandingan kategori; kolom dipilih otomatis, kanvas & filter terisi | [12 §2](12-studio-visual.md#2-susun-dashboard) |
+| Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
 | Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Versi | Versi terpasang tampil di **halaman login** & **Beranda**, dengan status *Versi terbaru* / *Pembaruan tersedia* (dicek ke GitHub) | [29](29-versi-pembaruan-hapus-total.md) |
@@ -50,7 +54,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **71/71 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **73/73 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

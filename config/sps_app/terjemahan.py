@@ -20,6 +20,9 @@ from pathlib import Path
 # --- Cangkang: navigasi, beranda, palet, bantuan -----------------------------------------------------
 CANGKANG = [
     ('Beranda', 'Home', 'ホーム'),
+    ('Ringkas dashboard ini dalam 5 poin', 'Summarize this dashboard in 5 points', 'このダッシュボードを5点で要約'),
+    ('Apa yang janggal atau perlu ditindaklanjuti di dashboard ini?', 'What looks unusual or needs follow-up on this dashboard?',
+     'このダッシュボードで異常な点や対応が必要な点は？'),
     ('Data', 'Data', 'データ'),
     ('Kueri', 'Query', 'クエリ'),
     ('Visual', 'Visual', 'ビジュアル'),

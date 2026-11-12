@@ -41,6 +41,7 @@ RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
 # Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
 WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
+KALKULASI = ("persen_total", "kumulatif")       # kalkulasi cepat; dihitung di sini & lewat fitur bawaan chart Superset
 
 from sps_studio.aturan import ATURAN_TANDA  # noqa: E402,F401  (dipakai juga sebagai lembar.ATURAN_TANDA)
 
@@ -93,6 +94,8 @@ class Lembar:
     batas: int = 1000
     analitik: dict = field(default_factory=dict)
     diabaikan: list[str] = field(default_factory=list)   # kolom di rak yang tidak dipakai jenis tanda ini
+    kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" (kalkulasi cepat ala Tableau)
+    skala_warna: bool = False         # tabel: latar sel makin pekat untuk nilai makin besar
 
     # --- Turunan --------------------------------------------------------------------
     @property
@@ -115,6 +118,11 @@ class Lembar:
                 and any(v not in (0, False, None) for v in a.values()))
 
     @property
+    def pakai_kalkulasi(self) -> bool:
+        """Kalkulasi cepat hanya untuk Garis/Area/Batang dengan tepat satu dimensi (satu deret per ukuran)."""
+        return self.kalkulasi in KALKULASI and self.tanda in TANDA_ANALITIK and len(self.dimensi) == 1
+
+    @property
     def dim_baris(self) -> list[Pil]:
         """Dimensi di rak Baris -> baris tabel pivot (sisanya jadi kolom)."""
         return _unik([p for p in self.baris if p.peran == "dimensi"])
@@ -133,7 +141,8 @@ class Lembar:
         return {"dataset_id": self.dataset_id, "judul": self.judul, "tanda": self.tanda,
                 "kolom": [pil(p) for p in self.kolom], "baris": [pil(p) for p in self.baris],
                 "warna": pil(self.warna), "ukuran": pil(self.ukuran), "label": self.label,
-                "filter": self.filter, "urut": self.urut, "batas": self.batas, "analitik": self.analitik}
+                "filter": self.filter, "urut": self.urut, "batas": self.batas, "analitik": self.analitik,
+                "kalkulasi": self.kalkulasi, "skala_warna": self.skala_warna}
 
 
 def _unik(pils: list[Pil]) -> list[Pil]:
@@ -180,7 +189,9 @@ def dari_dict(d: dict) -> tuple[Any, Lembar]:
         warna=_pil(t, d.get("warna")), ukuran=_pil(t, d.get("ukuran")),
         label=bool(d.get("label")), filter=list(d.get("filter") or []),
         urut=str(d.get("urut") or ""), batas=max(1, min(int(d.get("batas") or 1000), 10000)),
-        analitik=_analitik(d.get("analitik")))
+        analitik=_analitik(d.get("analitik")),
+        kalkulasi=str(d.get("kalkulasi") or "") if d.get("kalkulasi") in KALKULASI else "",
+        skala_warna=bool(d.get("skala_warna")))
     pangkas(t, lembar)
     return t, lembar
 
@@ -269,13 +280,39 @@ def jalankan(t, lembar: Lembar) -> dict:
         orderby = [[lembar.dimensi[0].field, False]]
     hasil = alat.jalankan_objek(t, metrics, [p.field for p in lembar.dimensi], _filter(t, lembar),
                                 orderby, lembar.batas)
+    if lembar.pakai_kalkulasi:
+        hasil["baris"] = _kalkulasi(hasil["baris"], lembar.dimensi[0].label, [p.label for p in lembar.ukuran_semua],
+                                    lembar.kalkulasi, _kolom_waktu(t, lembar.dimensi[0].field))
     analitik = (prediksi.analisis(hasil["baris"], lembar.dimensi[0].label,
                                   [p.label for p in lembar.ukuran_semua], lembar.analitik)
                 if lembar.pakai_analitik else None)
     return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"],
             "dimensi": [p.label for p in lembar.dimensi], "ukuran": [p.label for p in lembar.ukuran_semua],
             "dim_baris": [p.label for p in lembar.dim_baris], "diabaikan": lembar.diabaikan,
+            "kalkulasi": lembar.kalkulasi if lembar.pakai_kalkulasi else "",
             "geo": {p.label: peran_geo(p.field) for p in lembar.dimensi if peran_geo(p.field)}}
+
+
+def _kalkulasi(baris: list[dict], dim: str, ukuran: list[str], jenis: str, waktu: bool) -> list[dict]:
+    """% dari total (0-100) atau kumulatif per ukuran. Kumulatif pada kolom waktu dihitung urut waktu;
+    pada kategori mengikuti urutan tampil (terbesar dulu = kurva Pareto)."""
+    from sps_studio import prediksi
+    baris = [dict(b) for b in baris]
+    if jenis == "kumulatif" and waktu:
+        baris.sort(key=lambda b: prediksi.kunci_urut(b.get(dim)))
+    for u in ukuran:
+        nilai = [float(b[u]) if isinstance(b.get(u), (int, float)) else 0.0 for b in baris]
+        if jenis == "persen_total":
+            total = sum(nilai) or 1.0
+            hasil = [v / total * 100 for v in nilai]
+        else:
+            jalan, hasil = 0.0, []
+            for v in nilai:
+                jalan += v
+                hasil.append(jalan)
+        for b, v in zip(baris, hasil):
+            b[u] = v
+    return baris
 
 
 def nilai_unik(t, kolom: str, batas: int = 300) -> list:
@@ -312,7 +349,10 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     elif tanda == "tabel":
         if M:
             p.update(query_mode="aggregate", groupby=D, metrics=M, order_desc=True,
-                     show_cell_bars=True, server_page_length=25)
+                     show_cell_bars=not lembar.skala_warna, server_page_length=25)
+            if lembar.skala_warna:      # operator "None" = gradasi dari nilai terkecil ke terbesar
+                p["conditional_formatting"] = [{"column": u.label, "operator": "None", "colorScheme": WARNA[0]}
+                                               for u in lembar.ukuran_semua]
         else:
             p.update(query_mode="raw", all_columns=D, server_page_length=25)
     elif tanda in ("batang", "garis", "area"):
@@ -323,6 +363,11 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                  y_axis_format="SMART_NUMBER", show_legend=len(M) > 1 or len(D) > 1,
                  show_value=lembar.label, truncateXAxis=True, rich_tooltip=True,
                  x_axis_sort_asc=lembar.urut != "turun")
+        if lembar.pakai_kalkulasi:       # padanan bawaan Superset agar chart tersimpan = pratinjau Studio
+            if lembar.kalkulasi == "persen_total":
+                p.update(contributionMode="column", y_axis_format=".1%")
+            else:
+                p.update(rolling_type="cumsum")
         if tanda == "batang":
             p["orientation"] = "horizontal" if lembar.horizontal else "vertical"
         if len(D) > 1 and tanda in ("batang", "area"):        # warna = dimensi -> bertumpuk

@@ -71,10 +71,23 @@ $("#latar").addEventListener("click", e => { if (e.target.id === "latar") Studio
 document.addEventListener("keydown", e => { if (e.key === "Escape") { Studio.tutupDialog(); Studio.tutupMenu(); } });
 
 /* ---------- Tabel data sederhana ---------- */
-Studio.tabelHtml = (kolom, baris, maks = 500) =>
-  `<table class="data"><tr>${kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr>` +
-  baris.slice(0, maks).map(b => "<tr>" + kolom.map(k => angka(b[k])
-    ? `<td class="n">${fmtPenuh.format(b[k])}</td>` : `<td>${esc(b[k])}</td>`).join("") + "</tr>").join("") + "</table>";
+// skala = daftar kolom ukuran yang selnya diberi latar makin pekat untuk nilai makin besar (skala warna tabel).
+Studio.tabelHtml = (kolom, baris, maks = 500, skala = null) => {
+  const tampil = baris.slice(0, maks), rentang = {};
+  (skala || []).forEach(k => {
+    const v = tampil.map(b => b[k]).filter(angka);
+    if (v.length) rentang[k] = [Math.min(...v), Math.max(...v)];
+  });
+  const latar = (k, v) => {
+    const r = rentang[k];
+    if (!r || !angka(v)) return "";
+    const a = r[1] === r[0] ? 0.4 : 0.06 + 0.5 * (v - r[0]) / (r[1] - r[0]);
+    return ` style="background:rgba(225,29,116,${a.toFixed(3)})"`;
+  };
+  return `<table class="data"><tr>${kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr>` +
+    tampil.map(b => "<tr>" + kolom.map(k => angka(b[k])
+      ? `<td class="n"${latar(k, b[k])}>${fmtPenuh.format(b[k])}</td>` : `<td>${esc(b[k])}</td>`).join("") + "</tr>").join("") + "</table>";
+};
 
 /* ---------- Tab ---------- */
 $$("nav.tab button").forEach(b => b.onclick = () => {

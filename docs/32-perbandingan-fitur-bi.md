@@ -24,7 +24,9 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Langganan laporan, riwayat versi, tata letak ponsel | semua | ✅ | [26](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Story / presentasi berurutan | Tableau | ✅ | Story |
 | Parameter *what-if* (geser angka, chart ikut berubah) | Power BI, Tableau | ⏳ | lihat §2 |
-| Kalkulasi tabel cepat (% dari total, kumulatif, YoY) | Tableau | ⏳ | lihat §2 |
+| **Kalkulasi cepat** (% dari total, kumulatif) | Tableau | 🆕 | Studio › **Hitung**; YoY: ⏳ lihat §2 |
+| **Template dashboard** (*Quick create*) | Power BI, Tableau | 🆕 | Susun dashboard › **Dari template…** |
+| **Kelompokkan nilai** (*Group*) & skala warna tabel | Tableau, Power BI | 🆕 | Studio: klik kanan dimensi; Tabel › *Skala warna sel* |
 | Peringatan data (*data alerts*) saat angka melewati ambang | Power BI, Looker | ⏳ | lihat §2 |
 | *Bookmark* (simpan keadaan filter bernama) | Power BI | ⏳ | sebagian tertutup filter global per akun |
 | Tabel input (ketik data langsung ke gudang) | Sigma | ✖ | menulis ke database sumber berisiko; pakai impor Excel/CSV |
@@ -35,7 +37,7 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Kandidat | Nilai | Risiko / keterkaitan | Rencana aman |
 |---|---|---|---|
 | Parameter *what-if* | simulasi (mis. kenaikan harga 5%) | rumus ukuran harus menerima nilai dari pengguna → perlu templat Jinja, yang membuat dataset **tidak bisa diekstrak** dan cache per nilai | batasi ke Studio (dihitung di browser atas hasil kueri), tidak menyentuh dataset |
-| % dari total, kumulatif, YoY | sangat sering dipakai | butuh fungsi jendela; hasil berbeda per database sumber (Oracle 11g, MySQL lama) | hitung di server setelah kueri (seperti Analitik), bukan di SQL |
+| YoY / perubahan % dari periode lalu | sangat sering dipakai | perlu tahu butir waktu (bulan vs hari) & periode yang bolong; % dari total & kumulatif **sudah ada** | hitung di server setelah kueri, sama seperti kalkulasi cepat lain |
 | Peringatan data | pemantauan otomatis | memakai penjadwal & email yang sama dengan Langganan laporan; salah ambang = banjir email | tumpangkan pada Langganan laporan dengan batas 1 email per hari |
 | Bookmark | berbagi tampilan tersaring | bentrok dengan filter global & `native_filters_key` Superset | simpan sebagai tautan bernama per dashboard |
 

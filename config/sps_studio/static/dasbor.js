@@ -328,6 +328,42 @@
     $("#judulDasbor").value = ""; $("#ketDasbor").value = ""; $("#tautanDasbor").innerHTML = ""; $("#bukaDasbor").value = "";
     renderKanvas();
   }
+  // Template: server membuat lembar kerja dari dataset (sps_studio/templat.py), kanvas diisi, pengguna tinggal Simpan.
+  function dialogTemplat() {
+    const T = Studio.awal.templat || {};
+    Studio.dialog({judul: "Dashboard dari template", ok: "Buat", isi: `
+      <label>Dataset<select id="tpDs">${Studio.awal.dataset.map(d => `<option value="${d.id}">${esc(d.nama)}</option>`).join("")}</select></label>
+      <label style="display:block;margin-top:8px">Ukuran utama<select id="tpUkuran"></select></label>
+      <div class="nilaiList" style="margin-top:10px;max-height:none">${Object.entries(T).map(([k, v], i) =>
+        `<label style="align-items:flex-start"><input type="radio" name="tpJenis" value="${k}" ${i ? "" : "checked"}>
+          <span><b>${esc(v.label)}</b><br><span class="ket">${esc(v.ket)}</span></span></label>`).join("")}</div>
+      <p class="ket">ALDx memilih kolom tanggal, kategori, dan ukuran secara otomatis, lalu membuat lembar kerjanya.
+        Hasil muncul di kanvas: ubah sesuka Anda, lalu klik <b>Simpan dashboard</b>.</p>
+      <div class="hasilUji" id="tpHasil"></div>`,
+      padaOk: () => {
+        const tombol = $("#dlgOk");
+        tombol.disabled = true; $("#tpHasil").textContent = "Membuat lembar kerja…";
+        Studio.api("/studio/api/templat", {dataset_id: Number($("#tpDs").value), templat: $('input[name="tpJenis"]:checked').value, ukuran: $("#tpUkuran").value})
+          .then(async h => {
+            await Studio.muatAwal();
+            Object.assign(D, {id: null, baris: h.baris, filter: h.filter || []});
+            cacheHasil.clear(); renderFilter();
+            $("#judulDasbor").value = h.judul; $("#ketDasbor").value = ""; $("#tautanDasbor").innerHTML = ""; isiPilihan();
+            renderKanvas(); Studio.tutupDialog();
+            window.dispatchEvent(new Event("lembar-berubah"));
+            Studio.notif(`Template siap: ${h.baris.flat().filter(k => k.chart_id).length} lembar kerja dibuat.` +
+              (h.dilewati.length ? ` Dilewati: ${esc(h.dilewati.join("; "))}.` : "") + " Periksa, lalu klik <b>Simpan dashboard</b>.");
+          })
+          .catch(e => { tombol.disabled = false; $("#tpHasil").innerHTML = `<span style="color:var(--merah)">${esc(e.message)}</span>`; });
+        return false;
+      }});
+    const isiUkuran = async () => {
+      const b = await Studio.api(`/studio/api/bidang/${$("#tpDs").value}`).catch(() => ({ukuran: []}));
+      $("#tpUkuran").innerHTML = b.ukuran.filter(u => u.field !== "__baris__").map(u => `<option value="${esc(u.field)}">${esc(u.label)}</option>`).join("")
+        || '<option value="">Jumlah baris</option>';
+    };
+    $("#tpDs").onchange = isiUkuran; isiUkuran();
+  }
   function isiPilihan() {
     $("#bukaDasbor").innerHTML = '<option value="">Buka dashboard Studio…</option>' +
       Studio.awal.dashboard.map(d => `<option value="${d.id}" ${d.id === D.id ? "selected" : ""}>${esc(d.judul)}</option>`).join("");
@@ -346,6 +382,8 @@
     });
     $("#bukaDasbor").onchange = () => buka($("#bukaDasbor").value);
     $("#dasborBaru").onclick = baru;
+    $("#dasborTemplat").onclick = dialogTemplat;
+    $("#dasborTemplat").disabled = !Studio.awal.izin.chart;
     $("#simpanDasbor").onclick = simpan;
     $("#simpanDasbor").disabled = !Studio.awal.izin.dashboard;
     if (!Studio.awal.izin.dashboard) $("#simpanDasbor").title = "Anda belum punya izin membuat dashboard";

@@ -66,12 +66,18 @@
     peranAktif = id; peranDipilih = peranDipilih || manual;
     gambarPeran();
   }
+  // Tombol cepat sesuai halaman: di dashboard, satu klik untuk ringkasan & hal yang janggal.
+  function contohHalaman() {
+    const h = SPS.halaman ? SPS.halaman().alamat : "";
+    return /\/superset\/dashboard\//.test(h)
+      ? ["Ringkas dashboard ini dalam 5 poin", "Apa yang janggal atau perlu ditindaklanjuti di dashboard ini?"] : [];
+  }
   function sapaan() {
     const p = peran(peranAktif);
     if (!p) return;
     $("#obrolanAi").innerHTML = `<div class="sapa-ai"><div class="ikon-bulat">${ik(p.ikon, 22)}</div>
       <b>${esc(t(p.nama))}</b><p>${esc(t(p.ringkas))}</p>
-      <div class="contoh-ai">${p.contoh.map(c => `<button type="button" data-contoh="${esc(c)}">${esc(t(c))}</button>`).join("")}</div>
+      <div class="contoh-ai">${[...contohHalaman(), ...p.contoh].map(c => `<button type="button" data-contoh="${esc(c)}">${esc(t(c))}</button>`).join("")}</div>
       <small>${esc(t("Ketik / untuk berganti peran"))}: ${daftarPeran.map(x => `<code>${esc(x.perintah)}</code>`).join(" ")}</small></div>`;
     document.querySelectorAll("[data-contoh]").forEach(b => b.onclick = () => kirim(t(b.dataset.contoh)));
   }
