@@ -17,6 +17,8 @@
   const TANDA_ANALITIK = ["garis", "area", "batang"];
 
   /* ---------- Pil ---------- */
+  // Kunci kolom hasil query (sama dengan Pil.label di lembar.py): untuk menandai pil yang diabaikan.
+  const kunciPil = p => p.peran === "dimensi" || p.metrik ? p.field : p.field === "__baris__" ? "Jumlah baris" : `${p.agg}(${p.field})`;
   const labelPil = p => p.hierarki ? `${p.hierarki} › ${(p.jalur || []).map(v => `${v} › `).join("")}${p.field}`
     : p.peran === "dimensi" || p.metrik ? (p.label || p.field)
     : p.field === "__baris__" ? "Jumlah baris" : `${p.agg}(${p.field})`;
@@ -40,7 +42,9 @@
   const punyaGeo = (d, peran) => d.some(p => p.geo === peran);
   const sah = (t, nd, nu) => {
     const a = Studio.awal.aturan[t], d = dimensi();
-    if (!(nd >= a.dim[0] && nd <= a.dim[1] && nu >= a.ukuran[0] && nu <= a.ukuran[1] && nd + nu > 0)) return false;
+    // Hanya kebutuhan MINIMAL: kolom yang melebihi kapasitas jenis ini tidak dipakai (server: lembar.pangkas),
+    // seperti Tableau. Dulu batas maksimal membuat hampir semua jenis mati begitu ada kolom ketiga.
+    if (!(nd >= a.dim[0] && nu >= a.ukuran[0] && nd + nu > 0)) return false;
     if (a.geo === "titik" && !(punyaGeo(d, "lintang") && punyaGeo(d, "bujur"))) return false;
     if (a.waktu && !d.some(p => p.waktu)) return false;
     return true;
@@ -68,7 +72,7 @@
     const a = Studio.awal.aturan[t];
     const r = (x, n) => x[0] === x[1] ? `${x[0]} ${n}` : `${x[0]}–${x[1]} ${n}`;
     const tambahan = a.geo === "titik" ? " (termasuk lintang & bujur)" : a.waktu ? " (termasuk tanggal)" : "";
-    return `${a.label}: ${r(a.dim, "dimensi")}${tambahan}, ${r(a.ukuran, "ukuran")}`;
+    return `${a.label}: ${r(a.dim, "dimensi")}${tambahan}, ${r(a.ukuran, "ukuran")}. Kolom lebih dari itu tidak dipakai (ditandai pudar)`;
   };
 
   function renderShowMe() {
@@ -110,7 +114,7 @@
         <span class="tag">${tag(b)}</span>${esc(b.label || b.field)}</div>`).join("") || '<div class="ket">–</div>';
     $("#daftarHierarki").innerHTML = L.hierarki.map(h => `<div class="bidang dimensi hierarki" draggable="true" data-h="${esc(h.nama)}"
         title="Seret ke rak. Klik kanan: hapus."><span class="tag">⛬</span>${esc(h.nama)}<small>${h.kolom.map(esc).join(" › ")}</small></div>`).join("")
-      || '<div class="ket">Belum ada. Contoh: Provinsi › Kab/Kota › Kecamatan.</div>';
+      || '<div class="ket">Belum ada. Seret satu dimensi ke atas dimensi lain (mis. kecamatan ke atas kab_kota) untuk membuat hierarki.</div>';
     $$("#daftarHierarki .bidang").forEach(el => {
       const h = L.hierarki.find(x => x.nama === el.dataset.h);
       el.ondragstart = e => e.dataTransfer.setData("text/plain", JSON.stringify({sumber: "panel", pil: pilHierarki(h)}));
@@ -124,7 +128,37 @@
       const b = cariBidang(el.dataset.f, el.dataset.p);
       el.ondragstart = e => e.dataTransfer.setData("text/plain", JSON.stringify({sumber: "panel", pil: salin(b)}));
       el.ondblclick = () => { (b.peran === "dimensi" ? L.kolom : L.baris).push(salin(b)); perbarui(); };
+      if (b.peran === "dimensi") zonaTumpuk(el, d => dialogHierarki(null, {kolom: [b.field, d.field],
+        saran: `${b.label || b.field} › ${d.label || d.field}`}));
     });
+    $$("#daftarHierarki .bidang").forEach(el => {
+      const h = L.hierarki.find(x => x.nama === el.dataset.h);
+      zonaTumpuk(el, d => tambahLevel(h, d.field));
+    });
+  }
+  // Seret dimensi dari panel ke atas dimensi lain = hierarki baru; ke atas hierarki = tambah level (seperti Tableau).
+  function zonaTumpuk(el, aksi) {
+    el.ondragover = e => { e.preventDefault(); e.stopPropagation(); el.classList.add("tumpuk"); };
+    el.ondragleave = () => el.classList.remove("tumpuk");
+    el.ondrop = e => {
+      e.preventDefault(); e.stopPropagation(); el.classList.remove("tumpuk");
+      let d;
+      try { d = JSON.parse(e.dataTransfer.getData("text/plain")); } catch (x) { return; }
+      const p = d.sumber === "panel" ? d.pil : null;
+      if (!p || p.peran !== "dimensi" || p.hierarki || p.field === el.dataset.f) {
+        if (d.sumber !== "panel") { buang(d.sumber, d.idx); perbarui(); }      // pil dari rak tetap = buang
+        return;
+      }
+      aksi(p);
+    };
+  }
+  async function tambahLevel(h, field) {
+    if (h.kolom.includes(field)) { Studio.notif(`${esc(field)} sudah ada di hierarki ${esc(h.nama)}.`, true); return; }
+    try {
+      L.hierarki = (await Studio.api(`/studio/api/hierarki/${L.ds}`, {nama: h.nama, kolom: [...h.kolom, field]})).hierarki;
+      renderBidang();
+      Studio.notif(`<b>${esc(field)}</b> jadi level ke-${h.kolom.length + 1} hierarki <b>${esc(h.nama)}</b>. Klik kanan hierarki untuk mengubah urutan.`);
+    } catch (e) { Studio.notif(esc(e.message), true); }
   }
   const cariBidang = (f, peran) => L.bidang[peran].find(b => b.field === f);
 
@@ -144,14 +178,15 @@
     return true;
   }
   const pilTelusur = () => [...L.kolom, ...L.baris, L.warna].find(p => p?.hierarki && p.level < p.kolomH.length - 1);
-  function dialogHierarki(lama = null) {
-    const urut = [...(lama?.kolom || [])];
+  // lama = hierarki yang diubah; awal = {kolom, saran} dari seret-tumpuk (kolom sudah berurutan, tinggal beri nama).
+  function dialogHierarki(lama = null, awal = null) {
+    const urut = [...(lama?.kolom || awal?.kolom || [])];
     const tulis = () => $$("#hKolom label").forEach(l => {
       const i = urut.indexOf(l.dataset.f), no = $(".no", l);
       no.textContent = i + 1; no.classList.toggle("ada", i >= 0); $("input", l).checked = i >= 0;
     });
     Studio.dialog({judul: lama ? `Ubah hierarki: ${lama.nama}` : "Hierarki baru", ok: "Simpan", isi: `
-      <label>Nama<input type="text" id="hNama" value="${esc(lama?.nama || "")}" placeholder="mis. Wilayah" maxlength="80"></label>
+      <label>Nama hierarki (nama kolom baru)<input type="text" id="hNama" value="${esc(lama?.nama || awal?.saran || "")}" placeholder="mis. Wilayah" maxlength="80"></label>
       <p class="ket">Centang kolom berurutan dari yang paling umum ke paling rinci (mis. provinsi, kabupaten, kecamatan, kelurahan).</p>
       <div class="nilaiList urutHierarki" id="hKolom">${L.bidang.dimensi.map(b => `<label data-f="${esc(b.field)}">
         <input type="checkbox"><span class="no"></span>${esc(b.label || b.field)}</label>`).join("")}</div>`,
@@ -164,6 +199,7 @@
           renderBidang(); Studio.notif(`Hierarki <b>${esc(nama)}</b> tersimpan. Seret ke rak, lalu klik batang/irisan untuk menelusuri.`);
         } catch (e) { Studio.notif(esc(e.message), true); return false; }
       }});
+    if (awal) { const n = $("#hNama"); n.focus(); n.select(); }
     $$("#hKolom label").forEach(l => { $("input", l).onchange = () => {
       const f = l.dataset.f, i = urut.indexOf(f);
       if (i >= 0) urut.splice(i, 1); else urut.push(f);
@@ -190,7 +226,7 @@
 
   function elPil(p, rak, i) {
     const el = document.createElement("div");
-    el.className = `pil ${p.peran}`; el.draggable = true;
+    el.className = `pil ${p.peran}`; el.draggable = true; el.dataset.kunci = kunciPil(p);
     const f = rak === "filter" ? L.filter[i] : null;
     const teks = f ? `${labelPil(p)}${f.nilai ? ` (${f.nilai.length})` : ""}` : labelPil(p);
     const tombolH = p.hierarki && rak !== "filter"
@@ -329,7 +365,10 @@
         klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null}) || {};
       $("#statusLembar").innerHTML = `<span>${fmtPenuh.format(L.hasil.baris.length)} baris</span><span>${esc(Studio.awal.aturan[t].label)}</span>
         <span>${Math.round(performance.now() - mulai)} ms</span>${L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
-        ${info.catatan ? `<span class="peringatan">${esc(info.catatan)}</span>` : ""}`;
+        ${info.catatan ? `<span class="peringatan">${esc(info.catatan)}</span>` : ""}
+        ${hasil.diabaikan?.length ? `<span class="peringatan" title="Jenis ini memakai lebih sedikit kolom. Pilih jenis lain di Tampilkan saya untuk memakai semuanya.">Tidak dipakai ${esc(Studio.awal.aturan[t].label)}: ${esc(hasil.diabaikan.join(", "))}</span>` : ""}`;
+      const abaikan = new Set(hasil.diabaikan || []);
+      $$(".rak:not([data-rak=filter]) .pil").forEach(el => el.classList.toggle("diabaikan", abaikan.has(el.dataset.kunci)));
       renderAnalitik();
       if ($("#tabelData").classList.contains("tampil")) $("#tabelData").innerHTML = Studio.tabelHtml(L.hasil.kolom, L.hasil.baris);
     } catch (e) { if (nomor === L.nomorKueri) tampilPesan(`<span style="color:var(--merah)">${esc(e.message)}</span>`); }
@@ -344,10 +383,29 @@
 
   /* ---------- Panel Analitik (ramalan, tren, anomali) ---------- */
   const bacaAnalitik = () => {
+    const target = $("#anNilaiTarget").value.trim();
     const a = {ramalan: $("#anRamalan").checked ? Math.max(1, Math.min(36, +$("#anPeriode").value || 6)) : 0,
-               tren: $("#anTren").checked, anomali: $("#anAnomali").checked};
-    L.analitik = a.ramalan || a.tren || a.anomali ? a : {};
+               tren: $("#anTren").checked, anomali: $("#anAnomali").checked,
+               rata_bergerak: $("#anGerak").checked ? Math.max(2, Math.min(24, +$("#anJendela").value || 3)) : 0,
+               rata_rata: $("#anRata").checked, median: $("#anMedian").checked, ekstrem: $("#anEkstrem").checked,
+               target: $("#anTarget").checked && target !== "" ? Number(target) : null};
+    L.analitik = Object.values(a).some(v => v && v !== 0) ? a : {};
   };
+  // Panel pudar? Satu klik: pilih dimensi waktu (atau dimensi pertama), lepas dimensi lain, ukuran ke Baris, jenis Garis.
+  function siapkanAnalitik() {
+    const d = dimensi(), utama = d.find(p => p.waktu || p.dttm) || d[0];
+    if (!utama) { Studio.notif("Seret kolom tanggal/periode (Tgl) ke rak Kolom dulu.", true); return; }
+    const uk = [...L.kolom, ...L.baris].filter(p => p.peran === "ukuran");
+    if (!uk.length && !(L.ukuran && L.ukuran.peran === "ukuran")) { Studio.notif("Seret satu ukuran (mis. total) ke rak Baris dulu.", true); return; }
+    const dilepas = d.filter(p => p !== utama).map(labelPil);
+    L.kolom = [utama];
+    L.baris = uk.length ? uk : [L.ukuran];
+    if (L.warna && L.warna.peran === "dimensi") L.warna = null;
+    if (!TANDA_ANALITIK.includes(tandaEfektif())) { L.tanda = "garis"; $("#pilihTanda").value = "garis"; }
+    perbarui();
+    Studio.notif(`Siap untuk analitik: ${esc(labelPil(utama))} di Kolom, jenis ${esc(Studio.awal.aturan[tandaEfektif()].label)}.` +
+      (dilepas.length ? ` Dilepas: ${esc(dilepas.join(", "))} (pakai rak Filter untuk menyaring per nilai).` : ""));
+  }
   function renderAnalitik() {
     const bisa = TANDA_ANALITIK.includes(tandaEfektif()) && dimensi().length === 1 && L.warna?.peran !== "dimensi";
     $("#panelAnalitik").classList.toggle("mati", !bisa);
@@ -355,6 +413,10 @@
     const a = L.analitik;
     $("#anRamalan").checked = !!a.ramalan; if (a.ramalan) $("#anPeriode").value = a.ramalan;
     $("#anTren").checked = !!a.tren; $("#anAnomali").checked = !!a.anomali;
+    $("#anGerak").checked = !!a.rata_bergerak; if (a.rata_bergerak) $("#anJendela").value = a.rata_bergerak;
+    $("#anRata").checked = !!a.rata_rata; $("#anMedian").checked = !!a.median; $("#anEkstrem").checked = !!a.ekstrem;
+    $("#anTarget").checked = a.target != null; if (a.target != null) $("#anNilaiTarget").value = a.target;
+    $("#anSiapkan").hidden = bisa || !dimensi().length;
     const r = Object.values(L.hasil?.analitik?.seri || {}).find(x => x.ramalan)?.ramalan;
     $("#anKet").innerHTML = !bisa ? "Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan)."
       : r ? `Metode: ${esc(r.metode)}. Pita = keyakinan 80% &amp; 95%.` + (L.hasil.analitik.catatan.length ? `<br>${esc(L.hasil.analitik.catatan.join(" "))}` : "")
@@ -457,7 +519,9 @@
     $("#tambahHierarki").onclick = () => { if (L.ds) dialogHierarki(); else Studio.notif("Pilih sumber data dulu.", true); };
     $("#pilihTanda").onchange = () => { L.tanda = $("#pilihTanda").value; perbarui(); };
     $("#pakaiLabel").onchange = () => { L.label = $("#pakaiLabel").checked; perbarui(); };
-    ["anRamalan", "anTren", "anAnomali", "anPeriode"].forEach(id => { $("#" + id).onchange = () => { bacaAnalitik(); perbarui(); }; });
+    ["anRamalan", "anTren", "anAnomali", "anPeriode", "anGerak", "anJendela", "anRata", "anMedian", "anEkstrem", "anTarget", "anNilaiTarget"]
+      .forEach(id => { $("#" + id).onchange = () => { bacaAnalitik(); perbarui(); }; });
+    $("#anSiapkan").onclick = siapkanAnalitik;
     $("#tukar").onclick = () => { [L.kolom, L.baris] = [L.baris, L.kolom]; perbarui(); };
     $("#urut").onclick = () => { L.urut = {"": "turun", turun: "naik", naik: ""}[L.urut]; perbarui(); };
     $("#lihatData").onclick = () => {

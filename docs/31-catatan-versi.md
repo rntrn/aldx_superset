@@ -22,6 +22,10 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | **Objek desain dashboard**: Teks (10 huruf lokal, ukuran, warna, latar, rata), Gambar (unggah), Garis pemisah | [12](12-studio-visual.md#objek-desain-teks-gambar-garis) |
 | Filter global | Nilai dipilih dari **daftar yang bisa dicari** (RLS berlaku), **chip filter aktif** di bilah atas, *Kecualikan dashboard ini* | [25](25-berkas-filter-global-ulasan.md) |
 | Dashboard | Klik-filter antar-chart, **drill to detail**, **drill by** aktif bawaan | [12](12-studio-visual.md) |
+| Studio | **Hierarki seret-tumpuk**: seret satu dimensi ke atas dimensi lain → beri nama (seperti Tableau); seret ke atas hierarki = tambah level | [12](12-studio-visual.md#hierarki-dimensi-telusur-bertingkat) |
+| Studio | **Tampilkan saya** tidak lagi mematikan jenis saat kolom berlebih: kolom ekstra tidak dipakai & ditandai pudar (±19 dari 23 jenis aktif dengan 3 dimensi) | [12](12-studio-visual.md#tampilkan-saya-dengan-banyak-kolom) |
+| Analitik | Opsi baru: **rata bergerak**, **garis rata-rata**, **median**, **target**, **tertinggi & terendah** (ikut tersimpan ke chart Superset); tombol **Siapkan agar analitik aktif** | [17 §4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif) |
+| Data latihan | **`latihan_penjualan_harian`**: ±2,3 juta baris harian 2021–2025, hierarki Wilayah/Kalender/Produk, pola Lebaran & anomali, dashboard *Latihan: Wilayah & Prediksi*; dimuat otomatis oleh installer (`-Skala` s.d. ±23 juta baris) | [bahan ajar](bahan-ajar/README.md) |
 
 ### Perbaikan
 
@@ -29,17 +33,21 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 |---|---|
 | **Ramalan / tren / anomali tidak bisa dipakai** pada data ALDx Engine (mis. `latihan_penjualan`) | Superset 6.1 tidak mengenali kolom ClickHouse `Float32/Float64` (termasuk di dalam `Nullable(...)`) sebagai angka. Kolom seperti `total` masuk **Dimensi**, tidak bisa dijumlah, dan panel Analitik mati. Sekarang dikenali sebagai angka (`config/sps_dialek.py` §5), juga di Explore |
 | Label sumbu tanggal panjang ("Sat, 01 Mar 2025 00:00:00 GMT") | Kolom `Date/Date32` kini dikirim sebagai `2025-03-01` (`config/sps_ai/alat.py`) |
+| **Pilih preset Tinta & Sakura (pink) tapi warna tetap hijau** | preset ini ikut mengosongkan nama perusahaan sehingga ditolak validasi; kini preset hanya mengubah tampilan, dan tiap preset menetapkan keempat warnanya |
+| Kolom `ID_…` (mis. `t1.ID_Penerbangan` hasil gabung Kueri Visual) masuk **Ukuran** | awalan alias tabel `t1.` membuat ID tidak dikenali; pengenal ID/kode kini membuang awalan & mengenali `ID_x`, `x_id`, `idX`, `XId`, `kode_`, `NIK` |
 
 ### Perlu dilakukan setelah memperbarui
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **62/62 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **67/67 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 
 Tidak ada langkah manual lain:
 - Tabel baru `sps_hierarki` (hierarki) dan `sps_gambar` (gambar dashboard) dibuat otomatis di metadb.
+- Data latihan harian & dashboard *Latihan: Wilayah & Prediksi*: dimuat otomatis oleh Setup; instalasi git jalankan
+  `scripts\data-latihan.ps1` sekali (± 20 detik).
 - Kolom desimal di ALDx Engine otomatis pindah ke **Ukuran** di Studio. Chart lama yang sudah disimpan tidak berubah.
 - Role tamu *Penonton Sematan* dibuat otomatis oleh `build-dashboards`.
 

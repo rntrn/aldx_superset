@@ -13,6 +13,10 @@ di ALDx Engine (bisa dipakai siapa pun, tanpa data asli):
 
 Juga membuat "Latihan: Dashboard Penjualan (fiktif)" (8 chart + 2 filter) untuk Level 1.
 
+Ditambah data BESAR dari sps_latihan_wilayah.py (hanya ke ALDx Engine, dibangkitkan dengan SQL):
+    latihan_outlet, latihan_penjualan_harian (±2,3 juta baris; hierarki Wilayah/Kalender/Produk)
+    + dashboard "Latihan: Wilayah & Prediksi (fiktif)". Skala: env SPS_LATIHAN_SKALA (scripts\\data-latihan.ps1 -Skala).
+
 Angka dibuat dari bilangan acak dengan benih tetap: hasil selalu sama, jadi bahan ajar &
 skenario uji bisa menyebut angka pasti. Semua role yang bisa login (Gamma ke atas) boleh membaca.
 
@@ -219,6 +223,7 @@ def siapkan(database=None) -> list[str]:
             "latihan_cabang": (buat_cabang(), ["kd_cabang"],
                                "DATA FIKTIF: daftar cabang (tabel induk untuk latihan gabung di Kueri Visual).")}
     hasil = _hapus_versi_lama()
+    engine = database is None
     if database is None:
         from sps_engine.ekstrak import database_engine
         from sps_engine import klien as K
@@ -238,8 +243,26 @@ def siapkan(database=None) -> list[str]:
     import os
     hasil.append(buat_dashboard(ids["latihan_penjualan"], ids["latihan_lokasi_pelanggan"],
                                 os.environ.get("ADMIN_USERNAME", "admin")))
+    if engine:                          # data harian berskala besar dibangkitkan di ClickHouse (sps_latihan_wilayah)
+        hasil += _siapkan_wilayah(database, schema)
     import sps_warna                    # warna kategori tetap & berurutan sesuai palet sejak awal
     hasil.append(sps_warna.kunci_semua())
+    return hasil
+
+
+def _siapkan_wilayah(database, schema) -> list[str]:
+    """latihan_outlet + latihan_penjualan_harian (jutaan baris), hierarki bawaan, dashboard Wilayah & Prediksi."""
+    import os
+    import sps_latihan_wilayah as W
+    jumlah = W.tulis_engine()
+    hasil = []
+    t_outlet = _daftarkan(W.TABEL_OUTLET, database, schema, "DATA FIKTIF: outlet rekaan dengan hierarki wilayah.")
+    t = _daftarkan(W.TABEL_FAKTA, database, schema,
+                   "DATA FIKTIF: penjualan harian 2021-2025 per outlet & subkategori (hierarki, ramalan, anomali).")
+    W.lengkapi_dataset(t)
+    for nama, tb in ((W.TABEL_OUTLET, t_outlet), (W.TABEL_FAKTA, t)):
+        hasil.append(f"{nama}: {jumlah[nama]:,} baris (dataset {tb.id})".replace(",", "."))
+    hasil.append(W.buat_dashboard(t.id, os.environ.get("ADMIN_USERNAME", "admin")))
     return hasil
 
 

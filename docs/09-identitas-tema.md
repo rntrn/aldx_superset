@@ -56,7 +56,9 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 | `ungu` | `#4B2E83` / `#19B5A5` | gelombang |
 | `grafit` | `#263238` / `#26A69A` | titik |
 
-Preset selain `netral` hanya mengganti warna & motif; nama dan logo Anda tetap.
+Semua preset, termasuk **Tinta & Sakura** (`netral`), hanya mengganti **tampilan**: warna utama, aksen, aksen kedua,
+latar, huruf, sudut, motif, dan animasi. Nama aplikasi, nama perusahaan, teks, dan logo Anda tetap. Setiap preset
+menetapkan keempat warnanya, sehingga tidak ada sisa warna dari preset sebelumnya.
 
 ### Tinta & Sakura (bawaan)
 

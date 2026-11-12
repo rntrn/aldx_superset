@@ -221,8 +221,9 @@
     "langkah": [
       "Pilih Sumber data.",
       "Seret Dimensi (per apa?) ke rak Kolom dan Ukuran (berapa?) ke rak Baris.",
-      "Pilih jenis di Tampilkan saya; bingkai emas = rekomendasi.",
-      "Tambah Warna, Filter, Ramalan bila perlu, lalu Simpan.",
+      "Pilih jenis di Tampilkan saya; bingkai emas = rekomendasi. Kolom berlebih tidak dipakai (pil pudar dicoret).",
+      "Hierarki: seret satu dimensi ke atas dimensi lain, beri nama; klik batang untuk menelusuri.",
+      "Tambah Warna, Filter, Analitik (ramalan, rata bergerak, rata-rata, median, target) bila perlu, lalu Simpan. Panel Analitik pudar? Klik Siapkan agar analitik aktif.",
       "Tab Susun dashboard: seret lembar kerja ke kanvas, tambah filter, percantik dengan objek Teks (huruf & warna), Gambar, Garis, lalu Simpan."
     ],
     "pintasan": [

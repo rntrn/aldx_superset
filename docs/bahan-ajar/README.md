@@ -36,6 +36,23 @@ Untuk latihan gabung tabel & demo data besar tersedia set **Penerbangan** (fikti
 (maskapai, bandara, penerbangan, jadwal, penumpang, tiket) dalam tiga ukuran, 1.000 sampai 1 juta tiket lebih.
 Kamus data, cara impor, dan angka kunci: [`berkas/README.md`](berkas/README.md).
 
+Untuk latihan **hierarki, ramalan, dan data besar** tersedia `latihan_penjualan_harian` (fiktif, dimuat otomatis
+oleh installer): penjualan harian 2021–2025 di 138 outlet, 17 provinsi, 30 kab/kota, 68 kecamatan, 10 subkategori,
+**2.337.380 baris**, dengan hierarki bawaan *Wilayah*, *Kalender*, *Produk* dan dashboard
+*Latihan: Wilayah & Prediksi*. Lebih besar untuk demo kecepatan: `scripts\data-latihan.ps1 -Skala 4` (± 9,3 juta baris).
+
+| Pertanyaan (data harian) | Jawaban |
+|---|---|
+| Total penjualan 2021–2025 | **Rp20,31 triliun** (`20.3T`); margin **24,5%**; capaian target **100,4%** |
+| Per tahun 2021 / 2022 / 2023 / 2024 / 2025 | 2,52 / 3,57 / 4,19 / 4,83 / 5,20 triliun |
+| Pulau / provinsi / kab-kota terbesar | Jawa 12,77 T · DKI Jakarta 4,49 T · Jakarta Selatan 1,99 T |
+| Kategori / subkategori terbesar | Elektronik 5,45 T · Ponsel 3,73 T |
+| Hari rata-rata tertinggi / terendah | **Sabtu** · **Senin** |
+| Bulan tertinggi | **Maret 2025**, Rp579,6 miliar (menjelang Lebaran 31 Mar 2025) |
+| Hari tertinggi | **29 Maret 2025**, Rp33,0 miliar |
+| Anomali yang ditanam | banjir Jakarta Timur 27 Jan–2 Feb 2025 (turun ± 85%); gangguan sistem Sulawesi Selatan 5 Okt 2023 (Rp0,05 miliar); promo 17 Agustus 2024 Gerai Mekarmulya (OT0105) Rp568 juta |
+| Outlet buka sejak 1 Jan 2021 | 115 dari 138 (23 menyusul 2022–2024) |
+
 Angka kunci yang sering dipakai:
 
 | Pertanyaan | Jawaban |

@@ -221,8 +221,9 @@
     "langkah": [
       "Choose a Data source.",
       "Drag Dimensions (by what?) to the Columns shelf and Measures (how much?) to the Rows shelf.",
-      "Pick a type under Show me; a gold frame = recommended.",
-      "Add Color, Filters, Forecast if needed, then Save.",
+      "Pick a type under Show me; a gold frame = recommended. Extra fields are not used (dimmed, struck-through pills).",
+      "Hierarchy: drag one dimension onto another and name it; click a bar to drill down.",
+      "Add Color, Filters, Analytics (forecast, moving average, average, median, target) if needed, then Save. Analytics greyed out? Click the prepare button.",
       "Build a dashboard tab: drag worksheets onto the canvas, add filters, polish with Text (fonts & colors), Image and Line objects, then Save."
     ],
     "pintasan": [

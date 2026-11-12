@@ -38,7 +38,7 @@ Memperbarui: jalankan Setup terbaru di atas instalasi lama (data dipertahankan);
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
-| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **ramalan** (Holt-Winters + pita keyakinan, tren, anomali), **hierarki dimensi** (provinsi › kabupaten › … , klik untuk menelusuri), **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
+| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
 | Pusat Kendali | `/pusat-kendali/`: proses, cache, batas, identitas, hubungkan data, ekstrak, hak akses, multi-node |
 | Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
 | Ekspor | tombol **Ekspor** di setiap tabel & grafik halaman ALDx: gambar PNG, PDF, Excel, CSV, TXT, salin |
@@ -105,6 +105,7 @@ D:\superset
 │   ├── sps_build_dashboards.py # Menyiapkan dashboard, menu, izin, ALDx Engine
 │   ├── sps_latihan.py      # DATA LATIHAN fiktif (penjualan ritel) + dashboard latihan
 │   ├── sps_latihan_penerbangan.py # DATA LATIHAN fiktif penerbangan (Excel/CSV, 6 tabel, s.d. jutaan baris)
+│   ├── sps_latihan_wilayah.py # DATA LATIHAN harian ±2,3 juta baris + hierarki Wilayah/Kalender/Produk (dimuat installer)
 │   ├── sps_uji.py          # UJI OTOMATIS (scripts\uji.ps1)
 │   ├── ai.yaml + sps_ai/   # Asisten AI
 │   ├── sps_server/         # Pusat Kendali Server: pengaturan, auto-tuning, monitor, multi-node, HTTPS (tls.py)

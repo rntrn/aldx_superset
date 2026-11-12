@@ -68,6 +68,17 @@ def simpan(dataset_id: int, nama: str, kolom: list[str]) -> dict:
     return {"nama": nama, "kolom": kolom}
 
 
+def pasang_bawaan(dataset_id: int, nama: str, kolom: list[str], pembuat: str = "sistem") -> None:
+    """Hierarki bawaan dari data latihan (tanpa cek izin pengguna; hanya dipanggil kode server).
+    Tidak menimpa hierarki bernama sama yang sudah diubah admin."""
+    db = _db()
+    ada = db.session.execute(select(TABEL.c.pembuat).where((TABEL.c.dataset_id == dataset_id) & (TABEL.c.nama == nama))).first()
+    if ada is None:
+        db.session.execute(TABEL.insert().values(dataset_id=dataset_id, nama=nama, kolom=json.dumps(kolom),
+                                                 pembuat=pembuat, diubah=datetime.now()))
+        db.session.commit()
+
+
 def hapus(dataset_id: int, nama: str) -> None:
     _boleh_ubah()
     t = alat._dataset(dataset_id)

@@ -163,6 +163,29 @@ def jalankan_semua() -> None:
                     raise RuntimeError("telusur/hapus gagal")
                 return f"{len(atas['baris'])} provinsi -> {len(dalam['baris'])} cabang di {prov}"
 
+            @uji("Studio", "Tampilkan saya: kolom berlebih diabaikan, jenis tetap bisa dipakai")
+            def _():
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "pie", "kolom": [D("periode"), D("kategori")],
+                                          "baris": [U("total")], "warna": D("saluran")})
+                lembar.periksa_tanda(lb)
+                hasil = lembar.jalankan(t, lb)
+                if hasil["dimensi"] != ["kategori"] or sorted(lb.diabaikan) != ["periode", "saluran"]:
+                    raise RuntimeError(f"pie memakai {hasil['dimensi']}, diabaikan {lb.diabaikan}")
+                return f"Pie memakai kategori; diabaikan {', '.join(lb.diabaikan)}"
+
+            @uji("Analitik", "Analitik lengkap: rata bergerak, rata-rata, median, target, tertinggi/terendah")
+            def _():
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")],
+                                          "analitik": {"rata_bergerak": 3, "rata_rata": True, "median": True,
+                                                       "target": 1e9, "ekstrem": True}})
+                s = lembar.jalankan(t, lb)["analitik"]["seri"]["SUM(total)"]
+                rb = s["rata_bergerak"]["nilai"]
+                if rb[:2] != [None, None] or rb[2] is None or not (s["median"] and s["rata_rata"] and s["target"] == 1e9):
+                    raise RuntimeError(f"analitik tidak lengkap: {sorted(s)}")
+                if s["ekstrem"]["maks"]["nilai"] < s["ekstrem"]["min"]["nilai"]:
+                    raise RuntimeError("tertinggi < terendah")
+                return f"rata bergerak 3, median, rata-rata, target, tertinggi {s['ekstrem']['maks']['x']}"
+
             @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
             def _():
                 from sps_ai import auto
@@ -195,6 +218,41 @@ def jalankan_semua() -> None:
                 ("2025-03-01", "2025-03-01", "2025-03-01T08:30:00", 5):
             raise RuntimeError("tanggal tidak dikirim sebagai ISO")
         return "Float32/64, Double, Int, Decimal = angka; String tetap teks; tanggal ISO"
+
+    @uji("Data", "Data latihan harian: jutaan baris & hierarki Wilayah/Kalender/Produk")
+    def _():
+        from sps_studio import hierarki
+        t = db.session.query(SqlaTable).filter_by(table_name="latihan_penjualan_harian").first()
+        if t is None:
+            raise RuntimeError("belum ada; jalankan scripts\\data-latihan.ps1")
+        from superset.utils.core import override_user
+        with override_user(admin):                     # RLS & hak akses dataset dibaca dari g.user
+            jumlah = int(lembar.jalankan(*lembar.dari_dict({"dataset_id": t.id, "tanda": "angka",
+                                                            "baris": [{"field": "__baris__", "peran": "ukuran"}]}))["baris"][0]["Jumlah baris"])
+            nama = {h["nama"] for h in hierarki.daftar(t.id)}
+        if jumlah < 1_000_000 or not {"Wilayah", "Kalender", "Produk"} <= nama:
+            raise RuntimeError(f"{jumlah} baris, hierarki {sorted(nama)}")
+        return f"{jumlah:,}".replace(",", ".") + f" baris, hierarki {', '.join(sorted(nama))}"
+
+    @uji("Studio", "Kolom ID/kode selalu dimensi (juga dengan alias tabel t1.)")
+    def _():
+        from sps_ai.auto import kolom_pengenal
+        salah = [n for n in ("t1.ID_Penerbangan", "ID_Tiket", "kd_cabang", "provinsi_kode", "NIK", "idPelanggan")
+                 if not kolom_pengenal(n)] + [n for n in ("Harga", "total", "t2.harga", "valid_rate") if kolom_pengenal(n)]
+        if salah:
+            raise RuntimeError(f"salah golong: {salah}")
+        return "ID/kode -> dimensi; harga/total -> ukuran"
+
+    @uji("Studio", "Preset tema lolos validasi & tidak menghapus nama perusahaan")
+    def _():
+        from sps_identitas import skema
+        for nama, isi in skema.PRESET.items():
+            for k, v in skema.nilai_preset(nama).items():
+                skema.periksa(k, v)
+        lebih = set(skema.nilai_preset("netral")) - set(skema.KUNCI_TAMPILAN)
+        if lebih:
+            raise RuntimeError(f"preset bawaan menyentuh {sorted(lebih)}")
+        return f"{len(skema.PRESET)} preset; hanya warna, huruf, sudut, hiasan, animasi"
 
     @uji("Studio", "Objek dashboard: teks aman, huruf lokal, gambar hanya raster")
     def _():

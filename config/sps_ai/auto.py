@@ -29,6 +29,18 @@ from sps_ai import alat
 SAMPEL_MAKS = 5000
 POLA_WAKTU = re.compile(r"(tahun|thn|bulan|bln|tgl|tanggal|date|periode|masa|year|month|minggu|week)", re.I)
 POLA_ID = re.compile(r"(^id$|_id$|npwp|nip|nik|nomor|no_|kode_?unik)", re.I)
+# Kata kunci pengenal sebagai potongan nama utuh (dipisah _): ID_Tiket, kd_cabang, provinsi_kode, NIK, uuid.
+POLA_PENGENAL = re.compile(r"(^|_)(id|kd|kode|no|nomor|nik|nip|npwp|key|uuid|sku)(_|$)", re.I)
+POLA_PENGENAL_CAMEL = re.compile(r"^(id|kode)[A-Z]|[a-z0-9](Id|ID|Kode|Key)$")
+
+
+def kolom_pengenal(nama: str) -> bool:
+    """Kolom kode/ID: angka tapi bukan untuk dijumlah -> selalu Dimensi.
+
+    Awalan alias tabel dari Kueri Visual (mis. "t1.ID_Penerbangan") dibuang dulu; dulu awalan itu membuat
+    ID_Penerbangan terbaca sebagai Ukuran."""
+    dasar = str(nama).rsplit(".", 1)[-1]
+    return bool(POLA_ID.search(dasar) or POLA_PENGENAL.search(dasar) or POLA_PENGENAL_CAMEL.search(dasar))
 MAKS_KATEGORI = 60
 
 
@@ -65,7 +77,7 @@ def profil_kolom(df: pd.DataFrame) -> dict[str, list[str]]:
             peran["abaikan"].append(kolom)                     # konstan (mis. kolom periode)
         elif POLA_WAKTU.search(kolom) or pd.api.types.is_datetime64_any_dtype(s):
             peran["waktu"].append(kolom)
-        elif POLA_ID.search(kolom) and unik / n > 0.5:
+        elif kolom_pengenal(kolom) and unik / n > 0.5:
             peran["abaikan"].append(kolom)                     # pengenal unik (NPWP, NIP, ...)
         elif rasio_angka > 0.95 and not kolom.lower().startswith(("kd_", "kode")) \
                 and (unik > 12 or (angka % 1 != 0).any()):

@@ -72,8 +72,10 @@ Urutan rekomendasi (yang pertama cocok dipakai):
 
 ### Panel Analitik
 
-Ramalan (Holt-Winters, pita 80/95%), garis tren (R²), dan tanda anomali untuk Garis/Area/Batang
-dengan satu dimensi berurutan. Penjelasan: [17 bagian 4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif).
+Ramalan (Holt-Winters, pita 80/95%), garis tren (R²), tanda anomali, **rata-rata bergerak**, **garis rata-rata**,
+**garis median**, **garis target**, dan **tertinggi & terendah** untuk Garis/Area/Batang dengan satu dimensi berurutan.
+Panel pudar? Klik **Siapkan agar analitik aktif**: kolom tanggal dipilih, dimensi lain dilepas, ukuran ke Baris,
+jenis menjadi Garis. Penjelasan: [17 bagian 4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif).
 
 ### Hierarki dimensi (telusur bertingkat)
 
@@ -81,7 +83,8 @@ Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provi
 
 | Langkah | Cara |
 |---|---|
-| Buat | Panel Data → **Hierarki → ＋**, beri nama, centang kolom **berurutan dari yang paling umum** (2–8 level). Atau menu pil → *Buat hierarki dari kolom ini…* |
+| Buat (seret-tumpuk) | **Seret satu dimensi ke atas dimensi lain** di panel Data (mis. `kecamatan` ke atas `kab_kota`): dialog *Hierarki baru* terbuka dengan urutan terisi, tinggal beri **nama** (= nama kolom baru). Seret dimensi ke atas **hierarki** = tambah level paling rinci |
+| Buat (dialog) | Panel Data → **Hierarki → ＋**, beri nama, centang kolom **berurutan dari yang paling umum** (2–8 level). Atau menu pil → *Buat hierarki dari kolom ini…* |
 | Pakai | Seret/dobel klik hierarki ke rak. Tampil di level teratas (teragregasi). |
 | Masuk ke satu nilai | **Klik** batang/titik/wilayah di chart → level berikutnya, difilter ke nilai itu (jalur tampil di pil, mis. `ID-JK › kategori`). |
 | Turun / naik level | Tombol **▸** (level berikutnya, semua nilai) dan **◂** (kembali satu level) di pil. |
@@ -92,6 +95,17 @@ Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provi
 - Chart yang disimpan memakai **level yang sedang tampil** (beserta filter jalurnya).
 - API: `GET/POST /studio/api/hierarki/<dataset_id>`, `POST /studio/api/hierarki/<dataset_id>/hapus`
   (modul `config/sps_studio/hierarki.py`).
+
+Data latihan `latihan_penjualan_harian` sudah membawa hierarki **Wilayah** (pulau › provinsi › kab/kota › kecamatan ›
+kelurahan › outlet), **Kalender** (tahun › kuartal › bulan › tanggal), dan **Produk** (kategori › subkategori).
+
+### Tampilkan saya dengan banyak kolom
+
+Jenis grafik bisa dipilih selama **kebutuhan minimalnya** terpenuhi. Kolom yang melebihi kapasitas jenis itu
+**tidak dipakai**: pilnya tampil pudar dicoret dan status menulis *Tidak dipakai Pie: …* (seperti Tableau).
+Urutan pemakaian: jenis berbasis waktu mendahulukan kolom tanggal, peta titik mendahulukan lintang/bujur, peta
+provinsi mendahulukan kolom wilayah, jenis komposisi (Pie, Treemap, Corong) mendahulukan kategori; selebihnya
+urutan rak (Kolom, Baris, Warna). Chart yang disimpan memakai kolom yang sama dengan pratinjau.
 
 ### Saran dari data
 
@@ -240,6 +254,7 @@ config/sps_studio/
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |
 | Saran dari data lama muncul | Sumber data lambat | Tunggu; jawaban lama otomatis diabaikan |
 | Panel Analitik pudar | jenis bukan Garis/Area/Batang, atau > 1 dimensi | sisakan satu dimensi berurutan; kosongkan Warna |
+| Kolom `ID_…` / `t1.ID_…` / `kode_…` ada di **Ukuran** | versi lama: awalan alias tabel hasil Kueri Visual (`t1.`) membuat ID tidak dikenali | perbarui ALDx; ID/kode kini selalu Dimensi |
 | Kolom angka (mis. `total`) ada di **Dimensi**, tidak bisa dijumlah / diramal | versi lama: kolom desimal ClickHouse (`Float64`) tidak dikenali sebagai angka | perbarui ALDx ([31](31-catatan-versi.md)); bila sumber lain, set tipe kolom ke angka di Dataset › Edit › Kolom |
 | Huruf objek teks tidak berubah di dashboard | CSS dashboard dihapus manual di Superset | buka dashboard di Studio › Simpan lagi (bagian `ALDX-HURUF` dibuat ulang) |
 | Gambar objek: "Format gambar harus PNG, JPEG, WebP, atau GIF" | berkas SVG / format lain | ekspor ulang logo sebagai PNG |

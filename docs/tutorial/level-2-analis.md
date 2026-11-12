@@ -84,7 +84,8 @@ Klik pil ukuran, misalnya `SUM(total)` → **(1)** pilih Jumlah, Rata-rata, Hitu
 ## 7. Memilih jenis grafik lain
 
 Di panel **Tampilkan saya**, klik jenis lain. Tombol pudar berarti kolom belum cukup; arahkan
-kursor untuk melihat kebutuhannya (mis. *Sankey: 2 dimensi, 1 ukuran*).
+kursor untuk melihat kebutuhannya (mis. *Sankey: 2 dimensi, 1 ukuran*). Kolom **lebih** dari kebutuhan tidak
+membuat tombol mati: kolom itu tidak dipakai, pilnya tampil pudar dicoret, dan status menyebutnya.
 Galeri seluruh 23 jenis: [17-katalog-chart-peta-prediksi.md](../17-katalog-chart-peta-prediksi.md).
 
 | Ingin menunjukkan | Pilih |
@@ -136,6 +137,21 @@ Seret **provinsi** ke Kolom dan **belanja** ke Baris → **(1) Peta provinsi**. 
    - **Garis tren**: arah umum naik/turun;
    - **Tandai anomali**: titik merah pada bulan yang tidak wajar.
 3. Arahkan kursor ke bulan ramalan untuk melihat rentang 80%/95%.
+4. Opsi lain di panel yang sama:
+   - **Rata bergerak 3**: garis halus yang meredam naik-turun;
+   - **Garis rata-rata** / **Garis median**: garis acuan mendatar berlabel;
+   - **Target** + nilai (mis. `22000000000`): garis sasaran;
+   - **Tertinggi & terendah**: penanda di periode ekstrem.
+5. Panel pudar (mis. ada 3 dimensi)? Klik **Siapkan agar analitik aktif**: kolom tanggal dipakai, dimensi lain dilepas.
+
+### 10b. Hierarki & data besar (latihan_penjualan_harian, ± 2,3 juta baris)
+
+1. Sumber data **latihan_penjualan_harian**. Di panel **Hierarki** sudah ada *Wilayah*, *Kalender*, *Produk*.
+2. **Buat hierarki sendiri dengan seret-tumpuk**: seret `kecamatan` ke atas `kab_kota` → isi nama
+   (mis. *Kota & Kecamatan*) → **Simpan**. Seret `kelurahan` ke atas hierarki itu untuk menambah level.
+3. Klik dua kali *Wilayah* (ke Kolom) dan `penjualan` (ke Baris). Klik batang **Jawa** → provinsi di Jawa;
+   **▸** turun satu level untuk semua nilai, **◂** naik lagi.
+4. Ganti ke *Kalender* level `bulan` lalu aktifkan Ramalan: puncak tiap tahun mengikuti Lebaran.
 
 Cara membaca: lihat [17-katalog-chart-peta-prediksi.md bagian 4](../17-katalog-chart-peta-prediksi.md#4-analitik-prediktif).
 Ramalan meneruskan pola lama; kebijakan baru tidak diketahui model.

@@ -147,6 +147,27 @@
         series.push({name: `Anomali ${u}`, type: "scatter", data: titik, symbolSize: opsi.mini ? 7 : 11, z: 4,
                      itemStyle: {color: MERAH, borderColor: "#fff", borderWidth: 1.5}});
       }
+      if (a.rata_bergerak) {
+        series.push({name: `Rata-rata bergerak ${a.rata_bergerak.n} ${u}`, type: "line", data: [...a.rata_bergerak.nilai, ...pad],
+                     symbol: "none", smooth: true, z: 2, itemStyle: {color: w}, lineStyle: {width: 2.5, color: w, opacity: 0.55}});
+      }
+      // Garis acuan mendatar (markLine pada seri aktual): label di DALAM area grafik, tidak terpotong tepi kanan.
+      // Posisi label berbeda (atas/bawah, kiri/kanan) agar rata-rata & median yang berdekatan tidak saling tumpuk.
+      const garisAcuan = [["rata_rata", "Rata-rata", "#6B7280", "dashed", "insideEndTop"],
+                          ["median", "Median", "#8B47C9", [6, 3, 1, 3], "insideEndBottom"],
+                          ["target", "Target", "#0F9488", "solid", "insideStartTop"]].filter(([k]) => a[k] != null).map(([k, judul, wr, tipe, pos]) => ({
+        name: judul, yAxis: a[k], lineStyle: {color: wr, type: tipe, width: 1.4},
+        label: {show: !opsi.mini, position: pos, formatter: `${judul} ${fmtRingkas.format(a[k])}`, color: wr, fontSize: 11, fontWeight: 600}}));
+      if (garisAcuan.length) {
+        series.find(x => x.name === u).markLine = {symbol: "none", silent: true, data: garisAcuan};
+      }
+      if (a.ekstrem) {
+        const titik = Array(n + h).fill(null);
+        titik[a.ekstrem.maks.i] = {value: a.ekstrem.maks.nilai, label: {formatter: "Tertinggi"}};
+        titik[a.ekstrem.min.i] = {value: a.ekstrem.min.nilai, label: {formatter: "Terendah", position: "bottom"}};
+        series.push({name: `Tertinggi & terendah ${u}`, type: "scatter", data: titik, symbol: "pin", symbolSize: opsi.mini ? 14 : 22, z: 5,
+                     itemStyle: {color: w}, label: {show: !opsi.mini, position: "top", fontSize: 11, fontWeight: 600, color: "#374151"}});
+      }
     });
   }
   function tooltipAnalitik(ps, an, n) {
