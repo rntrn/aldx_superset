@@ -415,6 +415,14 @@ SKENARIO = [
      "Data → Jejak data → pilih latihan_penjualan → arahkan kursor ke sebuah dashboard → klik sebuah chart; ulangi sebagai Analis",
      "Empat kolom Sumber/Dataset/Chart/Dashboard terisi; chart pemakai tersorot; klik membuka chart; Analis hanya melihat "
      "dataset & chart yang boleh ia akses"),
+    ("K13", 1, "Sedang", "Label kesegaran data", "Dashboard latihan",
+     "Buka dashboard latihan → lihat label di bilah atas → arahkan kursor → klik",
+     "Label 'Data: … lalu' tampil; tooltip merinci tiap dataset & waktu diperbarui; klik membuka Jejak data; "
+     "label hilang di halaman selain dashboard"),
+    ("D29", 2, "Sedang", "Simulasi what-if", "latihan_penjualan",
+     "Studio → nm_cabang × total, Batang → geser Simulasi ke +10% → Simpan baru → buka chart tersimpan",
+     "Batang naik 10% (total ±667 M → ±734 M); status menulis 'hanya pratinjau'; chart tersimpan tetap nilai asli; "
+     "slider mati saat Hitung dipakai"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",

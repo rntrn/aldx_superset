@@ -206,6 +206,28 @@
         return false;
       }});
   }
+  /* ---------- Simulasi what-if ----------
+     Menggeser satu ukuran naik/turun sekian persen di browser, di atas hasil kueri. Tidak menyentuh dataset
+     (tetap bisa diekstrak & di-cache) dan tidak ikut tersimpan. Garis analitik disembunyikan selama simulasi
+     karena dihitung dari nilai asli. */
+  function simulasiAktif() {
+    const s = L.simulasi;
+    return s && s.persen && L.hasil?.ukuran?.includes(s.ukuran) ? s : null;
+  }
+  function denganSimulasi(h) {
+    const s = simulasiAktif();
+    if (!s) return h;
+    const faktor = 1 + s.persen / 100;
+    return {...h, analitik: null, baris: h.baris.map(b => (typeof b[s.ukuran] === "number" ? {...b, [s.ukuran]: b[s.ukuran] * faktor} : b))};
+  }
+  function isiSimulasi() {
+    const ukuran = L.hasil?.ukuran || [], s = L.simulasi || {ukuran: "", persen: 0};
+    if (!ukuran.includes(s.ukuran)) L.simulasi = {ukuran: ukuran[0] || "", persen: ukuran.length ? s.persen : 0};
+    $("#simUkuran").innerHTML = ukuran.map(u => `<option ${u === L.simulasi.ukuran ? "selected" : ""}>${esc(u)}</option>`).join("");
+    $("#simUkuran").disabled = $("#simPersen").disabled = !ukuran.length || L.hasil.kalkulasi !== "";
+    if ($("#simPersen").disabled) L.simulasi.persen = 0;
+    $("#simPersen").value = L.simulasi.persen; $("#simNilai").textContent = `${L.simulasi.persen > 0 ? "+" : ""}${L.simulasi.persen}%`;
+  }
   async function simpanDefinisi(jenis, lama) {
     try {
       const r = await Studio.api(`/studio/api/definisi/${L.ds}`, {jenis, nama: $("#dfNama").value.trim(), rumus: $("#dfRumus").value,
@@ -449,8 +471,11 @@
       const dataEkspor = {kolom: hasil.kolom, baris: hasil.baris.map(b => hasil.kolom.map(k => b[k]))};
       if (window.SPS && SPS.ekspor) ["#tabelData"].concat(".lukis").forEach(s => SPS.ekspor.data($(s), dataEkspor));
       pesan.style.display = "none";
-      const info = Studio.gambar($("#grafik"), L.hasil, t, {horizontal: horizontal(), label: L.label, skala: L.skala,
+      isiSimulasi();
+      const sim = simulasiAktif();
+      const info = Studio.gambar($("#grafik"), denganSimulasi(L.hasil), t, {horizontal: horizontal(), label: L.label, skala: L.skala,
         klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null}) || {};
+      if (sim) info.catatan = `Simulasi: ${sim.ukuran} ${sim.persen > 0 ? "+" : ""}${sim.persen}% (hanya pratinjau, tidak ikut tersimpan)` + (info.catatan ? ". " + info.catatan : "");
       $("#statusLembar").innerHTML = `<span>${fmtPenuh.format(L.hasil.baris.length)} baris</span><span>${esc(Studio.awal.aturan[t].label)}</span>
         <span>${Math.round(performance.now() - mulai)} ms</span>${L.topN ? `<span>${L.topN} teratas</span>` : L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
         ${info.catatan ? `<span class="peringatan">${esc(info.catatan)}</span>` : ""}
@@ -600,7 +625,7 @@
   /* ---------- Tombol ---------- */
   function bersihkan(render = true) {
     Object.assign(L, {kolom: [], baris: [], warna: null, ukuran: null, filter: [], tanda: "otomatis", label: false, urut: "",
-                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false});
+                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false, simulasi: null});
     $("#topN").value = ""; $("#pilihKalkulasi").value = ""; $("#pakaiSkala").checked = false;
     $("#judulLembar").value = ""; $("#pakaiLabel").checked = false; $("#pilihTanda").value = "otomatis";
     if (render) perbarui(); else { renderRak(); renderShowMe(); renderAnalitik(); tampilPesan("Seret <b>&nbsp;Dimensi&nbsp;</b> ke rak Kolom dan <b>&nbsp;Ukuran&nbsp;</b> ke rak Baris."); }
@@ -618,6 +643,9 @@
     $("#pakaiLabel").onchange = () => { L.label = $("#pakaiLabel").checked; perbarui(); };
     $("#pilihKalkulasi").onchange = () => { L.kalkulasi = $("#pilihKalkulasi").value; perbarui(); };
     $("#pakaiSkala").onchange = () => { L.skala = $("#pakaiSkala").checked; perbarui(); };
+    $("#simUkuran").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
+    $("#simPersen").oninput = () => { $("#simNilai").textContent = `${$("#simPersen").value > 0 ? "+" : ""}${$("#simPersen").value}%`; };
+    $("#simPersen").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
     ["anRamalan", "anTren", "anAnomali", "anPeriode", "anGerak", "anJendela", "anRata", "anMedian", "anEkstrem", "anTarget", "anNilaiTarget"]
       .forEach(id => { $("#" + id).onchange = () => { bacaAnalitik(); perbarui(); }; });
     $("#anSiapkan").onclick = siapkanAnalitik;

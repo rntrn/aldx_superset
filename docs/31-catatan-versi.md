@@ -36,6 +36,8 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Dashboard | **Tampilan tersimpan** (bookmark): simpan keadaan filter dengan nama, buka lagi satu klik | [25 §2c](25-berkas-filter-global-ulasan.md) |
 | Dashboard | Menu **Peringatan data**: email bila angka melewati ambang | [26 §1b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
 | Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
 | Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |

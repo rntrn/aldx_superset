@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **157 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **159 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -92,6 +92,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D26 | 2 Analis | Sedang | Skala warna tabel & Kelompokkan nilai | latihan_penjualan | Tabel nm_cabang × total → centang Skala warna sel; klik kanan nm_cabang → Kelompokkan nilai… → kelompok Jawa = Jakarta, Bandung, Surabaya; nilai lain = Lainnya → Buat dimensi → pakai di Batang | Sel Jakarta paling pekat; dimensi nm_cabang_kelompok bertanda ƒ; batang Jawa ±493 M dan Lainnya ±175 M; klik kanan → Ubah rumus… menampilkan CASE WHEN |
 | D27 | 2 Analis | Tinggi | Dashboard dari template | latihan_penjualan | Susun dashboard → Dari template… → dataset latihan_penjualan, ukuran utama total, Ringkasan eksekutif → Buat → Simpan dashboard → Buka; ulangi untuk dua template lain | Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart |
 | D28 | 2 Analis | Tinggi | YoY (% vs tahun lalu) | latihan_penjualan | Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % vs tahun lalu (YoY) → Simpan baru → buka di Explore; ganti dimensi ke nm_cabang | 12 bulan pertama kosong; Januari 2024 ±15,8%; chart tersimpan menampilkan angka yang sama; pilihan YoY mati untuk dimensi bukan tanggal |
+| D29 | 2 Analis | Sedang | Simulasi what-if | latihan_penjualan | Studio → nm_cabang × total, Batang → geser Simulasi ke +10% → Simpan baru → buka chart tersimpan | Batang naik 10% (total ±667 M → ±734 M); status menulis 'hanya pratinjau'; chart tersimpan tetap nilai asli; slider mati saat Hitung dipakai |
 
 ## E. Peta & analitik prediktif
 
@@ -207,6 +208,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 
 | ID | Level | Prioritas | Skenario | Prasyarat | Langkah | Hasil diharapkan |
 |---|---|---|---|---|---|---|
+| K13 | 1 Pengguna | Sedang | Label kesegaran data | Dashboard latihan | Buka dashboard latihan → lihat label di bilah atas → arahkan kursor → klik | Label 'Data: … lalu' tampil; tooltip merinci tiap dataset & waktu diperbarui; klik membuka Jejak data; label hilang di halaman selain dashboard |
 | K12 | 3 Admin data | Sedang | Peringatan data | SMTP terpasang (tanpa SMTP: cek log) | Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, jadwal tiap menit, penerima email sendiri | Peringatan tercatat berjalan; email diterima (atau tercatat di log bila mode uji); masa tenang mencegah email berulang |
 | K11 | 1 Pengguna | Sedang | Asisten AI: ringkas dashboard | Model AI tersambung | Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin | Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka |
 | K01 | 2 Analis | Tinggi | Riwayat versi & pulihkan | Pemilik dashboard | Ubah judul/tata letak → Simpan → Riwayat versi → Pulihkan versi sebelumnya | Judul/tata letak kembali; versi sebelum pemulihan tercatat; pengguna bukan pemilik tidak bisa memulihkan |

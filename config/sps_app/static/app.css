@@ -561,6 +561,8 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
   border-radius: var(--r-kecil); background: var(--kertas); color: var(--teks); font: inherit; cursor: pointer; }
 .item-telusur:hover { border-color: var(--garis-kuat); background: var(--aksen-muda); }
 .item-telusur span { display: flex; flex-direction: column; min-width: 0; }
+.chip-segar { cursor: default; padding: 0 10px; font-size: 12px; color: var(--teks-2, var(--teks)); white-space: nowrap; }
+.chip-segar.lama { border-color: #E8A33D; }
 .simpan-tampilan { display: flex; gap: 6px; margin: 6px 0 8px; }
 .simpan-tampilan input { flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid var(--garis); border-radius: var(--r); background: var(--latar); color: var(--teks); font: inherit; }
 .baris-tampilan { display: flex; gap: 4px; align-items: stretch; }
