@@ -8,6 +8,7 @@ Kegunaan: sebelum mengubah/menghapus dataset atau kolom, lihat dulu chart & dash
     GET /jejak-data/                    halaman (wajib login)
     GET /jejak-data/api/daftar?q=       dataset yang boleh diakses pengguna + jumlah chart
     GET /jejak-data/api/jejak/<id>      sumber, chart, dan dashboard untuk satu dataset
+    GET /jejak-data/api/segar?dashboard=<id|slug>   kesegaran data sebuah dashboard (label di bilah atas)
 
 Hanya membaca. Pengguna hanya melihat dataset, chart, dan dashboard yang memang boleh ia buka;
 objek lain dihitung sebagai "tersembunyi" tanpa menampilkan namanya.
@@ -96,6 +97,68 @@ def jejak(dataset_id: int) -> dict:
                         "url": f"/explore/?datasource_type=table&datasource_id={t.id}"},
             "sumber": sumber, "chart": charts,
             "dashboard": sorted(dashboards.values(), key=lambda d: d["judul"].lower()), "tersembunyi": tersembunyi}
+
+
+def _tabel_ditulis() -> dict[str, tuple[str, int]]:
+    """{nama tabel: (waktu terakhir ditulis, usia dalam detik)} untuk semua tabel ALDx Engine.
+    Usia dihitung engine sendiri agar beda zona waktu antar-container tidak menggeser hasil. {} bila engine tidak menjawab."""
+    from sps_engine import klien as K
+    try:
+        df = K.klien().kueri_df("SELECT table AS tabel, toString(max(modification_time)) AS waktu, "
+                                "dateDiff('second', max(modification_time), now()) AS usia FROM system.parts "
+                                f"WHERE active AND database = '{K.nama_db()}' GROUP BY table")
+    except Exception:  # noqa: BLE001 - label kesegaran tidak boleh menggagalkan halaman
+        return {}
+    return {n: (w, max(int(u), 0)) for n, w, u in zip(df["tabel"], df["waktu"], df["usia"])}
+
+
+def kesegaran(dash, sekarang=None) -> dict:
+    """Seberapa baru data sebuah dashboard.
+
+    Dataset hasil Ekstrak (ALDx Engine) -> waktu penyegaran terakhir & jadwal berikutnya.
+    Tabel engine lain (impor berkas, data latihan, ramalan) -> waktu tabel terakhir ditulis (dari engine).
+    Dataset lain membaca database sumber secara langsung -> selalu terbaru ("langsung").
+    usia_detik = usia data yang PALING LAMA (itulah batas kesegaran dashboard); None bila semuanya langsung.
+    """
+    from datetime import datetime
+
+    from superset import security_manager as sm
+
+    from sps_engine import ekstrak
+    sekarang = sekarang or datetime.now()
+    per_dataset = {e["dataset_id"]: e for e in ekstrak.daftar()}
+    usia_dari = lambda teks: max(int((sekarang - datetime.fromisoformat(teks)).total_seconds()), 0)  # noqa: E731
+    ditulis = None                                              # diisi saat pertama dibutuhkan (satu kueri ke engine)
+    rincian, lihat = [], set()
+    for c in dash.slices:
+        t = c.datasource
+        if t is None or t.id in lihat or not sm.can_access_datasource(t):
+            continue
+        lihat.add(t.id)
+        e = per_dataset.get(t.id)
+        if e and e.get("selesai"):
+            rincian.append({"dataset": t.table_name, "jenis": "ekstrak", "selesai": e["selesai"],
+                            "usia_detik": usia_dari(e["selesai"]), "status": e.get("status") or "",
+                            "berikutnya": e.get("berikutnya") or ""})
+        elif ekstrak.adalah_engine(t.database):
+            ditulis = _tabel_ditulis() if ditulis is None else ditulis
+            waktu = ditulis.get(t.table_name)
+            rincian.append({"dataset": t.table_name, "jenis": "engine", **(
+                {"selesai": waktu[0], "usia_detik": waktu[1]} if waktu else {})})
+        else:
+            rincian.append({"dataset": t.table_name, "jenis": "langsung"})
+    usia = [r["usia_detik"] for r in rincian if "usia_detik" in r]
+    return {"usia_detik": max(usia) if usia else None, "gagal": any(r.get("status") == "gagal" for r in rincian),
+            "rincian": sorted(rincian, key=lambda r: -r.get("usia_detik", -1))}
+
+
+@bp.route("/api/segar")
+def api_segar():
+    from sps_filter_global import _dashboard
+    dash = _dashboard(request.args.get("dashboard", ""))
+    if dash is None:
+        return jsonify(error="Dashboard tidak ditemukan atau tidak boleh Anda akses"), 404
+    return jsonify(kesegaran(dash))
 
 
 @bp.route("/api/daftar")

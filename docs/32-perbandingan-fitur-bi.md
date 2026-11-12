@@ -23,7 +23,8 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Sematkan dengan RLS per penonton | Looker, Sigma, Power BI | ✅ | [30](30-sematkan-dashboard.md) |
 | Langganan laporan, riwayat versi, tata letak ponsel | semua | ✅ | [26](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Story / presentasi berurutan | Tableau | ✅ | Story |
-| Parameter *what-if* (geser angka, chart ikut berubah) | Power BI, Tableau | ⏳ | lihat §2 |
+| Parameter *what-if* (geser angka, chart ikut berubah) | Power BI, Tableau | 🆕 (sebagian) | Studio › **Simulasi** (pratinjau, tidak tersimpan) |
+| Label kesegaran data | Tableau, Power BI | 🆕 | bilah atas dashboard ([26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md)) |
 | **Kalkulasi cepat** (% dari total, kumulatif, YoY) | Tableau | 🆕 | Studio › **Hitung** |
 | **Template dashboard** (*Quick create*) | Power BI, Tableau | 🆕 | Susun dashboard › **Dari template…** |
 | **Kelompokkan nilai** (*Group*) & skala warna tabel | Tableau, Power BI | 🆕 | Studio: klik kanan dimensi; Tabel › *Skala warna sel* |

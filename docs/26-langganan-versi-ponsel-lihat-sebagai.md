@@ -117,6 +117,19 @@ Pakai sebelum mengubah atau menghapus dataset/kolom, untuk tahu chart dan dashbo
 
 Hanya membaca; tidak mengubah apa pun. Kode: `config/sps_jejak.py`, `config/sps_jejak.html`.
 
+### 7b. Label kesegaran data
+
+Saat sebuah dashboard dibuka, bilah atas menampilkan seberapa baru datanya:
+
+| Label | Arti |
+|---|---|
+| **Data: 2 jam lalu** | data di ALDx Engine (ekstrak, impor berkas) yang **paling lama** diperbarui 2 jam lalu |
+| **Data langsung** | semua chart membaca database sumber langsung, jadi selalu terbaru |
+| bingkai jingga | lebih dari 2 hari, atau penyegaran ekstrak terakhir gagal |
+
+Arahkan kursor ke label untuk rincian per dataset (waktu diperbarui & jadwal berikutnya); klik membuka Jejak data.
+Label tidak tampil di layar sempit. Kode: `kesegaran()` di `config/sps_jejak.py`, `config/sps_app/static/segar.js`.
+
 ## 8. Untuk pengembang
 
 | Berkas | Isi |

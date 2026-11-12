@@ -279,6 +279,12 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"tabel sumber SQL salah: {sumber}")
                 if not any(d["id"] == P and d["chart"] == len(j["chart"]) + j["tersembunyi"] for d in sps_jejak.daftar()):
                     raise RuntimeError("jumlah chart di daftar tidak cocok")
+                from superset.models.dashboard import Dashboard
+                dash = db.session.query(Dashboard).get(j["dashboard"][0]["id"])
+                segar = sps_jejak.kesegaran(dash)                       # data latihan = tabel engine: usia dari engine
+                if not segar["rincian"] or segar["usia_detik"] is None or segar["usia_detik"] < 0 or \
+                        any(r["jenis"] not in ("ekstrak", "engine", "langsung") for r in segar["rincian"]):
+                    raise RuntimeError(f"kesegaran salah: {segar}")
                 return f"{len(j['chart'])} chart, {len(j['dashboard'])} dashboard; tabel sumber SQL terbaca"
 
             @uji("Studio", "Template dashboard: 3 template menghasilkan lembar kerja yang sah")

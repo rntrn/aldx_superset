@@ -140,6 +140,14 @@ Saat disimpan memakai fitur bawaan chart Superset (*Contribution* / *Rolling cum
 sehingga chart di dashboard sama dengan pratinjau. Chart YoY tersimpan memakai rentang waktu 30 tahun terakhir
 (syarat Superset) dan serinya bernama *1 year ago*. Kode: `_kalkulasi()` di `config/sps_studio/lembar.py`.
 
+### Simulasi what-if
+
+Baris **Simulasi** di panel Marks: pilih ukuran, geser dari −50% sampai +100% → grafik langsung menunjukkan
+keadaan bila ukuran itu naik/turun sekian persen (mis. *bagaimana bila penjualan naik 10%?*).
+
+Hanya pratinjau di Studio: **tidak mengubah data dan tidak ikut tersimpan** ke chart (status di bawah grafik
+menuliskannya). Garis analitik disembunyikan selama simulasi; simulasi mati saat **Hitung** dipakai.
+
 ### Skala warna tabel
 
 Jenis **Tabel** → centang **Skala warna sel**: latar sel ukuran makin pekat untuk nilai makin besar (per kolom),
