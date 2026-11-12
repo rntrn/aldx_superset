@@ -33,7 +33,9 @@
      langkah: 4, cocok: /^\/(dashboard\/list|superset\/dashboard)/},
     {id: "story", grup: "Dashboard & Story", label: "Story", ikon: "story", alamat: "/asisten/?tab=story", izin: "Story", langkah: 5},
     {id: "langganan", grup: "Dashboard & Story", label: "Langganan laporan", ikon: "riwayat", alamat: "/report/list/", izin: "Alerts & Report",
-     cocok: /^\/(report|alert)\//},
+     cocok: /^\/report\//},
+    {id: "peringatan", grup: "Dashboard & Story", label: "Peringatan data", ikon: "riwayat", alamat: "/alert/list/", izin: "Alerts & Report",
+     cocok: /^\/alert\//},
     {id: "berkas", grup: "Dashboard & Story", label: "Berkas .ald / .aldx", ikon: "simpan", alamat: "/berkas/", izin: "Berkas ALDx", cocok: /^\/berkas/},
     {id: "sematkan", grup: "Dashboard & Story", label: "Sematkan ke web lain", ikon: "sambung", alamat: "/sematkan/", izin: "Sematkan", admin: true, cocok: /^\/sematkan\/?$/},
     // Tanya-jawab AI ada di panel ✦ (Ctrl + I) di setiap halaman; menu ini untuk membuat chart & dashboard otomatis.

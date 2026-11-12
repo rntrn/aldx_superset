@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **153 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **156 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -91,6 +91,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D25 | 2 Analis | Tinggi | Kalkulasi cepat: % dari total & kumulatif | latihan_penjualan | Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % dari total, lalu Kumulatif → Simpan baru → buka di Explore | % dari total: sumbu bertanda %, jumlah semua titik 100%; Kumulatif: garis selalu naik, titik akhir = total (±667 M); chart tersimpan sama dengan pratinjau; pilihan Hitung mati untuk Pie |
 | D26 | 2 Analis | Sedang | Skala warna tabel & Kelompokkan nilai | latihan_penjualan | Tabel nm_cabang × total → centang Skala warna sel; klik kanan nm_cabang → Kelompokkan nilai… → kelompok Jawa = Jakarta, Bandung, Surabaya; nilai lain = Lainnya → Buat dimensi → pakai di Batang | Sel Jakarta paling pekat; dimensi nm_cabang_kelompok bertanda ƒ; batang Jawa ±493 M dan Lainnya ±175 M; klik kanan → Ubah rumus… menampilkan CASE WHEN |
 | D27 | 2 Analis | Tinggi | Dashboard dari template | latihan_penjualan | Susun dashboard → Dari template… → dataset latihan_penjualan, ukuran utama total, Ringkasan eksekutif → Buat → Simpan dashboard → Buka; ulangi untuk dua template lain | Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart |
+| D28 | 2 Analis | Tinggi | YoY (% vs tahun lalu) | latihan_penjualan | Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % vs tahun lalu (YoY) → Simpan baru → buka di Explore; ganti dimensi ke nm_cabang | 12 bulan pertama kosong; Januari 2024 ±15,8%; chart tersimpan menampilkan angka yang sama; pilihan YoY mati untuk dimensi bukan tanggal |
 
 ## E. Peta & analitik prediktif
 
@@ -193,6 +194,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | J04 | 3 Admin data | Tinggi | Berkas tanpa rahasia koneksi | J01 | Cek isi berkas (tidak bisa dibuka tanpa kunci); Impor ke koneksi tujuan lain | Tidak ada alamat/user/password koneksi; hanya koneksi yang boleh diakses penerima yang bisa dipilih |
 | J05 | 1 Pengguna | Tinggi/asap | Filter global di semua dashboard & Story | Dashboard latihan & latihan-wilayah (keduanya punya filter Kategori) | Tombol corong → Kategori = Elektronik → Terapkan; buka dashboard lain & Story | Kedua dashboard langsung tersaring Elektronik (209B dan 5,45T); lencana corong = 1; hapus semua = kembali normal |
 | J12 | 1 Pengguna | Tinggi | Telusuri ke dashboard lain (drill-through) | Dashboard latihan & latihan-wilayah | Dashboard latihan → klik irisan Elektronik di pie → tombol Telusuri → pilih Latihan: Wilayah & Prediksi → klik chip ← di bilah atas | Panel menulis 'kategori: Elektronik' dan menawarkan dashboard Wilayah; tujuan terbuka tersaring (total 5,45 T); chip Kembali mengantar ke dashboard asal; tanpa filter aktif panel memberi petunjuk |
+| J13 | 1 Pengguna | Tinggi | Tampilan tersimpan (bookmark) | Dashboard Latihan: Wilayah & Prediksi | Pilih Kategori = Elektronik → Terapkan → Telusuri → nama 'Elektronik saja' → Simpan tampilan ini; hapus filter; Telusuri → klik 'Elektronik saja'; login akun lain; hapus dengan × | Dashboard terbuka tersaring Elektronik; tampilan tidak terlihat di akun lain; × menghapus; tanpa filter aktif kotak simpan tidak muncul |
 | J06 | 1 Pengguna | Sedang | Komentar & rating dimoderasi | Akun pengguna & Superadmin | Pengguna: dashboard → tombol komentar → 4 bintang + komentar → Kirim; Superadmin: Kelola → Moderasi ulasan → Tampilkan | Sebelum disetujui hanya penulis & Superadmin yang melihat; sesudahnya semua; rata-rata rating tampil |
 | J07 | 1 Pengguna | Sedang | Balasan & @sebut | J06; dua akun | A menulis komentar menyebut @B; B membalas komentar A | Saran nama muncul saat mengetik @; B mendapat titik di avatar & pemberitahuan; balasan tampil menjorok di bawah komentar A |
 | J08 | 1 Pengguna | Sedang | Filter global rentang & per akun | Dashboard latihan-wilayah (filter Tahun rentang & Rentang waktu) | Corong → Tahun dari 2024 sampai 2025 → Terapkan (lalu ganti: Rentang waktu, Tanggal tertentu 2025-01-01 : 2026-01-01); buka ALDx dari komputer/ponsel lain | Total penjualan 10T (2024-2025), lalu 5,2T (tahun 2025); filter yang sama sudah aktif di perangkat lain |
@@ -204,6 +206,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 
 | ID | Level | Prioritas | Skenario | Prasyarat | Langkah | Hasil diharapkan |
 |---|---|---|---|---|---|---|
+| K12 | 3 Admin data | Sedang | Peringatan data | SMTP terpasang (tanpa SMTP: cek log) | Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, jadwal tiap menit, penerima email sendiri | Peringatan tercatat berjalan; email diterima (atau tercatat di log bila mode uji); masa tenang mencegah email berulang |
 | K11 | 1 Pengguna | Sedang | Asisten AI: ringkas dashboard | Model AI tersambung | Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin | Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka |
 | K01 | 2 Analis | Tinggi | Riwayat versi & pulihkan | Pemilik dashboard | Ubah judul/tata letak → Simpan → Riwayat versi → Pulihkan versi sebelumnya | Judul/tata letak kembali; versi sebelum pemulihan tercatat; pengguna bukan pemilik tidak bisa memulihkan |
 | K02 | 2 Analis | Sedang | Tata letak ponsel | Pemilik dashboard; ponsel | Tata ponsel → balik urutan, sembunyikan 1 chart → Simpan → buka di ponsel | Urutan sesuai pengaturan, chart tersembunyi tidak tampil; layar lebar tidak berubah |

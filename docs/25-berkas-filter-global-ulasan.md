@@ -132,6 +132,26 @@ Tombol **Telusuri** (ikon dua kotak berpanah, di kiri corong) tampil saat sebuah
 
 Kode: `config/sps_app/static/telusur.js`, `GET /filter-global/api/sasaran`, pembaca filter aktif di `bingkai.js`.
 
+### 2c. Tampilan tersimpan (bookmark)
+
+Menyimpan **keadaan filter sebuah dashboard dengan nama**, supaya bisa dibuka lagi dengan satu klik
+(padanan *Bookmark* Power BI). Ada di panel yang sama dengan Telusuri.
+
+1. Atur filter di dashboard (bilah filter dan/atau klik chart).
+2. Klik **Telusuri** → bagian **Tampilan tersimpan** → ketik nama (mis. *Elektronik Jawa*) → **Simpan tampilan ini**.
+3. Lain waktu: buka dashboard itu → **Telusuri** → klik nama tampilan → dashboard terbuka dengan filter tersebut.
+   Tombol **×** menghapus.
+
+| Hal | Penjelasan |
+|---|---|
+| Milik siapa | per akun: tampilan Anda tidak terlihat orang lain |
+| Batas | 20 tampilan per dashboard; nama sama = menimpa |
+| Yang disimpan | pilihan nilai, rentang angka, rentang waktu (bukan datanya) |
+| Hak akses | filter dipasang lewat alamat dashboard biasa, jadi RLS tetap berlaku |
+
+Kode: `simpan_tampilan()`, `daftar_tampilan()`, `hapus_tampilan()` di `config/sps_filter_global.py` (tabel `sps_tampilan`),
+API `/filter-global/api/tampilan`.
+
 ## 3. Komentar & rating
 
 Tombol **komentar** muncul di bilah atas saat dashboard atau chart dibuka.

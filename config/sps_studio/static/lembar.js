@@ -506,6 +506,9 @@
     $("#anTarget").checked = a.target != null; if (a.target != null) $("#anNilaiTarget").value = a.target;
     $("#anSiapkan").hidden = bisa || !dimensi().length;
     $("#pilihKalkulasi").disabled = !bisa;                       // syarat sama dengan analitik: 1 dimensi, Garis/Area/Batang
+    const dimWaktu = bisa && !!dimensi()[0]?.waktu;            // YoY butuh dimensi tanggal
+    $('#pilihKalkulasi option[value="yoy"]').disabled = !dimWaktu;
+    if (L.kalkulasi === "yoy" && bisa && !dimWaktu) { L.kalkulasi = ""; $("#pilihKalkulasi").value = ""; }
     $("#barisSkala").style.display = tandaEfektif() === "tabel" ? "" : "none";
     const r = Object.values(L.hasil?.analitik?.seri || {}).find(x => x.ramalan)?.ramalan;
     $("#anKet").innerHTML = !bisa ? "Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan)."

@@ -124,7 +124,7 @@ Kode: `config/sps_studio/definisi.py`.
 Kotak **N teratas** di bilah alat: isi angka (mis. 10) → hanya N baris teratas menurut urutan yang tampil; dengan
 **Urutkan** naik = N terbawah. Kosongkan = semua. Ikut tersimpan ke chart.
 
-### Kalkulasi cepat: % dari total & kumulatif
+### Kalkulasi cepat: % dari total, kumulatif & YoY
 
 Pilihan **Hitung** di panel Marks (aktif untuk Garis/Area/Batang dengan **satu dimensi**, syarat yang sama dengan Analitik):
 
@@ -133,10 +133,12 @@ Pilihan **Hitung** di panel Marks (aktif untuk Garis/Area/Batang dengan **satu d
 | Nilai asli | angka apa adanya | penjualan per bulan |
 | **% dari total** | tiap batang/titik = porsinya terhadap jumlah semua (total 100%) | porsi tiap saluran |
 | **Kumulatif (berjalan)** | nilai dijumlah terus dari kiri ke kanan; pada tanggal urut waktu, pada kategori urut terbesar (kurva Pareto) | penjualan sejak awal tahun |
+| **% vs tahun lalu (YoY)** | perubahan % terhadap tanggal yang sama setahun sebelumnya; kosong bila tahun lalu tidak ada datanya. Hanya aktif bila dimensinya **kolom tanggal** | pertumbuhan Januari 2024 vs Januari 2023 |
 
 Dihitung di server setelah kueri (bukan fungsi jendela SQL), jadi hasilnya sama di semua database sumber.
-Saat disimpan memakai fitur bawaan chart Superset (*Contribution* / *Rolling cumsum*) sehingga chart di dashboard
-sama dengan pratinjau. Kode: `_kalkulasi()` di `config/sps_studio/lembar.py`.
+Saat disimpan memakai fitur bawaan chart Superset (*Contribution* / *Rolling cumsum* / *Time comparison 1 year ago*)
+sehingga chart di dashboard sama dengan pratinjau. Chart YoY tersimpan memakai rentang waktu 30 tahun terakhir
+(syarat Superset) dan serinya bernama *1 year ago*. Kode: `_kalkulasi()` di `config/sps_studio/lembar.py`.
 
 ### Skala warna tabel
 

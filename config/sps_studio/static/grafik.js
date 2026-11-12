@@ -79,7 +79,7 @@
     }
     const nama = Object.keys(seriData);
     const persen = opsi.persen;
-    const persenTotal = hasil.kalkulasi === "persen_total";          // nilai sudah 0-100 dari server (lembar._kalkulasi)
+    const persenTotal = hasil.kalkulasi === "persen_total" || hasil.kalkulasi === "yoy";   // nilai sudah dalam % dari server (lembar._kalkulasi)
     const fmtPersen = v => (v == null ? "–" : (Math.round(v * 10) / 10).toLocaleString("id-ID") + "%");
     if (persen) {                                              // batang 100%: tiap kategori dijumlah = 100
       kategori.forEach((_, i) => {

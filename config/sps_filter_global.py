@@ -252,6 +252,19 @@ def api_nilai():
     return jsonify(nilai=cocok[:MAKS_NILAI], lebih=len(cocok) > MAKS_NILAI)
 
 
+def _bersihkan_filter(filter_) -> dict:
+    """Filter dari browser -> bentuk aman untuk disimpan: {kolom: [nilai] | {min, max} | "rentang waktu"}."""
+    bersih = {}
+    for k, nilai in list((filter_ if isinstance(filter_, dict) else {}).items())[:30]:
+        if isinstance(nilai, dict):
+            bersih[str(k)[:120]] = {b: _angka(nilai.get(b)) for b in ("min", "max")}
+        elif isinstance(nilai, str):
+            bersih[str(k)[:120]] = nilai[:80]
+        else:
+            bersih[str(k)[:120]] = [v for v in (nilai if isinstance(nilai, list) else [nilai])][:MAKS_NILAI]
+    return bersih
+
+
 # --- Simpanan per akun (U24) --------------------------------------------------------------------
 def _tabel():
     from sqlalchemy import Column, DateTime, MetaData, String, Table, Text
@@ -283,15 +296,7 @@ def api_simpan_milik():
     from flask import g
     from sqlalchemy import delete, insert
     d = request.get_json(silent=True) or {}
-    filter_ = d.get("filter") if isinstance(d.get("filter"), dict) else {}
-    bersih = {}
-    for k, nilai in list(filter_.items())[:30]:
-        if isinstance(nilai, dict):
-            bersih[str(k)[:120]] = {b: _angka(nilai.get(b)) for b in ("min", "max")}
-        elif isinstance(nilai, str):
-            bersih[str(k)[:120]] = nilai[:80]
-        else:
-            bersih[str(k)[:120]] = [v for v in (nilai if isinstance(nilai, list) else [nilai])][:MAKS_NILAI]
+    bersih = _bersihkan_filter(d.get("filter"))
     kecuali = [str(k)[:120] for k in (d.get("kecuali") if isinstance(d.get("kecuali"), list) else [])][:MAKS_KECUALI]
     isi = json.dumps({"aktif": bool(d.get("aktif", True)), "filter": bersih, "kecuali": kecuali}, ensure_ascii=False)
     t, meta = _tabel()
@@ -299,6 +304,94 @@ def api_simpan_milik():
     with _engine().begin() as c:
         c.execute(delete(t).where(t.c.pengguna == g.user.username))
         c.execute(insert(t).values(pengguna=g.user.username, isi=isi, diubah=datetime.now()))
+    return jsonify(ok=True)
+
+
+# --- Tampilan tersimpan (bookmark, padanan Power BI) ------------------------------------------------
+# Keadaan filter sebuah dashboard disimpan dengan nama, per akun. Membuka tampilan = membuka dashboard yang sama
+# dengan filter itu terpasang (parameter URL native_filters), jadi hak akses & RLS tetap berlaku seperti biasa.
+MAKS_TAMPILAN = 20          # per akun per dashboard
+
+
+def _tabel_tampilan():
+    from sqlalchemy import Column, DateTime, Integer, MetaData, String, Table, Text
+    meta = MetaData()
+    return Table("sps_tampilan", meta, Column("id", Integer, primary_key=True, autoincrement=True),
+                 Column("pengguna", String(128), index=True), Column("dashboard_id", Integer, index=True),
+                 Column("nama", String(80)), Column("isi", Text), Column("dibuat", DateTime)), meta
+
+
+def daftar_tampilan(dash, pengguna: str) -> list[dict]:
+    from sqlalchemy import select
+    t, meta = _tabel_tampilan()
+    meta.create_all(bind=_engine(), checkfirst=True)
+    with _engine().connect() as c:
+        rows = c.execute(select(t.c.id, t.c.nama, t.c.isi).where(t.c.pengguna == pengguna, t.c.dashboard_id == dash.id)
+                         .order_by(t.c.nama)).fetchall()
+    hasil = []
+    for r in rows:
+        filter_ = json.loads(r.isi or "{}")
+        rison, berlaku, _ = native_filters(dash, filter_)
+        hasil.append({"id": r.id, "nama": r.nama, "filter": filter_, "berlaku": berlaku, "native_filters": rison})
+    return hasil
+
+
+def simpan_tampilan(dash, pengguna: str, nama: str, filter_) -> None:
+    from datetime import datetime
+
+    from sqlalchemy import delete, func, insert, select
+    nama, bersih = " ".join(str(nama or "").split())[:80], _bersihkan_filter(filter_)
+    if not nama:
+        raise ValueError("Beri nama tampilan dulu.")
+    if not bersih:
+        raise ValueError("Belum ada filter aktif untuk disimpan.")
+    t, meta = _tabel_tampilan()
+    meta.create_all(bind=_engine(), checkfirst=True)
+    milik = (t.c.pengguna == pengguna) & (t.c.dashboard_id == dash.id)
+    with _engine().begin() as c:
+        c.execute(delete(t).where(milik & (t.c.nama == nama)))               # nama sama = timpa
+        if c.execute(select(func.count()).select_from(t).where(milik)).scalar() >= MAKS_TAMPILAN:
+            raise ValueError(f"Maksimal {MAKS_TAMPILAN} tampilan per dashboard. Hapus yang tidak dipakai.")
+        c.execute(insert(t).values(pengguna=pengguna, dashboard_id=dash.id, nama=nama,
+                                   isi=json.dumps(bersih, ensure_ascii=False), dibuat=datetime.now()))
+
+
+def hapus_tampilan(pengguna: str, tampilan_id: int) -> None:
+    from sqlalchemy import delete
+    t, meta = _tabel_tampilan()
+    meta.create_all(bind=_engine(), checkfirst=True)
+    with _engine().begin() as c:                                             # hanya milik sendiri
+        c.execute(delete(t).where(t.c.id == int(tampilan_id), t.c.pengguna == pengguna))
+
+
+@bp.route("/api/tampilan")
+def api_tampilan():
+    from flask import g
+    dash = _dashboard(request.args.get("dashboard", ""))
+    if dash is None:
+        return jsonify(error="Dashboard tidak ditemukan atau tidak boleh Anda akses"), 404
+    return jsonify(tampilan=daftar_tampilan(dash, g.user.username), url=f"/superset/dashboard/{dash.slug or dash.id}/")
+
+
+@bp.route("/api/tampilan", methods=["POST"])
+def api_simpan_tampilan():
+    from flask import g
+    d = request.get_json(silent=True) or {}
+    dash = _dashboard(d.get("dashboard", ""))
+    if dash is None:
+        return jsonify(error="Dashboard tidak ditemukan atau tidak boleh Anda akses"), 404
+    try:
+        simpan_tampilan(dash, g.user.username, d.get("nama"), d.get("filter"))
+    except ValueError as e:
+        return jsonify(error=str(e)), 400
+    return jsonify(tampilan=daftar_tampilan(dash, g.user.username))
+
+
+@bp.route("/api/tampilan/hapus", methods=["POST"])
+def api_hapus_tampilan():
+    from flask import g
+    d = request.get_json(silent=True) or {}
+    hapus_tampilan(g.user.username, int(d.get("id") or 0))
     return jsonify(ok=True)
 
 
