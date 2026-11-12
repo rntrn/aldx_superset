@@ -15,7 +15,7 @@ from pathlib import Path
 from flask import Blueprint, g, jsonify, redirect, render_template_string, request
 
 from sps_ai import alat
-from sps_studio import bidang, dasbor, definisi, lembar, objek, prep
+from sps_studio import bidang, dasbor, definisi, lembar, objek, prep, templat
 
 log = logging.getLogger(__name__)
 FOLDER = Path(__file__).resolve().parent
@@ -60,7 +60,7 @@ def api_awal():
     from superset import security_manager as sm
     return jsonify(dataset=alat.daftar_dataset(batas=500), aturan=lembar.ATURAN_TANDA, warna=lembar.WARNA,
                    lembar=lembar.daftar(), dashboard=dasbor.daftar(), user=g.user.username,
-                   huruf=objek.daftar_huruf(),
+                   huruf=objek.daftar_huruf(), templat=templat.TEMPLAT,
                    izin={"chart": sm.can_access("can_write", "Chart"),
                          "dashboard": sm.can_access("can_write", "Dashboard"),
                          "dataset": sm.can_access("can_write", "Dataset")})
@@ -176,6 +176,14 @@ def api_simpan_dashboard():
 @_login()
 def api_buka_dashboard(dashboard_id: int):
     return jsonify(dasbor.buka(dashboard_id))
+
+
+@bp.route("/api/templat", methods=["POST"])
+@_login()
+def api_templat():
+    """{"dataset_id": 13, "templat": "ringkasan", "ukuran": "total"} -> lembar kerja dibuat, susunan untuk kanvas."""
+    d = _data()
+    return jsonify(templat.buat(int(d.get("dataset_id") or 0), str(d.get("templat") or ""), str(d.get("ukuran") or "")))
 
 
 @bp.route("/api/gambar", methods=["POST"])

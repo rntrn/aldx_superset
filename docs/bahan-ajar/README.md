@@ -63,6 +63,7 @@ bisa disimulasikan di instalasi baru tanpa data kantor.
 | Studio (23 jenis chart), ramalan, anomali, dashboard, filter pilihan | `latihan_penjualan`, dashboard *Latihan: Dashboard Penjualan* |
 | Peta titik, kepadatan, provinsi | `latihan_lokasi_pelanggan` |
 | Gabung tabel di Kueri Visual | `latihan_cabang` + `latihan_lokasi_pelanggan`; set Penerbangan (6 lembar Excel) |
+| Kalkulasi cepat, skala warna tabel, kelompokkan nilai, dashboard dari template | `latihan_penjualan` (angka kunci: total ±667 M; Jawa ±493 M) |
 | Hierarki, data besar, analitik lengkap, N teratas, ukuran & dimensi terdefinisi | `latihan_penjualan_harian` (2,3 juta baris), `latihan_outlet` |
 | Filter global (pilihan, **rentang angka**, **rentang waktu**), drill-through | dashboard *Latihan* & *Latihan: Wilayah & Prediksi* (sama-sama punya filter Kategori; Wilayah punya Tahun & Rentang waktu) |
 | **Hubungkan data**, pilih skema, **Ekstrak penuh & inkremental**, **impor banyak tabel** | koneksi **Contoh sumber (PostgreSQL)**: skema `toko` (cabang, produk, pelanggan, transaksi 200.000 baris, retur, stok) & `sdm` (pegawai, absensi); dataset `transaksi`, `pelanggan`. Tambah baris baru: `scripts\data-latihan.ps1 -TambahTransaksi 500` |

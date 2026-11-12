@@ -79,6 +79,8 @@
     }
     const nama = Object.keys(seriData);
     const persen = opsi.persen;
+    const persenTotal = hasil.kalkulasi === "persen_total";          // nilai sudah 0-100 dari server (lembar._kalkulasi)
+    const fmtPersen = v => (v == null ? "–" : (Math.round(v * 10) / 10).toLocaleString("id-ID") + "%");
     if (persen) {                                              // batang 100%: tiap kategori dijumlah = 100
       kategori.forEach((_, i) => {
         const total = nama.reduce((a, n) => a + (seriData[n][i] || 0), 0) || 1;
@@ -88,7 +90,7 @@
     const tumpuk = Boolean(dw) && tanda !== "garis";
     const series = nama.map(n => {
       const s = {name: n, data: seriData[n], itemStyle: {color: warna(n, nama)},
-                 label: {show: opsi.label, formatter: p => persen ? Math.round(p.value) + "%" : fmtRingkas.format(p.value),
+                 label: {show: opsi.label, formatter: p => persen ? Math.round(p.value) + "%" : persenTotal ? fmtPersen(p.value) : fmtRingkas.format(p.value),
                          position: tumpuk ? "inside" : (opsi.horizontal ? "right" : "top"), fontSize: 10}};
       if (tanda === "batang") {
         Object.assign(s, {type: "bar", barMaxWidth: 44, barGap: "8%", stack: tumpuk ? "t" : undefined});
@@ -104,10 +106,12 @@
     if (an) tambahAnalitik(series, an, kategori.length, nama, opsi);
     const sumbuK = sumbuKategori([...kategori, ...(an ? an.x_ramalan : [])].map(String)), sumbuN = sumbuNilai();
     if (persen) Object.assign(sumbuN, {max: 100, axisLabel: {formatter: v => v + "%"}});
+    if (persenTotal) sumbuN.axisLabel = {formatter: v => v + "%"};
     const tampak = series.filter(x => !x.name.startsWith("_")).map(x => x.name);
     const o = {...dasar(opsi.mini), legend: {...legenda(tampak.length, opsi.mini), data: tampak}, series,
                tooltip: {...dasar().tooltip, trigger: "axis", axisPointer: {type: tanda === "batang" ? "shadow" : "line"},
                          ...(persen ? {valueFormatter: v => v == null ? "–" : fmtPenuh.format(v) + "%"} : {}),
+                         ...(persenTotal ? {valueFormatter: fmtPersen} : {}),
                          ...(an ? {formatter: ps => tooltipAnalitik(ps, an, kategori.length)} : {})}};
     if (opsi.horizontal && tanda === "batang") { sumbuK.inverse = true; o.yAxis = sumbuK; o.xAxis = sumbuN; }
     else { o.xAxis = sumbuK; o.yAxis = sumbuN; }
@@ -489,7 +493,7 @@
     if (el._anak) { instans.delete(el._anak); el._anak.dispose(); el._anak = null; }
   }
   const HTML = {                                             // jenis yang digambar sebagai HTML biasa
-    tabel: h => `<div style="position:absolute;inset:0;overflow:auto">${Studio.tabelHtml(h.kolom, h.baris)}</div>`,
+    tabel: (h, o) => `<div style="position:absolute;inset:0;overflow:auto">${Studio.tabelHtml(h.kolom, h.baris, 500, o && o.skala ? h.ukuran : null)}</div>`,
     tabel_pivot: h => `<div style="position:absolute;inset:0;overflow:auto">${pivotHtml(h)}</div>`,
     awan_kata: (h, o) => awanKata(h, o),
   };

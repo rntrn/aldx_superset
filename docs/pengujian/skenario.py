@@ -387,6 +387,23 @@ SKENARIO = [
      "klik chip ← di bilah atas",
      "Panel menulis 'kategori: Elektronik' dan menawarkan dashboard Wilayah; tujuan terbuka tersaring (total 5,45 T); "
      "chip Kembali mengantar ke dashboard asal; tanpa filter aktif panel memberi petunjuk"),
+    ("D25", 2, "Tinggi", "Kalkulasi cepat: % dari total & kumulatif", "latihan_penjualan",
+     "Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % dari total, lalu Kumulatif → Simpan baru → buka di Explore",
+     "% dari total: sumbu bertanda %, jumlah semua titik 100%; Kumulatif: garis selalu naik, titik akhir = total (±667 M); "
+     "chart tersimpan sama dengan pratinjau; pilihan Hitung mati untuk Pie"),
+    ("D26", 2, "Sedang", "Skala warna tabel & Kelompokkan nilai", "latihan_penjualan",
+     "Tabel nm_cabang × total → centang Skala warna sel; klik kanan nm_cabang → Kelompokkan nilai… → kelompok Jawa = "
+     "Jakarta, Bandung, Surabaya; nilai lain = Lainnya → Buat dimensi → pakai di Batang",
+     "Sel Jakarta paling pekat; dimensi nm_cabang_kelompok bertanda ƒ; batang Jawa ±493 M dan Lainnya ±175 M; "
+     "klik kanan → Ubah rumus… menampilkan CASE WHEN"),
+    ("D27", 2, "Tinggi", "Dashboard dari template", "latihan_penjualan",
+     "Susun dashboard → Dari template… → dataset latihan_penjualan, ukuran utama total, Ringkasan eksekutif → Buat → "
+     "Simpan dashboard → Buka; ulangi untuk dua template lain",
+     "Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/"
+     "Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart"),
+    ("K11", 1, "Sedang", "Asisten AI: ringkas dashboard", "Model AI tersambung",
+     "Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin",
+     "Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka"),
     ("J06", 1, "Sedang", "Komentar & rating dimoderasi", "Akun pengguna & Superadmin",
      "Pengguna: dashboard → tombol komentar → 4 bintang + komentar → Kirim; Superadmin: Kelola → Moderasi ulasan → Tampilkan",
      "Sebelum disetujui hanya penulis & Superadmin yang melihat; sesudahnya semua; rata-rata rating tampil"),

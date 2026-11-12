@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **149 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **153 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -88,6 +88,9 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D21 | 2 Analis | Tinggi | Tampilkan saya dengan banyak kolom | A10 | latihan_penjualan: periode, kategori, saluran ke rak + total → lihat Tampilkan saya → klik Pie | ± 19 dari 23 jenis aktif; Pie memakai kategori, periode & saluran tampil pudar dicoret dan status 'Tidak dipakai Pie: …' |
 | D22 | 2 Analis | Sedang | Kolom ID tetap dimensi | Dataset hasil gabung Kueri Visual (kolom t1.ID_...) | Buka dataset gabungan penerbangan di Studio | Semua kolom ID_…, t1.ID_…, kode_…, NIK ada di Dimensi; Harga & angka lain di Ukuran |
 | D19 | 2 Analis | Tinggi | Objek desain dashboard: teks, gambar, garis | D09; berkas logo PNG | Susun dashboard → Objek: klik Teks → Atur: huruf Playfair Display, 34 px, warna pink, rata tengah; klik Garis; seret Gambar ke baris baru → unggah logo; seret satu chart ke samping logo → Simpan → buka dashboard; buka lagi di Studio & ubah teks → Simpan | Judul tampil dengan huruf & warna pilihan tanpa kartu putih; garis pemisah & logo tampil; SVG ditolak; perubahan teks tersimpan dan CSS buatan sendiri di Superset tidak hilang |
+| D25 | 2 Analis | Tinggi | Kalkulasi cepat: % dari total & kumulatif | latihan_penjualan | Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % dari total, lalu Kumulatif → Simpan baru → buka di Explore | % dari total: sumbu bertanda %, jumlah semua titik 100%; Kumulatif: garis selalu naik, titik akhir = total (±667 M); chart tersimpan sama dengan pratinjau; pilihan Hitung mati untuk Pie |
+| D26 | 2 Analis | Sedang | Skala warna tabel & Kelompokkan nilai | latihan_penjualan | Tabel nm_cabang × total → centang Skala warna sel; klik kanan nm_cabang → Kelompokkan nilai… → kelompok Jawa = Jakarta, Bandung, Surabaya; nilai lain = Lainnya → Buat dimensi → pakai di Batang | Sel Jakarta paling pekat; dimensi nm_cabang_kelompok bertanda ƒ; batang Jawa ±493 M dan Lainnya ±175 M; klik kanan → Ubah rumus… menampilkan CASE WHEN |
+| D27 | 2 Analis | Tinggi | Dashboard dari template | latihan_penjualan | Susun dashboard → Dari template… → dataset latihan_penjualan, ukuran utama total, Ringkasan eksekutif → Buat → Simpan dashboard → Buka; ulangi untuk dua template lain | Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart |
 
 ## E. Peta & analitik prediktif
 
@@ -201,6 +204,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 
 | ID | Level | Prioritas | Skenario | Prasyarat | Langkah | Hasil diharapkan |
 |---|---|---|---|---|---|---|
+| K11 | 1 Pengguna | Sedang | Asisten AI: ringkas dashboard | Model AI tersambung | Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin | Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka |
 | K01 | 2 Analis | Tinggi | Riwayat versi & pulihkan | Pemilik dashboard | Ubah judul/tata letak → Simpan → Riwayat versi → Pulihkan versi sebelumnya | Judul/tata letak kembali; versi sebelum pemulihan tercatat; pengguna bukan pemilik tidak bisa memulihkan |
 | K02 | 2 Analis | Sedang | Tata letak ponsel | Pemilik dashboard; ponsel | Tata ponsel → balik urutan, sembunyikan 1 chart → Simpan → buka di ponsel | Urutan sesuai pengaturan, chart tersembunyi tidak tampil; layar lebar tidak berubah |
 | K03 | 3 Admin data | Tinggi | Lihat sebagai… | Admin; dua akun beda cabang | Kelola → Lihat sebagai… → akun cabang A → dashboard latihan → Tampilkan | Setiap chart menampilkan angka cabang A & aturan RLS-nya; tercatat di jejak audit; akun non-Admin ditolak (403) |

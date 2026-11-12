@@ -124,6 +124,32 @@ Kode: `config/sps_studio/definisi.py`.
 Kotak **N teratas** di bilah alat: isi angka (mis. 10) → hanya N baris teratas menurut urutan yang tampil; dengan
 **Urutkan** naik = N terbawah. Kosongkan = semua. Ikut tersimpan ke chart.
 
+### Kalkulasi cepat: % dari total & kumulatif
+
+Pilihan **Hitung** di panel Marks (aktif untuk Garis/Area/Batang dengan **satu dimensi**, syarat yang sama dengan Analitik):
+
+| Pilihan | Hasil | Contoh |
+|---|---|---|
+| Nilai asli | angka apa adanya | penjualan per bulan |
+| **% dari total** | tiap batang/titik = porsinya terhadap jumlah semua (total 100%) | porsi tiap saluran |
+| **Kumulatif (berjalan)** | nilai dijumlah terus dari kiri ke kanan; pada tanggal urut waktu, pada kategori urut terbesar (kurva Pareto) | penjualan sejak awal tahun |
+
+Dihitung di server setelah kueri (bukan fungsi jendela SQL), jadi hasilnya sama di semua database sumber.
+Saat disimpan memakai fitur bawaan chart Superset (*Contribution* / *Rolling cumsum*) sehingga chart di dashboard
+sama dengan pratinjau. Kode: `_kalkulasi()` di `config/sps_studio/lembar.py`.
+
+### Skala warna tabel
+
+Jenis **Tabel** → centang **Skala warna sel**: latar sel ukuran makin pekat untuk nilai makin besar (per kolom),
+sehingga nilai tinggi/rendah langsung terlihat tanpa membaca angka. Ikut tersimpan (format bersyarat Superset).
+
+### Kelompokkan nilai (Group)
+
+Klik kanan sebuah **dimensi teks** → **Kelompokkan nilai…** → beri nama kelompok (mis. *Jawa*, *Luar Jawa*), pilih
+kelompok untuk tiap nilai, tentukan nilai lain (*tetap* atau *gabung jadi "Lainnya"*) → **Buat dimensi**.
+Hasilnya dimensi terdefinisi biasa (`CASE WHEN … END`), jadi bisa diubah lewat **Ubah rumus…** dan dipakai semua
+chart. Butuh izin mengubah dataset; maksimal 4 kelompok dan 300 nilai (lebih dari itu pakai **+ Dimensi**).
+
 ### Tampilkan saya dengan banyak kolom
 
 Jenis grafik bisa dipilih selama **kebutuhan minimalnya** terpenuhi. Kolom yang melebihi kapasitas jenis itu
@@ -150,6 +176,19 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
 
 ## 2. Susun dashboard
 
+0. **Mulai cepat: Dari template…** → pilih dataset, **ukuran utama**, dan template; ALDx memilih kolom tanggal,
+   kategori (teks dengan 2–50 nilai), dan provinsi secara otomatis, membuat lembar kerjanya, lalu mengisi kanvas
+   beserta filter. Periksa/ubah, lalu **Simpan dashboard**.
+
+   | Template | Isi |
+   |---|---|
+   | Ringkasan eksekutif | angka utama, tren + ramalan, komposisi, 10 teratas, peta provinsi |
+   | Tren & ramalan | angka utama, tren + ramalan + garis tren, kumulatif, perbandingan ukuran, tabel berskala warna |
+   | Perbandingan kategori | angka utama, peringkat, % dari total, peta, peta panas, tabel berskala warna |
+
+   Lembar kerja template tersimpan sebagai chart biasa (bisa dibuka & diubah di tab Lembar kerja). Template yang
+   butuh kolom tanggal/kategori memberi pesan jelas bila dataset tidak memilikinya. Kode: `config/sps_studio/templat.py`
+   (menambah template = satu entri `TEMPLAT` + satu fungsi `_susun_…`).
 1. Tab **Susun dashboard** → seret lembar kerja dari kiri ke kanvas.
 2. Ke **baris yang ada** = berdampingan; ke kotak **"baris baru"** = baris baru.
 3. Atur lebar tiap kotak (¼ ⅓ ½ ⅔ Penuh; total satu baris ≤ penuh). Seret kotak untuk memindah.
@@ -254,6 +293,7 @@ config/sps_studio/
 ├── objek.py      objek desain dashboard (teks, gambar, garis), daftar HURUF, tabel sps_gambar
 ├── hierarki.py   hierarki dimensi per dataset (tabel sps_hierarki)
 ├── definisi.py   ukuran & dimensi terdefinisi (rumus -> metrik / kolom hitung dataset)
+├── templat.py    template dashboard (petakan kolom -> lembar kerja -> susunan kanvas)
 ├── prep.py       persiapan data -> dataset virtual + warisan RLS
 ├── tampilan.py   halaman & API /studio/
 ├── halaman.html  tata letak & gaya

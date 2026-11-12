@@ -150,6 +150,9 @@ Seret **provinsi** ke Kolom dan **belanja** ke Baris → **(1) Peta provinsi**. 
 2. **+ Dimensi** → nama `kelompok_nilai`, rumus `CASE WHEN total >= 150000000 THEN 'Besar' ELSE 'Kecil' END` → **Simpan**.
 3. Seret keduanya ke rak: rata-rata nilai transaksi untuk kelompok Besar dan Kecil.
 4. Kotak **N teratas** di bilah alat membatasi hasil ke N baris terbesar.
+5. **Hitung** → *% dari total* (porsi) atau *Kumulatif* (akumulasi berjalan); untuk Tabel centang **Skala warna sel**.
+6. Klik kanan dimensi teks → **Kelompokkan nilai…** untuk menggabung nilai (mis. cabang → Jawa / Luar Jawa) tanpa rumus.
+7. Butuh dashboard cepat? Tab **Susun dashboard** → **Dari template…** → pilih dataset & template → **Simpan dashboard**.
 
 ### 10b. Hierarki & data besar (latihan_penjualan_harian, ± 2,3 juta baris)
 

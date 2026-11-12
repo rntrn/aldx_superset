@@ -218,6 +218,52 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"dimensi terdefinisi salah: {h['baris']}")
                 return f"5 rumus salah ditolak; rasio per kelompok: {len(h['baris'])} baris; kolom asli terlindung"
 
+            @uji("Studio", "Kalkulasi cepat (% dari total, kumulatif) & skala warna tabel")
+            def _():
+                dasar = {"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}
+                asli = [b["SUM(total)"] for b in lembar.jalankan(*lembar.dari_dict(dasar))["baris"]]
+                persen = [b["SUM(total)"] for b in lembar.jalankan(*lembar.dari_dict({**dasar, "kalkulasi": "persen_total"}))["baris"]]
+                t, lb = lembar.dari_dict({**dasar, "kalkulasi": "kumulatif"})
+                kum = [b["SUM(total)"] for b in lembar.jalankan(t, lb)["baris"]]
+                if abs(sum(persen) - 100) > 1e-6 or abs(kum[-1] - sum(asli)) > 1 or kum != sorted(kum):
+                    raise RuntimeError(f"persen={sum(persen)} kumulatif akhir={kum[-1]} total={sum(asli)}")
+                if lembar.ke_superset(t, lb)[1].get("rolling_type") != "cumsum":
+                    raise RuntimeError("kumulatif tidak ikut ke chart Superset")
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "pie", "kolom": [D("kategori")], "baris": [U("total")],
+                                          "kalkulasi": "kumulatif"})
+                if lembar.jalankan(t, lb)["kalkulasi"]:
+                    raise RuntimeError("kalkulasi aktif di Pie (seharusnya hanya Garis/Area/Batang)")
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "tabel", "baris": [D("nm_cabang")], "kolom": [U("total")],
+                                          "skala_warna": True})
+                p = lembar.ke_superset(t, lb)[1]
+                if not p.get("conditional_formatting") or p.get("show_cell_bars"):
+                    raise RuntimeError("skala warna tabel tidak ikut ke chart Superset")
+                return f"% total = {sum(persen):.0f}; kumulatif akhir = total ({kum[-1]:,.0f}); skala warna tersimpan"
+
+            @uji("Studio", "Template dashboard: 3 template menghasilkan lembar kerja yang sah")
+            def _():
+                from sps_ai import alat
+                from sps_studio import templat
+                jumlah = {}
+                for kunci in templat.TEMPLAT:
+                    p, baris = templat.rancang(P, kunci, "total")
+                    if p["ukuran"][0]["field"] != "total":
+                        raise RuntimeError(f"ukuran utama bukan total: {p['ukuran'][0]}")
+                    for isi in baris:
+                        if sum(lebar for _, lebar in isi) > 12:
+                            raise RuntimeError(f"{kunci}: baris lebih dari 12 kolom")
+                        for spec, _ in isi:
+                            tt, lb = lembar.dari_dict(spec)
+                            lembar.periksa_tanda(lb)
+                            lembar.ke_superset(tt, lb)
+                    jumlah[kunci] = sum(len(isi) for isi in baris)
+                try:
+                    templat.rancang(P, "ngawur")
+                    raise RuntimeError("template tak dikenal lolos")
+                except alat.InputSalah:
+                    pass
+                return ", ".join(f"{k}: {n} lembar" for k, n in jumlah.items())
+
             @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
             def _():
                 from sps_ai import auto

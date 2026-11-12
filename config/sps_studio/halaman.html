@@ -229,6 +229,9 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <div class="barisRak"><label>Warna</label><div class="rak" data-rak="warna" data-petunjuk="Seret ke sini"></div></div>
       <div class="barisRak"><label>Ukuran</label><div class="rak" data-rak="ukuran" data-petunjuk="Seret ke sini"></div></div>
       <div class="barisRak"><label>Label</label><label style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--teks)"><input type="checkbox" id="pakaiLabel"> Tampilkan nilai</label></div>
+      <div class="barisRak"><label title="Kalkulasi cepat untuk Garis/Area/Batang dengan satu dimensi">Hitung</label><select id="pilihKalkulasi">
+        <option value="">Nilai asli</option><option value="persen_total">% dari total</option><option value="kumulatif">Kumulatif (berjalan)</option></select></div>
+      <div class="barisRak" id="barisSkala"><label>Tabel</label><label style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--teks)"><input type="checkbox" id="pakaiSkala"> Skala warna sel</label></div>
     </div>
     <div class="judulPanel">Analitik</div>
     <div class="analitik" id="panelAnalitik">
@@ -295,6 +298,7 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <input type="text" class="judul" id="judulDasbor" placeholder="Judul dashboard">
       <select id="bukaDasbor" style="width:auto"></select>
       <button class="kedua" id="dasborBaru">Dashboard baru</button>
+      <button class="kedua" id="dasborTemplat" title="Pilih dataset; ALDx menyusun angka utama, tren, peringkat, dan filter untuk Anda">Dari template…</button>
       <button class="utama" id="simpanDasbor">Simpan dashboard</button>
       <span id="tautanDasbor"></span>
     </div>
