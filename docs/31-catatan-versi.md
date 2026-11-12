@@ -30,6 +30,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Dashboard | **Telusuri ke dashboard lain** (drill-through): filter & klik-filter aktif dibawa ke dashboard lain | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Studio | **N teratas** (Top N) | [12](12-studio-visual.md#n-teratas-top-n) |
 | Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
+| Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Versi | Versi terpasang tampil di **halaman login** & **Beranda**, dengan status *Versi terbaru* / *Pembaruan tersedia* (dicek ke GitHub) | [29](29-versi-pembaruan-hapus-total.md) |
 | Ekstrak | **Impor banyak tabel sekaligus** dari satu koneksi, dengan **cek kapasitas** (perkiraan ukuran vs sisa kuota & disk engine: Cukup / Mendekati / Tidak cukup) sebelum impor | [13 §2.5](13-sps-engine-ekstrak.md) |
 | Data latihan | **`latihan_penjualan_harian`**: ±2,3 juta baris harian 2021–2025, hierarki Wilayah/Kalender/Produk, pola Lebaran & anomali, dashboard *Latihan: Wilayah & Prediksi*; dimuat otomatis oleh installer (`-Skala` s.d. ±23 juta baris) | [bahan ajar](bahan-ajar/README.md) |
