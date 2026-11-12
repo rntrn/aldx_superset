@@ -23,6 +23,7 @@ import numpy as np
 
 MIN_TITIK_RAMALAN = 4
 MAKS_PERIODE = 36
+MAKS_JENDELA = 24                # rata-rata bergerak: 2..24 periode
 Z80, Z95 = 1.2816, 1.96
 BATAS_ANOMALI = 3.5                     # skor-z termodifikasi (Iglewicz & Hoaglin)
 _GRID = (0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9)
@@ -247,8 +248,20 @@ def anomali(y: list[float], m: int = 0) -> list[int]:
 
 
 # --- Untuk lembar kerja ------------------------------------------------------------------------
+def rata_bergerak(y: list[float], n: int) -> list[float | None]:
+    """Rata-rata n periode terakhir (periode awal yang belum cukup data = None)."""
+    hasil: list[float | None] = []
+    for i in range(len(y)):
+        hasil.append(sum(y[i - n + 1:i + 1]) / n if i >= n - 1 else None)
+    return hasil
+
+
 def analisis(baris: list[dict], dim: str, ukuran: list[str], opsi: dict) -> dict:
-    """Hitung ramalan/tren/anomali tiap ukuran. opsi = {"ramalan": n, "tren": bool, "anomali": bool}."""
+    """Hitung analitik tiap ukuran.
+
+    opsi = {"ramalan": n, "tren": bool, "anomali": bool, "rata_bergerak": n, "rata_rata": bool, "median": bool,
+            "target": angka | None, "ekstrem": bool}
+    Garis acuan (rata-rata, median, target) & rata-rata bergerak ikut disimpan ke chart Superset (ramalan.py)."""
     data = sorted((b for b in baris if b.get(dim) is not None), key=lambda b: kunci_urut(b[dim]))
     xs = [b[dim] for b in data]
     h = max(0, min(int(opsi.get("ramalan") or 0), MAKS_PERIODE))
@@ -262,6 +275,21 @@ def analisis(baris: list[dict], dim: str, ukuran: list[str], opsi: dict) -> dict
         s: dict[str, Any] = {}
         if opsi.get("tren") and len(y) >= 2:
             s["tren"] = tren_linear(y)
+        jendela = int(opsi.get("rata_bergerak") or 0)
+        if jendela >= 2 and len(y) >= jendela:
+            s["rata_bergerak"] = {"n": jendela, "nilai": rata_bergerak(y, jendela)}
+        elif jendela >= 2:
+            hasil["catatan"].append(f"{u}: rata-rata bergerak {jendela} periode butuh minimal {jendela} titik.")
+        if y and opsi.get("rata_rata"):
+            s["rata_rata"] = sum(y) / len(y)
+        if y and opsi.get("median"):
+            s["median"] = float(np.median(y))
+        if opsi.get("target") is not None:
+            s["target"] = float(opsi["target"])
+        if y and opsi.get("ekstrem"):
+            imaks, imin = int(np.argmax(y)), int(np.argmin(y))
+            s["ekstrem"] = {"maks": {"i": imaks, "x": xs[imaks], "nilai": y[imaks]},
+                            "min": {"i": imin, "x": xs[imin], "nilai": y[imin]}}
         if (h or opsi.get("anomali")) and len(y) >= MIN_TITIK_RAMALAN:
             if h:
                 r = ramal(y, h, m)

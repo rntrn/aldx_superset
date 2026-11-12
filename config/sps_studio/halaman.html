@@ -71,6 +71,9 @@ table.pivot td.tot,table.pivot tr.tot td{font-weight:700;background:#F7F9FB}tabl
 .analitik label{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:3px 0;cursor:pointer}
 .analitik input[type=number]{width:46px;padding:3px 5px;font:inherit;font-size:12px;border:1px solid var(--garis);border-radius:5px}
 .analitik.mati label{opacity:.45;cursor:default}
+.analitik input.lebar{width:96px;flex:1;min-width:0}
+.analitik label{white-space:nowrap}
+#anSiapkan{margin-top:6px;width:100%}
 .tabelData{max-height:34vh;overflow:auto;background:#fff;border:1px solid var(--garis);border-radius:8px;display:none}
 .tabelData.tampil{display:block}
 table.data{border-collapse:collapse;width:100%;font-size:12px}
@@ -128,6 +131,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .dtile .kepala span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dtile .kepala select{width:auto;padding:1px 4px;font-size:11.5px}
 .dtile .mini{height:190px;position:relative}
+.bidang.tumpuk{outline:2px dashed var(--emas);outline-offset:1px;background:#FFFBEA}
+.pil.diabaikan{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
 /* Objek desain dashboard (teks, gambar, garis) */
 .objekList{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
 .objekList .bidang{flex-direction:column;justify-content:center;text-align:center;gap:4px;padding:8px 4px;font-size:12px;color:var(--teks)}
@@ -205,7 +210,7 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <div id="daftarHierarki"><div class="ket">Belum ada. Contoh: Provinsi › Kab/Kota › Kecamatan.</div></div>
     <div class="judulPanel">Dimensi</div><div id="daftarDimensi"></div>
     <div class="judulPanel">Ukuran</div><div id="daftarUkuran"></div>
-    <p class="ket" style="margin-top:14px">Seret kolom ke rak. Klik dua kali untuk menambah cepat. Seret pil kembali ke sini untuk membuang.</p>
+    <p class="ket" style="margin-top:14px">Seret kolom ke rak. Klik dua kali untuk menambah cepat. Seret pil kembali ke sini untuk membuang. Seret dimensi ke atas dimensi lain = hierarki baru.</p>
   </div>
   <div class="panel marks" style="width:200px;flex:none">
     <div class="judulPanel">Filter</div>
@@ -222,7 +227,13 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <label><input type="checkbox" id="anRamalan"> Ramalan <input type="number" id="anPeriode" min="1" max="36" value="6"> periode</label>
       <label><input type="checkbox" id="anTren"> Garis tren</label>
       <label><input type="checkbox" id="anAnomali"> Tandai anomali</label>
+      <label title="Rata-rata N periode terakhir: meredam naik-turun agar arah terlihat"><input type="checkbox" id="anGerak"> Rata bergerak <input type="number" id="anJendela" min="2" max="24" value="3"></label>
+      <label title="Garis mendatar di nilai rata-rata seluruh periode"><input type="checkbox" id="anRata"> Garis rata-rata</label>
+      <label title="Garis mendatar di nilai tengah (tidak terpengaruh nilai ekstrem)"><input type="checkbox" id="anMedian"> Garis median</label>
+      <label title="Tandai periode dengan nilai tertinggi dan terendah"><input type="checkbox" id="anEkstrem"> Tertinggi &amp; terendah</label>
+      <label title="Garis mendatar di nilai sasaran Anda, mis. 25000000"><input type="checkbox" id="anTarget"> Target <input type="number" id="anNilaiTarget" class="lebar" placeholder="nilai"></label>
       <p class="ket" id="anKet">Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan).</p>
+      <button class="kedua kecil" id="anSiapkan" hidden>Siapkan agar analitik aktif</button>
     </div>
   </div>
   <div class="kanvas">

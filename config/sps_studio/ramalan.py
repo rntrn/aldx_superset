@@ -71,6 +71,11 @@ def baris_panjang(analitik: dict, sidik: str):
             tambah(x, i, u, analitik["aktual"][u][i])
             if "tren" in s:
                 tambah(x, i, f"Tren {u}", s["tren"]["nilai"][i])
+            if "rata_bergerak" in s:
+                tambah(x, i, f"Rata-rata bergerak {s['rata_bergerak']['n']} {u}", s["rata_bergerak"]["nilai"][i])
+            for kunci, nama in (("rata_rata", "Rata-rata"), ("median", "Median"), ("target", "Target")):
+                if kunci in s:
+                    tambah(x, i, f"{nama} {u}", s[kunci])
         r = s.get("ramalan")
         if r:
             n = len(xs)
@@ -166,8 +171,8 @@ def siapkan(asal, lembar, chart_id: int | None) -> tuple[int, str]:
 
     hasil = L.jalankan(asal, lembar)
     an = hasil["analitik"]
-    if not an or not any("ramalan" in s or "tren" in s for s in an["seri"].values()):
-        raise L.alat.InputSalah("Data belum cukup untuk ramalan (minimal 4 periode).")
+    if not an or not any(k in s for s in an["seri"].values() for k in L.ANALITIK_SERI):
+        raise L.alat.InputSalah("Data belum cukup untuk analitik (ramalan butuh minimal 4 periode).")
     dim = hasil["dimensi"][0]
     urut = {str(x): i for i, x in enumerate(an["x"])}
     an["aktual"] = {u: [None] * len(an["x"]) for u in an["seri"]}

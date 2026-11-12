@@ -83,23 +83,25 @@ def bawaan() -> dict[str, Any]:
 
 
 # --- Preset --------------------------------------------------------------------------------
-# Hanya kunci yang disebut yang berubah; nama perusahaan dll. tetap milik admin
-# kecuali preset menyebutnya.
+# Preset hanya mengubah TAMPILAN (warna, huruf, sudut, hiasan, animasi). Nama aplikasi, nama perusahaan, teks,
+# dan logo tetap milik admin. Setiap preset menyebut keempat warna, agar tidak mewarisi sisa preset sebelumnya.
+KUNCI_TAMPILAN = ("warna_utama", "warna_aksen", "warna_aksen2", "warna_latar", "font", "sudut", "hiasan", "animasi")
 PRESET: dict[str, dict[str, Any]] = {
-    # "netral" = kembali ke SEMUA nilai bawaan (nama, teks, warna, logo otomatis).
-    "netral": {"label": "Tinta & Sakura / bawaan (hitam, abu, putih + pink)", **{i.kunci: i.bawaan for i in ISIAN}},
+    # "netral" = tampilan bawaan Tinta & Sakura (dulu ikut mengosongkan nama perusahaan -> ditolak validasi).
+    "netral": {"label": "Tinta & Sakura / bawaan (hitam, abu, putih + pink)",
+               **{i.kunci: i.bawaan for i in ISIAN if i.kunci in KUNCI_TAMPILAN}},
     # Neon: ±70% gelap, ±15% cyan, ±10% pink, sisanya putih. Dua aksen punya wilayah sendiri, tidak dicampur.
     "neon": {"label": "Neon malam (gelap, pink + cyan)", "warna_utama": "#11161D", "warna_aksen": "#FF2E8A",
              "warna_aksen2": "#22D3EE", "warna_latar": "#EEF3F6", "hiasan": "polos"},
     "navy": {"label": "Navy & biru (klasik)", "warna_utama": "#1E2A44", "warna_aksen": "#4F7CF7", "warna_aksen2": "#38BDF8",
              "warna_latar": "#F5F6F8", "hiasan": "polos"},
-    "hijau": {"label": "Hijau segar", "warna_utama": "#0F6E56", "warna_aksen": "#F4B400",
+    "hijau": {"label": "Hijau segar", "warna_utama": "#0F6E56", "warna_aksen": "#F4B400", "warna_aksen2": "#5FB49C",
               "warna_latar": "#F3F7F5", "hiasan": "titik"},
-    "marun": {"label": "Merah marun", "warna_utama": "#7A1F2B", "warna_aksen": "#E0A100",
+    "marun": {"label": "Merah marun", "warna_utama": "#7A1F2B", "warna_aksen": "#E0A100", "warna_aksen2": "#B07A72",
               "warna_latar": "#F8F4F4", "hiasan": "garis"},
-    "ungu": {"label": "Ungu modern", "warna_utama": "#4B2E83", "warna_aksen": "#19B5A5",
+    "ungu": {"label": "Ungu modern", "warna_utama": "#4B2E83", "warna_aksen": "#19B5A5", "warna_aksen2": "#9B8AFB",
              "warna_latar": "#F5F4FA", "hiasan": "gelombang"},
-    "grafit": {"label": "Grafit & toska", "warna_utama": "#263238", "warna_aksen": "#26A69A",
+    "grafit": {"label": "Grafit & toska", "warna_utama": "#263238", "warna_aksen": "#26A69A", "warna_aksen2": "#78909C",
                "warna_latar": "#F3F5F6", "hiasan": "titik"},
 }
 

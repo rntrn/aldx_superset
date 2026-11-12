@@ -22,6 +22,8 @@ Semua tutorial memakai **data fiktif** yang aman dipakai siapa saja:
 |---|---|
 | `latihan_penjualan` | penjualan bulanan perusahaan ritel rekaan *PT Contoh Sejahtera*, Jan 2023 – Des 2025: 6 cabang, 5 kategori produk, 4 saluran penjualan |
 | `latihan_lokasi_pelanggan` | 1.500 pelanggan rekaan dengan koordinat & provinsi |
+| `latihan_penjualan_harian` | **± 2,3 juta baris** penjualan harian 2021–2025, 138 outlet di 17 provinsi; hierarki bawaan *Wilayah*, *Kalender*, *Produk*; pola Lebaran & anomali untuk ramalan |
+| Dashboard **Latihan: Wilayah & Prediksi (fiktif)** | alamat `/superset/dashboard/latihan-wilayah/` |
 | Dashboard **Latihan: Dashboard Penjualan (fiktif)** | alamat `/superset/dashboard/latihan/` |
 
 Admin memuatnya dengan `scripts\data-latihan.ps1`. Angkanya selalu sama, sehingga hasil latihan

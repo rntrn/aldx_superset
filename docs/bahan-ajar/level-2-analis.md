@@ -76,6 +76,12 @@
    dengan **Pakai data di berkas**. Apa yang terjadi bila sandinya salah?
 9. Ubah judul dashboard no. 5, simpan, lalu pulihkan judul lama lewat **Riwayat versi**. Simpan juga susunan Kueri
    Visual no. 6 dengan **Simpan kueri**, muat ulang halaman, dan buka lagi dari *Kueri tersimpan…*.
+10. **Hierarki seret-tumpuk** (`latihan_penjualan_harian`): seret `kecamatan` ke atas `kab_kota`, beri nama
+    *Kota & Kecamatan*. Lalu pakai hierarki bawaan **Wilayah** di Kolom + `penjualan` di Baris, klik batang terbesar
+    sampai level kab/kota. Kab/kota mana terbesar di pulau itu?
+11. **Analitik lengkap**: hierarki **Kalender** turun ke level `bulan`, `penjualan` di Baris, Garis. Centang Ramalan 6,
+    Rata bergerak 3, Garis rata-rata, Tertinggi & terendah. Bulan apa tertinggi, dan kenapa tiap tahun ada puncak
+    di bulan berbeda?
 
 ### Kunci jawaban
 
@@ -89,6 +95,8 @@
 | 6 | Digabung otomatis lewat `kd_cabang`. **Jawa** ± **Rp18,6 miliar**, **1.106** pelanggan (Sumatra & Kalimantan masing-masing 146, Sulawesi 102). Online paling sedikit: **Eko Contoh** (Makassar), **19** pelanggan |
 | 7 | ± **Rp24,7 miliar** (18,6 + 2,5 + 2,3 + 1,3); angka tersimpan sebagai angka sehingga bisa dijumlah langsung |
 | 9 | Minimal 1 versi (judul lama). **Pulihkan** mengembalikan judul; keadaan sebelum pemulihan juga tercatat. Kueri tersimpan muncul lengkap (tabel, gabung, kolom) |
+| 10 | Pulau **Jawa** (12,77 T) → provinsi **DKI Jakarta** (4,49 T) → kab/kota **Jakarta Selatan** (1,99 T) |
+| 11 | Tertinggi **Maret 2025** (Rp579,6 miliar). Puncak mengikuti **Lebaran** yang maju ± 11 hari tiap tahun (Mei 2021, Mei 2022, April 2023, April 2024, Maret 2025); juga naik tiap Desember |
 | 8 | Sandi salah: *"Kata sandi salah, atau berkas telah diubah."* Sandi benar: ringkasan tampil, dashboard hasil berjudul **"... (salinan)"**, datanya dari ALDx Engine |
 
 ## Kuis

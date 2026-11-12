@@ -92,6 +92,7 @@ class Lembar:
     urut: str = ""
     batas: int = 1000
     analitik: dict = field(default_factory=dict)
+    diabaikan: list[str] = field(default_factory=list)   # kolom di rak yang tidak dipakai jenis tanda ini
 
     # --- Turunan --------------------------------------------------------------------
     @property
@@ -111,7 +112,7 @@ class Lembar:
     def pakai_analitik(self) -> bool:
         a = self.analitik
         return (self.tanda in TANDA_ANALITIK and len(self.dimensi) == 1
-                and bool(a.get("ramalan") or a.get("tren") or a.get("anomali")))
+                and any(v not in (0, False, None) for v in a.values()))
 
     @property
     def dim_baris(self) -> list[Pil]:
@@ -180,15 +181,55 @@ def dari_dict(d: dict) -> tuple[Any, Lembar]:
         label=bool(d.get("label")), filter=list(d.get("filter") or []),
         urut=str(d.get("urut") or ""), batas=max(1, min(int(d.get("batas") or 1000), 10000)),
         analitik=_analitik(d.get("analitik")))
+    pangkas(t, lembar)
     return t, lembar
 
 
+def pangkas(t, lembar: Lembar) -> None:
+    """Kolom melebihi kapasitas jenis tanda -> tidak dipakai (seperti Tableau), bukan jenisnya yang dimatikan.
+
+    Mis. Pie (1 dimensi) dengan rak berisi kategori + saluran: kategori dipakai, saluran diabaikan dan ditandai di
+    layar. Prioritas: dimensi waktu untuk jenis berbasis waktu, lintang/bujur untuk peta titik, lalu urutan rak."""
+    a = ATURAN_TANDA[lembar.tanda]
+    dim, uk = lembar.dimensi, lembar.ukuran_semua
+    if a.get("waktu"):
+        dim = sorted(dim, key=lambda p: not _kolom_waktu(t, p.field))
+    if a.get("geo") == "titik":
+        dim = sorted(dim, key=lambda p: peran_geo(p.field) not in ("lintang", "bujur"))
+    if lembar.tanda == "peta_wilayah":
+        dim = sorted(dim, key=lambda p: peran_geo(p.field) != "wilayah")
+    if a["grup"] == "Komposisi":                     # pie/treemap/corong: kategori lebih bermakna daripada tanggal
+        dim = sorted(dim, key=lambda p: _kolom_waktu(t, p.field))
+    pakai = {id(p) for p in dim[:a["dim"][1]]} | {id(p) for p in uk[:a["ukuran"][1]]}
+    buang = [p for p in dim[a["dim"][1]:] + uk[a["ukuran"][1]:]]
+    if not buang:
+        return
+    tetap = lambda p: p is None or id(p) in pakai or not any(p is b for b in buang)  # noqa: E731
+    lembar.kolom = [p for p in lembar.kolom if tetap(p)]
+    lembar.baris = [p for p in lembar.baris if tetap(p)]
+    lembar.warna = lembar.warna if tetap(lembar.warna) else None
+    lembar.ukuran = lembar.ukuran if tetap(lembar.ukuran) else None
+    lembar.diabaikan = [p.label for p in buang]
+
+
 def _analitik(a: dict | None) -> dict:
-    from sps_studio.prediksi import MAKS_PERIODE
+    from sps_studio.prediksi import MAKS_JENDELA, MAKS_PERIODE
     a = a or {}
+    jendela = int(a.get("rata_bergerak") or 0)
+    try:
+        target = float(a["target"]) if a.get("target") not in (None, "") else None
+    except (TypeError, ValueError):
+        raise alat.InputSalah("Garis target harus angka, mis. 25000000.") from None
     hasil = {"ramalan": max(0, min(int(a.get("ramalan") or 0), MAKS_PERIODE)),
-             "tren": bool(a.get("tren")), "anomali": bool(a.get("anomali"))}
-    return hasil if any(hasil.values()) else {}
+             "tren": bool(a.get("tren")), "anomali": bool(a.get("anomali")),
+             "rata_bergerak": max(2, min(jendela, MAKS_JENDELA)) if jendela else 0,
+             "rata_rata": bool(a.get("rata_rata")), "median": bool(a.get("median")),
+             "target": target, "ekstrem": bool(a.get("ekstrem"))}
+    return hasil if any(v not in (0, False, None) for v in hasil.values()) else {}
+
+
+# Analitik yang menghasilkan GARIS tambahan -> disimpan sebagai seri di ALDx Engine (ramalan.py) saat Simpan.
+ANALITIK_SERI = ("ramalan", "tren", "rata_bergerak", "rata_rata", "median", "target")
 
 
 def periksa_tanda(lembar: Lembar) -> None:
@@ -233,7 +274,7 @@ def jalankan(t, lembar: Lembar) -> dict:
                 if lembar.pakai_analitik else None)
     return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"],
             "dimensi": [p.label for p in lembar.dimensi], "ukuran": [p.label for p in lembar.ukuran_semua],
-            "dim_baris": [p.label for p in lembar.dim_baris],
+            "dim_baris": [p.label for p in lembar.dim_baris], "diabaikan": lembar.diabaikan,
             "geo": {p.label: peran_geo(p.field) for p in lembar.dimensi if peran_geo(p.field)}}
 
 
@@ -382,7 +423,7 @@ def simpan(t, lembar: Lembar, chart_id: int | None = None) -> dict:
         return {"disimpan": False, "url": alat.explore_url(t.id, params),
                 "catatan": "Anda belum punya izin menyimpan chart. Buka tautan untuk melihat di Explore."}
     sumber_id, tabel_ramalan, catatan = t.id, None, ""
-    if lembar.pakai_analitik and (lembar.analitik.get("ramalan") or lembar.analitik.get("tren")):
+    if lembar.pakai_analitik and any(lembar.analitik.get(k) not in (0, False, None) for k in ANALITIK_SERI):
         # Superset tidak punya ramalan Holt-Winters: hasil disimpan sebagai dataset di ALDx Engine
         sumber_id, tabel_ramalan = ramalan.siapkan(t, lembar, chart_id)
         from superset.connectors.sqla.models import SqlaTable

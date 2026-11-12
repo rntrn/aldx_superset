@@ -3,20 +3,15 @@
 Aturan saat membaca sumber data:
     Ukuran  = kolom angka yang bukan kode/ID/waktu (mis. total, jumlah_wp)
               + metrik tersimpan dataset + "Jumlah baris"
-    Dimensi = selain itu (teks, tanggal, kode seperti kd_cabang, tahun/bulan)
+    Dimensi = selain itu (teks, tanggal, kode/ID seperti kd_cabang, ID_Tiket, t1.ID_Penerbangan, tahun/bulan)
               + kolom geografis: lintang/bujur (lat, lon) & provinsi -> untuk peta
 """
 
 from __future__ import annotations
 
-import re
-
 from sps_ai import alat
-from sps_ai.auto import POLA_ID, POLA_WAKTU
+from sps_ai.auto import POLA_WAKTU, kolom_pengenal
 from sps_studio.lembar import BARIS, LABEL_BARIS, peran_geo
-
-POLA_KODE = re.compile(r"^(kd|kode|id)_|_(kd|kode)$", re.I)
-
 
 def _jenis(c) -> str:
     if peran_geo(c.column_name):
@@ -33,7 +28,7 @@ def daftar(dataset_id: int) -> dict:
         jenis = _jenis(c)
         nama = c.column_name
         item = {"field": nama, "label": c.verbose_name or nama, "jenis": jenis, "keterangan": c.description or ""}
-        if jenis == "angka" and not POLA_ID.search(nama) and not POLA_KODE.search(nama):
+        if jenis == "angka" and not kolom_pengenal(nama):
             ukuran.append({**item, "peran": "ukuran", "agg": "SUM"})
         else:
             dimensi.append({**item, "peran": "dimensi", "waktu": jenis == "tanggal",

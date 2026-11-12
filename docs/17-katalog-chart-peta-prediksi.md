@@ -105,9 +105,17 @@ Panel **Analitik** di bawah Marks.
 | **Ramalan _n_ periode** | garis putus-putus + pita keyakinan **80%** (lebih gelap) dan **95%** | Holt (tren) atau **Holt-Winters** (tren + musiman) bila data ≥ 2 musim + 2 titik. Parameter dipilih otomatis dari galat terkecil |
 | **Garis tren** | garis titik-titik + **R²** | regresi linear (kuadrat terkecil) |
 | **Tandai anomali** | titik merah | buang tren (rata-rata bergerak) & pola musim, tandai sisa > 3,5 simpangan robust (MAD); bertahap, sehingga satu lonjakan tidak membuat bulan yang sama di tahun lain ikut tertandai |
+| **Rata bergerak _n_** (2–24) | garis halus tebal transparan | rata-rata _n_ periode terakhir; periode awal yang belum cukup data dikosongkan |
+| **Garis rata-rata** | garis putus abu-abu + label | rata-rata seluruh periode yang tampil |
+| **Garis median** | garis putus-titik ungu + label | nilai tengah (tidak terpengaruh lonjakan) |
+| **Target** _nilai_ | garis toska + label | nilai sasaran yang Anda ketik, mis. `25000000` |
+| **Tertinggi & terendah** | penanda pin + label | periode dengan nilai terbesar & terkecil |
 
 Syarat: jenis **Garis, Area, atau Batang**, tepat **satu dimensi berurutan** (tanggal, `YYYY-MM`,
-tahun, atau urutan lain), tanpa dimensi di Warna, minimal **4 periode**.
+tahun, atau urutan lain), tanpa dimensi di Warna, minimal **4 periode** (ramalan & anomali).
+Panel pudar? Klik **Siapkan agar analitik aktif**: kolom tanggal (atau dimensi pertama) dipakai, dimensi lain dilepas
+(saring lewat rak Filter), ukuran pindah ke Baris, jenis menjadi Garis. Label garis acuan memakai angka ringkas
+(mis. *Rata-rata 18,5 M*).
 
 **Musim dikenali otomatis:** data bulanan → 12, triwulanan → 4, harian → 7.
 
@@ -121,17 +129,17 @@ tahun, atau urutan lain), tanpa dimensi di Warna, minimal **4 periode**.
 
 ### Ramalan di dashboard
 
-Saat lembar dengan **Ramalan** atau **Garis tren** disimpan:
+Saat lembar dengan **Ramalan**, **Garis tren**, **Rata bergerak**, **Garis rata-rata/median/target** disimpan:
 
 1. ramalan dihitung **sebagai pengguna yang menyimpan** (RLS berlaku);
 2. hasilnya ditulis ke ALDx Engine (tabel `ramalan__xxxx`) dan didaftarkan sebagai dataset;
-3. chart Superset menampilkan garis Aktual, Ramalan, batas 80%/95%, dan Tren;
+3. chart Superset menampilkan garis Aktual, Ramalan, batas 80%/95%, Tren, Rata-rata bergerak, Rata-rata, Median, Target;
 4. **hanya pengguna dengan lingkup akses yang sama** dengan pembuat yang melihat isinya
    (aturan RLS "ALDx ramalan (lingkup pembuat)"; lingkup = profil akses, atau kumpulan role bila tanpa
    profil). Pengguna Cabang Jakarta tidak melihat ramalan yang dibuat pengguna Cabang Bandung, dan sebaliknya;
 5. diperbarui otomatis **tiap hari 03:00** (tugas `sps.ramalan.segarkan`).
 
-*Tandai anomali* hanya tampil di Studio Visual (tidak disimpan ke chart Superset).
+*Tandai anomali* dan *Tertinggi & terendah* hanya tampil di Studio Visual (penanda, tidak disimpan ke chart Superset).
 
 ### Kode
 
