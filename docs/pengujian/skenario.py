@@ -178,6 +178,15 @@ SKENARIO = [
      "seret kelurahan ke atas hierarki itu",
      "Dialog Hierarki baru terbuka dengan urutan 1 kab_kota, 2 kecamatan; tersimpan; kelurahan jadi level ke-3; "
      "hierarki bawaan Wilayah, Kalender, Produk sudah ada"),
+    ("D23", 2, "Tinggi", "Ukuran & dimensi terdefinisi", "A10; peran Analis (Alpha)",
+     "Studio → latihan_penjualan → + Ukuran: nama rata_transaksi, rumus 'total / jumlah_transaksi' → Uji; ganti "
+     "'SUM(total) / SUM(jumlah_transaksi)' → Uji → Simpan; + Dimensi: kelompok_nilai = CASE WHEN total >= 150000000 "
+     "THEN 'Besar' ELSE 'Kecil' END → Simpan; pakai keduanya di chart → Simpan chart → coba Hapus definisi",
+     "Rumus tanpa agregat ditolak dengan penjelasan; rumus benar menampilkan contoh hasil ± 867.442; keduanya bertanda ƒ; "
+     "chart 2 batang (Besar/Kecil); hapus ditolak selama dipakai chart; kolom asli tidak punya menu hapus"),
+    ("D24", 2, "Sedang", "N teratas", "Data latihan harian",
+     "latihan_penjualan_harian: kab_kota + penjualan → isi N teratas = 5",
+     "5 batang: Jakarta Selatan, Jakarta Timur, Kota Surabaya, Jakarta Barat, Kota Makassar; status '5 teratas'"),
     ("D21", 2, "Tinggi", "Tampilkan saya dengan banyak kolom", "A10",
      "latihan_penjualan: periode, kategori, saluran ke rak + total → lihat Tampilkan saya → klik Pie",
      "± 19 dari 23 jenis aktif; Pie memakai kategori, periode & saluran tampil pudar dicoret dan status "
@@ -373,6 +382,11 @@ SKENARIO = [
     ("J05", 1, "Tinggi/asap", "Filter global di semua dashboard & Story", "≥ 2 dashboard dengan filter Cabang",
      "Tombol corong → Cabang = Cabang Bandung → Terapkan; buka dashboard lain & Story",
      "Semua dashboard dengan filter Cabang langsung tersaring Cabang Bandung; lencana corong = 1; hapus semua = kembali normal"),
+    ("J12", 1, "Tinggi", "Telusuri ke dashboard lain (drill-through)", "Dashboard latihan & latihan-wilayah",
+     "Dashboard latihan → klik irisan Elektronik di pie → tombol Telusuri → pilih Latihan: Wilayah & Prediksi → "
+     "klik chip ← di bilah atas",
+     "Panel menulis 'kategori: Elektronik' dan menawarkan dashboard Wilayah; tujuan terbuka tersaring (total 5,45 T); "
+     "chip Kembali mengantar ke dashboard asal; tanpa filter aktif panel memberi petunjuk"),
     ("J06", 1, "Sedang", "Komentar & rating dimoderasi", "Akun pengguna & Superadmin",
      "Pengguna: dashboard → tombol komentar → 4 bintang + komentar → Kirim; Superadmin: Kelola → Moderasi ulasan → Tampilkan",
      "Sebelum disetujui hanya penulis & Superadmin yang melihat; sesudahnya semua; rata-rata rating tampil"),

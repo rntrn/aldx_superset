@@ -15,7 +15,7 @@ from pathlib import Path
 from flask import Blueprint, g, jsonify, redirect, render_template_string, request
 
 from sps_ai import alat
-from sps_studio import bidang, dasbor, lembar, objek, prep
+from sps_studio import bidang, dasbor, definisi, lembar, objek, prep
 
 log = logging.getLogger(__name__)
 FOLDER = Path(__file__).resolve().parent
@@ -100,6 +100,28 @@ def api_hierarki_hapus(dataset_id: int):
     from sps_studio import hierarki
     hierarki.hapus(dataset_id, _data().get("nama", ""))
     return jsonify(hierarki=hierarki.daftar(dataset_id))
+
+
+@bp.route("/api/definisi/<int:dataset_id>/uji", methods=["POST"])
+@_login()
+def api_uji_definisi(dataset_id: int):
+    d = _data()
+    return jsonify(definisi.uji(alat._dataset(dataset_id), str(d.get("jenis") or ""), d.get("rumus")))
+
+
+@bp.route("/api/definisi/<int:dataset_id>", methods=["POST"])
+@_login()
+def api_simpan_definisi(dataset_id: int):
+    hasil = definisi.simpan(dataset_id, _data())
+    return jsonify(definisi=hasil, bidang=bidang.daftar(dataset_id))
+
+
+@bp.route("/api/definisi/<int:dataset_id>/hapus", methods=["POST"])
+@_login()
+def api_hapus_definisi(dataset_id: int):
+    d = _data()
+    definisi.hapus(dataset_id, str(d.get("jenis") or ""), str(d.get("nama") or ""))
+    return jsonify(bidang=bidang.daftar(dataset_id))
 
 
 @bp.route("/api/saran/<int:dataset_id>")

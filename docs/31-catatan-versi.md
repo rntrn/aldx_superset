@@ -26,6 +26,10 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | **Hierarki seret-tumpuk**: seret satu dimensi ke atas dimensi lain → beri nama (seperti Tableau); seret ke atas hierarki = tambah level | [12](12-studio-visual.md#hierarki-dimensi-telusur-bertingkat) |
 | Studio | **Tampilkan saya** tidak lagi mematikan jenis saat kolom berlebih: kolom ekstra tidak dipakai & ditandai pudar (±19 dari 23 jenis aktif dengan 3 dimensi) | [12](12-studio-visual.md#tampilkan-saya-dengan-banyak-kolom) |
 | Analitik | Opsi baru: **rata bergerak**, **garis rata-rata**, **median**, **target**, **tertinggi & terendah** (ikut tersimpan ke chart Superset); tombol **Siapkan agar analitik aktif** | [17 §4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif) |
+| Studio | **+ Ukuran / + Dimensi**: definisikan ukuran (rumus agregat) & dimensi (rumus per baris) seperti *measure / column* Power BI, dengan uji rumus | [12](12-studio-visual.md#ukuran--dimensi-terdefinisi-seperti-new-measure--new-column-power-bi) |
+| Dashboard | **Telusuri ke dashboard lain** (drill-through): filter & klik-filter aktif dibawa ke dashboard lain | [25 §2b](25-berkas-filter-global-ulasan.md) |
+| Studio | **N teratas** (Top N) | [12](12-studio-visual.md#n-teratas-top-n) |
+| Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
 | Versi | Versi terpasang tampil di **halaman login** & **Beranda**, dengan status *Versi terbaru* / *Pembaruan tersedia* (dicek ke GitHub) | [29](29-versi-pembaruan-hapus-total.md) |
 | Ekstrak | **Impor banyak tabel sekaligus** dari satu koneksi, dengan **cek kapasitas** (perkiraan ukuran vs sisa kuota & disk engine: Cukup / Mendekati / Tidak cukup) sebelum impor | [13 §2.5](13-sps-engine-ekstrak.md) |
 | Data latihan | **`latihan_penjualan_harian`**: ±2,3 juta baris harian 2021–2025, hierarki Wilayah/Kalender/Produk, pola Lebaran & anomali, dashboard *Latihan: Wilayah & Prediksi*; dimuat otomatis oleh installer (`-Skala` s.d. ±23 juta baris) | [bahan ajar](bahan-ajar/README.md) |
@@ -43,7 +47,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **69/69 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **70/70 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

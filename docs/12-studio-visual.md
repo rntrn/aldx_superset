@@ -99,6 +99,31 @@ Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provi
 Data latihan `latihan_penjualan_harian` sudah membawa hierarki **Wilayah** (pulau › provinsi › kab/kota › kecamatan ›
 kelurahan › outlet), **Kalender** (tahun › kuartal › bulan › tanggal), dan **Produk** (kategori › subkategori).
 
+### Ukuran & dimensi terdefinisi (seperti *New measure / New column* Power BI)
+
+Panel Data › **+ Ukuran** atau **+ Dimensi** (butuh izin mengubah dataset: Alpha/Admin).
+
+| | Ukuran | Dimensi |
+|---|---|---|
+| Rumus | **agregat**: `SUM(laba) / SUM(penjualan)`, `COUNT(DISTINCT id_pelanggan)`, `SUM(CASE WHEN … THEN … END)` | **per baris**: `CASE WHEN total >= 1000000 THEN 'Besar' ELSE 'Kecil' END`, `harga * jumlah` |
+| Dihitung | ulang di setiap pengelompokan → rasio tetap benar per cabang, per bulan, dan total | sekali per baris, lalu dipakai di rak, filter, hierarki |
+| Disimpan sebagai | metrik dataset (dengan format: angka, ribuan, desimal, persen, mata uang) | kolom hitung dataset |
+
+1. Isi **Nama** (huruf/angka/garis bawah), tulis **Rumus**; klik nama kolom untuk menyisipkan, atau pilih **Contoh rumus**.
+2. **Uji rumus**: rumus dijalankan ke sumber dan contoh hasilnya tampil. Rumus salah menampilkan sebabnya.
+3. **Simpan** → muncul di panel bertanda **ƒ**; seret ke rak. Klik kanan: **Ubah rumus…** / **Hapus definisi**.
+
+Aturan pengaman: tanpa subquery, perintah SQL, komentar, tabel lain, atau kolom yang tidak ada; ukuran wajib beragregat,
+dimensi tidak boleh; rumus selalu diuji sebelum disimpan; hanya definisi buatan Studio yang bisa diubah/dihapus di sini
+(kolom asli aman); definisi yang masih dipakai chart tidak bisa dihapus atau diganti namanya. Definisi tersimpan di
+**dataset**, jadi langsung tersedia di semua chart, Explore, dan untuk semua pengguna dataset itu, dengan RLS yang sama.
+Kode: `config/sps_studio/definisi.py`.
+
+### N teratas (Top N)
+
+Kotak **N teratas** di bilah alat: isi angka (mis. 10) → hanya N baris teratas menurut urutan yang tampil; dengan
+**Urutkan** naik = N terbawah. Kosongkan = semua. Ikut tersimpan ke chart.
+
 ### Tampilkan saya dengan banyak kolom
 
 Jenis grafik bisa dipilih selama **kebutuhan minimalnya** terpenuhi. Kolom yang melebihi kapasitas jenis itu
@@ -227,6 +252,7 @@ config/sps_studio/
 ├── dasbor.py     penyusun dashboard -> position_json Superset
 ├── objek.py      objek desain dashboard (teks, gambar, garis), daftar HURUF, tabel sps_gambar
 ├── hierarki.py   hierarki dimensi per dataset (tabel sps_hierarki)
+├── definisi.py   ukuran & dimensi terdefinisi (rumus -> metrik / kolom hitung dataset)
 ├── prep.py       persiapan data -> dataset virtual + warisan RLS
 ├── tampilan.py   halaman & API /studio/
 ├── halaman.html  tata letak & gaya
@@ -253,6 +279,8 @@ config/sps_studio/
 | Filter dashboard tidak menyaring sebuah chart | Dataset chart itu tidak punya kolom bernama sama | Samakan nama kolom (persiapan data → Ganti nama) |
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |
 | Saran dari data lama muncul | Sumber data lambat | Tunggu; jawaban lama otomatis diabaikan |
+| "Ukuran harus memakai fungsi agregat" | rumus ukuran tanpa SUM/AVG/COUNT | bungkus dengan agregat, atau buat sebagai **Dimensi** bila memang per baris |
+| "Rumus ditolak database: …" | fungsi tidak dikenal database sumber | pakai fungsi SQL database itu (mis. `ifNull` di ALDx Engine, `NVL` di Oracle) |
 | Panel Analitik pudar | jenis bukan Garis/Area/Batang, atau > 1 dimensi | sisakan satu dimensi berurutan; kosongkan Warna |
 | Kolom `ID_…` / `t1.ID_…` / `kode_…` ada di **Ukuran** | versi lama: awalan alias tabel hasil Kueri Visual (`t1.`) membuat ID tidak dikenali | perbarui ALDx; ID/kode kini selalu Dimensi |
 | Kolom angka (mis. `total`) ada di **Dimensi**, tidak bisa dijumlah / diramal | versi lama: kolom desimal ClickHouse (`Float64`) tidak dikenali sebagai angka | perbarui ALDx ([31](31-catatan-versi.md)); bila sumber lain, set tipe kolom ke angka di Dataset › Edit › Kolom |

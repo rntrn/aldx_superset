@@ -32,6 +32,43 @@
   };
   window.__spsFilterGlobal();
 
+  // ---- Telusuri ke dashboard lain (telusur.js): filter yang sedang aktif di dashboard ini ----
+  // Dibaca dari state halaman (dataMask Superset): filter di bilah filter + klik-filter pada chart.
+  // Hasil: {kolom: [nilai] | {min, max}, "__waktu__": "Last month"}; {} bila tidak ada / struktur Superset berubah.
+  window.__spsFilterAktif = function () {
+    try {
+      const akar = document.getElementById("app");
+      const kunci = akar && Object.keys(akar).find(k => k.startsWith("__reactContainer"));
+      if (!kunci) return {};
+      const antre = [akar[kunci]];
+      let toko = null, n = 0;
+      while (antre.length && n < 4000 && !toko) {             // cari Provider redux di pohon React (dangkal)
+        const x = antre.shift(); n++;
+        if (!x) continue;
+        const p = x.memoizedProps;
+        if (p && p.store && typeof p.store.getState === "function") toko = p.store;
+        if (x.child) antre.push(x.child);
+        if (x.sibling) antre.push(x.sibling);
+      }
+      const hasil = {};
+      Object.values((toko && toko.getState().dataMask) || {}).forEach(m => {
+        const e = (m && m.extraFormData) || {};
+        (e.filters || []).forEach(f => {
+          if (typeof f.col !== "string") return;               // kolom rumus (adhoc) tidak dibawa
+          const k = f.col.toLowerCase();
+          if (f.op === "IN" && Array.isArray(f.val)) hasil[k] = [...new Set([...(Array.isArray(hasil[k]) ? hasil[k] : []), ...f.val])];
+          else if (f.op === "==" || f.op === "=") hasil[k] = [f.val];
+          else if (f.op === ">=" || f.op === "<=") {
+            const r = hasil[k] && !Array.isArray(hasil[k]) ? hasil[k] : {min: null, max: null};
+            r[f.op === ">=" ? "min" : "max"] = f.val; hasil[k] = r;
+          }
+        });
+        if (e.time_range && e.time_range !== "No filter") hasil.__waktu__ = e.time_range;
+      });
+      return hasil;
+    } catch (e) { return {}; }
+  };
+
   let induk;
   try { induk = window.parent !== window && window.parent.location.pathname.startsWith("/app") ? window.parent : null; }
   catch (e) { induk = null; }

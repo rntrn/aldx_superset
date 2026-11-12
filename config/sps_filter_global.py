@@ -16,6 +16,8 @@ Aman: ini hanya mengisi nilai filter. Hak akses & RLS tetap berlaku; pengguna ti
     GET  /filter-global/api/nilai      ?kolom=x&cari=teks -> {nilai: [...]} daftar nilai untuk dipilih (RLS berlaku)
     GET  /filter-global/api/terapkan   ?dashboard=id|slug&filter={"kolom": [nilai, ...]}&kecuali=["id|slug", ...]
                                        -> {native_filters, berlaku, tidak_berlaku, dikecualikan, dashboard_id}
+    GET  /filter-global/api/sasaran    ?asal=id|slug&filter={...} -> dashboard LAIN yang bisa menerima filter itu
+                                       (Telusuri ke dashboard lain / drill-through, sps_app/static/telusur.js)
     GET  /filter-global/api/milik      filter global tersimpan milik pengguna ini
     POST /filter-global/api/milik      {aktif, filter, kecuali} simpan untuk akun ini
 """
@@ -33,6 +35,7 @@ JENIS_DIDUKUNG = {"filter_select", "filter_range", "filter_time"}
 WAKTU = "__waktu__"            # kunci khusus: rentang waktu (filter_time), mis. "Last month" atau "2025-01-01 : 2025-12-31"
 MAKS_NILAI = 200
 MAKS_KECUALI = 100
+MAKS_SASARAN = 30
 MAKS_SUMBER = 5               # dataset yang dibaca untuk daftar nilai satu kolom
 
 
@@ -177,6 +180,30 @@ def api_terapkan():
         return jsonify(native_filters=None, berlaku=[], tidak_berlaku=[], dikecualikan=True, dashboard_id=dash.id)
     rison, berlaku, tidak = native_filters(dash, pilihan if isinstance(pilihan, dict) else {})
     return jsonify(native_filters=rison, berlaku=berlaku, tidak_berlaku=tidak, dikecualikan=False, dashboard_id=dash.id)
+
+
+@bp.route("/api/sasaran")
+def api_sasaran():
+    """Dashboard lain (yang boleh dibuka pengguna) dengan filter di kolom yang sama -> tujuan drill-through."""
+    from superset import db, security_manager as sm
+    from superset.models.dashboard import Dashboard
+    try:
+        pilihan = json.loads(request.args.get("filter") or "{}")
+    except ValueError:
+        return jsonify(error="Filter tidak valid"), 400
+    if not isinstance(pilihan, dict) or not pilihan:
+        return jsonify(sasaran=[])
+    asal = _dashboard(request.args.get("asal", ""))
+    hasil = []
+    for d in db.session.query(Dashboard).order_by(Dashboard.dashboard_title):
+        if (asal is not None and d.id == asal.id) or not (sm.is_admin() or sm.can_access_dashboard(d)):
+            continue
+        rison, berlaku, _ = native_filters(d, pilihan)
+        if rison:
+            hasil.append({"id": d.id, "judul": d.dashboard_title, "url": f"/superset/dashboard/{d.slug or d.id}/",
+                          "berlaku": berlaku, "native_filters": rison})
+    hasil.sort(key=lambda x: -len(x["berlaku"]))
+    return jsonify(sasaran=hasil[:MAKS_SASARAN])
 
 
 def _dikecualikan(dash, teks: str | None) -> bool:

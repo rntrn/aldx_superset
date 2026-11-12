@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from sps_ai import alat
 from sps_ai.auto import POLA_WAKTU, kolom_pengenal
+from sps_studio import definisi
 from sps_studio.lembar import BARIS, LABEL_BARIS, peran_geo
 
 def _jenis(c) -> str:
@@ -27,7 +28,8 @@ def daftar(dataset_id: int) -> dict:
     for c in sorted((c for c in t.columns if c.is_active is not False), key=lambda c: c.column_name.lower()):
         jenis = _jenis(c)
         nama = c.column_name
-        item = {"field": nama, "label": c.verbose_name or nama, "jenis": jenis, "keterangan": c.description or ""}
+        item = {"field": nama, "label": c.verbose_name or nama, "jenis": jenis, "keterangan": c.description or "",
+                **definisi.info(c)}
         if jenis == "angka" and not kolom_pengenal(nama):
             ukuran.append({**item, "peran": "ukuran", "agg": "SUM"})
         else:
@@ -35,6 +37,7 @@ def daftar(dataset_id: int) -> dict:
                             "geo": peran_geo(nama), "dttm": bool(c.is_dttm)})
     for m in sorted(t.metrics, key=lambda m: m.metric_name.lower()):
         ukuran.append({"field": m.metric_name, "label": m.verbose_name or m.metric_name, "jenis": "metrik",
-                       "peran": "ukuran", "metrik": True, "keterangan": m.description or m.expression})
+                       "peran": "ukuran", "metrik": True, "keterangan": m.description or m.expression,
+                       **definisi.info(m)})
     ukuran.append({"field": BARIS, "label": LABEL_BARIS, "jenis": "angka", "peran": "ukuran", "agg": "COUNT"})
     return {"id": t.id, "nama": t.table_name, "dimensi": dimensi, "ukuran": ukuran}
