@@ -37,6 +37,21 @@ email, format.
 | CSV / teks (chart) | – | langsung jalan |
 | PNG / PDF (gambar dashboard/chart) | peramban di image | image standar ALDx belum memuatnya (instalasi tanpa internet). Pakai CSV/teks, atau minta pengembang menambahkan peramban ke `docker/Dockerfile` |
 
+### 1b. Peringatan data
+
+Menu **Dashboard & Story › Peringatan data** → **+ Peringatan**: ALDx menjalankan sebuah kueri sesuai jadwal dan
+mengirim email **hanya bila syaratnya terpenuhi**.
+
+| Isian | Contoh |
+|---|---|
+| Database & SQL (harus menghasilkan satu angka) | `SELECT SUM(total) FROM latihan_penjualan WHERE periode = '2025-12-01'` |
+| Syarat | `<` `20000000000` (penjualan bulan ini di bawah 20 M) |
+| Jadwal | tiap hari 07.00 |
+| Masa tenang (*grace period*) | 1 hari, agar tidak dikirimi email berulang untuk kejadian yang sama |
+| Isi pesan | chart atau dashboard terkait + penerima email |
+
+Butuh pengaturan email yang sama dengan Langganan laporan; tanpa `SMTP_HOST` peringatan hanya dicatat di log.
+
 Data di laporan diambil **sebagai pemilik laporan** (hak aksesnya berlaku). Jangan kirim ke penerima yang tidak berhak
 atas data itu. Tugas dijalankan backgrounder (antrean *laporan*).
 

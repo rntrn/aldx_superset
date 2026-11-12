@@ -240,6 +240,32 @@ def jalankan_semua() -> None:
                     raise RuntimeError("skala warna tabel tidak ikut ke chart Superset")
                 return f"% total = {sum(persen):.0f}; kumulatif akhir = total ({kum[-1]:,.0f}); skala warna tersimpan"
 
+            @uji("Studio", "YoY (% vs tahun lalu) & urutan batang mendatar")
+            def _():
+                dasar = {"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}
+                asli = [b["SUM(total)"] for b in sorted(lembar.jalankan(*lembar.dari_dict(dasar))["baris"],
+                                                        key=lambda b: prediksi.kunci_urut(b["periode"]))]
+                t, lb = lembar.dari_dict({**dasar, "kalkulasi": "yoy"})
+                yoy = [b["SUM(total)"] for b in lembar.jalankan(t, lb)["baris"]]
+                harap = (asli[12] - asli[0]) / asli[0] * 100
+                if any(v is not None for v in yoy[:12]) or abs(yoy[12] - harap) > 1e-6:
+                    raise RuntimeError(f"YoY salah: {yoy[:14]} (harap bulan ke-13 = {harap})")
+                p = lembar.ke_superset(t, lb)[1]
+                if p.get("time_compare") != ["1 year ago"] or p.get("time_range") != lembar.RENTANG_YOY:
+                    raise RuntimeError("YoY tidak ikut ke chart Superset")
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("nm_cabang")], "baris": [U("total")],
+                                          "kalkulasi": "yoy"})
+                if lembar.jalankan(t, lb)["kalkulasi"]:
+                    raise RuntimeError("YoY aktif pada dimensi bukan tanggal")
+                arah = {}
+                for nama, rak in (("tegak", {"kolom": [D("nm_cabang")], "baris": [U("total")]}),
+                                  ("mendatar", {"baris": [D("nm_cabang")], "kolom": [U("total")]})):
+                    t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "batang", "urut": "turun", **rak})
+                    arah[nama] = lembar.ke_superset(t, lb)[1]["x_axis_sort_asc"]
+                if arah != {"tegak": False, "mendatar": True}:
+                    raise RuntimeError(f"urutan batang salah: {arah}")
+                return f"YoY bulan ke-13 = {yoy[12]:.1f}%; batang mendatar: terbesar di atas"
+
             @uji("Studio", "Template dashboard: 3 template menghasilkan lembar kerja yang sah")
             def _():
                 from sps_ai import alat
@@ -615,6 +641,24 @@ def jalankan_semua() -> None:
         if not sps_filter_global.native_filters(Dash(), {"nm_cabang": ["Bandung"]})[0] or \
                 sps_filter_global.native_filters(Dash(), {"kolom_lain": ["x"]})[0] is not None:
             raise RuntimeError("pencocokan dashboard tujuan drill-through salah")
+        Dash.id = 987654                                    # tampilan tersimpan (bookmark): simpan, baca, timpa, hapus
+        for filter_ in ({"nm_cabang": ["Bandung"]}, {"nm_cabang": ["Jakarta"]}):
+            sps_filter_global.simpan_tampilan(Dash(), "uji__akun", "  Cabang   pilihan ", filter_)
+        daftar = sps_filter_global.daftar_tampilan(Dash(), "uji__akun")
+        if len(daftar) != 1 or daftar[0]["nama"] != "Cabang pilihan" or daftar[0]["filter"] != {"nm_cabang": ["Jakarta"]} \
+                or not daftar[0]["native_filters"] or sps_filter_global.daftar_tampilan(Dash(), "akun_lain"):
+            raise RuntimeError(f"tampilan tersimpan salah: {daftar}")
+        sps_filter_global.hapus_tampilan("akun_lain", daftar[0]["id"])           # bukan pemilik: tidak terhapus
+        if not sps_filter_global.daftar_tampilan(Dash(), "uji__akun"):
+            raise RuntimeError("tampilan bisa dihapus akun lain")
+        sps_filter_global.hapus_tampilan("uji__akun", daftar[0]["id"])
+        try:
+            sps_filter_global.simpan_tampilan(Dash(), "uji__akun", "kosong", {})
+            raise RuntimeError("tampilan tanpa filter lolos")
+        except ValueError:
+            pass
+        if sps_filter_global.daftar_tampilan(Dash(), "uji__akun"):
+            raise RuntimeError("tampilan tidak terhapus")
         model.ringkasan("dashboard", 0)                     # membuat tabel sps_ulasan bila belum ada
         return f"native_filters & pengecualian ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
 

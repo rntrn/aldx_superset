@@ -24,11 +24,11 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Langganan laporan, riwayat versi, tata letak ponsel | semua | ✅ | [26](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Story / presentasi berurutan | Tableau | ✅ | Story |
 | Parameter *what-if* (geser angka, chart ikut berubah) | Power BI, Tableau | ⏳ | lihat §2 |
-| **Kalkulasi cepat** (% dari total, kumulatif) | Tableau | 🆕 | Studio › **Hitung**; YoY: ⏳ lihat §2 |
+| **Kalkulasi cepat** (% dari total, kumulatif, YoY) | Tableau | 🆕 | Studio › **Hitung** |
 | **Template dashboard** (*Quick create*) | Power BI, Tableau | 🆕 | Susun dashboard › **Dari template…** |
 | **Kelompokkan nilai** (*Group*) & skala warna tabel | Tableau, Power BI | 🆕 | Studio: klik kanan dimensi; Tabel › *Skala warna sel* |
-| Peringatan data (*data alerts*) saat angka melewati ambang | Power BI, Looker | ⏳ | lihat §2 |
-| *Bookmark* (simpan keadaan filter bernama) | Power BI | ⏳ | sebagian tertutup filter global per akun |
+| Peringatan data (*data alerts*) saat angka melewati ambang | Power BI, Looker | ✅ | menu **Peringatan data** ([26 §1b](26-langganan-versi-ponsel-lihat-sebagai.md)) |
+| *Bookmark* (simpan keadaan filter bernama) | Power BI | 🆕 | **Tampilan tersimpan** di panel Telusuri ([25 §2c](25-berkas-filter-global-ulasan.md)) |
 | Tabel input (ketik data langsung ke gudang) | Sigma | ✖ | menulis ke database sumber berisiko; pakai impor Excel/CSV |
 | Bahasa model sendiri (DAX, LookML) | Power BI, Looker | ✖ | ALDx memakai SQL baku agar tidak ada bahasa baru yang harus dipelajari |
 

@@ -44,8 +44,13 @@
       (kunci.length ? `<p class="bantu-fg">${esc(t("Membawa filter yang sedang aktif:"))}</p><div class="bawa-telusur">${kunci.map(k =>
           `<span class="nilai-chip">${esc(ringkas(k, filter[k]))}</span>`).join("")}</div>`
         : `<p class="bantu-fg">${esc(t("Belum ada filter aktif. Klik batang/irisan pada chart atau pilih nilai di bilah filter, lalu buka panel ini lagi."))}</p>`) +
-      `<div class="daftar-telusur" id="daftarTelusur"><p class="bantu-fg">${kunci.length ? esc(t("Mencari dashboard yang cocok…")) : ""}</p></div>`;
+      `<div class="daftar-telusur" id="daftarTelusur"><p class="bantu-fg">${kunci.length ? esc(t("Mencari dashboard yang cocok…")) : ""}</p></div>` +
+      `<div class="kepala-fg" style="margin-top:12px"><b>${esc(t("Tampilan tersimpan"))}</b></div>` +
+      (kunci.length ? `<form class="simpan-tampilan" id="formTampilan"><input id="namaTampilan" maxlength="80" autocomplete="off"
+          placeholder="${esc(t("Nama tampilan, mis. Elektronik Jawa"))}"><button class="tombol" type="submit">${esc(t("Simpan tampilan ini"))}</button></form>` : "") +
+      `<div class="daftar-telusur" id="daftarTampilan"></div>`;
     panel.hidden = false; tombol.setAttribute("aria-expanded", "true");
+    tampilan(d, filter);
     if (!kunci.length) return;
     let sasaran = [];
     try {
@@ -63,6 +68,41 @@
       tutup();
       SPS.buka(`${s.url}?sps_fg=1&native_filters=${encodeURIComponent(s.native_filters)}`);
     });
+  }
+
+  // Tampilan tersimpan (bookmark): keadaan filter dashboard ini disimpan dengan nama, per akun.
+  // Klik = dashboard yang sama dibuka dengan filter itu terpasang. Disimpan di server (/filter-global/api/tampilan).
+  const kirim = (alamat, isi) => fetch(alamat, {method: "POST", credentials: "same-origin",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": (window.SPS_AWAL || {}).csrf || ""}, body: JSON.stringify(isi)}).then(r => r.json());
+  async function tampilan(d, filter) {
+    const el = $("#daftarTampilan");
+    const gambar = (daftar, url) => {
+      el.innerHTML = daftar.length ? daftar.map((s, i) => `<div class="baris-tampilan"><button type="button" class="item-telusur" data-t="${i}">
+          ${ik("corong", 18)}<span><b>${esc(s.nama)}</b><small>${esc(Object.keys(s.filter).map(k => ringkas(k, s.filter[k])).join(" · "))}</small></span></button>
+          <button type="button" class="hapus-tampilan" data-h="${s.id}" title="${esc(t("Hapus tampilan"))}" aria-label="${esc(t("Hapus tampilan"))}">×</button></div>`).join("")
+        : `<p class="bantu-fg">${esc(t("Belum ada. Atur filter di dashboard ini, lalu simpan dengan nama agar bisa dibuka lagi dengan satu klik."))}</p>`;
+      el.querySelectorAll("[data-t]").forEach(b => b.onclick = () => {
+        const s = daftar[+b.dataset.t];
+        tutup();
+        SPS.buka(s.native_filters ? `${url}?sps_fg=1&native_filters=${encodeURIComponent(s.native_filters)}` : url);
+      });
+      el.querySelectorAll("[data-h]").forEach(b => b.onclick = async () => {
+        await kirim("/filter-global/api/tampilan/hapus", {id: +b.dataset.h}).catch(() => 0);
+        tampilan(d, filter);
+      });
+    };
+    let url = "";
+    try {
+      const j = await (await fetch("/filter-global/api/tampilan?dashboard=" + encodeURIComponent(d), {credentials: "same-origin"})).json();
+      url = j.url; gambar(j.tampilan || [], url);
+    } catch (e) { el.innerHTML = ""; }
+    const form = $("#formTampilan");
+    if (form) form.onsubmit = async e => {
+      e.preventDefault();
+      const j = await kirim("/filter-global/api/tampilan", {dashboard: d, nama: $("#namaTampilan").value, filter}).catch(() => ({error: t("Gagal menyimpan")}));
+      if (j.error) { SPS.notif ? SPS.notif(j.error, true) : alert(j.error); return; }
+      $("#namaTampilan").value = ""; gambar(j.tampilan || [], url);
+    };
   }
 
   // Chip "Kembali ke <asal>" selama berada di dashboard hasil telusur.

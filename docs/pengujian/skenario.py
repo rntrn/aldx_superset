@@ -401,6 +401,20 @@ SKENARIO = [
      "Simpan dashboard → Buka; ulangi untuk dua template lain",
      "Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/"
      "Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart"),
+    ("D28", 2, "Tinggi", "YoY (% vs tahun lalu)", "latihan_penjualan",
+     "Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % vs tahun lalu (YoY) → Simpan baru → buka di Explore; "
+     "ganti dimensi ke nm_cabang",
+     "12 bulan pertama kosong; Januari 2024 ±15,8%; chart tersimpan menampilkan angka yang sama; pilihan YoY mati "
+     "untuk dimensi bukan tanggal"),
+    ("J13", 1, "Tinggi", "Tampilan tersimpan (bookmark)", "Dashboard Latihan: Wilayah & Prediksi",
+     "Pilih Kategori = Elektronik → Terapkan → Telusuri → nama 'Elektronik saja' → Simpan tampilan ini; hapus filter; "
+     "Telusuri → klik 'Elektronik saja'; login akun lain; hapus dengan ×",
+     "Dashboard terbuka tersaring Elektronik; tampilan tidak terlihat di akun lain; × menghapus; tanpa filter aktif "
+     "kotak simpan tidak muncul"),
+    ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
+     "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
+     "jadwal tiap menit, penerima email sendiri",
+     "Peringatan tercatat berjalan; email diterima (atau tercatat di log bila mode uji); masa tenang mencegah email berulang"),
     ("K11", 1, "Sedang", "Asisten AI: ringkas dashboard", "Model AI tersambung",
      "Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin",
      "Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka"),

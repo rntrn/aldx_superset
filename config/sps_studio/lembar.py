@@ -41,7 +41,8 @@ RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
 # Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
 WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
-KALKULASI = ("persen_total", "kumulatif")       # kalkulasi cepat; dihitung di sini & lewat fitur bawaan chart Superset
+KALKULASI = ("persen_total", "kumulatif", "yoy")
+RENTANG_YOY = "30 years ago : tomorrow"       # rentang tertutup terlebar yang wajar untuk perbandingan tahun lalu       # kalkulasi cepat; dihitung di sini & lewat fitur bawaan chart Superset
 
 from sps_studio.aturan import ATURAN_TANDA  # noqa: E402,F401  (dipakai juga sebagai lembar.ATURAN_TANDA)
 
@@ -94,7 +95,7 @@ class Lembar:
     batas: int = 1000
     analitik: dict = field(default_factory=dict)
     diabaikan: list[str] = field(default_factory=list)   # kolom di rak yang tidak dipakai jenis tanda ini
-    kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" (kalkulasi cepat ala Tableau)
+    kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" | "yoy" (kalkulasi cepat ala Tableau)
     skala_warna: bool = False         # tabel: latar sel makin pekat untuk nilai makin besar
 
     # --- Turunan --------------------------------------------------------------------
@@ -280,29 +281,54 @@ def jalankan(t, lembar: Lembar) -> dict:
         orderby = [[lembar.dimensi[0].field, False]]
     hasil = alat.jalankan_objek(t, metrics, [p.field for p in lembar.dimensi], _filter(t, lembar),
                                 orderby, lembar.batas)
-    if lembar.pakai_kalkulasi:
+    kalkulasi = _kalkulasi_aktif(t, lembar)
+    if kalkulasi:
         hasil["baris"] = _kalkulasi(hasil["baris"], lembar.dimensi[0].label, [p.label for p in lembar.ukuran_semua],
-                                    lembar.kalkulasi, _kolom_waktu(t, lembar.dimensi[0].field))
+                                    kalkulasi, _kolom_waktu(t, lembar.dimensi[0].field))
     analitik = (prediksi.analisis(hasil["baris"], lembar.dimensi[0].label,
                                   [p.label for p in lembar.ukuran_semua], lembar.analitik)
                 if lembar.pakai_analitik else None)
     return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"],
             "dimensi": [p.label for p in lembar.dimensi], "ukuran": [p.label for p in lembar.ukuran_semua],
             "dim_baris": [p.label for p in lembar.dim_baris], "diabaikan": lembar.diabaikan,
-            "kalkulasi": lembar.kalkulasi if lembar.pakai_kalkulasi else "",
+            "kalkulasi": kalkulasi,
             "geo": {p.label: peran_geo(p.field) for p in lembar.dimensi if peran_geo(p.field)}}
 
 
+def _kalkulasi_aktif(t, lembar: Lembar) -> str:
+    """Kalkulasi yang benar-benar dipakai. YoY (vs tahun lalu) hanya bermakna bila dimensinya kolom tanggal."""
+    if not lembar.pakai_kalkulasi:
+        return ""
+    if lembar.kalkulasi == "yoy" and not _kolom_waktu(t, lembar.dimensi[0].field):
+        return ""
+    return lembar.kalkulasi
+
+
+def _setahun_lalu(tgl):
+    try:
+        return tgl.replace(year=tgl.year - 1)
+    except ValueError:                       # 29 Februari -> 28 Februari tahun sebelumnya
+        return tgl.replace(year=tgl.year - 1, day=28)
+
+
 def _kalkulasi(baris: list[dict], dim: str, ukuran: list[str], jenis: str, waktu: bool) -> list[dict]:
-    """% dari total (0-100) atau kumulatif per ukuran. Kumulatif pada kolom waktu dihitung urut waktu;
-    pada kategori mengikuti urutan tampil (terbesar dulu = kurva Pareto)."""
+    """% dari total (0-100), kumulatif, atau YoY per ukuran. Kumulatif pada kolom waktu dihitung urut waktu;
+    pada kategori mengikuti urutan tampil (terbesar dulu = kurva Pareto).
+    YoY = perubahan % terhadap tanggal yang sama setahun sebelumnya; kosong bila tahun lalu tidak ada datanya."""
     from sps_studio import prediksi
     baris = [dict(b) for b in baris]
-    if jenis == "kumulatif" and waktu:
+    if jenis in ("kumulatif", "yoy") and waktu:
         baris.sort(key=lambda b: prediksi.kunci_urut(b.get(dim)))
+    tanggal = [prediksi._ke_tanggal(b.get(dim)) for b in baris] if jenis == "yoy" else []
     for u in ukuran:
         nilai = [float(b[u]) if isinstance(b.get(u), (int, float)) else 0.0 for b in baris]
-        if jenis == "persen_total":
+        if jenis == "yoy":
+            lalu = {tgl: v for tgl, v in zip(tanggal, nilai) if tgl is not None}
+            hasil = []
+            for tgl, v in zip(tanggal, nilai):
+                dulu = lalu.get(_setahun_lalu(tgl)) if tgl is not None else None
+                hasil.append((v - dulu) / abs(dulu) * 100 if dulu else None)
+        elif jenis == "persen_total":
             total = sum(nilai) or 1.0
             hasil = [v / total * 100 for v in nilai]
         else:
@@ -340,9 +366,11 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     # "No filter" = tanpa batas sampai pengguna memilih rentang; dataset tanpa kolom waktu tidak berubah.
     waktu = t.main_dttm_col or next((c.column_name for c in t.columns if c.is_dttm), None)
     if waktu:
-        p.update(granularity_sqla=waktu, time_range="No filter")
+        # YoY memakai "Time comparison" Superset, yang mewajibkan rentang tertutup (awal & akhir).
+        rentang = RENTANG_YOY if _kalkulasi_aktif(t, lembar) == "yoy" else "No filter"
+        p.update(granularity_sqla=waktu, time_range=rentang)
         p["adhoc_filters"].append({"expressionType": "SIMPLE", "clause": "WHERE", "subject": waktu,
-                                   "operator": "TEMPORAL_RANGE", "comparator": "No filter"})
+                                   "operator": "TEMPORAL_RANGE", "comparator": rentang})
     tanda = lembar.tanda
     if tanda == "angka":
         p.update(metric=M[0], y_axis_format="SMART_NUMBER", header_font_size=0.4)
@@ -363,9 +391,14 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                  y_axis_format="SMART_NUMBER", show_legend=len(M) > 1 or len(D) > 1,
                  show_value=lembar.label, truncateXAxis=True, rich_tooltip=True,
                  x_axis_sort_asc=lembar.urut != "turun")
-        if lembar.pakai_kalkulasi:       # padanan bawaan Superset agar chart tersimpan = pratinjau Studio
-            if lembar.kalkulasi == "persen_total":
+        kalkulasi = _kalkulasi_aktif(t, lembar)
+        if kalkulasi:                    # padanan bawaan Superset agar chart tersimpan = pratinjau Studio
+            if kalkulasi == "persen_total":
                 p.update(contributionMode="column", y_axis_format=".1%")
+            elif kalkulasi == "yoy":
+                # butir waktu harian wajib ada agar Superset bisa mencocokkan tanggal dengan setahun sebelumnya
+                p.update(time_compare=["1 year ago"], comparison_type="percentage", y_axis_format=".1%",
+                         time_grain_sqla="P1D")
             else:
                 p.update(rolling_type="cumsum")
         if tanda == "batang":
@@ -376,7 +409,9 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
             if len(D) > 1:      # ada seri warna: Superset mengurutkan lewat total seri, bukan x_axis_sort
                 p.update(x_axis_sort_series="sum", x_axis_sort_series_ascending=lembar.urut == "naik")
             else:
-                p.update(x_axis_sort=lembar.ukuran_semua[0].label, x_axis_sort_asc=lembar.urut == "naik")
+                # batang mendatar digambar dari bawah: urutan dibalik agar yang pertama tetap di atas (= pratinjau)
+                p.update(x_axis_sort=lembar.ukuran_semua[0].label,
+                         x_axis_sort_asc=(lembar.urut == "naik") != lembar.horizontal)
     elif tanda == "pie":
         p.update(groupby=D[:1], metric=M[0], donut=True, show_labels=True, label_type="key_percent",
                  number_format="SMART_NUMBER", sort_by_metric=True, legendOrientation="right")
