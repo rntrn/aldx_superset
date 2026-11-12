@@ -180,6 +180,15 @@ Pusat Kendali → tab **Ekstrak** (role Admin).
 
 RLS & akses role sumber **otomatis ikut**. Rincian: [13-sps-engine-ekstrak.md](../13-sps-engine-ekstrak.md).
 
+### 5a. Impor banyak tabel sekaligus
+
+1. Di tab yang sama, bagian **Impor banyak tabel sekaligus**: pilih **Koneksi** dan **Skema**.
+2. Centang tabel yang diperlukan (atau **Pilih semua yang tampil**).
+3. **Cek kapasitas**: lihat vonis **Cukup / Mendekati batas / Tidak cukup** dan kebutuhan tiap tabel.
+   Ukuran belum diketahui? Centang **Hitung baris pasti** lalu cek lagi.
+4. **Impor N tabel**: semua masuk antrean ekstrak; pantau statusnya di *Daftar ekstrak*.
+5. Tidak cukup? Kurangi tabel, hapus ekstrak lama, atau minta Superadmin menaikkan kuota di **Batas data**.
+
 ---
 
 ## 6. Upload Excel/CSV

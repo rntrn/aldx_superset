@@ -182,6 +182,7 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Query engine langsung | `docker compose exec engine clickhouse-client` (keluar: `exit`) |
 | Bersihkan sisa image | `scripts\cleanup.ps1` |
 | Bangun ulang dashboard bawaan & menu | `scripts\build-dashboards.ps1` |
+| Terbitkan installer online/offline/HapusTotal (pengembang) | `.\scripts\sinkron-laptop.ps1 -Terbitkan` (Inno Setup & GitHub CLI dipasang otomatis; galat "GitHub CLI belum login" = jalankan lagi, browser login terbuka) |
 | Muat ulang data latihan | `scripts\data-latihan.ps1` (± 20 detik; `-Skala 4` = ± 9,3 juta baris data harian untuk demo kecepatan) |
 
 Semua skrip dijalankan dengan `powershell -ExecutionPolicy Bypass -File scripts\<nama>.ps1`.

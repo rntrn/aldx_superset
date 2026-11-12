@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **144 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **145 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -109,6 +109,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | F03 | 3 Admin data | Tinggi | Aturan RLS per role | Role Cabang Bandung + akun uji | Settings → Row Level Security → Regular, dataset latihan_penjualan, role Cabang Bandung, clause nm_cabang = 'Cabang Bandung' | Akun uji hanya melihat Cabang Bandung (± 121,2 miliar); admin melihat semua |
 | F04 | 3 Admin data | Tinggi/asap | Ekstrak penuh | Dataset dari koneksi database sumber | Data → Ekstrak ke ALDx Engine → mode Penuh, jadwal Harian 02:00 → Buat & segarkan | Status siap; baris = baris sumber; kolom Berikutnya = besok 02:00 |
 | F05 | 3 Admin data | Tinggi | Ekstrak inkremental | Sumber dengan kolom tanggal | Buat ekstrak Inkremental (kolom tanggal) → tambah data di sumber → Segarkan | Baris terakhir = jumlah baris baru saja; total bertambah |
+| F05b | 3 Admin data | Tinggi | Impor banyak tabel + cek kapasitas | Koneksi database sumber berisi ≥ 5 tabel | Ekstrak → Impor banyak tabel: pilih koneksi & skema → Pilih semua → Cek kapasitas → Impor; lalu Superadmin set Batas data › Ekstrak baris maksimal lebih kecil dari tabel terbesar → Cek kapasitas lagi | Perkiraan baris & ukuran tampil; vonis Cukup + kebutuhan per tabel; semua tabel jadi ekstrak berstatus siap; setelah batas diturunkan vonis Tidak cukup, tabel itu ditandai, tombol Impor mati |
 | F06 | 3 Admin data | Tinggi | RLS ikut ke ekstrak | F04 dari dataset ber-RLS | Akun uji cabang membuka chart setelah Pakai di chart | Hanya data cabangnya |
 | F07 | 3 Admin data | Sedang | Pakai di chart / Kembalikan | F04 | Klik Pakai di chart lalu Kembalikan chart | Jumlah chart dipindah sesuai; dashboard tetap tampil di kedua kondisi |
 | F08 | 3 Admin data | Sedang | Hapus ekstrak dilindungi | F07 (chart masih memakai ekstrak) | Klik Hapus | Ditolak dengan pesan 'Masih ada chart yang memakai ekstrak ini' |

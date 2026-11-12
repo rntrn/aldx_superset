@@ -9,6 +9,7 @@
     POST /api/ekstrak/<id>/kembali   chart ekstrak -> sumber
     POST /api/ekstrak/<id>/hapus
     GET  /api/ekstrak/<id>/riwayat
+    GET  /api/ekstrak/impor/koneksi | /impor/tabel   POST /impor/cek | /impor   impor banyak tabel (impor_banyak.py)
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ import logging
 
 from flask import Blueprint, g, jsonify, request
 
-from sps_engine import ekstrak as E, klien as K
+from sps_engine import ekstrak as E, impor_banyak as IB, klien as K
 from sps_server.tampilan import _khusus_admin
 
 log = logging.getLogger(__name__)
@@ -84,6 +85,33 @@ def api_buat():
                d.get("kolom_inkremental") or None, d.get("jadwal") or {}, g.user.username)
     status = kirim_penyegaran(e["id"], "pertama", True) if d.get("segarkan_sekarang", True) else "baru"
     return jsonify(ekstrak=E.ambil(e["id"]), kirim=status)
+
+
+@bp.route("/impor/koneksi")
+@_khusus_admin()
+def api_impor_koneksi():
+    return jsonify(IB.koneksi())
+
+
+@bp.route("/impor/tabel")
+@_khusus_admin()
+def api_impor_tabel():
+    return jsonify(IB.daftar_tabel(int(request.args.get("db") or 0), request.args.get("skema")))
+
+
+@bp.route("/impor/cek", methods=["POST"])
+@_khusus_admin()
+def api_impor_cek():
+    d = _data()
+    return jsonify(IB.cek(int(d.get("db") or 0), d.get("skema"), d.get("tabel") or [], bool(d.get("hitung"))))
+
+
+@bp.route("/impor", methods=["POST"])
+@_khusus_admin()
+def api_impor():
+    d = _data()
+    return jsonify(IB.impor(int(d.get("db") or 0), d.get("skema"), d.get("tabel") or [], d.get("jadwal") or {},
+                            g.user.username, lambda i: kirim_penyegaran(i, "pertama", True)))
 
 
 @bp.route("/<int:ekstrak_id>/segarkan", methods=["POST"])

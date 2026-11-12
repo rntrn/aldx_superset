@@ -23,7 +23,11 @@ pwsh -File installer\setup\buat-installer.ps1 -Offline                # PowerShe
 # atau Windows PowerShell: powershell -ExecutionPolicy Bypass -File installer\setup\buat-installer.ps1 -Offline
 ```
 
-Setelah setiap perbaikan, pengembang menjalankan `pwsh -File installer\setup\terbitkan.ps1`, sehingga installer online
+Setelah setiap perbaikan, pengembang menjalankan `.\scripts\sinkron-laptop.ps1 -Terbitkan` (memanggil
+`installer\setup\terbitkan.ps1` setelah uji lulus). Persiapan sekali dikerjakan otomatis: **Inno Setup 6** dan
+**GitHub CLI** dipasang lewat `winget` bila belum ada, lalu **login GitHub** dibuka di browser (salin kode 8 huruf
+dari layar). Berkas `.bundle` di folder dipindah ke `installer\log`; berkas lain yang belum di-commit membuat
+proses berhenti dengan daftar berkasnya. Seluruh pesan tercatat di `installer\log\sinkron-*.log`. Hasilnya: installer online
 **dan** offline di Releases selalu sama dengan versi terbaru di git.
 
 Hasil di `installer\setup\Output\`: `ALDx-Setup.exe` (online), `ALDx-HapusTotal.exe` (pembersih total), dan
