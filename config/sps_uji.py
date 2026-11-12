@@ -266,6 +266,29 @@ def jalankan_semua() -> None:
             raise RuntimeError(f"{jumlah} baris, hierarki {sorted(nama)}")
         return f"{jumlah:,}".replace(",", ".") + f" baris, hierarki {', '.join(sorted(nama))}"
 
+    @uji("Data", "Data pendukung latihan: database sumber contoh, role RLS, filter rentang & waktu")
+    def _():
+        import json as _json
+        import sps_latihan_sumber as LS
+        from superset.connectors.sqla.models import RowLevelSecurityFilter
+        from superset.models.core import Database
+        from superset.models.dashboard import Dashboard
+        kurang = []
+        d = db.session.query(Database).filter_by(database_name=LS.NAMA_KONEKSI).one_or_none()
+        if d is None:
+            kurang.append("koneksi sumber contoh")
+        elif f"{LS.AKUN_BACA}:" not in d.sqlalchemy_uri_decrypted:
+            kurang.append("koneksi sumber tidak memakai akun hanya-baca")
+        if db.session.query(RowLevelSecurityFilter).filter(RowLevelSecurityFilter.name.like("Latihan: hanya%")).count() < 2:
+            kurang.append("aturan RLS contoh")
+        dash = db.session.query(Dashboard).filter_by(slug="latihan-wilayah").one_or_none()
+        jenis = {f.get("filterType") for f in _json.loads((dash.json_metadata if dash else "") or "{}").get("native_filter_configuration") or []}
+        if not {"filter_select", "filter_range", "filter_time"} <= jenis:
+            kurang.append(f"filter dashboard wilayah {sorted(jenis)}")
+        if kurang:
+            raise RuntimeError("belum ada: " + "; ".join(kurang) + " (jalankan scripts\\data-latihan.ps1)")
+        return "sumber contoh (hanya-baca), 2 role RLS, filter pilihan + rentang + waktu"
+
     @uji("Studio", "Kolom ID/kode selalu dimensi (juga dengan alias tabel t1.)")
     def _():
         from sps_ai.auto import kolom_pengenal

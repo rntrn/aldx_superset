@@ -213,6 +213,7 @@ def lengkapi_dataset(t) -> None:
     for c in t.columns:
         if c.column_name == "tanggal":
             c.is_dttm = True
+    t.main_dttm_col = "tanggal"                       # filter rentang waktu dashboard memakai kolom ini
     ada = {m.metric_name for m in t.metrics}
     for nama, ekspresi, label, fmt in METRIK:
         if nama not in ada:
@@ -270,7 +271,9 @@ def buat_dashboard(ih: int, pemilik: str = "admin") -> str:
             "judul": JUDUL_DASHBOARD, "baris": baris,
             "keterangan": "Data FIKTIF ±2,3 juta baris penjualan harian. Di Studio: hierarki Wilayah, Kalender, Produk.",
             "filter": [{"nama": "Provinsi", "dataset_id": ih, "kolom": "nama_provinsi", "jenis": "pilihan"},
-                       {"nama": "Kategori", "dataset_id": ih, "kolom": "kategori", "jenis": "pilihan"}]},
+                       {"nama": "Kategori", "dataset_id": ih, "kolom": "kategori", "jenis": "pilihan"},
+                       {"nama": "Tahun", "dataset_id": ih, "kolom": "tahun", "jenis": "rentang"},
+                       {"nama": "Rentang waktu", "dataset_id": ih, "kolom": "tanggal", "jenis": "waktu"}]},
             lama.id if lama else None)
         d = db.session.query(Dashboard).get(hasil["id"])
         d.published, d.slug, d.dashboard_title = True, SLUG, JUDUL_DASHBOARD

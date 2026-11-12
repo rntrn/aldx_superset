@@ -180,7 +180,7 @@ Muncul bila metadata masih di **MySQL XAMPP** atau **MariaDB** (versi sebelumnya
 | 3 | bangun image, nyalakan metadb/engine/Redis, buat tabel, akun admin, role, auto-tuning, sertifikat HTTPS | `scripts\init.ps1` |
 | 4 | nyalakan semua container | `scripts\start.ps1` |
 | 6 | identitas awal, menu, izin, ALDx Engine | `scripts\build-dashboards.ps1` |
-| 7 | data latihan + dashboard latihan | `scripts\data-latihan.ps1` |
+| 7 | **data contoh dibangkitkan di setiap instalasi** (± 20 detik, tanpa internet): dataset latihan, 2,3 juta baris data harian, 2 dashboard contoh, database sumber contoh, role RLS contoh. Bisa dibuat ulang kapan saja; isinya selalu sama. Peta lengkap: [bahan ajar](bahan-ajar/README.md#peta-fitur--data-contoh) | `scripts\data-latihan.ps1` |
 | 8 | buat akun pengguna, tunggu web siap (maks. 5 menit), hapus password admin dari `.env` | (installer) |
 
 Pertama kali 15–40 menit (unduh & bangun image). Instalasi ulang 2–5 menit. Jendela tidak bisa ditutup selama

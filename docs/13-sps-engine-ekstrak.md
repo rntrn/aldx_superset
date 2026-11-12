@@ -9,7 +9,7 @@ container `engine`.
 | **Impor berkas** | Access, Excel, CSV, SQLite, DuckDB, Parquet dari wizard *Hubungkan data* | [06](06-sumber-data.md) |
 | **Upload Excel/CSV** | File dari menu Superset masuk ke engine, bukan ke database sumber | bagian 3 |
 | **Ramalan** | Hasil ramalan Studio disimpan sebagai dataset agar tampil di dashboard | [17-katalog-chart-peta-prediksi.md](17-katalog-chart-peta-prediksi.md) |
-| **Data latihan** | `latihan_penjualan`, `latihan_lokasi_pelanggan`, `latihan_outlet`, `latihan_penjualan_harian` (± 2,3 juta baris, dibangkitkan langsung di engine) (fiktif) | [tutorial/](tutorial/README.md) |
+| **Data latihan** | `latihan_penjualan`, `latihan_lokasi_pelanggan`, `latihan_outlet`, `latihan_penjualan_harian` (± 2,3 juta baris, dibangkitkan langsung di engine) (fiktif); sumber contoh untuk dicoba diekstrak: koneksi **Contoh sumber (PostgreSQL)** | [tutorial/](tutorial/README.md) |
 
 > ALDx Engine **terpisah** dari database sumber mana pun (termasuk ClickHouse lain milik perusahaan).
 > Sumber tetap hanya-baca: aplikasi tidak pernah menulis ke sana.

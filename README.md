@@ -106,6 +106,7 @@ D:\superset
 │   ├── sps_build_dashboards.py # Menyiapkan dashboard, menu, izin, ALDx Engine
 │   ├── sps_latihan.py      # DATA LATIHAN fiktif (penjualan ritel) + dashboard latihan
 │   ├── sps_latihan_penerbangan.py # DATA LATIHAN fiktif penerbangan (Excel/CSV, 6 tabel, s.d. jutaan baris)
+│   ├── sps_latihan_sumber.py # Database SUMBER contoh (PostgreSQL hanya-baca) + role RLS contoh untuk latihan
 │   ├── sps_latihan_wilayah.py # DATA LATIHAN harian ±2,3 juta baris + hierarki Wilayah/Kalender/Produk (dimuat installer)
 │   ├── sps_uji.py          # UJI OTOMATIS (scripts\uji.ps1)
 │   ├── ai.yaml + sps_ai/   # Asisten AI

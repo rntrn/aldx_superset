@@ -181,7 +181,8 @@ Catatan:
 ### Filter dashboard
 
 1. **Tambah filter** → pilih dataset & kolom, nama, jenis:
-   **Pilihan nilai** (dropdown, mis. Cabang) atau **Rentang angka** (mis. Penjualan).
+   **Pilihan nilai** (dropdown, mis. Cabang), **Rentang angka** (mis. Tahun, Penjualan), atau
+   **Rentang waktu** (30 hari terakhir, tanggal tertentu; berlaku untuk chart yang datasetnya punya kolom waktu).
 2. **Pilih** pada chip filter menyaring pratinjau kotak di Studio (hanya untuk mencoba).
 3. Saat disimpan, filter menjadi **bilah filter Superset** (panel kiri dashboard).
 

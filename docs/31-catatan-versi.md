@@ -33,6 +33,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Versi | Versi terpasang tampil di **halaman login** & **Beranda**, dengan status *Versi terbaru* / *Pembaruan tersedia* (dicek ke GitHub) | [29](29-versi-pembaruan-hapus-total.md) |
 | Ekstrak | **Impor banyak tabel sekaligus** dari satu koneksi, dengan **cek kapasitas** (perkiraan ukuran vs sisa kuota & disk engine: Cukup / Mendekati / Tidak cukup) sebelum impor | [13 §2.5](13-sps-engine-ekstrak.md) |
+| Data latihan | **Database sumber contoh** (*Contoh sumber (PostgreSQL)*, akun hanya-baca) untuk latihan Hubungkan data, Ekstrak & impor banyak tabel; **role RLS contoh** per cabang (`-AkunUji`); dashboard Wilayah kini punya filter **rentang Tahun** & **Rentang waktu** | [bahan ajar](bahan-ajar/README.md#peta-fitur--data-contoh) |
 | Data latihan | **`latihan_penjualan_harian`**: ±2,3 juta baris harian 2021–2025, hierarki Wilayah/Kalender/Produk, pola Lebaran & anomali, dashboard *Latihan: Wilayah & Prediksi*; dimuat otomatis oleh installer (`-Skala` s.d. ±23 juta baris) | [bahan ajar](bahan-ajar/README.md) |
 
 ### Perbaikan
@@ -40,6 +41,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Masalah | Penyebab & perbaikan |
 |---|---|
 | **Ramalan / tren / anomali tidak bisa dipakai** pada data ALDx Engine (mis. `latihan_penjualan`) | Superset 6.1 tidak mengenali kolom ClickHouse `Float32/Float64` (termasuk di dalam `Nullable(...)`) sebagai angka. Kolom seperti `total` masuk **Dimensi**, tidak bisa dijumlah, dan panel Analitik mati. Sekarang dikenali sebagai angka (`config/sps_dialek.py` §5), juga di Explore |
+| Filter **Rentang waktu** dashboard tidak berpengaruh pada chart buatan Studio | chart tidak mencatat kolom waktu dataset; kini dicatat saat chart disimpan (simpan ulang chart lama agar ikut) |
 | Label sumbu tanggal panjang ("Sat, 01 Mar 2025 00:00:00 GMT") | Kolom `Date/Date32` kini dikirim sebagai `2025-03-01` (`config/sps_ai/alat.py`) |
 | **Pilih preset Tinta & Sakura (pink) tapi warna tetap hijau** | preset ini ikut mengosongkan nama perusahaan sehingga ditolak validasi; kini preset hanya mengubah tampilan, dan tiap preset menetapkan keempat warnanya |
 | Kolom `ID_…` (mis. `t1.ID_Penerbangan` hasil gabung Kueri Visual) masuk **Ukuran** | awalan alias tabel `t1.` membuat ID tidak dikenali; pengenal ID/kode kini membuang awalan & mengenali `ID_x`, `x_id`, `idX`, `XId`, `kode_`, `NIK` |
@@ -48,7 +50,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **70/70 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **71/71 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

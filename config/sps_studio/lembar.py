@@ -299,6 +299,13 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                            "operator": f["op"], "comparator": f["val"]} for f in _filter(t, lembar)],
         "sps_studio": lembar.ke_dict(),                     # agar bisa dibuka lagi di Studio
     }
+    # Kolom waktu dataset dicatat di chart agar filter "Rentang waktu" dashboard (dan filter global waktu) berlaku.
+    # "No filter" = tanpa batas sampai pengguna memilih rentang; dataset tanpa kolom waktu tidak berubah.
+    waktu = t.main_dttm_col or next((c.column_name for c in t.columns if c.is_dttm), None)
+    if waktu:
+        p.update(granularity_sqla=waktu, time_range="No filter")
+        p["adhoc_filters"].append({"expressionType": "SIMPLE", "clause": "WHERE", "subject": waktu,
+                                   "operator": "TEMPORAL_RANGE", "comparator": "No filter"})
     tanda = lembar.tanda
     if tanda == "angka":
         p.update(metric=M[0], y_axis_format="SMART_NUMBER", header_font_size=0.4)

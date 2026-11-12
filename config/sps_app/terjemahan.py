@@ -707,6 +707,7 @@ PUSAT = [
     ('Berikutnya', 'Next run', '次回'),
     ('Belum ada ekstrak. Buat di bawah.', 'No extracts yet. Create one below.', '抽出はまだありません。下で作成してください。'),
     ('Buat ekstrak baru', 'Create a new extract', '新しい抽出を作成'),
+    ('Rentang waktu (tanggal)', 'Time range (date)', '期間（日付）'),
     ('Telusuri ke dashboard lain', 'Drill through to another dashboard', '別のダッシュボードへドリルスルー'),
     ('Membawa filter yang sedang aktif:', 'Carrying the active filters:', '現在のフィルターを引き継ぎます:'),
     ('Belum ada filter aktif. Klik batang/irisan pada chart atau pilih nilai di bilah filter, lalu buka panel ini lagi.', 'No active filter yet. Click a bar/slice on a chart or pick a value in the filter bar, then open this panel again.', '有効なフィルターがありません。チャートの棒やスライスをクリックするか、フィルターバーで値を選んでから、もう一度開いてください。'),
@@ -850,6 +851,15 @@ POLA = [
 
 # --- Halaman bawaan Superset: Inggris -> Indonesia ---------------------------------------------------
 SUPERSET = [
+    ('Cross-filters', 'Klik-filter'),
+    ('Cross-filtering is not enabled for this dashboard.', 'Klik-filter belum diaktifkan untuk dashboard ini.'),
+    ('Not added to any dashboard', 'Belum dipakai di dashboard'),
+    ('Inv', 'Balik'),
+    ('Applied filters', 'Filter aktif'),
+    ('Drill to detail', 'Lihat rincian baris'),
+    ('Drill by', 'Telusuri menurut'),
+    ('Add cross-filter', 'Jadikan klik-filter'),
+    ('Remove cross-filter', 'Lepas klik-filter'),
     ('Dashboards', 'Dashboard'),
     ('Charts', 'Chart'),
     ('Datasets', 'Dataset'),
@@ -1337,6 +1347,8 @@ SUPERSET = [
 
 # --- Pola teks dinamis Superset: (regex Inggris, id) -------------------------------------------------
 POLA_SUPERSET = [
+    ('^Applied filters \\((\\d+)\\)$', 'Filter aktif ($1)'),
+    ('^(\\d+) seconds ago$', '$1 detik lalu'),
     ('^Showing (\\d+) of (\\d+) items$', 'Menampilkan $1 dari $2'),
     ('^(\\d+) options$', '$1 pilihan'),
     ('^(\\d+) option$', '$1 pilihan'),

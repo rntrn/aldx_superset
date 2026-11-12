@@ -117,6 +117,7 @@ def _daftarkan(nama: str, database, schema: str | None, deskripsi: str):
     for c in t.columns:
         if c.column_name == "periode":
             c.is_dttm = True
+            t.main_dttm_col = "periode"
     if "total" in {c.column_name for c in t.columns} and not t.metrics:
         t.metrics.append(SqlMetric(metric_name="penjualan", expression="SUM(total)", verbose_name="Penjualan",
                                    d3format="SMART_NUMBER"))
@@ -245,6 +246,8 @@ def siapkan(database=None) -> list[str]:
                                 os.environ.get("ADMIN_USERNAME", "admin")))
     if engine:                          # data harian berskala besar dibangkitkan di ClickHouse (sps_latihan_wilayah)
         hasil += _siapkan_wilayah(database, schema)
+        import sps_latihan_sumber        # database sumber contoh + role RLS contoh (Ekstrak, Hubungkan data, RLS)
+        hasil += sps_latihan_sumber.siapkan()
     import sps_warna                    # warna kategori tetap & berurutan sesuai palet sejak awal
     hasil.append(sps_warna.kunci_semua())
     return hasil
@@ -267,7 +270,20 @@ def _siapkan_wilayah(database, schema) -> list[str]:
 
 
 if __name__ == "__main__":
+    import argparse
     from superset.app import create_app
+    arg = argparse.ArgumentParser(description="Muat data latihan fiktif")
+    arg.add_argument("--akun-uji", action="store_true", help="hanya buat akun uji per cabang (sandi acak dicetak)")
+    arg.add_argument("--tambah-transaksi", type=int, default=0, metavar="N",
+                     help="hanya tambah N transaksi hari ini ke database sumber contoh (latihan ekstrak inkremental)")
+    pilihan = arg.parse_args()
     with create_app().app_context():
-        for h in siapkan():
-            print("OK ", h)
+        import sps_latihan_sumber
+        if pilihan.tambah_transaksi:
+            print("OK ", f"toko.transaksi kini {sps_latihan_sumber.tambah_transaksi(pilihan.tambah_transaksi):,} baris".replace(",", "."))
+        elif pilihan.akun_uji:
+            for h in sps_latihan_sumber.siapkan_rls() + sps_latihan_sumber.buat_akun_uji():
+                print("OK ", h)
+        else:
+            for h in siapkan():
+                print("OK ", h)
