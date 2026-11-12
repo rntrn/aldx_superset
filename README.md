@@ -126,6 +126,7 @@ D:\superset
 │   ├── uji.ps1             # Uji otomatis semua komponen
 │   ├── cadangkan.ps1       # Cadangan & pemulihan metadb (+ engine)
 │   ├── versi.ps1           # Versi tiap komponen
+│   ├── sinkron-laptop.ps1  # Ambil versi terbaru dari GitHub, terapkan, uji, (opsional) terbitkan installer
 │   ├── data-latihan.ps1    # Muat data latihan fiktif
 │   ├── data-penerbangan.ps1 # Buat Excel/CSV latihan penerbangan ukuran besar
 │   ├── pindah-metadata.ps1 # Pindah metadata versi lama (XAMPP/MariaDB) ke PostgreSQL

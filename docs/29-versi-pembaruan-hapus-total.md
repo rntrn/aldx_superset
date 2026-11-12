@@ -45,8 +45,11 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 
 ### Menyamakan versi di komputer lain
 
-1. **Dengan git (paling pasti):** di folder instalasi jalankan `git pull`, lalu klik dua kali `PASANG.cmd`
-   (data & pengaturan dipertahankan).
+1. **Dengan git (paling pasti):** di folder instalasi jalankan
+   `powershell -ExecutionPolicy Bypass -File scripts\sinkron-laptop.ps1`. Skrip ini mengambil versi terbaru,
+   menerapkannya ke Docker, memperbarui menu & izin, lalu menjalankan uji. Data & pengaturan dipertahankan.
+   Tambah `-KomitInstaller -Terbitkan` untuk sekalian menerbitkan installer baru ke Releases (pengembang).
+   Cara manual: `git pull`, lalu klik dua kali `PASANG.cmd`.
 2. **Dengan Setup.exe:** pastikan exe di Releases dibangun **setelah** perubahan terakhir, lalu jalankan di atas
    instalasi lama (folder sama, data dipertahankan).
 3. **Tanpa internet:** salin folder instalasi dari komputer yang sudah terbaru (tanpa `.env` dan `backup\`), lalu

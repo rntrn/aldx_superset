@@ -4,7 +4,7 @@ Daftar perubahan per rilis, terbaru di atas. Setiap rilis punya bagian **Perlu d
 ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 > **Untuk pengembang:** setiap kali menambah fitur, tambahkan baris di rilis teratas (atau buat rilis baru), lalu
-> jalankan `installer\setup\terbitkan.ps1` agar `ALDx-Setup.exe`, `ALDx-Setup-Offline.exe` dan `ALDx-HapusTotal.exe`
+> jalankan `scripts\sinkron-laptop.ps1 -KomitInstaller -Terbitkan` (memanggil `installer\setup\terbitkan.ps1` setelah uji lulus) agar `ALDx-Setup.exe`, `ALDx-Setup-Offline.exe` dan `ALDx-HapusTotal.exe`
 > di Releases ikut berisi versi ini.
 
 ---
@@ -34,7 +34,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** (`git pull`) | `git pull` → `docker compose up -d` (atau klik dua kali `PASANG.cmd`) → `scripts\uji.ps1` harus **62/62 LULUS** → browser `Ctrl + F5` |
+| **git** | `powershell -ExecutionPolicy Bypass -File scripts\sinkron-laptop.ps1` (ambil versi baru, terapkan, uji: harus **62/62 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 
