@@ -53,6 +53,27 @@ oleh installer): penjualan harian 2021–2025 di 138 outlet, 17 provinsi, 30 kab
 | Anomali yang ditanam | banjir Jakarta Timur 27 Jan–2 Feb 2025 (turun ± 85%); gangguan sistem Sulawesi Selatan 5 Okt 2023 (Rp0,05 miliar); promo 17 Agustus 2024 Gerai Mekarmulya (OT0105) Rp568 juta |
 | Outlet buka sejak 1 Jan 2021 | 115 dari 138 (23 menyusul 2022–2024) |
 
+### Peta fitur → data contoh
+
+Semua di bawah ini dimuat otomatis oleh installer (`scripts\data-latihan.ps1`), sehingga setiap fitur di bahan ajar
+bisa disimulasikan di instalasi baru tanpa data kantor.
+
+| Fitur yang dilatih | Data contoh |
+|---|---|
+| Studio (23 jenis chart), ramalan, anomali, dashboard, filter pilihan | `latihan_penjualan`, dashboard *Latihan: Dashboard Penjualan* |
+| Peta titik, kepadatan, provinsi | `latihan_lokasi_pelanggan` |
+| Gabung tabel di Kueri Visual | `latihan_cabang` + `latihan_lokasi_pelanggan`; set Penerbangan (6 lembar Excel) |
+| Hierarki, data besar, analitik lengkap, N teratas, ukuran & dimensi terdefinisi | `latihan_penjualan_harian` (2,3 juta baris), `latihan_outlet` |
+| Filter global (pilihan, **rentang angka**, **rentang waktu**), drill-through | dashboard *Latihan* & *Latihan: Wilayah & Prediksi* (sama-sama punya filter Kategori; Wilayah punya Tahun & Rentang waktu) |
+| **Hubungkan data**, pilih skema, **Ekstrak penuh & inkremental**, **impor banyak tabel** | koneksi **Contoh sumber (PostgreSQL)**: skema `toko` (cabang, produk, pelanggan, transaksi 200.000 baris, retur, stok) & `sdm` (pegawai, absensi); dataset `transaksi`, `pelanggan`. Tambah baris baru: `scripts\data-latihan.ps1 -TambahTransaksi 500` |
+| **RLS / hak akses per cabang**, Lihat sebagai…, .aldx sesuai hak akses | role **Latihan Cabang Bandung** & **Latihan Cabang Jakarta** (aturan `kd_cabang`). Akun uji: `scripts\data-latihan.ps1 -AkunUji` (sandi acak dicetak sekali; hapus setelah latihan) |
+| Impor berkas Excel/CSV, banyak lembar, berkas besar | `berkas/contoh-target-toko.xlsx`, `berkas/contoh-penerbangan-*.xlsx`, `scripts\data-penerbangan.ps1` |
+
+Yang tetap butuh bahan dari luar: berkas Microsoft Access (.mdb/.accdb), server LDAP, SMTP untuk langganan email,
+dan model AI (Ollama / LM Studio / key cloud).
+
+Akun `Contoh sumber` hanya-baca dan tidak punya hak atas database metadata ALDx. Semua data rekaan.
+
 Angka kunci yang sering dipakai:
 
 | Pertanyaan | Jawaban |

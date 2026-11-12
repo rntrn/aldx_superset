@@ -51,6 +51,9 @@ kapan saja di **Pusat Kendali**. Ingin mengaturnya saat pasang: centang **Atur p
 
 ## Setelah terpasang: ikuti kartu "Siapkan ALDx"
 
+Setiap pemasangan otomatis membuat **data contoh** (fiktif) untuk mencoba semua fitur: dua dashboard contoh, data
+penjualan harian 2,3 juta baris, database sumber contoh, dan role hak akses contoh. Tidak perlu data kantor dulu.
+
 Di **Beranda**, admin melihat kartu **Siapkan ALDx**: lima langkah (AI, data kantor, pengguna, nama & logo, cadangan)
 dengan tombol **Mulai →** yang langsung membuka tempatnya. Semua dokumentasi juga ada di aplikasi: menu **Panduan**.
 

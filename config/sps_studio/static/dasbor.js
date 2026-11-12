@@ -163,6 +163,7 @@
     return D.filter.flatMap(f => {
       const nama = kolom.find(k => k.toLowerCase() === f.kolom.toLowerCase());
       if (!nama) return [];
+      if (f.jenis === "waktu") return [];                    // rentang waktu hanya diatur di dashboard jadi
       if (f.jenis === "pilihan") return f.nilai?.length ? [{field: nama, op: "IN", nilai: f.nilai}] : [];
       return [f.min != null && {field: nama, op: ">=", nilai: f.min}, f.max != null && {field: nama, op: "<=", nilai: f.max}].filter(Boolean);
     });
@@ -191,7 +192,7 @@
       <label>Dataset<select id="fdDs">${pilihan.map(d => `<option value="${d.id}">${esc(d.nama)}</option>`).join("")}</select></label>
       <label style="display:block;margin-top:8px">Kolom<select id="fdKolom"></select></label>
       <label style="display:block;margin-top:8px">Nama di dashboard<input type="text" id="fdNama" placeholder="mis. Cabang"></label>
-      <label style="display:block;margin-top:8px">Jenis<select id="fdJenis"><option value="pilihan">Pilihan nilai (dropdown)</option><option value="rentang">Rentang angka</option></select></label>
+      <label style="display:block;margin-top:8px">Jenis<select id="fdJenis"><option value="pilihan">Pilihan nilai (dropdown)</option><option value="rentang">Rentang angka</option><option value="waktu">Rentang waktu (tanggal)</option></select></label>
       <p class="ket">Filter berlaku untuk semua chart yang datanya punya kolom dengan nama sama.</p>`,
       padaOk: () => {
         const kolom = $("#fdKolom").value;
@@ -202,7 +203,8 @@
     const isiKolom = async () => {
       const k = await kolomDataset(Number($("#fdDs").value));
       const jenis = $("#fdJenis").value;
-      $("#fdKolom").innerHTML = k.filter(x => jenis === "rentang" ? x.peran === "ukuran" : x.peran === "dimensi")
+      $("#fdKolom").innerHTML = k.filter(x => jenis === "rentang" ? (x.peran === "ukuran" || x.jenis === "angka")
+          : jenis === "waktu" ? (x.waktu || x.dttm) : x.peran === "dimensi")
         .map(x => `<option>${esc(x.field)}</option>`).join("");
     };
     $("#fdDs").onchange = isiKolom; $("#fdJenis").onchange = isiKolom;
@@ -210,6 +212,7 @@
   }
 
   async function aturFilter(f) {
+    if (f.jenis === "waktu") { Studio.notif("Rentang waktu dipilih pengguna di dashboard (mis. 30 hari terakhir); tidak ada pratinjau di Studio."); return; }
     if (f.jenis === "rentang") {
       Studio.dialog({judul: `Filter: ${f.nama}`, isi: `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <label>Minimal<input type="number" id="fdMin" value="${f.min ?? ""}"></label><label>Maksimal<input type="number" id="fdMaks" value="${f.max ?? ""}"></label></div>

@@ -7,7 +7,8 @@ Susunan dari browser:
 lebar mengikuti grid Superset (12 kolom per baris): 3 = ¼, 4 = ⅓, 6 = ½, 8 = ⅔, 12 = penuh.
 Selain chart, kotak boleh berupa objek desain (teks/label, gambar, garis pemisah): lihat objek.py.
 Filter dashboard -> native filter Superset:
-    "filter": [{"nama": "Cabang", "dataset_id": 13, "kolom": "kd_cabang", "jenis": "pilihan|rentang"}]
+    "filter": [{"nama": "Cabang", "dataset_id": 13, "kolom": "kd_cabang", "jenis": "pilihan|rentang|waktu"}]
+"waktu" = rentang waktu (30 hari terakhir, tanggal tertentu, ...) untuk semua chart yang datasetnya punya kolom waktu.
 Filter berlaku untuk semua chart yang dataset-nya punya kolom bernama sama (perilaku Superset).
 Klik-filter antar-chart (cross filter, padanan "filter action") selalu diaktifkan.
 
@@ -24,7 +25,7 @@ from sps_ai import alat
 from sps_studio import lembar, objek
 
 LEBAR_SAH = (3, 4, 6, 8, 12)
-JENIS_FILTER = {"pilihan": "filter_select", "rentang": "filter_range"}
+JENIS_FILTER = {"pilihan": "filter_select", "rentang": "filter_range", "waktu": "filter_time"}
 AWALAN_FILTER = "NATIVE_FILTER-sps"                # filter milik Studio (lainnya dibiarkan)
 TINGGI = {"big_number_total": 26}            # kotak angka lebih pendek
 TINGGI_BAWAAN = 52
@@ -112,10 +113,13 @@ def filter_native(daftar: list[dict], chart_ids: list[int]) -> list[dict]:
         if fid in lihat:
             raise alat.InputSalah(f"Filter kolom '{kolom}' dipasang dua kali.")
         lihat.add(fid)
+        waktu = jenis == "waktu"
         hasil.append({
             "id": fid, "type": "NATIVE_FILTER", "filterType": JENIS_FILTER[jenis],
-            "name": (str(f.get("nama") or "").strip() or kolom)[:100], "description": "",
-            "targets": [{"datasetId": t.id, "column": {"name": kolom}}],
+            "name": (str(f.get("nama") or "").strip() or ("Rentang waktu" if waktu else kolom))[:100], "description": "",
+            # filter waktu Superset tidak menunjuk kolom; datasetId/kolom disimpan agar bisa dibuka lagi di Studio
+            "targets": [{}] if waktu else [{"datasetId": t.id, "column": {"name": kolom}}],
+            "sps_asal": {"dataset_id": t.id, "kolom": kolom},
             "controlValues": {"enableEmptyFilter": False, "defaultToFirstItem": False, "multiSelect": True,
                               "searchAllOptions": False, "inverseSelection": False},
             "defaultDataMask": {"extraFormData": {}, "filterState": {}, "ownState": {}},
@@ -188,8 +192,10 @@ def buka(dashboard_id: int) -> dict:
         if isi:
             baris.append(isi)
     jenis = {v: k for k, v in JENIS_FILTER.items()}
-    filter_ = [{"nama": f["name"], "dataset_id": f["targets"][0]["datasetId"],
-                "kolom": f["targets"][0]["column"]["name"], "jenis": jenis.get(f["filterType"], "pilihan")}
+    filter_ = [{"nama": f["name"],
+                "dataset_id": (f.get("sps_asal") or {}).get("dataset_id") or f["targets"][0].get("datasetId"),
+                "kolom": (f.get("sps_asal") or {}).get("kolom") or (f["targets"][0].get("column") or {}).get("name"),
+                "jenis": jenis.get(f["filterType"], "pilihan")}
                for f in meta_dash.get("native_filter_configuration") or []
                if str(f.get("id", "")).startswith(AWALAN_FILTER)]
     return {"id": dash.id, "judul": dash.dashboard_title, "keterangan": keterangan, "baris": baris,

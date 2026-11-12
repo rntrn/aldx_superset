@@ -170,6 +170,11 @@ Hanya Admin (bawaan) yang boleh memuat data dari berkas `.aldx`. Dataset hasilny
 
 Pusat Kendali → tab **Ekstrak** (role Admin).
 
+> Belum punya database kantor untuk dicoba? Pakai koneksi **Contoh sumber (PostgreSQL)** yang ikut terpasang
+> (skema `toko` & `sdm`, dataset `transaksi` & `pelanggan`). Untuk mencoba **Inkremental**: buat ekstrak `transaksi`
+> dengan kolom `id_transaksi`, jalankan `scripts\data-latihan.ps1 -TambahTransaksi 500`, lalu **Segarkan**:
+> hanya 500 baris baru yang disalin.
+
 1. **(3)** Pilih dataset sumber (dari koneksi database mana pun).
 2. Nama ekstrak, **(4)** Mode:
    - **Penuh**: salin semua setiap kali;

@@ -51,7 +51,7 @@ function Pindai([string]$berkas) {
 $WAJIB = @("config\ai.yaml", "config\sps_ai\wawasan.py", "config\sps_ai\kunci_api.py", "config\sps_ai\tab.js",
            "config\sps_app\static\ai.js", "config\sps_panduan\tampilan.py", "scripts\hapus-total.ps1",
            "scripts\hapus-aldx.ps1", "docs\28-sambungkan-asisten-ai.md", "docs\pdf\cara-pasang.pdf", "installer\pasang.ps1",
-           "config\sps_versi_aplikasi.py", "config\sps_latihan_wilayah.py", "config\sps_studio\definisi.py",
+           "config\sps_versi_aplikasi.py", "config\sps_latihan_wilayah.py", "config\sps_latihan_sumber.py", "config\sps_studio\definisi.py",
            "config\sps_studio\static\huruf\huruf.css", "config\sps_app\static\telusur.js", "docs\31-catatan-versi.md")
 $TERLARANG = '(^|\\)(CHANGELOG\.md|bersih\.kecuali|buat-installer\.ps1|terbitkan\.ps1|laporan-qa\.(md|pdf)|unins\d+\.(exe|dat)|\.env|[^\\]+\.(log|dump|sql\.gz))$|' +
              '(^|\\)(\.github|tests|\.git|node_modules|\.vitepress)\\'
