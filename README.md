@@ -49,6 +49,7 @@ Memperbarui: jalankan Setup terbaru di atas instalasi lama (data dipertahankan);
 | Filter global & ulasan | satu filter (pilihan, rentang angka, rentang waktu) berlaku di **semua dashboard & Story**, tersimpan per akun; nilai dipilih dari daftar yang bisa dicari, **chip filter aktif** di bilah atas, *kecualikan dashboard ini*; **komentar & rating** dengan balasan, @sebut, pemberitahuan & moderasi Superadmin. Lihat [docs/25](docs/25-berkas-filter-global-ulasan.md) |
 | Sematkan ke web lain | dashboard tampil di web/aplikasi lain lewat `<iframe>` + token tamu: **RLS per penonton**, filter dari URL (`f.<kolom>=...`), hanya domain yang diizinkan (`.env`: `SPS_SEMATKAN_*`). Lihat [docs/30](docs/30-sematkan-dashboard.md) |
 | Dokumentasi | **Panduan di dalam aplikasi** (menu *Panduan*, `/panduan/`: pencarian, daftar isi, mode gelap, tanpa internet) dari Markdown di `docs\` + **PDF** di `docs\pdf\` |
+| Versi | versi terpasang di halaman login & bawah Beranda, dengan status *Versi terbaru / Pembaruan tersedia* ([docs/29](docs/29-versi-pembaruan-hapus-total.md)) |
 | Mutu | `scripts\uji.ps1` di server; daftar periksa audit keamanan [docs/27](docs/27-daftar-periksa-audit-keamanan.md) |
 
 **Mulai membaca:** [`docs/00-mulai-di-sini.md`](docs/00-mulai-di-sini.md) (peta dokumentasi per peran). **Apa yang baru:** [`docs/31-catatan-versi.md`](docs/31-catatan-versi.md).

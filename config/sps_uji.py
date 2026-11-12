@@ -318,6 +318,17 @@ def jalankan_semua() -> None:
     from flask import current_app
     klien = current_app.test_client()
 
+    @uji("Halaman", "Versi aplikasi tampil di login & tersedia untuk Beranda")
+    def _():
+        import re as _re
+        import sps_versi_aplikasi as va
+        if not _re.fullmatch(r"\d{4}\.\d{2}\.\d{2}", va.VERSI):
+            raise RuntimeError(f"format VERSI salah: {va.VERSI}")
+        if f"v{va.VERSI}" not in klien.get("/login/").get_data(as_text=True):
+            raise RuntimeError("versi tidak tampil di halaman login")
+        t = va.terbaru()
+        return f"v{va.VERSI}; terbaru di GitHub: {t.get('versi') or t.get('pesan')}"
+
     @uji("Halaman", "/health")
     def _():
         r = klien.get("/health")

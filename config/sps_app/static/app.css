@@ -167,6 +167,11 @@ kbd {
 .lebar { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
 .sapa h1 { margin: 0; font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -.02em; }
 .sapa p { margin: 4px 0 0; color: var(--teks-2); }
+.versi-beranda { margin: 28px 0 8px; font-size: 12px; color: var(--teks-3); text-align: center; }
+.versi-beranda code { font: 11.5px ui-monospace, monospace; background: var(--latar); padding: 1px 5px; border-radius: 4px; }
+.versi-beranda a { color: var(--aksen-teks, var(--aksen)); }
+.status-versi.ok { color: #12805C; font-weight: 600; }
+.status-versi.baru { color: #B54708; font-weight: 600; }
 .tanya {
   display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 18px; border-radius: 16px; background: var(--kertas);
   border: 1px solid var(--garis); box-shadow: var(--bayang-2); transition: box-shadow var(--cepat), border-color var(--cepat);

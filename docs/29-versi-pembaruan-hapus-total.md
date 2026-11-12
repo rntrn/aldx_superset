@@ -43,6 +43,8 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 
 | Di mana | Cara |
 |---|---|
+| Halaman login | kaki halaman: `v2026.11.12` (versi terpasang; plus kode commit bila dipasang dengan git) |
+| Beranda (bawah) | `ALDx v2026.11.12 · a1b2c3d · ✓ Versi terbaru`, atau **Pembaruan tersedia: v…** + tautan *Unduh installer* & *Apa yang baru* (Admin). Dicek ke GitHub tiap 6 jam; tanpa internet tertulis *tidak bisa dicek* |
 | Aplikasi | fitur terbaru terlihat? Versi November 2026: menu **Sematkan ke web lain**, bagian **Objek** di Studio › Susun dashboard, chip filter global di bilah atas. Daftar lengkap: [31 · Catatan versi](31-catatan-versi.md) |
 | Folder instalasi | `git log -1 --oneline` (bila dipasang dengan git), atau `scripts\versi.ps1` |
 | Paket offline | berkas `offline\versi.txt` (tanggal + kode commit) |

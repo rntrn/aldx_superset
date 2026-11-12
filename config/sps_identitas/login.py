@@ -12,6 +12,8 @@ from pathlib import Path
 
 from flask import get_flashed_messages, redirect, render_template_string, request
 
+import sps_versi_aplikasi
+
 from sps_identitas import tema
 
 HTML = Path(__file__).with_name("login.html")
@@ -37,7 +39,7 @@ def daftarkan(app) -> None:
         lanjut = request.args.get("next", "")
         return render_template_string(
             HTML.read_text(encoding="utf-8"), n=n, p=tema.palet(n), v=app.config["SPS_IDENTITAS_VERSI"],
-            kaki=tema.teks_kaki(n), pesan=pesan, csrf=generate_csrf(), tahun=date.today().year,
+            kaki=tema.teks_kaki(n), versi_aldx=sps_versi_aplikasi.teks_singkat(), pesan=pesan, csrf=generate_csrf(), tahun=date.today().year,
             aksi="/login/" + (f"?next={_aman(lanjut)}" if lanjut else ""))
 
 

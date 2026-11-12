@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **145 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **146 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -14,6 +14,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 |---|---|---|---|---|---|---|
 | A01 | 4 Admin server | Tinggi/asap | Instalasi baru dengan PASANG.cmd | Docker Desktop menyala, folder di D:\superset | Klik dua kali PASANG.cmd, isi password admin, lewati isian opsional, klik Pasang | Semua langkah selesai; halaman Selesai menampilkan alamat; browser membuka halaman login |
 | A02 | 4 Admin server | Tinggi/asap | Uji otomatis | A01 | Jalankan scripts\uji.ps1 | 55/55 LULUS, kode keluar 0 |
+| A02b | 4 Admin server | Sedang | Versi tampil & status pembaruan | A01; komputer dengan internet | Buka /login/ (lihat kaki halaman); login → gulir ke bawah Beranda | Login menulis vYYYY.MM.DD; Beranda menulis ALDx vYYYY.MM.DD (+ kode commit bila dipasang dengan git) dan '✓ Versi terbaru' atau 'Pembaruan tersedia' dengan tautan Unduh installer; tanpa internet tertulis 'Tidak bisa dicek' |
 | A03 | 4 Admin server | Tinggi | Pemeriksaan prasyarat menolak kondisi tidak layak | Docker Desktop DIMATIKAN | Jalankan PASANG.cmd | Baris 'Docker Desktop menyala' GAGAL, tombol Lanjut nonaktif; setelah Docker dinyalakan & Periksa ulang: OK |
 | A04 | 4 Admin server | Tinggi | Pindah metadata lama ke PostgreSQL | Instalasi lama (MYSQL_HOST=host.docker.internal + XAMPP menyala, atau MariaDB) | Jalankan PASANG.cmd, centang Pindahkan data | Dashboard, chart, user, koneksi lama tampil di versi baru; .env METADB_JENIS=postgres; upload lama terbaca dari ALDx Engine |
 | A05 | 4 Admin server | Tinggi | Instalasi ulang tidak menghapus data | A01 + ada chart buatan sendiri | Jalankan PASANG.cmd lagi (password admin dikosongkan) | Selesai tanpa galat; chart tetap ada; password admin tidak berubah |
