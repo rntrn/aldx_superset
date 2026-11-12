@@ -225,6 +225,11 @@ SKENARIO = [
     ("F05", 3, "Tinggi", "Ekstrak inkremental", "Sumber dengan kolom tanggal",
      "Buat ekstrak Inkremental (kolom tanggal) → tambah data di sumber → Segarkan",
      "Baris terakhir = jumlah baris baru saja; total bertambah"),
+    ("F05b", 3, "Tinggi", "Impor banyak tabel + cek kapasitas", "Koneksi database sumber berisi ≥ 5 tabel",
+     "Ekstrak → Impor banyak tabel: pilih koneksi & skema → Pilih semua → Cek kapasitas → Impor; lalu Superadmin set "
+     "Batas data › Ekstrak baris maksimal lebih kecil dari tabel terbesar → Cek kapasitas lagi",
+     "Perkiraan baris & ukuran tampil; vonis Cukup + kebutuhan per tabel; semua tabel jadi ekstrak berstatus siap; "
+     "setelah batas diturunkan vonis Tidak cukup, tabel itu ditandai, tombol Impor mati"),
     ("F06", 3, "Tinggi", "RLS ikut ke ekstrak", "F04 dari dataset ber-RLS",
      "Akun uji cabang membuka chart setelah Pakai di chart", "Hanya data cabangnya"),
     ("F07", 3, "Sedang", "Pakai di chart / Kembalikan", "F04", "Klik Pakai di chart lalu Kembalikan chart",

@@ -12,6 +12,7 @@
       4. Uji               : scripts\uji.ps1, semua harus LULUS.
       5. -KomitInstaller   : commit & push folder installer\setup dan .github\workflows bila belum ada di repo.
       6. -Terbitkan        : bangun & unggah installer online, offline, HapusTotal (installer\setup\terbitkan.ps1).
+                             Inno Setup & GitHub CLI dipasang otomatis bila belum; login GitHub dibuka di browser.
 
     Data, akun, dan .env TIDAK diubah. Bila satu langkah gagal, skrip berhenti dan menjelaskan apa yang harus dilakukan.
     Catatan lengkap tersimpan di installer\log\sinkron-<waktu>.log.
@@ -79,9 +80,11 @@ function Gagal([string]$pesan, [string]$saran) {
 # Jalankan perintah luar; berhenti bila kode keluarnya bukan 0.
 # EAP "Continue" di sini: git & docker menulis kemajuan ke stderr, yang di Windows PowerShell 5.1 + "Stop"
 # bisa dianggap error fatal walau perintahnya berhasil. Keberhasilan dinilai dari kode keluar.
+# Keluaran dialirkan lewat Out-Host agar ikut tercatat di log (transcript Windows PowerShell 5.1 tidak mencatat
+# keluaran program luar yang langsung ke konsol; dulu pesan galat terbitkan.ps1 hilang dari log).
 function Jalankan([string]$keterangan, [scriptblock]$perintah, [string]$saran) {
     $ErrorActionPreference = "Continue"
-    & $perintah
+    & $perintah 2>&1 | ForEach-Object { "$_" } | Out-Host
     if ($LASTEXITCODE -ne 0) { Gagal "$keterangan (kode $LASTEXITCODE)" $saran }
 }
 function Diam([scriptblock]$perintah) {         # jalankan tanpa output; kembalikan kode keluar
@@ -197,6 +200,43 @@ if ($Terbitkan) {
     if ($larangan) { Gagal "berkas berlisensi terbatas ada di folder build: $($larangan.Name -join ', ')" "pindahkan berkas itu keluar dari folder ALDx selama membangun installer." }
     Ok "tidak ada driver berlisensi terbatas di folder build"
     if (-not (Test-Path "$Akar\config\sps_studio\static\huruf\huruf.css")) { Gagal "berkas huruf dashboard tidak ada" "git pull ulang; folder config\sps_studio\static\huruf wajib ikut installer." }
+
+    # Perkakas: Inno Setup 6 (pembuat installer) & GitHub CLI yang sudah login (unggah ke Releases). Dipasang bila belum.
+    $winget = "--accept-source-agreements", "--accept-package-agreements", "-e", "--silent"
+    $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+              "$env:ProgramFiles\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $iscc) {
+        Info "memasang Inno Setup 6 (sekali saja)..."
+        Jalankan "memasang Inno Setup gagal" { winget install --id JRSoftware.InnoSetup @winget } "pasang manual: https://jrsoftware.org/isdl.php, lalu ulangi."
+    }
+    Ok "Inno Setup 6 terpasang"
+    $cariGh = { @((Get-Command gh -ErrorAction SilentlyContinue).Source, "$env:ProgramFiles\GitHub CLI\gh.exe",
+                  "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\GitHub.cli_Microsoft.Winget.Source_8wekyb3d8bbwe\bin\gh.exe") |
+                Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1 }
+    $gh = & $cariGh
+    if (-not $gh) {
+        Info "memasang GitHub CLI (sekali saja)..."
+        Jalankan "memasang GitHub CLI gagal" { winget install --id GitHub.cli @winget } "pasang manual: https://cli.github.com, lalu ulangi."
+        $gh = & $cariGh
+        if (-not $gh) { Gagal "GitHub CLI sudah dipasang tapi belum terbaca" "tutup PowerShell, buka lagi, lalu jalankan perintah ini lagi." }
+    }
+    if ((Diam { & $gh auth status }) -ne 0) {
+        Info "GitHub CLI belum login: browser akan terbuka. Salin kode 8 huruf yang tampil di sini, tempel di browser, lalu Authorize."
+        & $gh auth login --hostname github.com --git-protocol https --web          # interaktif: tidak dialirkan ke Out-Host
+        if ((Diam { & $gh auth status }) -ne 0) { Gagal "login GitHub belum berhasil" "jalankan: & `"$gh`" auth login   lalu ulangi perintah ini." }
+    }
+    Ok "GitHub CLI login ($gh)"
+
+    # terbitkan.ps1 menolak folder yang tidak bersih (berkas baru pun dihitung). Paket .bundle dipindah ke log.
+    Get-ChildItem "$Akar\*.bundle" -ErrorAction SilentlyContinue | ForEach-Object {
+        Move-Item $_.FullName "$Akar\installer\log\" -Force; Info "paket $($_.Name) dipindah ke installer\log"
+    }
+    $kotorRilis = git status --porcelain
+    if ($kotorRilis) {
+        Write-Host ($kotorRilis -join "`n")
+        Gagal "folder belum bersih (daftar di atas); installer harus sama persis dengan versi di git" "commit & push berkas itu, atau pindahkan keluar folder ALDx, lalu ulangi."
+    }
+    Ok "folder bersih & sama dengan GitHub ($(git rev-parse --short HEAD))"
     $ps = (Get-Command pwsh -ErrorAction SilentlyContinue).Source; if (-not $ps) { $ps = $PS }
     Info "memakai $ps (pembangunan offline bisa 20-40 menit)"
     Jalankan "terbitkan.ps1 gagal" { & $ps -NoProfile -ExecutionPolicy Bypass -File $skrip } "baca pesan di atas (Inno Setup terpasang? login GitHub? semua perubahan sudah di-push?)."

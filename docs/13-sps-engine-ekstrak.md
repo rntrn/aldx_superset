@@ -94,7 +94,29 @@ superset-beat  ──tiap 5 menit──► sps.ekstrak.jadwal  ──► antrean
 - Data dibaca per potongan 50.000 baris (hemat memori).
 - Riwayat setiap penyegaran: tombol **Riwayat** (mulai, selesai, pemicu, baris, pesan galat).
 
-### 2.5 Batasan
+### 2.5 Impor banyak tabel sekaligus (dengan cek kapasitas)
+
+Pusat Kendali › **Ekstrak** › bagian **Impor banyak tabel sekaligus**:
+
+1. Pilih **Koneksi** & **Skema**: daftar tabel tampil dengan **perkiraan baris** & **ukuran di sumber** dari statistik
+   database (PostgreSQL/Redshift, MySQL/MariaDB, SQL Server, Oracle, ClickHouse), tanpa `COUNT(*)` yang berat.
+   Database tanpa statistik: centang **Hitung baris pasti** (`COUNT(*)`, maks. 30 tabel).
+2. Centang tabel (ada **Cari** & **Pilih semua yang tampil**), lalu **Cek kapasitas**.
+3. Hasil: **Cukup** (hijau) / **Mendekati batas** (kuning, > 80% atau ada tabel yang ukurannya belum diketahui) /
+   **Tidak cukup** (merah), dengan perkiraan per tabel.
+4. **Impor**: tiap tabel didaftarkan jadi dataset, dibuat ekstrak **Penuh** bernama `<skema>_<tabel>` dengan jadwal
+   pilihan, lalu dikirim ke backgrounder. Satu tabel gagal (mis. nama sudah ada) tidak menggagalkan yang lain.
+
+| Pembanding | Asal angka |
+|---|---|
+| Kebutuhan di engine | ukuran sumber × 0,3 (ClickHouse terkompresi), atau baris × 40 byte bila ukuran tidak ada. Uji: 5 tabel 2,55 juta baris → perkiraan 40,3 MB, nyata 41,0 MB |
+| Tersedia | yang terkecil dari **sisa kuota** (Batas data › kuota ALDx Engine − terpakai) dan **disk kosong** dikurangi cadangan 10% disk (maks. 10 GB) |
+| Baris per tabel | tidak boleh melebihi Batas data › *Ekstrak: baris maksimal* |
+
+**Tidak cukup** = tombol Impor mati, dan server juga menolak (aman walau dipanggil lewat API). Kode:
+`config/sps_engine/impor_banyak.py`.
+
+### 2.6 Batasan
 
 | Batasan | Alasan / solusi |
 |---|---|
@@ -120,6 +142,8 @@ Data upload versi lama (database `sps_upload` di XAMPP/MariaDB) dipindah ke **AL
 ---
 
 ## 4. Struktur kode (`config/sps_engine/`)
+
+`impor_banyak.py` = impor banyak tabel + cek kapasitas (§2.5).
 
 | Berkas | Isi |
 |---|---|

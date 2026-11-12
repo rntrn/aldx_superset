@@ -61,6 +61,14 @@ button.kecil{padding:3px 9px;font-size:12px;background:#fff;color:var(--navy)}bu
 .redup{color:#9AA5B1}
 .formEk{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 16px;margin-bottom:8px}
 .formEk label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--redup);font-weight:600}
+.ibDaftar{max-height:320px;overflow:auto;border:1px solid var(--garis);border-radius:8px;margin:8px 0}
+.ibDaftar table{width:100%}.ibDaftar td,.ibDaftar th{padding:5px 8px}.ibDaftar th{position:sticky;top:0;background:var(--kertas,#fff)}
+.ibDaftar td.n,.ibDaftar th.n{text-align:right;font-variant-numeric:tabular-nums}
+.ibVonis{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:10px;margin:8px 0;border:1px solid}
+.ibVonis b{font-size:15px}.ibVonis.cukup{background:#ECFDF3;border-color:#12B76A}.ibVonis.mendekati{background:#FFF8EC;border-color:#E8A33D}
+.ibVonis.tidak_cukup{background:#FEF3F2;border-color:#F04438}
+.ibBar{height:10px;border-radius:5px;background:var(--garis);overflow:hidden;flex:1;min-width:120px}
+.ibBar span{display:block;height:100%;background:#12B76A}.ibVonis.mendekati .ibBar span{background:#E8A33D}.ibVonis.tidak_cukup .ibBar span{background:#F04438}
 select{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:6px;background:#fff;color:var(--teks)}
 .st{font-size:11px;padding:2px 8px;border-radius:10px;white-space:nowrap}
 .st.siap{background:#E3F6EE;color:#0B7A52}.st.gagal{background:#FDECEC;color:#B42318}
@@ -212,6 +220,23 @@ select{font:inherit;padding:7px 9px;border:1px solid var(--garis);border-radius:
       </div>
       <p class="ket" id="ekCatatan"></p>
       <button class="utama" id="ekBuat">Buat &amp; segarkan sekarang</button> <span id="ekPesan"></span>
+    </div>
+    <h2>Impor banyak tabel sekaligus</h2>
+    <div class="kartu">
+      <p class="ket">Salin banyak tabel dari satu koneksi ke ALDx Engine. <b>Cek kapasitas</b> dulu: perkiraan ukuran tiap tabel
+        dari statistik database sumber dibandingkan dengan sisa kuota, ruang disk kosong, dan batas baris per ekstrak.</p>
+      <div class="formEk">
+        <label>Koneksi<select id="ibDb"></select></label>
+        <label>Skema<select id="ibSkema"></select></label>
+        <label>Cari tabel<input type="text" id="ibCari" placeholder="mis. penjualan"></label>
+        <label>Jadwal segarkan<select id="ibJadwal"><option value="manual">Manual</option><option value="harian" selected>Harian 02:00</option><option value="mingguan">Mingguan (Senin 02:00)</option></select></label>
+      </div>
+      <div class="ibDaftar" id="ibDaftar"><p class="ket" style="padding:8px">Pilih koneksi.</p></div>
+      <button class="kedua" id="ibSemua">Pilih semua yang tampil</button>
+      <button class="kedua" id="ibCek">Cek kapasitas</button>
+      <label class="ket"><input type="checkbox" id="ibHitung"> Hitung baris pasti (COUNT, lebih lambat)</label>
+      <div id="ibHasilCek"></div>
+      <button class="utama" id="ibImpor" disabled>Impor tabel terpilih</button> <span id="ibPesan"></span>
     </div>
     <div id="riwayatEk"></div>
   </section>
@@ -490,6 +515,7 @@ function jadwalForm() {
 
 async function muatEkstrak() {
   clearTimeout(TIMER_EK);
+  ibSiapkan().catch(() => {});
   const [d, s] = await Promise.all([api("/pusat-kendali/api/ekstrak"), SUMBER.length ? SUMBER : api("/pusat-kendali/api/ekstrak/sumber")]);
   if (!SUMBER.length) { SUMBER = s; isiSumber(); }
   const e = d.engine, list = d.ekstrak;
@@ -561,6 +587,79 @@ $("#ekBuat").onclick = async () => {
     $("#ekNama").value = ""; delete $("#ekNama").dataset.diisi; aturForm();
   } catch (e) { $("#ekPesan").innerHTML = `<span class="galat">${esc(e.message)}</span>`; }
   b.disabled = false; muatEkstrak();
+};
+
+// ---------------- IMPOR BANYAK TABEL (sps_engine/impor_banyak.py) ----------------
+const IB = {tabel: [], cek: null};
+const ibUrl = "/pusat-kendali/api/ekstrak/impor";
+const ibTerpilih = () => [...document.querySelectorAll("#ibDaftar input[data-t]:checked")].map(c => c.dataset.t);
+function ibJadwal() {
+  const j = $("#ibJadwal").value;
+  return j === "manual" ? {jenis: "manual"} : j === "mingguan" ? {jenis: "mingguan", jam: 2, hari: 0} : {jenis: "harian", jam: 2};
+}
+function ibGambar() {
+  const cari = $("#ibCari").value.trim().toLowerCase(), pilih = new Set(ibTerpilih());
+  const daftar = IB.tabel.filter(t => !cari || t.nama.toLowerCase().includes(cari));
+  $("#ibDaftar").innerHTML = daftar.length ? `<table><tr><th></th><th>Tabel</th><th class="n">Perkiraan baris</th><th class="n">Ukuran di sumber</th></tr>` +
+    daftar.map(t => `<tr><td><input type="checkbox" data-t="${esc(t.nama)}" ${pilih.has(t.nama) ? "checked" : ""}></td><td>${esc(t.nama)}</td>
+      <td class="n">${t.baris == null ? "–" : fmt.format(t.baris)}</td><td class="n">${byte(t.byte)}</td></tr>`).join("") + "</table>"
+    : '<p class="ket" style="padding:8px">Tidak ada tabel.</p>';
+  document.querySelectorAll("#ibDaftar input[data-t]").forEach(c => c.onchange = () => { IB.cek = null; $("#ibImpor").disabled = true; $("#ibHasilCek").innerHTML = ""; });
+}
+async function ibMuatTabel(skema) {
+  $("#ibDaftar").innerHTML = '<p class="ket" style="padding:8px">Membaca tabel…</p>';
+  try {
+    const q = new URLSearchParams({db: $("#ibDb").value, ...(skema ? {skema} : {})});
+    const r = await api(`${ibUrl}/tabel?${q}`);
+    IB.tabel = r.tabel; IB.cek = null; $("#ibImpor").disabled = true; $("#ibHasilCek").innerHTML = "";
+    $("#ibSkema").innerHTML = r.semua_skema.map(x => `<option ${x === r.skema ? "selected" : ""}>${esc(x)}</option>`).join("");
+    ibGambar();
+    if (!r.statistik && r.tabel.length) $("#ibHasilCek").innerHTML = '<p class="ket">Database ini tidak menyediakan statistik ukuran; centang <b>Hitung baris pasti</b> sebelum Cek kapasitas.</p>';
+  } catch (e) { $("#ibDaftar").innerHTML = `<p class="galat" style="padding:8px">${esc(e.message)}</p>`; }
+}
+async function ibSiapkan() {
+  if ($("#ibDb").options.length) return;
+  const k = await api(`${ibUrl}/koneksi`);
+  $("#ibDb").innerHTML = k.length ? k.map(x => `<option value="${x.id}">${esc(x.nama)} (${esc(x.jenis)})</option>`).join("")
+    : '<option value="">(belum ada koneksi; tambah di Data › Hubungkan data)</option>';
+  if (k.length) ibMuatTabel();
+}
+$("#ibDb").onchange = () => ibMuatTabel();
+$("#ibSkema").onchange = () => ibMuatTabel($("#ibSkema").value);
+$("#ibCari").oninput = ibGambar;
+$("#ibSemua").onclick = () => { document.querySelectorAll("#ibDaftar input[data-t]").forEach(c => { c.checked = true; }); IB.cek = null; $("#ibImpor").disabled = true; };
+$("#ibCek").onclick = async () => {
+  const tabel = ibTerpilih();
+  if (!tabel.length) { $("#ibHasilCek").innerHTML = '<p class="galat">Centang minimal satu tabel.</p>'; return; }
+  $("#ibHasilCek").innerHTML = '<p class="ket">Menghitung kebutuhan penyimpanan…</p>';
+  try {
+    const c = IB.cek = await api(`${ibUrl}/cek`, {db: +$("#ibDb").value, skema: $("#ibSkema").value, tabel, hitung: $("#ibHitung").checked});
+    const label = {cukup: "Cukup", mendekati: "Mendekati batas", tidak_cukup: "Tidak cukup"}[c.vonis];
+    const persen = c.tersedia_byte ? Math.min(100, Math.round(c.perlu_byte / c.tersedia_byte * 100)) : 100;
+    $("#ibHasilCek").innerHTML = `<div class="ibVonis ${c.vonis}"><b>${label}</b>
+        <span>Perlu ± <b>${byte(c.perlu_byte)}</b> dari <b>${byte(c.tersedia_byte)}</b> yang tersedia</span>
+        <div class="ibBar"><span style="width:${Math.max(persen, c.perlu_byte ? 1 : 0)}%"></span></div><span>${persen === 0 && c.perlu_byte ? "< 1" : persen}%</span></div>
+      <p class="ket">Disk engine kosong ${byte(c.disk_bebas)} dari ${byte(c.disk_total)} · terpakai ALDx ${byte(c.terpakai)}
+        · kuota ${c.kuota_gb ? fmt.format(c.kuota_gb) + " GB" : "tanpa batas"} · cara hitung: ${esc(c.metode)}.
+        ${c.tak_diketahui ? `<br><b>${c.tak_diketahui} tabel</b> belum diketahui ukurannya: centang Hitung baris pasti lalu cek lagi.` : ""}
+        ${c.lebih_baris.length ? `<br><b class="galat">Melebihi batas baris per ekstrak:</b> ${esc(c.lebih_baris.join(", "))}.` : ""}</p>
+      <div class="ibDaftar"><table><tr><th>Tabel</th><th class="n">Baris</th><th class="n">Perlu di engine</th><th>Catatan</th></tr>${c.tabel.map(t =>
+        `<tr><td>${esc(t.nama)}</td><td class="n">${t.baris == null ? "–" : fmt.format(t.baris)}</td><td class="n">${byte(t.perlu_byte)}</td><td class="ket">${esc(t.catatan)}</td></tr>`).join("")}</table></div>`;
+    $("#ibImpor").disabled = c.vonis === "tidak_cukup";
+    $("#ibImpor").textContent = `Impor ${tabel.length} tabel`;
+  } catch (e) { $("#ibHasilCek").innerHTML = `<p class="galat">${esc(e.message)}</p>`; }
+};
+$("#ibImpor").onclick = async () => {
+  const tabel = ibTerpilih();
+  if (!IB.cek || !confirm(`Impor ${tabel.length} tabel ke ALDx Engine? Penyalinan berjalan di latar (backgrounder).`)) return;
+  const b = $("#ibImpor"); b.disabled = true; $("#ibPesan").innerHTML = "Mendaftarkan dataset & membuat ekstrak…";
+  try {
+    const r = await api(ibUrl, {db: +$("#ibDb").value, skema: $("#ibSkema").value, tabel, jadwal: ibJadwal()});
+    const gagal = r.hasil.filter(x => !x.ok);
+    $("#ibPesan").innerHTML = `<span class="sukses">${r.berhasil} dari ${r.hasil.length} tabel masuk antrean ekstrak.</span>` +
+      (gagal.length ? `<br><span class="galat">Gagal: ${gagal.map(x => esc(x.tabel + " (" + x.pesan + ")")).join("; ")}</span>` : "");
+    SUMBER = []; muatEkstrak();
+  } catch (e) { $("#ibPesan").innerHTML = `<span class="galat">${esc(e.message)}</span>`; b.disabled = false; }
 };
 
 // ---------------- HAK AKSES ----------------

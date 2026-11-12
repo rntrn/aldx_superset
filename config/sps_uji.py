@@ -304,6 +304,16 @@ def jalankan_semua() -> None:
         e = ekstrak.daftar()
         return f"{len(e)} ekstrak, {len(ekstrak.jatuh_tempo())} jatuh tempo"
 
+    @uji("Engine", "Impor banyak tabel: perkiraan kapasitas & koneksi sumber")
+    def _():
+        from sps_engine import impor_banyak as IB
+        if IB._perlu_byte(None, 1_000_000) != 300_000 or IB._perlu_byte(1000, None) != 40_000 or IB._perlu_byte(None, None) is not None:
+            raise RuntimeError("rumus perkiraan kebutuhan salah")
+        kurang = {"postgresql", "mysql", "mssql", "oracle", "clickhouse"} - set(IB.SQL_PERKIRAAN)
+        if kurang:
+            raise RuntimeError(f"statistik katalog belum ada untuk {sorted(kurang)}")
+        return f"{len(IB.koneksi())} koneksi sumber; statistik katalog {len(IB.SQL_PERKIRAAN)} jenis database"
+
     # ---- 6. Halaman
     from flask import current_app
     klien = current_app.test_client()
