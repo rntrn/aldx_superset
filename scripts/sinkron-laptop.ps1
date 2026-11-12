@@ -25,30 +25,41 @@
 .PARAMETER Terbitkan
     Jalankan installer\setup\terbitkan.ps1 setelah uji lulus.
 
+.PARAMETER JadikanGit
+    Untuk folder yang dipasang dengan ALDx-Setup.exe (belum ada .git): jadikan folder git yang mengikuti GitHub.
+    Berkas program diganti versi GitHub; .env, cadangan, log, dan data Docker TIDAK disentuh (.env disalin dulu
+    ke installer\log). Cukup sekali; berikutnya skrip berjalan tanpa pilihan ini.
+
 .PARAMETER TanpaUji
     Lewati scripts\uji.ps1 (tidak disarankan; -Terbitkan tidak bisa dipakai bersama ini).
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File scripts\sinkron-laptop.ps1
-    Ambil versi terbaru main, terapkan, uji.
+    Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1
+    Ambil versi terbaru main, terapkan, uji (dijalankan di jendela PowerShell yang sedang terbuka).
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File scripts\sinkron-laptop.ps1 -KomitInstaller -Terbitkan
+    Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1 -KomitInstaller -Terbitkan
     Sekaligus simpan skrip installer ke repo dan terbitkan installer baru ke GitHub Releases.
 
 .EXAMPLE
-    powershell -ExecutionPolicy Bypass -File scripts\sinkron-laptop.ps1 -Cabang ccr-ea4b74df-ofmr6n
+    Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1 -JadikanGit
+    Folder hasil ALDx-Setup.exe: jadikan folder git (sekali), lalu ambil versi terbaru, terapkan, uji.
     Coba isi PR sebelum di-merge.
 #>
 param(
     [string]$Cabang = "main",
     [switch]$KomitInstaller,
     [switch]$Terbitkan,
+    [switch]$JadikanGit,
     [switch]$TanpaUji
 )
 
 $ErrorActionPreference = "Stop"
 $Akar = Split-Path $PSScriptRoot -Parent
+$Repo = "https://github.com/rntrn/aldx_superset.git"
+# PowerShell yang sedang menjalankan skrip ini (powershell.exe atau pwsh.exe), dipakai untuk skrip lain.
+# Tidak memakai nama "powershell" karena di sebagian komputer tidak ada di PATH.
+$PS = (Get-Process -Id $PID).Path
 Set-Location $Akar
 
 # ---------- Alat bantu tampilan ----------
@@ -88,15 +99,29 @@ Write-Host "ALDx - sinkron laptop ($Akar), cabang: $Cabang" -ForegroundColor Whi
 
 # ---------- 1. Pemeriksaan awal ----------
 Langkah "Pemeriksaan awal"
-if (-not (Test-Path "$Akar\.git")) { Gagal "folder ini bukan hasil git clone" "jalankan skrip dari folder ALDx yang dipasang dengan git (mis. D:\superset)." }
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Gagal "git belum terpasang" "winget install Git.Git, lalu buka PowerShell baru." }
 Ok "git $((git --version) -replace 'git version ','')"
+if (-not (Test-Path "$Akar\.git")) {
+    if (-not $JadikanGit) { Gagal "folder ini dipasang dengan Setup.exe (belum folder git)" "jalankan lagi dengan tambahan -JadikanGit (sekali saja)." }
+    Langkah "Jadikan folder git (sekali saja)"
+    if (Test-Path "$Akar\.env") {
+        Copy-Item "$Akar\.env" "$Akar\installer\log\env-cadangan-$(Get-Date -Format 'yyyyMMdd-HHmmss').env"
+        Ok ".env dicadangkan ke installer\log (tidak akan diubah)"
+    }
+    Jalankan "git init gagal" { git init -q } ""
+    Jalankan "menambah alamat GitHub gagal" { git remote add origin $Repo } ""
+    Jalankan "mengunduh dari GitHub gagal" { git fetch origin $Cabang } "cek internet & login GitHub (jendela login Git akan muncul untuk repo privat)."
+    # -f: berkas program diganti versi GitHub. .env, backup\, log & data Docker tidak dilacak git, jadi tidak tersentuh.
+    Jalankan "mengambil berkas versi GitHub gagal" { git checkout -q -f -B $Cabang --track "origin/$Cabang" } ""
+    Ok "folder kini mengikuti $Repo ($Cabang)"
+}
 
 if ((Diam { docker info }) -ne 0) { Gagal "Docker Desktop belum menyala" "buka Docker Desktop, tunggu sampai 'Engine running', lalu jalankan skrip ini lagi." }
 Ok "Docker Desktop menyala"
 
 # Perubahan lokal (kecuali folder installer yang memang belum masuk repo) akan menghalangi pull.
-$kotor = git status --porcelain | Where-Object { $_ -notmatch '^\?\? (installer/setup/|\.github/)' -and $_ -notmatch 'installer/log/' }
+# Berkas baru yang tidak dilacak (??) tidak menghalangi pull; server/gateway.conf ditulis ulang otomatis oleh Pusat Kendali.
+$kotor = git status --porcelain | Where-Object { $_ -notmatch '^\?\? ' -and $_ -notmatch 'server/gateway\.conf$' }
 if ($kotor) {
     Write-Host ($kotor -join "`n")
     Gagal "ada perubahan lokal yang belum di-commit (daftar di atas)" "commit atau simpan dulu (git stash), supaya tidak hilang saat versi baru diambil."
@@ -118,7 +143,7 @@ if (-not (Test-Path "$Akar\docs\31-catatan-versi.md")) {
 
 # ---------- 3. Terapkan ----------
 Langkah "Terapkan ke Docker (data & .env tidak diubah)"
-Jalankan "menyalakan layanan gagal" { powershell -ExecutionPolicy Bypass -File "$Akar\scripts\start.ps1" } "lihat scripts\logs.ps1, atau jalankan PASANG.cmd untuk perbaikan."
+Jalankan "menyalakan layanan gagal" { & $PS -NoProfile -ExecutionPolicy Bypass -File "$Akar\scripts\start.ps1" } "lihat scripts\logs.ps1, atau jalankan PASANG.cmd untuk perbaikan."
 # Konfigurasi di config\ di-mount ke container: restart agar kode Python & halaman baru terbaca.
 Jalankan "restart web & backgrounder gagal" { docker compose restart superset superset-worker superset-beat } "lihat scripts\logs.ps1"
 Info "menunggu web sehat..."
@@ -129,7 +154,7 @@ do {
 } until ($status -match "\(healthy\)" -or (Get-Date) -gt $batas)
 if ($status -notmatch "\(healthy\)") { Gagal "web belum sehat setelah 4 menit ($status)" "lihat scripts\logs.ps1 superset; kirim isi log ke pengembang." }
 Ok "web sehat"
-Jalankan "build-dashboards gagal" { powershell -ExecutionPolicy Bypass -File "$Akar\scripts\build-dashboards.ps1" } "lihat pesan di atas; biasanya cukup diulang."
+Jalankan "build-dashboards gagal" { & $PS -NoProfile -ExecutionPolicy Bypass -File "$Akar\scripts\build-dashboards.ps1" } "lihat pesan di atas; biasanya cukup diulang."
 Ok "menu, izin & role diperbarui"
 
 # ---------- 4. Uji ----------
@@ -137,7 +162,7 @@ if ($TanpaUji) {
     Langkah "Uji otomatis dilewati (-TanpaUji)"
 } else {
     Langkah "Uji otomatis (scripts\uji.ps1)"
-    Jalankan "ada uji yang GAGAL" { powershell -ExecutionPolicy Bypass -File "$Akar\scripts\uji.ps1" } "baca baris GAGAL di atas; installer TIDAK diterbitkan sebelum semua lulus."
+    Jalankan "ada uji yang GAGAL" { & $PS -NoProfile -ExecutionPolicy Bypass -File "$Akar\scripts\uji.ps1" } "baca baris GAGAL di atas; installer TIDAK diterbitkan sebelum semua lulus."
     Ok "semua uji LULUS"
 }
 
@@ -172,9 +197,9 @@ if ($Terbitkan) {
     if ($larangan) { Gagal "berkas berlisensi terbatas ada di folder build: $($larangan.Name -join ', ')" "pindahkan berkas itu keluar dari folder ALDx selama membangun installer." }
     Ok "tidak ada driver berlisensi terbatas di folder build"
     if (-not (Test-Path "$Akar\config\sps_studio\static\huruf\huruf.css")) { Gagal "berkas huruf dashboard tidak ada" "git pull ulang; folder config\sps_studio\static\huruf wajib ikut installer." }
-    $ps = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }
+    $ps = (Get-Command pwsh -ErrorAction SilentlyContinue).Source; if (-not $ps) { $ps = $PS }
     Info "memakai $ps (pembangunan offline bisa 20-40 menit)"
-    Jalankan "terbitkan.ps1 gagal" { & $ps -ExecutionPolicy Bypass -File $skrip } "baca pesan di atas (Inno Setup terpasang? login GitHub? semua perubahan sudah di-push?)."
+    Jalankan "terbitkan.ps1 gagal" { & $ps -NoProfile -ExecutionPolicy Bypass -File $skrip } "baca pesan di atas (Inno Setup terpasang? login GitHub? semua perubahan sudah di-push?)."
     Ok "installer diterbitkan; cek tanggal berkas di GitHub > Releases"
 }
 
