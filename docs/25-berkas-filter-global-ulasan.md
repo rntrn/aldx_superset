@@ -89,7 +89,9 @@ Tombol **corong** di bilah atas. Angka di tombol = jumlah filter global yang akt
 ![Filter global](gambar/app/c4-filter-global.png)
 
 1. **Tambah** → pilih kolom (daftar diambil dari filter dashboard yang boleh Anda lihat) → isi nilainya:
-   - kolom *pilihan* (mis. Cabang): nilai dipisah koma;
+   - kolom *pilihan* (mis. Cabang): klik kotak nilai → **pilih dari daftar** (bisa dicari sambil mengetik) atau ketik
+     lalu **Enter**. Setiap nilai jadi chip; × mencabutnya, Backspace di kotak kosong mencabut chip terakhir.
+     Daftar nilai mengikuti hak akses & RLS Anda;
    - kolom *rentang* (filter angka, mis. Tahun): **dari** – **sampai** (salah satu boleh kosong);
    - **Rentang waktu** (filter waktu dashboard): 30 hari terakhir, 3 bulan terakhir, … atau *Tanggal tertentu*
      `2025-01-01 : 2025-12-31`.
@@ -97,6 +99,12 @@ Tombol **corong** di bilah atas. Angka di tombol = jumlah filter global yang akt
 3. Setiap dashboard lain, termasuk dashboard di halaman **Story**, otomatis memakai nilai yang sama **bila** dashboard
    itu punya filter di kolom bernama sama (filter pilihan, rentang angka, atau rentang waktu).
 4. Matikan dengan centang **Aktif**, atau **Hapus semua**.
+5. **Kecualikan dashboard ini**: saat sebuah dashboard terbuka, centang ini → dashboard itu selalu tampil tanpa filter
+   global (mis. dashboard ringkasan nasional). Hapus centang untuk memakainya lagi.
+
+**Chip di bilah atas** (layar ≥ 1280 px): filter yang aktif tampil di sebelah tombol corong, mis. `Elektronik ×`.
+Arahkan kursor untuk melihat nama kolomnya; klik chip untuk membuka panel; × mencabut filter itu dan memuat ulang
+dashboard. Di dashboard yang dikecualikan, chip tampak redup dengan catatan *dikecualikan*.
 
 ![Dashboard terfilter](gambar/app/c5-dashboard-terfilter.png)
 
@@ -144,8 +152,8 @@ Menu **Kelola › Moderasi ulasan** (`/ulasan/moderasi/`), tab *Menunggu / Tampi
 | `config/sps_berkas/paket.py` | ekspor / periksa / impor (perintah ekspor-impor resmi Superset) |
 | `config/sps_berkas/tampilan.py`, `halaman.html`, `static/berkas.js` | halaman & API `/berkas/` |
 | `config/sps_berkas/tugas.py` | ekspor `.aldx` berisi data di backgrounder (antrean *ekstrak*), hasil di tabel `sps_berkas_tugas` 24 jam |
-| `config/sps_filter_global.py` | `GET /filter-global/api/kolom`, `GET /filter-global/api/terapkan` |
-| `config/sps_app/static/filter.js` | panel filter global di cangkang |
+| `config/sps_filter_global.py` | `GET /filter-global/api/kolom`, `GET /filter-global/api/nilai?kolom=&cari=` (daftar nilai, RLS berlaku), `GET /filter-global/api/terapkan` (`kecuali=[id/slug]`), `GET/POST /filter-global/api/milik` (`{aktif, filter, kecuali}`) |
+| `config/sps_app/static/filter.js` | panel filter global, pemilih nilai, chip aktif di bilah atas |
 | `config/sps_app/static/bingkai.js` | menerapkan filter global saat dashboard dibuka (juga di Story) |
 | `config/sps_ulasan/` | tabel `sps_ulasan`, API `/ulasan/api/...`, halaman moderasi |
 | `config/sps_app/static/ulasan.js` | panel komentar & rating di cangkang |

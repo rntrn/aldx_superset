@@ -9,7 +9,7 @@
 | `tutorial-semua-level.pdf` | tutorial bergambar level 1–4 |
 | `bahan-ajar-lengkap.pdf` | bahan ajar level 1–4 + modul runbook admin |
 | `per-level/*.pdf` | tutorial & bahan ajar per level (untuk dibagikan ke peserta/pengajar) |
-| `pengujian-uat.pdf` | panduan pengujian + 133 skenario UAT (isian tetap di `../pengujian/lembar-uji.xlsx`) |
+| `pengujian-uat.pdf` | panduan pengujian + 138 skenario UAT (isian tetap di `../pengujian/lembar-uji.xlsx`) |
 | `kartu-runbook-admin.pdf` | runbook & FAQ admin (cetak §7 sebagai kartu perintah) |
 | `presentasi-sosialisasi.pdf` | presentasi sosialisasi 21 slide (16:9) |
 

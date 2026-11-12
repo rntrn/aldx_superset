@@ -232,6 +232,10 @@ powershell -ExecutionPolicy Bypass -File scripts\uji.ps1
 Isinya: semua image siap pakai (`offline\aldx-images.tar.gz`: Superset ALDx yang sudah dibangun, PostgreSQL, ClickHouse,
 Redis, nginx), `offline\versi.txt`, dan Docker Desktop Installer. Berkas `.exe` + semua `.bin` harus satu folder.
 
+Semua fitur jalan **tanpa internet**: ECharts, peta provinsi, 10 huruf dashboard, dan gambar dashboard tersimpan lokal;
+sematan dashboard hanya butuh jaringan antara web Anda dan server ALDx. Yang baru di tiap versi:
+[31 · Catatan versi](31-catatan-versi.md).
+
 | Tahap | Yang terjadi |
 |---|---|
 | Setup | Docker belum ada → tawaran memasang Docker Desktop dari paket (UAC admin) |

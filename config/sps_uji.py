@@ -145,6 +145,80 @@ def jalankan_semua() -> None:
                     raise RuntimeError(s["ramalan"]["metode"])
                 return f"{s['ramalan']['metode']}, R² {s['tren']['r2']}, {len(s['anomali'])} anomali"
 
+            @uji("Studio", "Hierarki dimensi: simpan, baca, telusuri (filter jalur), hapus")
+            def _():
+                from sps_studio import hierarki
+                nama = "uji__hierarki"
+                hierarki.simpan(P, nama, ["provinsi", "nm_cabang", "kategori"])
+                if not any(h["nama"] == nama for h in hierarki.daftar(P)):
+                    raise RuntimeError("hierarki tidak tersimpan")
+                atas = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("provinsi")],
+                                                          "baris": [U("jumlah_transaksi")]}))
+                prov = str(atas["baris"][0]["provinsi"])
+                dalam = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("nm_cabang")],
+                                                           "baris": [U("jumlah_transaksi")],
+                                                           "filter": [{"field": "provinsi", "op": "IN", "nilai": [prov]}]}))
+                hierarki.hapus(P, nama)
+                if any(h["nama"] == nama for h in hierarki.daftar(P)) or not dalam["baris"]:
+                    raise RuntimeError("telusur/hapus gagal")
+                return f"{len(atas['baris'])} provinsi -> {len(dalam['baris'])} cabang di {prov}"
+
+            @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
+            def _():
+                from sps_ai import auto
+                jenis, gagal = set(), []
+                for ds_id in (P, L):
+                    h = auto.sarankan(ds_id, "", None, 40)
+                    for sr in {x["jenis"]: x for x in h["saran"]}.values():
+                        jenis.add(sr["jenis"])
+                        try:
+                            tt, lb = lembar.dari_dict({"dataset_id": ds_id, "tanda": sr["jenis"], **sr["spec"]})
+                            lembar.ke_superset(tt, lb)
+                        except Exception as e:  # noqa: BLE001
+                            gagal.append(f"{sr['jenis']}: {e}")
+                if gagal or len(jenis) < 12:
+                    raise RuntimeError(f"{len(jenis)} jenis; gagal: {gagal[:3]}")
+                return f"{len(jenis)} jenis chart diusulkan, semua bisa dibangun"
+
+    @uji("Studio", "Kolom desimal ClickHouse jadi ukuran & tanggal ISO (syarat ramalan)")
+    def _():
+        from superset.db_engine_specs.clickhouse import ClickHouseConnectEngineSpec as C
+        from superset.utils.core import GenericDataType as G
+        salah = [t for t in ("Nullable(Float64)", "NULLABLE(FLOAT64)", "Float32", "LowCardinality(Nullable(Float64))",
+                             "Nullable(Int64)", "Decimal(18, 2)") if getattr(C.get_column_spec(t), "generic_type", None) != G.NUMERIC]
+        teks = C.get_column_spec("LowCardinality(Nullable(String))")
+        if salah or teks is None or teks.generic_type != G.STRING:
+            raise RuntimeError(f"tipe tidak dikenali sebagai angka: {salah}")
+        from datetime import date as _d, datetime as _dt
+        from sps_ai.alat import _iso
+        if (_iso(_d(2025, 3, 1)), _iso(_dt(2025, 3, 1)), _iso(_dt(2025, 3, 1, 8, 30)), _iso(5)) != \
+                ("2025-03-01", "2025-03-01", "2025-03-01T08:30:00", 5):
+            raise RuntimeError("tanggal tidak dikirim sebagai ISO")
+        return "Float32/64, Double, Int, Decimal = angka; String tetap teks; tanggal ISO"
+
+    @uji("Studio", "Objek dashboard: teks aman, huruf lokal, gambar hanya raster")
+    def _():
+        from pathlib import Path as _P
+        from sps_studio import objek
+        o = objek.bersihkan({"jenis": "teks", "lebar": 12, "tinggi": 999, "teks": "<script>x</script>\nBaris 2",
+                             "huruf": "playfair-display", "ukuran": 500, "warna": "red;}", "rata": "tengah"})
+        h = objek.html_objek(o)
+        if "<script>" in h or "&lt;script&gt;" not in h or "<br>" not in h:
+            raise RuntimeError("teks objek tidak di-escape")
+        if (o["tinggi"], o["ukuran"], o["warna"], o["rata"]) != (10, 96, "#111827", "left"):
+            raise RuntimeError(f"nilai tidak sah lolos: {o}")
+        css = objek.gabung_css(".milik-saya{color:red}", {"playfair-display"}, True)
+        css2 = objek.gabung_css(css, set(), False)
+        if ".milik-saya" not in css2 or "ALDX-HURUF" in css2 or "playfair-display-latin-700" not in css:
+            raise RuntimeError("CSS huruf dashboard salah")
+        folder = _P(objek.__file__).parent / "static" / "huruf"
+        hilang = [k for k, v in objek.HURUF.items() if v[2] and not (folder / f"{k}-latin-400-normal.woff2").exists()]
+        if hilang:
+            raise RuntimeError(f"berkas huruf hilang: {hilang}")
+        if objek.jenis_gambar(b"\x89PNG\r\n\x1a\n....") != "image/png" or objek.jenis_gambar(b"<svg onload=x>") is not None:
+            raise RuntimeError("deteksi format gambar salah")
+        return f"{len(objek.HURUF) - 1} huruf lokal, escape & validasi ok"
+
     @uji("Analitik", "Label periode ramalan")
     def _():
         if prediksi.label_berikut(["2025-11-01", "2025-12-01"], 2) != ["2026-01-01", "2026-02-01"]:
@@ -353,8 +427,12 @@ def jalankan_semua() -> None:
         rison, berlaku, tidak = sps_filter_global.native_filters(Dash(), {"NM_CABANG": ["Bandung"], "tahun": [2025]})
         if berlaku != ["nm_cabang"] or tidak != ["tahun"] or "NATIVE_FILTER-a" not in (rison or ""):
             raise RuntimeError("filter global salah: " + str((rison, berlaku, tidak)))
+        Dash.id, Dash.slug = 7, "penjualan"
+        kec = sps_filter_global._dikecualikan
+        if not (kec(Dash(), '["penjualan"]') and kec(Dash(), "[7]") and not kec(Dash(), '["lain"]') and not kec(Dash(), "rusak")):
+            raise RuntimeError("pengecualian dashboard filter global salah")
         model.ringkasan("dashboard", 0)                     # membuat tabel sps_ulasan bila belum ada
-        return f"native_filters ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
+        return f"native_filters & pengecualian ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
 
     @uji("Tahap 3", "HTTPS gateway: sertifikat otomatis & konfigurasi")
     def _():

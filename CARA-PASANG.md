@@ -79,6 +79,14 @@ Paket offline berisi semua yang dibutuhkan (± 3 GB), termasuk Docker Desktop: *
    (butuh password admin, lalu mulai ulang komputer dan jalankan Setup lagi).
 3. Lanjutkan seperti bagian B langkah 4–5. Di halaman Pemeriksaan, baris *Internet* tertulis **paket offline** (OK).
 
+## Memperbarui ALDx (versi baru)
+
+1. Unduh **ALDx-Setup.exe** terbaru (atau paket offline terbaru), lihat tanggalnya di Releases.
+2. Klik dua kali, pasang ke **folder yang sama**. Data, akun, dan pengaturan tetap ada.
+3. Buka aplikasi, tekan **Ctrl + F5**.
+
+Apa yang baru dan langkah tambahan (bila ada): [docs/31 · Catatan versi](docs/31-catatan-versi.md).
+
 ## Menghapus ALDx
 
 Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *Hapus ALDx*). Nyalakan Docker Desktop dulu. Ditanya:
@@ -103,7 +111,7 @@ Lupa password? Menu Start › ALDx › **Atur ulang password**: ketik email & pa
 
 Bila hanya punya folder proyek atau ZIP dari GitHub (**Code › Download ZIP**):
 
-1. **Klik kanan** ZIP › **Extract All…** › isi `D:\` › *Extract*. Ganti nama folder hasil (`superset-ald-main`) menjadi **`superset`**.
+1. **Klik kanan** ZIP › **Extract All…** › isi `D:\` › *Extract*. Ganti nama folder hasil (`aldx_superset-main`) menjadi **`superset`**.
    Folder dari flashdisk: salin seluruhnya ke `D:\superset`. Jangan di Desktop/OneDrive, nama folder tanpa spasi.
 2. Buka `D:\superset`, **klik dua kali `PASANG.cmd`** (tidak perlu *Run as administrator*). Wizard sama dengan langkah B.5.
 

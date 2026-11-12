@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **133 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **138 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -80,6 +80,8 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D15 | 2 Analis | Sedang | Menu Asisten AI hanya bila model aktif | LM Studio/Ollama terpasang | Matikan server model, tunggu 1 menit, muat ulang; nyalakan lagi, tunggu 1 menit, muat ulang | Saat mati menu Asisten AI hilang (Story tetap di Dashboard & Story); saat menyala menu & model muncul |
 | D16 | 2 Analis | Sedang | Story hanya dashboard selesai | Ada dashboard draf kosong milik orang lain | Dashboard & Story → Story → Story baru → buka pilihan dashboard | Hanya dashboard berisi chart yang terbit atau milik sendiri (ditandai draf) yang tampil |
 | D17 | 2 Analis | Tinggi | Chart berat tidak membuat browser macet | Dataset ≥ 10.000 baris | Explore → Tree Chart (atau Graph/Sankey) → isi Id & Parent → Update chart | Data dibatasi 1.000 baris (Pusat Kendali → Baris maksimal chart berat); halaman tetap responsif; petunjuk Explore tampil |
+| D18 | 2 Analis | Tinggi | Hierarki dimensi: buat & telusuri | A10; peran Analis | Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂ | Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi |
+| D19 | 2 Analis | Tinggi | Objek desain dashboard: teks, gambar, garis | D09; berkas logo PNG | Susun dashboard → Objek: klik Teks → Atur: huruf Playfair Display, 34 px, warna pink, rata tengah; klik Garis; seret Gambar ke baris baru → unggah logo; seret satu chart ke samping logo → Simpan → buka dashboard; buka lagi di Studio & ubah teks → Simpan | Judul tampil dengan huruf & warna pilihan tanpa kartu putih; garis pemisah & logo tampil; SVG ditolak; perubahan teks tersimpan dan CSS buatan sendiri di Superset tidak hilang |
 
 ## E. Peta & analitik prediktif
 
@@ -88,7 +90,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | E01 | 2 Analis | Tinggi | Peta titik | A10 | latihan_lokasi_pelanggan → lon ke Kolom, lat ke Baris, saluran ke Warna | Rekomendasi Peta titik; titik di 6 wilayah Indonesia, warna per saluran |
 | E02 | 2 Analis | Tinggi | Peta provinsi | A10 | provinsi ke Kolom, belanja ke Baris | Rekomendasi Peta provinsi; DKI Jakarta paling gelap; legenda nilai tampil |
 | E03 | 2 Analis | Sedang | Peta di Superset | E01–E02 disimpan | Buka chart di Explore | Peta provinsi (Indonesia) & peta titik deck.gl tampil; titik tampil walau ubin peta tidak termuat |
-| E04 | 2 Analis | Tinggi/asap | Ramalan | A10 | periode ke Kolom, total ke Baris → centang Ramalan 6 | Garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)' |
+| E04 | 2 Analis | Tinggi/asap | Ramalan | A10 | periode ke Kolom, total ke Baris → centang Ramalan 6 | total tercantum di bagian Ukuran (bukan Dimensi) & tampil SUM(total); garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)'; label sumbu berformat 2025-03-01 |
 | E05 | 2 Analis | Tinggi | Tren & anomali | E04 | Centang Garis tren & Tandai anomali | Garis tren titik-titik; satu titik merah di Maret 2025 |
 | E06 | 2 Analis | Tinggi | Ramalan tersimpan ke dashboard | E04 | Simpan → buka di Explore | Chart garis berisi seri Aktual, Ramalan, batas 80%/95%, Tren; pesan 'diperbarui otomatis tiap hari' |
 | E07 | 2 Analis | Tinggi | Ramalan mengikuti lingkup akses | Dua akun beda cabang (role RLS berbeda) | Akun A menyimpan ramalan; akun B membuka chart yang sama | Akun B tidak melihat angka milik lingkup akun A |
@@ -134,6 +136,8 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | G11 | 4 Admin server | Tinggi | Usulan /hw-engineer & /ahli-ui-ux | Akun Superadmin; model AI aktif | Ctrl + I di Pusat Kendali → 'Server terasa lambat…' → Abaikan; ulangi → Terapkan. Di Identitas & Tema minta tema baru | Kartu usulan (lama → baru + alasan, cek kontras untuk tema); Abaikan = tidak ada perubahan; Terapkan = tersimpan & tercatat di Riwayat |
 | G12 | 4 Admin server | Sedang | Logo ALDx "Tebasan" & animasi pemuatan | Akun Admin | Lihat navbar, halaman login, tab browser; buka dashboard berat; ganti preset ke hijau lalu kembali ke netral | Logo huruf A dibelah sayatan pink di latar terang & gelap, favicon tajam; pemuatan menampilkan sayatan melesat; di preset lain tanda mengikuti warna preset; tidak ada gambar rusak |
 | G13 | 4 Admin server | Sedang | Tema bawaan Tinta & Sakura | Akun Admin | Identitas & Tema → preset netral → Terapkan; buka /login/ (jendela Incognito), Beranda, satu dashboard; klik kolom isian login; lalu preset navy | Login bersih: kanvas gradasi hitam → abu tanpa motif, hanya logo di kiri atas + slogan di kiri bawah, garis data tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama |
+| G15 | 4 Admin server | Sedang | Preset Neon & warna manual | Akun Admin | Identitas & Tema → preset Neon malam → Simpan; buka /login/ & satu dashboard; lalu ubah Warna aksen kedua manual | Login gelap dengan garis pink & cyan, tombol pink bertulisan gelap saat disorot; pratinjau berubah langsung saat warna diubah; teks di atas setiap warna tetap terbaca; chart bisa memakai skema ALDx Neon |
+| G14 | 4 Admin server | Tinggi | Sematkan dashboard ke web lain | .env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu | Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe /sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';' | Dashboard tampil tanpa login, hanya Cabang Bandung & Elektronik; domain lain diblokir; kunci salah 401; rls ';' 400; Matikan → iframe berhenti tampil; halaman ALDx biasa tetap tidak bisa dibingkai |
 
 ## H. Keamanan
 
@@ -179,6 +183,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | J07 | 1 Pengguna | Sedang | Balasan & @sebut | J06; dua akun | A menulis komentar menyebut @B; B membalas komentar A | Saran nama muncul saat mengetik @; B mendapat titik di avatar & pemberitahuan; balasan tampil menjorok di bawah komentar A |
 | J08 | 1 Pengguna | Sedang | Filter global rentang & per akun | Dashboard dengan filter Tahun (rentang) & waktu | Corong → Tahun dari 2024; Rentang waktu 30 hari terakhir → Terapkan; buka ALDx dari komputer/ponsel lain | Dashboard tersaring sesuai rentang; filter yang sama sudah aktif di perangkat lain |
 | J09 | 3 Admin data | Sedang | Ekspor .aldx besar di latar | Backgrounder menyala; dashboard dengan data | Ekspor .aldx + data → pindah halaman → kembali ke Berkas | Pesan 'disiapkan di latar'; bagian Ekspor terakhir berubah siap; Unduh berhasil; akun lain tidak bisa mengunduh |
+| J11 | 1 Pengguna | Sedang | Filter global: pilih nilai, chip & kecualikan | Dashboard latihan; layar ≥ 1280 px | Corong → Cabang → ketik 'ban' → pilih Cabang Bandung dari daftar → Terapkan; × pada chip di bilah atas; terapkan lagi lalu centang Kecualikan dashboard ini → Terapkan | Daftar nilai hanya berisi cabang yang boleh dilihat; chip 'Cabang Bandung' tampil & angka tersaring; × = kembali normal; dikecualikan = dashboard tanpa filter, chip redup bertanda 'dikecualikan', dashboard lain tetap tersaring |
 | J10 | 4 Admin server | Rendah | Moderasi massal | ≥ 3 komentar menunggu | Moderasi ulasan → Pilih semua → Tampilkan terpilih | Semua tampil; lencana jumlah menunggu di menu & avatar hilang; tercatat di jejak audit |
 
 ## K. Dashboard lanjutan & kenyamanan

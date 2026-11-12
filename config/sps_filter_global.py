@@ -8,13 +8,16 @@ Cara kerja:
     3. Server mencocokkan NAMA KOLOM filter global dengan filter native dashboard (Filter pilihan / select),
        lalu membuat parameter URL `native_filters` resmi Superset. Dashboard dimuat ulang dengan filter itu.
     4. Kolom yang tidak punya filter native di dashboard itu dilewati (ditampilkan "tidak berlaku").
+    5. Dashboard di daftar `kecuali` pengguna tidak diberi filter global sama sekali.
 
 Aman: ini hanya mengisi nilai filter. Hak akses & RLS tetap berlaku; pengguna tidak bisa melihat lebih banyak data.
 
     GET  /filter-global/api/kolom      kolom yang bisa dipakai (dari filter native dashboard yang boleh dilihat)
-    GET  /filter-global/api/terapkan   ?dashboard=id|slug&filter={"kolom": [nilai, ...]} -> {native_filters, berlaku, tidak_berlaku}
+    GET  /filter-global/api/nilai      ?kolom=x&cari=teks -> {nilai: [...]} daftar nilai untuk dipilih (RLS berlaku)
+    GET  /filter-global/api/terapkan   ?dashboard=id|slug&filter={"kolom": [nilai, ...]}&kecuali=["id|slug", ...]
+                                       -> {native_filters, berlaku, tidak_berlaku, dikecualikan, dashboard_id}
     GET  /filter-global/api/milik      filter global tersimpan milik pengguna ini
-    POST /filter-global/api/milik      {aktif, filter} simpan untuk akun ini
+    POST /filter-global/api/milik      {aktif, filter, kecuali} simpan untuk akun ini
 """
 
 from __future__ import annotations
@@ -29,6 +32,8 @@ bp = Blueprint("sps_filter_global", __name__, url_prefix="/filter-global")
 JENIS_DIDUKUNG = {"filter_select", "filter_range", "filter_time"}
 WAKTU = "__waktu__"            # kunci khusus: rentang waktu (filter_time), mis. "Last month" atau "2025-01-01 : 2025-12-31"
 MAKS_NILAI = 200
+MAKS_KECUALI = 100
+MAKS_SUMBER = 5               # dataset yang dibaca untuk daftar nilai satu kolom
 
 
 def _filter_native(dashboard) -> list[dict]:
@@ -168,8 +173,56 @@ def api_terapkan():
         pilihan = json.loads(request.args.get("filter") or "{}")
     except ValueError:
         return jsonify(error="Filter tidak valid"), 400
+    if _dikecualikan(dash, request.args.get("kecuali")):
+        return jsonify(native_filters=None, berlaku=[], tidak_berlaku=[], dikecualikan=True, dashboard_id=dash.id)
     rison, berlaku, tidak = native_filters(dash, pilihan if isinstance(pilihan, dict) else {})
-    return jsonify(native_filters=rison, berlaku=berlaku, tidak_berlaku=tidak)
+    return jsonify(native_filters=rison, berlaku=berlaku, tidak_berlaku=tidak, dikecualikan=False, dashboard_id=dash.id)
+
+
+def _dikecualikan(dash, teks: str | None) -> bool:
+    """`kecuali` = JSON daftar id/slug dashboard yang tidak diberi filter global."""
+    try:
+        daftar = json.loads(teks or "[]")
+    except ValueError:
+        return False
+    kunci = {str(dash.id), str(dash.slug or "")} - {""}
+    return any(str(k) in kunci for k in (daftar if isinstance(daftar, list) else [])[:MAKS_KECUALI])
+
+
+def _sumber_kolom(kolom: str) -> list[tuple[int, str]]:
+    """(dataset_id, nama kolom asli) dari filter pilihan di dashboard yang boleh dilihat, untuk kolom ini."""
+    from superset import db, security_manager as sm
+    from superset.models.dashboard import Dashboard
+    hasil: list[tuple[int, str]] = []
+    for d in db.session.query(Dashboard):
+        if not (sm.is_admin() or sm.can_access_dashboard(d)):
+            continue
+        for f in _filter_native(d):
+            t = f["targets"][0]
+            pasangan = (t.get("datasetId"), (t.get("column") or {}).get("name"))
+            if f.get("filterType") == "filter_select" and _kolom(f) == kolom and all(pasangan) and pasangan not in hasil:
+                hasil.append(pasangan)
+    return hasil[:MAKS_SUMBER]
+
+
+@bp.route("/api/nilai")
+def api_nilai():
+    """Daftar nilai kolom pilihan untuk isian filter global. RLS dataset tetap berlaku (values_for_column)."""
+    from superset import db, security_manager as sm
+    from superset.connectors.sqla.models import SqlaTable
+    kolom = str(request.args.get("kolom", "")).lower()
+    cari = str(request.args.get("cari", "")).strip().lower()[:80]
+    nilai: set = set()
+    for dataset_id, asli in _sumber_kolom(kolom):
+        t = db.session.get(SqlaTable, dataset_id)
+        if t is None or not (sm.is_admin() or sm.can_access_datasource(t)):
+            continue
+        try:
+            nilai.update(v for v in t.values_for_column(asli, limit=5000) if v is not None)
+        except Exception:                                    # pylint: disable=broad-except
+            log.warning("Nilai filter global gagal dibaca: dataset %s kolom %s", dataset_id, asli, exc_info=True)
+    cocok = sorted((v for v in nilai if not cari or cari in str(v).lower()), key=lambda v: str(v).lower())
+    return jsonify(nilai=cocok[:MAKS_NILAI], lebih=len(cocok) > MAKS_NILAI)
 
 
 # --- Simpanan per akun (U24) --------------------------------------------------------------------
@@ -212,7 +265,8 @@ def api_simpan_milik():
             bersih[str(k)[:120]] = nilai[:80]
         else:
             bersih[str(k)[:120]] = [v for v in (nilai if isinstance(nilai, list) else [nilai])][:MAKS_NILAI]
-    isi = json.dumps({"aktif": bool(d.get("aktif", True)), "filter": bersih}, ensure_ascii=False)
+    kecuali = [str(k)[:120] for k in (d.get("kecuali") if isinstance(d.get("kecuali"), list) else [])][:MAKS_KECUALI]
+    isi = json.dumps({"aktif": bool(d.get("aktif", True)), "filter": bersih, "kecuali": kecuali}, ensure_ascii=False)
     t, meta = _tabel()
     meta.create_all(bind=_engine(), checkfirst=True)
     with _engine().begin() as c:

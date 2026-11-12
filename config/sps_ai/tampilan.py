@@ -168,7 +168,7 @@ def api_chat():
 def api_auto_saran():
     d = _data()
     return jsonify(auto.sarankan(int(d["dataset_id"]), d.get("fokus", ""), d.get("dimensi") or None,
-                                 int(d.get("jumlah") or 8)))
+                                 int(d.get("jumlah") or 20)))
 
 
 @bp.route("/api/auto/buat", methods=["POST"])

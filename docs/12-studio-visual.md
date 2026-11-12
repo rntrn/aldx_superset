@@ -75,10 +75,30 @@ Urutan rekomendasi (yang pertama cocok dipakai):
 Ramalan (Holt-Winters, pita 80/95%), garis tren (R²), dan tanda anomali untuk Garis/Area/Batang
 dengan satu dimensi berurutan. Penjelasan: [17 bagian 4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif).
 
+### Hierarki dimensi (telusur bertingkat)
+
+Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provinsi › kabupaten › kecamatan › kelurahan.
+
+| Langkah | Cara |
+|---|---|
+| Buat | Panel Data → **Hierarki → ＋**, beri nama, centang kolom **berurutan dari yang paling umum** (2–8 level). Atau menu pil → *Buat hierarki dari kolom ini…* |
+| Pakai | Seret/dobel klik hierarki ke rak. Tampil di level teratas (teragregasi). |
+| Masuk ke satu nilai | **Klik** batang/titik/wilayah di chart → level berikutnya, difilter ke nilai itu (jalur tampil di pil, mis. `ID-JK › kategori`). |
+| Turun / naik level | Tombol **▸** (level berikutnya, semua nilai) dan **◂** (kembali satu level) di pil. |
+| Hapus | Tombol 🗑 di daftar Hierarki. |
+
+- Disimpan **per dataset di server** (tabel `sps_hierarki`), dipakai semua orang yang boleh membuka dataset itu.
+  Membuat/menghapus butuh izin membuat chart (Alpha/Admin).
+- Chart yang disimpan memakai **level yang sedang tampil** (beserta filter jalurnya).
+- API: `GET/POST /studio/api/hierarki/<dataset_id>`, `POST /studio/api/hierarki/<dataset_id>/hapus`
+  (modul `config/sps_studio/hierarki.py`).
+
 ### Saran dari data
 
-Memakai mesin Auto Chart (`sps_ai/auto.py`: tren R², konsentrasi, korelasi). Klik saran →
-rak terisi otomatis.
+Memakai mesin Auto Chart (`sps_ai/auto.py`: tren R², konsentrasi, korelasi, k-means). Hingga 16 saran dari
+berbagai jenis chart (batang, garis, treemap, peta panas, pivot, sankey, sebar, peta, …), masing-masing dengan
+label jenisnya. Klik saran → rak Kolom, Baris, Warna, dan jenis chart terisi otomatis. Daftar lengkap jenis menurut
+bentuk data: [10 §5](10-asisten-ai.md).
 
 ### Warna
 
@@ -97,6 +117,27 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
 4. Isi judul & keterangan → **Simpan dashboard**. Buka lagi lewat pilihan "Buka dashboard Studio".
 
 Dashboard tersimpan sebagai *Draft* di Superset (publikasikan dari menu **Dashboard & Story → Daftar dashboard** bila siap).
+
+### Objek desain: teks, gambar, garis
+
+Panel kiri bagian **Objek** (padanan *Objects* di Tableau / Power BI). Seret ke kanvas, atau klik untuk menambah di
+baris paling bawah. Kotak teks & gambar punya tombol **Atur**.
+
+| Objek | Yang bisa diatur |
+|---|---|
+| **Teks** | isi (Enter = baris baru), **huruf** (10 pilihan + bawaan), ukuran 10–96 px, tebal, miring, warna teks, latar (atau tanpa latar), rata kiri/tengah/kanan, posisi tegak, tinggi kotak |
+| **Gambar** | unggah PNG/JPEG/WebP/GIF (maks. 3 MB), teks alternatif, rata, *Utuh* atau *Penuhi kotak*, tinggi kotak |
+| **Garis** | garis pemisah selebar dashboard; seret untuk memindah |
+
+Pilihan huruf (berkas tersimpan lokal, jalan tanpa internet): Inter, Plus Jakarta Sans, Montserrat, Poppins,
+Space Grotesk, Oswald, Playfair Display, Lora, Roboto Slab, JetBrains Mono.
+
+Catatan:
+- Objek tampil tanpa kartu putih, menyatu dengan latar dashboard; warna latar teks diatur objek itu sendiri.
+- Gambar disimpan di server (tabel `sps_gambar`, ikut cadangan metadb). Alamatnya `/studio/gambar/<id>` terbuka tanpa
+  login agar tampil juga di dashboard sematan; id = sidik isi berkas, tidak bisa ditebak. Jangan unggah gambar rahasia.
+- SVG tidak diterima (bisa berisi skrip). Format dicek dari isi berkas, bukan dari namanya.
+- Huruf dipasang lewat CSS dashboard (bagian bertanda `ALDX-HURUF`); CSS yang Anda tulis sendiri di Superset tetap utuh.
 
 ### Filter dashboard
 
@@ -170,6 +211,8 @@ config/sps_studio/
 ├── ramalan.py    simpan ramalan ke ALDx Engine + RLS lingkup pembuat + penyegaran harian
 ├── bidang.py     panel Data: Dimensi & Ukuran
 ├── dasbor.py     penyusun dashboard -> position_json Superset
+├── objek.py      objek desain dashboard (teks, gambar, garis), daftar HURUF, tabel sps_gambar
+├── hierarki.py   hierarki dimensi per dataset (tabel sps_hierarki)
 ├── prep.py       persiapan data -> dataset virtual + warisan RLS
 ├── tampilan.py   halaman & API /studio/
 ├── halaman.html  tata letak & gaya
@@ -180,6 +223,7 @@ config/sps_studio/
     ├── lembar.js   lembar kerja (drag & drop, Tampilkan saya)
     ├── dasbor.js   penyusun dashboard
     ├── prep.js     persiapan data
+    ├── huruf/      10 huruf woff2 (OFL/Apache-2.0) + huruf.css + LISENSI-*.txt
     └── echarts.min.js  ECharts 5.6.1 (Apache-2.0), disimpan lokal: tidak butuh internet
 ```
 
@@ -196,6 +240,9 @@ config/sps_studio/
 | "Rumus tidak boleh …" | Rumus berisi subquery/perintah SQL | Gunakan ekspresi sederhana atas kolom yang ada |
 | Saran dari data lama muncul | Sumber data lambat | Tunggu; jawaban lama otomatis diabaikan |
 | Panel Analitik pudar | jenis bukan Garis/Area/Batang, atau > 1 dimensi | sisakan satu dimensi berurutan; kosongkan Warna |
+| Kolom angka (mis. `total`) ada di **Dimensi**, tidak bisa dijumlah / diramal | versi lama: kolom desimal ClickHouse (`Float64`) tidak dikenali sebagai angka | perbarui ALDx ([31](31-catatan-versi.md)); bila sumber lain, set tipe kolom ke angka di Dataset › Edit › Kolom |
+| Huruf objek teks tidak berubah di dashboard | CSS dashboard dihapus manual di Superset | buka dashboard di Studio › Simpan lagi (bagian `ALDX-HURUF` dibuat ulang) |
+| Gambar objek: "Format gambar harus PNG, JPEG, WebP, atau GIF" | berkas SVG / format lain | ekspor ulang logo sebagai PNG |
 | "butuh minimal 4 titik" | periode terlalu sedikit | perluas filter periode |
 | Simpan ramalan: "ALDx Engine tidak bisa dihubungi" | container engine mati | `docker compose up -d engine`, atau simpan tanpa Ramalan |
 | Status "dicocokkan lewat nama" di peta provinsi | kolom berisi nama, bukan kode ISO | ubah ke kode ISO (ID-JK) sebelum disimpan |

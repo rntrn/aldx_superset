@@ -257,7 +257,7 @@ $HALAMAN += @{ Judul = "Pemeriksaan komputer"; Sub = "Docker, CPU, RAM, disk, po
 
 # --- 3.2 Identitas, alamat & HTTPS ------------------------------------------------------
 # Nilai awal saja: setelah terpasang, identitas diubah di Pusat Kendali > Identitas & Tema.
-$PRESET = [ordered]@{ "netral" = @("Tinta & Sakura (bawaan)", "#18181B", "#E11D74"); "navy" = @("Navy & biru (klasik)", "#1E2A44", "#4F7CF7")
+$PRESET = [ordered]@{ "netral" = @("Tinta & Sakura (bawaan)", "#18181B", "#E11D74"); "neon" = @("Neon malam (pink + cyan)", "#11161D", "#FF2E8A"); "navy" = @("Navy & biru (klasik)", "#1E2A44", "#4F7CF7")
     "hijau" = @("Hijau segar", "#0F6E56", "#F4B400")
     "marun" = @("Merah marun", "#7A1F2B", "#E0A100"); "ungu" = @("Ungu modern", "#4B2E83", "#19B5A5")
     "grafit" = @("Grafit & toska", "#263238", "#26A69A") }

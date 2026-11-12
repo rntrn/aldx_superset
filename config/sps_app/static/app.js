@@ -35,6 +35,7 @@
     {id: "langganan", grup: "Dashboard & Story", label: "Langganan laporan", ikon: "riwayat", alamat: "/report/list/", izin: "Alerts & Report",
      cocok: /^\/(report|alert)\//},
     {id: "berkas", grup: "Dashboard & Story", label: "Berkas .ald / .aldx", ikon: "simpan", alamat: "/berkas/", izin: "Berkas ALDx", cocok: /^\/berkas/},
+    {id: "sematkan", grup: "Dashboard & Story", label: "Sematkan ke web lain", ikon: "sambung", alamat: "/sematkan/", izin: "Sematkan", admin: true, cocok: /^\/sematkan\/?$/},
     // Tanya-jawab AI ada di panel ✦ (Ctrl + I) di setiap halaman; menu ini untuk membuat chart & dashboard otomatis.
     {id: "asisten", grup: "Asisten", label: "Auto chart & dashboard", ikon: "ai", alamat: "/asisten/?tab=auto", izin: "Asisten AI", cocok: /^\/asisten\/?(\?tab=(auto|tanya))?$/},
     {id: "panduan", grup: "Asisten", label: "Panduan", ikon: "bantuan", alamat: "/panduan/", cocok: /^\/panduan/},
@@ -129,6 +130,7 @@
     const judul = judulHalaman || (n ? t(n.label) : "");
     $("#jejak").innerHTML = grup + `<b>${esc(judul)}</b>`;
     document.title = (judul ? judul + " · " : "") + AWAL.app;
+    window.dispatchEvent(new Event("sps:halaman"));        // mis. chip filter global menyesuaikan dashboard yang dibuka
   }
   function buka(alamat, {dorong = true} = {}) {
     if (alamat.startsWith("/app")) { const p = new URL(alamat, location.origin).searchParams.get("p"); alamat = p || "beranda"; }

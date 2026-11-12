@@ -56,6 +56,9 @@ def main() -> None:
         print(f"OK  {ramalan.tandai_semua()}")             # dataset ramalan = dataset sistem (U17)
         import sps_warna
         print(f"OK  {sps_warna.kunci_semua()}")              # warna kategori sama untuk semua pengguna
+        import sps_sematkan
+        for hasil in sps_sematkan.siapkan():                  # role penonton dashboard yang disematkan
+            print(f"OK  {hasil}")
 
 
 if __name__ == "__main__":

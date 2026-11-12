@@ -15,6 +15,8 @@ Semua lisensi di bawah **sejalan** dengan Apache 2.0 untuk cara pakai ALDx (dipa
 | html-to-image 1.11.11 | `config/sps_app/static/vendor/html-to-image.js` | MIT | pemberitahuan hak cipta ada di kepala berkas |
 | Peta provinsi Indonesia | `config/sps_studio/static/indonesia.geojson` | Apache-2.0 | salinan dari peta negara Apache Superset 6.1.0 |
 | Plus Jakarta Sans | `branding/fonts/` | SIL Open Font License 1.1 | teks lisensi: `branding/fonts/OFL-PlusJakartaSans.txt`; font tidak boleh dijual tersendiri |
+| Huruf dashboard (Inter, Plus Jakarta Sans, Montserrat, Poppins, Space Grotesk, Oswald, Playfair Display, Lora, JetBrains Mono) | `config/sps_studio/static/huruf/` | SIL Open Font License 1.1 | dari paket @fontsource 5.3.0 (subset latin 400/700); teks lisensi: `LISENSI-<nama>.txt` di folder yang sama |
+| Huruf Roboto Slab | `config/sps_studio/static/huruf/` | Apache-2.0 | teks lisensi: `config/sps_studio/static/huruf/LISENSI-roboto-slab.txt` |
 | Paket Python (driver) | `docker/wheels/*.whl` | lihat tabel §2 | dipasang ke image saat build, tanpa internet |
 
 Ikon antarmuka (`config/sps_app/static/ikon.js`), kode, dokumentasi, gambar, dan data latihan dibuat sendiri

@@ -151,7 +151,23 @@ Tidak perlu container tambahan: `pandas` + `numpy` sudah ada di image Superset.
 | Korelasi | Pearson r ≥ 0,7 | "jumlah_transaksi ↔ total sangat berkorelasi (r 0,98)" |
 | Segmen | k-means (numpy) | "kategori terbagi 3 kelompok" |
 
-4. Pengguna memilih saran (centang), boleh ganti judul & jenis chart → **Buat chart** / **Buat dashboard**.
+4. **Jenis chart diusulkan dari bentuk data**, mencakup ke-23 jenis Studio Visual (satu daftar aturan,
+   `config/sps_studio/aturan.py`):
+
+| Bentuk data | Jenis yang diusulkan |
+|---|---|
+| satu ukuran | angka besar, gauge |
+| kategori | batang (mendatar bila > 8 kategori), pie (≤ 6), corong (3–8), treemap (≥ 6), awan kata (≥ 15 teks) |
+| waktu | garis, area, waterfall (≤ 24 periode), garis per kategori, peta panas waktu × kategori |
+| dua kategori | batang bertumpuk, batang 100%, peta panas, tabel pivot, sunburst, sankey, box plot |
+| beberapa ukuran | sebar (skor naik bila berkorelasi), radar (≥ 3 ukuran) |
+| kolom provinsi / lintang & bujur | peta provinsi, peta titik, peta kepadatan |
+
+   Daftar diurutkan menurut skor, dengan maksimal dua saran per jenis di depan agar beragam. Setiap saran
+   membawa rak Studio lengkap, jadi jenisnya bisa diganti ke jenis lain yang cocok di daftar pilihan.
+5. Pengguna memilih saran (centang), boleh ganti judul & jenis chart → **Buat chart** / **Buat dashboard**.
+   Semua jenis dibuat oleh pembangun yang sama dengan Studio Visual. Asisten AI (alat `buat_chart`) juga bisa
+   membuat semua jenis tersebut.
 
 Keterbatasan: skor dari sampel, jadi angka di skor bisa sedikit berbeda dari total penuh.
 

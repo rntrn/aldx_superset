@@ -5,6 +5,7 @@ Susunan dari browser:
      "baris": [[{"chart_id": 12, "lebar": 6}, {"chart_id": 13, "lebar": 6}], [...]]}
 
 lebar mengikuti grid Superset (12 kolom per baris): 3 = ¼, 4 = ⅓, 6 = ½, 8 = ⅔, 12 = penuh.
+Selain chart, kotak boleh berupa objek desain (teks/label, gambar, garis pemisah): lihat objek.py.
 Filter dashboard -> native filter Superset:
     "filter": [{"nama": "Cabang", "dataset_id": 13, "kolom": "kd_cabang", "jenis": "pilihan|rentang"}]
 Filter berlaku untuk semua chart yang dataset-nya punya kolom bernama sama (perilaku Superset).
@@ -20,7 +21,7 @@ import json
 from typing import Any
 
 from sps_ai import alat
-from sps_studio import lembar
+from sps_studio import lembar, objek
 
 LEBAR_SAH = (3, 4, 6, 8, 12)
 JENIS_FILTER = {"pilihan": "filter_select", "rentang": "filter_range"}
@@ -39,15 +40,15 @@ def _chart(chart_id: int):
     return c
 
 
-def posisi(judul: str, keterangan: str, baris: list[list[dict]]) -> tuple[dict, list]:
-    """position_json Superset + daftar chart yang dipakai."""
+def posisi(judul: str, keterangan: str, baris: list[list[dict]]) -> tuple[dict, list, dict]:
+    """position_json Superset + daftar chart yang dipakai + objek desain {id komponen: pengaturan}."""
     pos: dict[str, Any] = {
         "DASHBOARD_VERSION_KEY": "v2",
         "ROOT_ID": {"type": "ROOT", "id": "ROOT_ID", "children": ["GRID_ID"]},
         "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": [], "parents": ["ROOT_ID"]},
         "HEADER_ID": {"type": "HEADER", "id": "HEADER_ID", "meta": {"text": judul}},
     }
-    charts = []
+    charts, objek_ = [], {}
 
     def baris_baru(n: int) -> str:
         rid = f"ROW-sps{n}"
@@ -64,13 +65,26 @@ def posisi(judul: str, keterangan: str, baris: list[list[dict]]) -> tuple[dict, 
         pos[rid]["children"].append("MARKDOWN-sps")
 
     for n, isi in enumerate((b for b in baris if b), 1):
+        if isi[0].get("jenis") == "garis":                 # garis pemisah = satu baris tersendiri
+            did = f"DIVIDER-sps{n}"
+            pos["GRID_ID"]["children"].append(did)
+            pos[did] = {"type": "DIVIDER", "id": did, "children": [], "parents": ["ROOT_ID", "GRID_ID"]}
+            continue
         if sum(int(k.get("lebar", 6)) for k in isi) > 12:
             raise alat.InputSalah(f"Baris {n}: total lebar lebih dari 12 (penuh).")
         rid = baris_baru(n)
-        for k in isi:
+        for m, k in enumerate(isi):
             lebar = int(k.get("lebar", 6))
             if lebar not in LEBAR_SAH:
                 raise alat.InputSalah(f"Lebar {lebar} tidak sah; pilih {LEBAR_SAH}.")
+            if k.get("jenis") in ("teks", "gambar"):
+                o = objek.bersihkan({**k, "lebar": lebar})
+                mid = f"MARKDOWN-spsobj{n}x{m}"
+                pos[mid] = {"type": "MARKDOWN", "id": mid, "children": [], "parents": ["ROOT_ID", "GRID_ID", rid],
+                            "meta": {"width": lebar, "height": o["tinggi"], "code": objek.html_objek(o)}}
+                pos[rid]["children"].append(mid)
+                objek_[mid] = o
+                continue
             c = _chart(k["chart_id"])
             cid = f"CHART-sps{c.id}"
             if cid in pos:
@@ -80,9 +94,9 @@ def posisi(judul: str, keterangan: str, baris: list[list[dict]]) -> tuple[dict, 
                                  "chartId": c.id, "uuid": str(c.uuid), "sliceName": c.slice_name}}
             pos[rid]["children"].append(cid)
             charts.append(c)
-    if not charts:
-        raise alat.InputSalah("Seret minimal satu lembar kerja ke kanvas dashboard.")
-    return pos, charts
+    if not charts and not objek_:
+        raise alat.InputSalah("Seret minimal satu lembar kerja atau objek ke kanvas dashboard.")
+    return pos, charts, objek_
 
 
 def filter_native(daftar: list[dict], chart_ids: list[int]) -> list[dict]:
@@ -119,9 +133,11 @@ def simpan(data: dict, dashboard_id: int | None = None) -> dict:
     if not security_manager.can_access("can_write", "Dashboard"):
         raise alat.IzinDitolak("Anda belum punya izin membuat dashboard.")
     judul = (str(data.get("judul") or "").strip() or "Dashboard Studio")[:500]
-    pos, charts = posisi(judul, str(data.get("keterangan") or ""), data.get("baris") or [])
+    pos, charts, objek_ = posisi(judul, str(data.get("keterangan") or ""), data.get("baris") or [])
     filter_studio = filter_native(data.get("filter") or [], [c.id for c in charts])
-    meta = {"sps_studio": True, "cross_filters_enabled": True, "color_scheme": lembar.SKEMA_WARNA}
+    meta = {"sps_studio": True, "cross_filters_enabled": True, "color_scheme": lembar.SKEMA_WARNA,
+            "sps_objek": objek_}
+    huruf = {o["huruf"] for o in objek_.values() if o["jenis"] == "teks"}
 
     if dashboard_id:
         dash = db.session.query(Dashboard).get(int(dashboard_id))
@@ -132,9 +148,11 @@ def simpan(data: dict, dashboard_id: int | None = None) -> dict:
         lain = [f for f in lama.get("native_filter_configuration") or []
                 if not str(f.get("id", "")).startswith(AWALAN_FILTER)]     # filter buatan Superset tetap
         dash.dashboard_title, dash.position_json = judul, json.dumps(pos)
+        dash.css = objek.gabung_css(dash.css, huruf, bool(objek_))
         dash.json_metadata = json.dumps({**lama, **meta, "native_filter_configuration": filter_studio + lain})
     else:
         dash = CreateDashboardCommand({"dashboard_title": judul, "position_json": json.dumps(pos),
+                                       "css": objek.gabung_css("", huruf, bool(objek_)),
                                        "json_metadata": json.dumps({**meta, "native_filter_configuration": filter_studio}),
                                        "published": False}).run()
     dash.slices = charts
@@ -151,19 +169,28 @@ def buka(dashboard_id: int) -> dict:
     if dash is None or not security_manager.can_access_dashboard(dash):
         raise alat.IzinDitolak("Dashboard tidak ditemukan atau tidak boleh Anda buka.")
     pos = json.loads(dash.position_json or "{}")
-    keterangan = next((v["meta"].get("code", "") for v in pos.values()
-                       if isinstance(v, dict) and v.get("type") == "MARKDOWN"), "")
+    meta_dash = json.loads(dash.json_metadata or "{}")
+    simpanan = meta_dash.get("sps_objek") or {}
+    keterangan = (pos.get("MARKDOWN-sps") or {}).get("meta", {}).get("code", "")
     baris = []
     for rid in pos.get("GRID_ID", {}).get("children", []):
-        isi = [{"chart_id": pos[i]["meta"]["chartId"], "lebar": pos[i]["meta"]["width"],
-                "judul": pos[i]["meta"].get("sliceName", "")}
-               for i in pos.get(rid, {}).get("children", []) if pos.get(i, {}).get("type") == "CHART"]
+        if pos.get(rid, {}).get("type") == "DIVIDER":
+            baris.append([{"jenis": "garis"}])
+            continue
+        isi = []
+        for i in pos.get(rid, {}).get("children", []):
+            k = pos.get(i, {})
+            if k.get("type") == "CHART":
+                isi.append({"chart_id": k["meta"]["chartId"], "lebar": k["meta"]["width"],
+                            "judul": k["meta"].get("sliceName", "")})
+            elif k.get("type") == "MARKDOWN" and i in simpanan:   # ukuran bisa diubah di Superset: ambil terbaru
+                isi.append({**simpanan[i], "lebar": k["meta"].get("width", 12), "tinggi": k["meta"].get("height", 10)})
         if isi:
             baris.append(isi)
     jenis = {v: k for k, v in JENIS_FILTER.items()}
     filter_ = [{"nama": f["name"], "dataset_id": f["targets"][0]["datasetId"],
                 "kolom": f["targets"][0]["column"]["name"], "jenis": jenis.get(f["filterType"], "pilihan")}
-               for f in json.loads(dash.json_metadata or "{}").get("native_filter_configuration") or []
+               for f in meta_dash.get("native_filter_configuration") or []
                if str(f.get("id", "")).startswith(AWALAN_FILTER)]
     return {"id": dash.id, "judul": dash.dashboard_title, "keterangan": keterangan, "baris": baris,
             "filter": filter_}

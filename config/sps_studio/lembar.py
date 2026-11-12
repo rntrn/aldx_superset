@@ -33,54 +33,16 @@ SKEMA_WARNA = "aldxWarna"         # didaftarkan di superset_config (EXTRA_CATEGO
 # Lolos validator dataviz (terang & gelap #18181B): pisah buta warna ΔE 14, normal ΔE 18,5, kontras >= 3:1.
 # Urutan TETAP (bagian dari keamanan buta warna), jangan diputar.
 WARNA = ["#E11D74", "#5062D8", "#0F9488", "#8B47C9", "#B7791F", "#B03A62", "#2E86C1", "#6B8E23"]
+# Palet tambahan "Neon" (cyan & pink lebih dulu), lolos validator yang sama; dipilih di chart: Color scheme > ALDx Neon.
+SKEMA_NEON = "aldxNeon"
+WARNA_NEON = ["#0891B2", "#DB2777", "#7C3AED", "#059669", "#2563EB", "#D97706", "#BE185D", "#65A30D"]
 SKEMA_RUNTUN = "aldxRuntun"        # satu hue (pink) terang -> gelap, untuk peta panas
 RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
 # Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
 WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
 
-# Aturan "Tampilkan Saya": kebutuhan tiap jenis tanda. Dikirim apa adanya ke browser.
-#   dim/ukuran : [min, maks] jumlah dimensi & ukuran
-#   grup       : kelompok tombol di panel Tampilkan Saya
-#   waktu      : butuh dimensi tanggal          geo: "titik" = butuh kolom lintang & bujur
-ATURAN_TANDA: dict[str, dict[str, Any]] = {
-    # Angka
-    "angka":       {"label": "Angka besar", "grup": "Angka", "dim": [0, 0], "ukuran": [1, 1], "viz": "big_number_total"},
-    "angka_tren":  {"label": "Angka + tren", "grup": "Angka", "dim": [1, 1], "ukuran": [1, 1], "viz": "big_number",
-                    "waktu": True},
-    "gauge":       {"label": "Gauge", "grup": "Angka", "dim": [0, 0], "ukuran": [1, 1], "viz": "gauge_chart"},
-    # Tabel
-    "tabel":       {"label": "Tabel", "grup": "Tabel", "dim": [0, 9], "ukuran": [0, 9], "viz": "table"},
-    "tabel_pivot": {"label": "Tabel pivot", "grup": "Tabel", "dim": [2, 4], "ukuran": [1, 4], "viz": "pivot_table_v2"},
-    "peta_panas":  {"label": "Peta panas", "grup": "Tabel", "dim": [2, 2], "ukuran": [1, 1], "viz": "heatmap_v2"},
-    # Perbandingan & tren
-    "batang":      {"label": "Batang", "grup": "Perbandingan", "dim": [1, 2], "ukuran": [1, 5],
-                    "viz": "echarts_timeseries_bar"},
-    "batang_100":  {"label": "Batang 100%", "grup": "Perbandingan", "dim": [2, 2], "ukuran": [1, 1],
-                    "viz": "echarts_timeseries_bar"},
-    "garis":       {"label": "Garis", "grup": "Perbandingan", "dim": [1, 2], "ukuran": [1, 5],
-                    "viz": "echarts_timeseries_line"},
-    "area":        {"label": "Area", "grup": "Perbandingan", "dim": [1, 2], "ukuran": [1, 3], "viz": "echarts_area"},
-    "waterfall":   {"label": "Waterfall", "grup": "Perbandingan", "dim": [1, 1], "ukuran": [1, 1], "viz": "waterfall"},
-    "radar":       {"label": "Radar", "grup": "Perbandingan", "dim": [1, 1], "ukuran": [3, 8], "viz": "radar"},
-    # Komposisi
-    "pie":         {"label": "Pie", "grup": "Komposisi", "dim": [1, 1], "ukuran": [1, 1], "viz": "pie"},
-    "treemap":     {"label": "Treemap", "grup": "Komposisi", "dim": [1, 2], "ukuran": [1, 1], "viz": "treemap_v2"},
-    "sunburst":    {"label": "Sunburst", "grup": "Komposisi", "dim": [2, 3], "ukuran": [1, 1], "viz": "sunburst_v2"},
-    "funnel":      {"label": "Corong", "grup": "Komposisi", "dim": [1, 1], "ukuran": [1, 1], "viz": "funnel"},
-    "awan_kata":   {"label": "Awan kata", "grup": "Komposisi", "dim": [1, 1], "ukuran": [1, 1], "viz": "word_cloud"},
-    # Sebaran & alur
-    "sebar":       {"label": "Sebar", "grup": "Sebaran", "dim": [1, 1], "ukuran": [2, 3], "viz": "bubble_v2"},
-    "box_plot":    {"label": "Box plot", "grup": "Sebaran", "dim": [2, 2], "ukuran": [1, 1], "viz": "box_plot"},
-    "sankey":      {"label": "Sankey", "grup": "Sebaran", "dim": [2, 2], "ukuran": [1, 1], "viz": "sankey_v2"},
-    # Peta
-    "peta_wilayah":   {"label": "Peta provinsi", "grup": "Peta", "dim": [1, 1], "ukuran": [1, 1],
-                       "viz": "country_map"},
-    "peta_titik":     {"label": "Peta titik", "grup": "Peta", "dim": [2, 3], "ukuran": [0, 1],
-                       "viz": "deck_scatter", "geo": "titik"},
-    "peta_kepadatan": {"label": "Peta kepadatan", "grup": "Peta", "dim": [2, 2], "ukuran": [0, 1],
-                       "viz": "deck_hex", "geo": "titik"},
-}
+from sps_studio.aturan import ATURAN_TANDA  # noqa: E402,F401  (dipakai juga sebagai lembar.ATURAN_TANDA)
 
 # Kolom geografis dikenali dari namanya (peran geografis).
 POLA_LINTANG = re.compile(r"^(lat|latitude|lintang)(_|$)|_(lat|latitude|lintang)$", re.I)
@@ -351,9 +313,9 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                  orientation="horizontal" if lembar.horizontal else "vertical", truncateXAxis=True)
     elif tanda == "waterfall":
         p.update(x_axis=D[0], groupby=[], metric=M[0], show_value=lembar.label, y_axis_format="SMART_NUMBER",
-                 increase_color={"r": 27, "g": 175, "b": 122, "a": 1},
-                 decrease_color={"r": 227, "g": 73, "b": 72, "a": 1},
-                 total_color={"r": 42, "g": 91, "b": 184, "a": 1})
+                 increase_color={"r": 15, "g": 148, "b": 136, "a": 1},     # toska palet ALDx
+                 decrease_color={"r": 176, "g": 58, "b": 98, "a": 1},      # anggur palet ALDx
+                 total_color={"r": 80, "g": 98, "b": 216, "a": 1})         # indigo palet ALDx
     elif tanda == "radar":
         p.update(groupby=D, metrics=M, show_legend=True, show_labels=lembar.label, label_type="value",
                  number_format="SMART_NUMBER", is_circle=False, column_config={})
@@ -378,7 +340,7 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     elif tanda in ("peta_titik", "peta_kepadatan"):
         lat, lon = lembar.geo("lintang").field, lembar.geo("bujur").field
         p.update(spatial={"latCol": lat, "lonCol": lon, "type": "latlong"}, viewport=dict(VIEWPORT_INDONESIA),
-                 mapbox_style=_ubin_peta(), color_picker={"r": 42, "g": 91, "b": 184, "a": 0.8})
+                 mapbox_style=_ubin_peta(), color_picker={"r": 225, "g": 29, "b": 116, "a": 0.8})   # pink palet ALDx
         lain = [d for d in D if d not in (lat, lon)]
         if tanda == "peta_titik":
             p.update(point_radius_fixed={"type": "metric", "value": M[0]} if M else {"type": "fix", "value": 2000},

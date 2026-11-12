@@ -150,7 +150,11 @@ Ramalan meneruskan pola lama; kebijakan baru tidak diketahui model.
 2. Seret lembar kerja tersimpan dari panel kiri ke kanvas. Lepas di samping kotak lain agar sebaris.
 3. Atur lebar setiap kotak: ¼ · ⅓ · ½ · ⅔ · penuh.
 4. **Tambah filter**: pilih kolom (mis. `nm_cabang`), jenis *pilihan* atau *rentang*.
-5. Isi judul & keterangan → **Simpan**. Dashboard bisa dibuka di menu **Dashboards**.
+5. **Percantik dengan objek** (panel kiri bawah, bagian *Objek*):
+   - **Teks**: judul atau label. Klik **Atur** → pilih huruf (mis. *Playfair Display*), ukuran, warna, rata.
+   - **Gambar**: unggah logo (PNG/JPEG/WebP/GIF, maks. 3 MB).
+   - **Garis**: pemisah antarbagian.
+6. Isi judul & keterangan → **Simpan**. Dashboard bisa dibuka di menu **Dashboards**.
 
 Klik-filter antar-chart otomatis aktif.
 

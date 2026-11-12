@@ -134,7 +134,8 @@ body.ringkas .kepala-sidebar { flex-direction: column; align-items: center; padd
   box-shadow: var(--bayang-1); transition: border-color var(--cepat), box-shadow var(--cepat);
 }
 .cari-pintas:hover { border-color: var(--garis-kuat); box-shadow: var(--bayang-2); }
-.cari-pintas span { flex: 1; text-align: left; }
+.cari-pintas span { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jejak > span { white-space: nowrap; }
 kbd {
   font: 600 11px/1 var(--huruf); color: var(--teks-2); background: var(--latar); border: 1px solid var(--garis-kuat);
   border-bottom-width: 2px; border-radius: 6px; padding: 3px 6px; white-space: nowrap;
@@ -494,7 +495,7 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .kepala-fg { display: flex; align-items: center; justify-content: space-between; }
 .kepala-fg label { display: flex; gap: 6px; align-items: center; font-size: 13px; }
 .bantu-fg { margin: 0; font-size: 12px; color: var(--teks-2); line-height: 1.45; }
-.baris-fg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; margin-bottom: 6px; }
+.baris-fg { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: start; gap: 6px; margin-bottom: 6px; }
 .isi-fg, .rentang-fg, .waktu-fg { display: flex; gap: 6px; min-width: 0; }
 .rentang-fg input, .waktu-fg select, .waktu-fg input, .isi-fg > input { flex: 1; width: 100%; }
 .baris-fg select, .baris-fg input { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--garis-kuat); border-radius: var(--r-kecil); background: var(--kertas); color: var(--teks); min-width: 0; }
@@ -527,3 +528,24 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .status-ulasan { font-size: 11px; border-radius: 8px; padding: 1px 6px; background: #FFF4E5; color: #8A4B00; }
 .status-ulasan.ditolak { background: #FDECEA; color: var(--bahaya); }
 .hapus-ulasan { border: 0; background: none; cursor: pointer; color: var(--teks-3); vertical-align: middle; padding: 0 2px; }
+
+/* Filter global: chip aktif di bilah atas & pemilih nilai (filter.js) */
+.chip-fg-bar { display: flex; align-items: center; gap: 6px; flex: none; max-width: 26vw; min-width: 0; overflow: hidden; padding: 2px 0; }
+@media (max-width: 1280px) { .chip-fg-bar { display: none; } }
+.chip-fg-bar:empty { display: none; }
+.chip-fg { display: inline-flex; align-items: center; flex: 0 1 auto; min-width: 64px; max-width: 170px; height: 28px; border-radius: 14px; border: 1px solid var(--garis-kuat);
+  background: var(--aksen-muda); color: var(--teks); font-size: 12px; white-space: nowrap; }
+.chip-fg.redup { opacity: .55; }
+.chip-fg .isi-chip, .chip-fg.lagi { min-width: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0 4px 0 10px;
+  overflow: hidden; text-overflow: ellipsis; height: 100%; }
+.chip-fg.lagi { padding: 0 10px; font-weight: 650; }
+.chip-fg .cabut-chip { flex: none; border: 0; background: none; cursor: pointer; color: var(--teks-3); display: grid; place-items: center; padding: 0 8px 0 2px; height: 100%; }
+.chip-fg .cabut-chip:hover { color: var(--bahaya); }
+.catatan-chip { font-size: 11.5px; color: var(--teks-3); white-space: nowrap; }
+.pilih-fg { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; flex: 1; min-width: 0; padding: 3px 4px; cursor: text;
+  border: 1px solid var(--garis-kuat); border-radius: var(--r-kecil); background: var(--kertas); }
+.pilih-fg .cari-nilai { flex: 1; min-width: 90px; border: 0 !important; padding: 3px 4px !important; outline: none; background: none; }
+.nilai-chip { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; font-size: 12px; padding: 1px 2px 1px 8px; border-radius: 10px;
+  background: var(--aksen-muda); color: var(--teks); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cabut-nilai { border: 0; background: none; cursor: pointer; color: var(--teks-3); font-size: 14px; line-height: 1; padding: 0 4px; }
+.kecuali-fg { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--teks-2); }

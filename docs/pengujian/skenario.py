@@ -165,6 +165,16 @@ SKENARIO = [
     ("D17", 2, "Tinggi", "Chart berat tidak membuat browser macet", "Dataset ≥ 10.000 baris",
      "Explore → Tree Chart (atau Graph/Sankey) → isi Id & Parent → Update chart",
      "Data dibatasi 1.000 baris (Pusat Kendali → Baris maksimal chart berat); halaman tetap responsif; petunjuk Explore tampil"),
+    ("D18", 2, "Tinggi", "Hierarki dimensi: buat & telusuri", "A10; peran Analis",
+     "Studio → latihan_penjualan → Hierarki ＋ → nama Wilayah, centang provinsi, nm_cabang, kategori → hierarki ke Kolom, "
+     "jumlah_transaksi ke Baris → klik satu batang → ▸ → ◂ ◂",
+     "Awal 6 provinsi; klik batang → cabang di provinsi itu saja (jalur tampil di pil); ▸ → kategori; ◂ ◂ kembali ke provinsi"),
+    ("D19", 2, "Tinggi", "Objek desain dashboard: teks, gambar, garis", "D09; berkas logo PNG",
+     "Susun dashboard → Objek: klik Teks → Atur: huruf Playfair Display, 34 px, warna pink, rata tengah; klik Garis; "
+     "seret Gambar ke baris baru → unggah logo; seret satu chart ke samping logo → Simpan → buka dashboard; "
+     "buka lagi di Studio & ubah teks → Simpan",
+     "Judul tampil dengan huruf & warna pilihan tanpa kartu putih; garis pemisah & logo tampil; SVG ditolak; "
+     "perubahan teks tersimpan dan CSS buatan sendiri di Superset tidak hilang"),
     ("E01", 2, "Tinggi", "Peta titik", "A10", "latihan_lokasi_pelanggan → lon ke Kolom, lat ke Baris, saluran ke Warna",
      "Rekomendasi Peta titik; titik di 6 wilayah Indonesia, warna per saluran"),
     ("E02", 2, "Tinggi", "Peta provinsi", "A10", "provinsi ke Kolom, belanja ke Baris",
@@ -172,7 +182,8 @@ SKENARIO = [
     ("E03", 2, "Sedang", "Peta di Superset", "E01–E02 disimpan", "Buka chart di Explore",
      "Peta provinsi (Indonesia) & peta titik deck.gl tampil; titik tampil walau ubin peta tidak termuat"),
     ("E04", 2, "Tinggi/asap", "Ramalan", "A10", "periode ke Kolom, total ke Baris → centang Ramalan 6",
-     "Garis putus-putus 6 bulan + pita 80/95%; keterangan 'Holt-Winters (musiman 12)'"),
+     "total tercantum di bagian Ukuran (bukan Dimensi) & tampil SUM(total); garis putus-putus 6 bulan + pita 80/95%; "
+     "keterangan 'Holt-Winters (musiman 12)'; label sumbu berformat 2025-03-01"),
     ("E05", 2, "Tinggi", "Tren & anomali", "E04", "Centang Garis tren & Tandai anomali",
      "Garis tren titik-titik; satu titik merah di Maret 2025"),
     ("E06", 2, "Tinggi", "Ramalan tersimpan ke dashboard", "E04", "Simpan → buka di Explore",
@@ -266,6 +277,16 @@ SKENARIO = [
      "tergambar & titik cahaya melaju, panel dipotong sayatan pink; tombol hitam berubah pink saat disorot; fokus & tautan "
      "pink; di ponsel kanvas jadi kepala bermiring; navy mengembalikan warna lama"),
 
+    ("G15", 4, "Sedang", "Preset Neon & warna manual", "Akun Admin",
+     "Identitas & Tema → preset Neon malam → Simpan; buka /login/ & satu dashboard; lalu ubah Warna aksen kedua manual",
+     "Login gelap dengan garis pink & cyan, tombol pink bertulisan gelap saat disorot; pratinjau berubah langsung saat "
+     "warna diubah; teks di atas setiap warna tetap terbaca; chart bisa memakai skema ALDx Neon"),
+    ("G14", 4, "Tinggi", "Sematkan dashboard ke web lain", ".env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu",
+     "Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe "
+     "/sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';'",
+     "Dashboard tampil tanpa login, hanya Cabang Bandung & Elektronik; domain lain diblokir; kunci salah 401; rls ';' 400; "
+     "Matikan → iframe berhenti tampil; halaman ALDx biasa tetap tidak bisa dibingkai"),
+
     # H. Keamanan
     ("H01", 1, "Tinggi", "RLS dashboard antar-pengguna", "Dua akun beda cabang (role RLS berbeda)",
      "Keduanya membuka dashboard ber-RLS yang sama", "Masing-masing hanya melihat cabangnya; total berbeda"),
@@ -330,6 +351,11 @@ SKENARIO = [
      "Dashboard tersaring sesuai rentang; filter yang sama sudah aktif di perangkat lain"),
     ("J09", 3, "Sedang", "Ekspor .aldx besar di latar", "Backgrounder menyala; dashboard dengan data", "Ekspor .aldx + data → pindah halaman → kembali ke Berkas",
      "Pesan 'disiapkan di latar'; bagian Ekspor terakhir berubah siap; Unduh berhasil; akun lain tidak bisa mengunduh"),
+    ("J11", 1, "Sedang", "Filter global: pilih nilai, chip & kecualikan", "Dashboard latihan; layar ≥ 1280 px",
+     "Corong → Cabang → ketik 'ban' → pilih Cabang Bandung dari daftar → Terapkan; × pada chip di bilah atas; "
+     "terapkan lagi lalu centang Kecualikan dashboard ini → Terapkan",
+     "Daftar nilai hanya berisi cabang yang boleh dilihat; chip 'Cabang Bandung' tampil & angka tersaring; × = kembali normal; "
+     "dikecualikan = dashboard tanpa filter, chip redup bertanda 'dikecualikan', dashboard lain tetap tersaring"),
     ("J10", 4, "Rendah", "Moderasi massal", "≥ 3 komentar menunggu", "Moderasi ulasan → Pilih semua → Tampilkan terpilih",
      "Semua tampil; lencana jumlah menunggu di menu & avatar hilang; tercatat di jejak audit"),
 

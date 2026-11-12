@@ -57,6 +57,8 @@ ISIAN: tuple[Isian, ...] = (
     # putih di atas aksen 4,5:1 (WCAG AA). Gradasi abu dibuat otomatis dari warna utama (tema.palet).
     Isian("warna_utama", "Warna utama", "warna", "warna", "#18181B", "Tombol utama, menu aktif, judul."),
     Isian("warna_aksen", "Warna aksen", "warna", "warna", "#E11D74", "Sorotan, fokus, langkah berikutnya."),
+    Isian("warna_aksen2", "Warna aksen kedua", "warna", "warna", "#71717A",
+          "Pendamping aksen: garis & sorotan kedua (mis. garis data di halaman login). Pakai bila tema punya dua aksen."),
     Isian("warna_latar", "Warna latar halaman", "warna", "warna", "#F4F4F5"),
     Isian("font", "Huruf", "tampilan", "pilihan", "Plus Jakarta Sans", opsi=tuple(FONT)),
     Isian("sudut", "Sudut kotak & tombol", "tampilan", "pilihan", "lembut", opsi=tuple(SUDUT)),
@@ -86,7 +88,10 @@ def bawaan() -> dict[str, Any]:
 PRESET: dict[str, dict[str, Any]] = {
     # "netral" = kembali ke SEMUA nilai bawaan (nama, teks, warna, logo otomatis).
     "netral": {"label": "Tinta & Sakura / bawaan (hitam, abu, putih + pink)", **{i.kunci: i.bawaan for i in ISIAN}},
-    "navy": {"label": "Navy & biru (klasik)", "warna_utama": "#1E2A44", "warna_aksen": "#4F7CF7",
+    # Neon: ±70% gelap, ±15% cyan, ±10% pink, sisanya putih. Dua aksen punya wilayah sendiri, tidak dicampur.
+    "neon": {"label": "Neon malam (gelap, pink + cyan)", "warna_utama": "#11161D", "warna_aksen": "#FF2E8A",
+             "warna_aksen2": "#22D3EE", "warna_latar": "#EEF3F6", "hiasan": "polos"},
+    "navy": {"label": "Navy & biru (klasik)", "warna_utama": "#1E2A44", "warna_aksen": "#4F7CF7", "warna_aksen2": "#38BDF8",
              "warna_latar": "#F5F6F8", "hiasan": "polos"},
     "hijau": {"label": "Hijau segar", "warna_utama": "#0F6E56", "warna_aksen": "#F4B400",
               "warna_latar": "#F3F7F5", "hiasan": "titik"},

@@ -85,6 +85,12 @@ _FILTER = {"type": "array", "items": {"type": "object", "properties": {
     "nilai": {}}, "required": ["kolom", "op", "nilai"]}}
 
 
+def _semua_jenis() -> list[str]:
+    """Jenis chart untuk alat buat_chart: 5 jenis dasar + semua jenis Studio Visual (treemap, sankey, peta, ...)."""
+    from sps_studio.aturan import ATURAN_TANDA
+    return list(dict.fromkeys([*alat.JENIS_CHART, *(k for k, a in ATURAN_TANDA.items() if not a.get("waktu"))]))
+
+
 def _fungsi(nama: str, ket: str, props: dict, wajib: list[str]) -> dict:
     return {"type": "function", "function": {"name": nama, "description": ket, "parameters": {
         "type": "object", "properties": props, "required": wajib}}}
@@ -102,8 +108,8 @@ ALAT = [
     _fungsi("saran_otomatis", "Analisis otomatis dataset: saran chart terbaik + wawasan (tren, konsentrasi, korelasi, segmen).",
             {"dataset_id": {"type": "integer"}, "fokus": {"type": "string"}, "jumlah": {"type": "integer"}},
             ["dataset_id"]),
-    _fungsi("buat_chart", "Buat chart. jenis: angka|tabel|pie|batang|garis. kelompok[0] = sumbu X / kategori.",
-            {"dataset_id": {"type": "integer"}, "jenis": {"type": "string", "enum": list(alat.JENIS_CHART)},
+    _fungsi("buat_chart", "Buat chart. jenis: angka|tabel|pie|batang|garis atau jenis Studio lain (treemap, sankey, peta_panas, tabel_pivot, sebar, radar, peta_wilayah, ...). kelompok = dimensi berurutan; metrik = AGREGAT(kolom).",
+            {"dataset_id": {"type": "integer"}, "jenis": {"type": "string", "enum": _semua_jenis()},
              "judul": {"type": "string"}, "metrik": _ARR_STR, "kelompok": _ARR_STR, "filter": _FILTER},
             ["dataset_id", "jenis", "judul", "metrik"]),
     _fungsi("buat_dashboard", "Susun chart (id dari buat_chart yang tersimpan) menjadi dashboard baru.",
@@ -192,8 +198,11 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
         return {"saran": [{k: s[k] for k in ("judul", "jenis", "metrik", "kelompok")} for s in h["saran"]],
                 "profil": h.get("profil"), "data_tidak_dikirim": True}
     if nama == "buat_chart":
-        h = alat.buat_chart(arg["dataset_id"], arg["jenis"], arg.get("judul", ""), arg["metrik"],
-                            arg.get("kelompok"), arg.get("filter"))
+        if arg["jenis"] in alat.JENIS_CHART or arg.get("filter"):
+            h = alat.buat_chart(arg["dataset_id"], arg["jenis"], arg.get("judul", ""), arg["metrik"],
+                                arg.get("kelompok"), arg.get("filter"))
+        else:                       # jenis lain (treemap, sankey, peta, ...): pembangun Studio Visual
+            h = auto.buat_satu(arg["dataset_id"], arg)
         ev({"tipe": "chart", **h})
         return h
     if nama == "buat_dashboard":

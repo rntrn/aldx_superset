@@ -42,6 +42,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Menentukan CPU/RAM/disk | [15-sizing.md](15-sizing.md) |
 | Upgrade / downgrade komponen | [16-upgrade-downgrade.md](16-upgrade-downgrade.md) |
 | **Beda versi antar komputer** (Setup.exe vs offline vs git), **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](29-versi-pembaruan-hapus-total.md) |
+| **Apa yang baru** & langkah setelah memperbarui | [31-catatan-versi.md](31-catatan-versi.md) |
 | **Menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) | [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md) |
 | Rincian model AI lokal (RAM, jaringan kantor, masalah) | [20-model-ai-lokal.md](20-model-ai-lokal.md) |
 | Pusat Kendali, auto-tuning, multi-node | [11-pusat-kendali-server.md](11-pusat-kendali-server.md) |
@@ -54,6 +55,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Ada masalah (tabel pesan galat) | [04-troubleshooting.md](04-troubleshooting.md) |
 | Login LDAP / Active Directory (opsional) | [05-login-ldap.md](05-login-ldap.md) |
 | Nama, logo, warna, animasi (white-label) | [09-identitas-tema.md](09-identitas-tema.md) |
+| Sematkan dashboard ke web/aplikasi lain (token, RLS, filter URL) | [30-sematkan-dashboard.md](30-sematkan-dashboard.md) |
 | Lisensi (Apache 2.0) & komponen pihak ketiga yang diunduh sendiri | [THIRD-PARTY-LICENSES.md](../THIRD-PARTY-LICENSES.md) |
 | Dashboard sebagai kode (untuk pengembang) | [07-dashboard-sebagai-kode.md](07-dashboard-sebagai-kode.md) |
 

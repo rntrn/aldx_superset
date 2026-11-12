@@ -39,7 +39,7 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 
 | Di mana | Cara |
 |---|---|
-| Aplikasi | fitur terbaru terlihat? (mis. kartu **Siapkan ALDx** di Beranda, menu **Panduan**, ikon sambung 🔗 di panel AI) |
+| Aplikasi | fitur terbaru terlihat? Versi November 2026: menu **Sematkan ke web lain**, bagian **Objek** di Studio › Susun dashboard, chip filter global di bilah atas. Daftar lengkap: [31 · Catatan versi](31-catatan-versi.md) |
 | Folder instalasi | `git log -1 --oneline` (bila dipasang dengan git), atau `scripts\versi.ps1` |
 | Paket offline | berkas `offline\versi.txt` (tanggal + kode commit) |
 
@@ -52,7 +52,7 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 3. **Tanpa internet:** salin folder instalasi dari komputer yang sudah terbaru (tanpa `.env` dan `backup\`), lalu
    jalankan `PASANG.cmd`.
 
-Setelah memperbarui, ikuti bagian *Perlu dilakukan setelah memperbarui* di catatan versi, lalu muat ulang browser
+Setelah memperbarui, ikuti bagian *Perlu dilakukan setelah memperbarui* di [catatan versi](31-catatan-versi.md), lalu muat ulang browser
 dengan `Ctrl + F5`.
 
 ## 2. Menghapus ALDx
@@ -86,7 +86,7 @@ Nyalakan **Docker Desktop** dulu. Skrip menampilkan ringkasan, lalu meminta Anda
 
 | Langkah | Yang dikerjakan |
 |---|---|
-| 1. Cadangan | metadata, isi ALDx Engine, dan `.env` disalin ke **Dokumen\ALDx-cadangan-&lt;waktu&gt;** (di luar folder instalasi). **Cadangan gagal → berhenti, tidak ada yang dihapus** |
+| 1. Cadangan | metadata (termasuk hierarki, gambar dashboard, filter global & ulasan), isi ALDx Engine, dan `.env` disalin ke **Dokumen\ALDx-cadangan-&lt;waktu&gt;** (di luar folder instalasi). **Cadangan gagal → berhenti, tidak ada yang dihapus** |
 | 2. Docker | container, volume data (`sps_metadb_pg`, `sps_engine`), jaringan, dan image ALDx |
 | 2b. Kubernetes | bila ada cluster yang menyala (mis. Kubernetes Docker Desktop): namespace `aldx*` dan objek berlabel `app.kubernetes.io/part-of=aldx`. ALDx sendiri tidak memakai Kubernetes, jadi biasanya tidak ada yang dihapus |
 | 3. Windows | tugas terjadwal cadangan, sertifikat HTTPS ALDx yang dipercayai, pintasan Desktop & menu Start, entri di Settings › Apps |

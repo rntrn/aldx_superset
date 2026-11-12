@@ -49,6 +49,7 @@ di Windows (aturan aksesibilitas `prefers-reduced-motion`).
 | Preset | Warna utama / aksen | Motif |
 |---|---|---|
 | `netral` | **Tinta & Sakura**: hitam `#18181B` / pink `#E11D74`, latar `#F4F4F5` | tinta — juga **mengembalikan semua isian ke bawaan** |
+| `neon` | **Neon malam**: gelap `#11161D` / pink `#FF2E8A` + aksen kedua cyan `#22D3EE` | polos |
 | `navy` | navy `#1E2A44` / biru `#4F7CF7` (tampilan bawaan versi sebelumnya) | polos |
 | `hijau` | `#0F6E56` / `#F4B400` | titik |
 | `marun` | `#7A1F2B` / `#E0A100` | garis |
@@ -74,6 +75,20 @@ Palet **chart** ikut tema: pink lebih dulu, lalu batu permata gelap yang tetap a
 **Logo "Tebasan"**: huruf A tajam yang condong ke depan dibelah sayatan warna aksen yang naik ke kanan dan menembus
 bingkai, melambangkan ambisi, kecepatan, presisi. Tanda yang sama dipakai untuk logo otomatis setiap preset, ikon tab,
 dan animasi pemuatan (sayatan melesat).
+
+### Neon malam
+
+Kombinasi dua aksen dengan proporsi ±70% gelap, ±15% cyan, ±10% pink, sisanya teks putih. Tiap aksen punya
+wilayah sendiri dan tidak dicampur dalam satu elemen: pink untuk sorotan utama (tombol saat disorot, sayatan,
+garis data utama), cyan untuk pendamping (garis data kedua, pratinjau). Palet chart pasangannya: **ALDx Neon**
+(cyan & pink lebih dulu, lolos validator buta warna), dipilih per chart di *Color scheme*.
+
+### Kombinasi warna manual
+
+Selain preset, setiap warna bisa dipilih sendiri di bagian **Warna**: *Warna utama* (struktur: navbar, tombol,
+judul), *Warna aksen* (sorotan, fokus), *Warna aksen kedua* (pendamping), dan *Warna latar halaman*. Pratinjau
+berubah langsung sebelum disimpan. Teks di atas setiap warna dipilih otomatis (putih atau gelap, yang paling
+kontras), jadi kombinasi apa pun tetap terbaca.
 
 Instalasi yang sudah berjalan tidak berubah otomatis: pilih preset **netral** di tab ini untuk memakai tampilan baru,
 atau **navy** untuk kembali ke tampilan lama.
@@ -102,7 +117,7 @@ Dibaca **sekali** oleh `scripts\build-dashboards.ps1` bila database belum punya 
 
 | Variabel | Contoh |
 |---|---|
-| `SPS_PRESET` | `netral`, `navy`, `hijau`, `marun`, `ungu`, `grafit` |
+| `SPS_PRESET` | `netral`, `neon`, `navy`, `hijau`, `marun`, `ungu`, `grafit` |
 | `SPS_NAMA_APLIKASI` | `Analitik Penjualan` |
 | `SPS_NAMA_PERUSAHAAN` | `PT Contoh Sejahtera` |
 | `SPS_LOGO` | nama berkas di folder `branding\`, mis. `logo-kustom.png` |
