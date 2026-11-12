@@ -424,7 +424,8 @@
     $("#bukaTab").innerHTML = ik("bukaTab", 18);
     $("#bukaLainnya").innerHTML = ik("lainnya");
     $("#bukaLainnya").onclick = () => {                // ponsel: isi menu = tombol bilah atas yang sedang tersedia
-      const item = [["bukaUlasan", "komentar", "Komentar & rating"], ["bukaFilter", "corong", "Filter global"],
+      const item = [["bukaUlasan", "komentar", "Komentar & rating"], ["bukaTelusur", "telusur", "Telusuri ke dashboard lain"],
+                    ["bukaFilter", "corong", "Filter global"],
                     ["bukaAi", "ai", "Asisten AI"], ["bukaBantuan", "bantuan", "Cara pakai halaman ini"]]
         .filter(([id]) => !$("#" + id).hidden);
       const m = menuMengambang($("#bukaLainnya"), item.map(([id, ikon, label]) =>

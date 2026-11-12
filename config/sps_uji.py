@@ -186,6 +186,38 @@ def jalankan_semua() -> None:
                     raise RuntimeError("tertinggi < terendah")
                 return f"rata bergerak 3, median, rata-rata, target, tertinggi {s['ekstrem']['maks']['x']}"
 
+            @uji("Studio", "Ukuran & dimensi terdefinisi: validasi rumus, pakai, lindungi, hapus")
+            def _():
+                from sps_ai import alat
+                from sps_studio import definisi
+                t = db.session.get(SqlaTable, P)
+                for jenis, rumus in (("ukuran", "total / jumlah_transaksi"), ("ukuran", "SUM(total) / (SELECT 1)"),
+                                     ("ukuran", "SUM(kolom_ngawur)"), ("dimensi", "SUM(total)"), ("dimensi", "total; DROP TABLE x")):
+                    try:
+                        definisi.periksa(t, jenis, rumus)
+                    except alat.InputSalah:
+                        continue
+                    raise RuntimeError(f"rumus berbahaya/salah lolos: {jenis} {rumus}")
+                for jenis, nama in (("ukuran", "uji__rasio"), ("dimensi", "uji__kelompok")):   # sisa uji sebelumnya
+                    try:
+                        definisi.hapus(P, jenis, nama)
+                    except alat.InputSalah:
+                        pass
+                definisi.simpan(P, {"jenis": "ukuran", "nama": "uji__rasio", "rumus": "SUM(total) / SUM(jumlah_transaksi)"})
+                definisi.simpan(P, {"jenis": "dimensi", "nama": "uji__kelompok",
+                                    "rumus": "CASE WHEN total >= 150000000 THEN 'Besar' ELSE 'Kecil' END"})
+                h = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("uji__kelompok")],
+                                                       "baris": [{"field": "uji__rasio", "peran": "ukuran", "metrik": True}]}))
+                try:
+                    definisi.hapus(P, "dimensi", "kategori")
+                    raise RuntimeError("kolom asli bisa dihapus")
+                except alat.InputSalah:
+                    pass
+                definisi.hapus(P, "ukuran", "uji__rasio"); definisi.hapus(P, "dimensi", "uji__kelompok")
+                if len(h["baris"]) != 2:
+                    raise RuntimeError(f"dimensi terdefinisi salah: {h['baris']}")
+                return f"5 rumus salah ditolak; rasio per kelompok: {len(h['baris'])} baris; kolom asli terlindung"
+
             @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
             def _():
                 from sps_ai import auto
@@ -510,6 +542,10 @@ def jalankan_semua() -> None:
         kec = sps_filter_global._dikecualikan
         if not (kec(Dash(), '["penjualan"]') and kec(Dash(), "[7]") and not kec(Dash(), '["lain"]') and not kec(Dash(), "rusak")):
             raise RuntimeError("pengecualian dashboard filter global salah")
+        Dash.dashboard_title = "Tujuan"
+        if not sps_filter_global.native_filters(Dash(), {"nm_cabang": ["Bandung"]})[0] or \
+                sps_filter_global.native_filters(Dash(), {"kolom_lain": ["x"]})[0] is not None:
+            raise RuntimeError("pencocokan dashboard tujuan drill-through salah")
         model.ringkasan("dashboard", 0)                     # membuat tabel sps_ulasan bila belum ada
         return f"native_filters & pengecualian ok, {model.jumlah_menunggu()} ulasan menunggu moderasi"
 

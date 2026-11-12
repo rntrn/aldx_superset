@@ -144,6 +144,13 @@ Seret **provinsi** ke Kolom dan **belanja** ke Baris → **(1) Peta provinsi**. 
    - **Tertinggi & terendah**: penanda di periode ekstrem.
 5. Panel pudar (mis. ada 3 dimensi)? Klik **Siapkan agar analitik aktif**: kolom tanggal dipakai, dimensi lain dilepas.
 
+### 10a. Ukuran & dimensi buatan sendiri
+
+1. Panel Data › **+ Ukuran** → nama `rata_transaksi`, rumus `SUM(total) / SUM(jumlah_transaksi)` → **Uji rumus** → **Simpan**.
+2. **+ Dimensi** → nama `kelompok_nilai`, rumus `CASE WHEN total >= 150000000 THEN 'Besar' ELSE 'Kecil' END` → **Simpan**.
+3. Seret keduanya ke rak: rata-rata nilai transaksi untuk kelompok Besar dan Kecil.
+4. Kotak **N teratas** di bilah alat membatasi hasil ke N baris terbesar.
+
 ### 10b. Hierarki & data besar (latihan_penjualan_harian, ± 2,3 juta baris)
 
 1. Sumber data **latihan_penjualan_harian**. Di panel **Hierarki** sudah ada *Wilayah*, *Kalender*, *Produk*.

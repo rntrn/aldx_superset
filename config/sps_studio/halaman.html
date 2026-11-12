@@ -131,6 +131,14 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .dtile .kepala span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dtile .kepala select{width:auto;padding:1px 4px;font-size:11.5px}
 .dtile .mini{height:190px;position:relative}
+.dlgDef textarea{width:100%;min-height:74px;font:12.5px ui-monospace,monospace}
+.dlgDef .chipKolom{display:flex;flex-wrap:wrap;gap:4px;max-height:92px;overflow:auto;margin:4px 0 8px}
+.dlgDef .chipKolom button{font-size:11.5px;padding:2px 7px;border-radius:10px;border:1px solid var(--garis);background:#fff;cursor:pointer}
+.dlgDef .hasilUji{font-size:12px;margin-top:6px;min-height:18px}
+.dlgDef .duaKolom{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bidang .tandaHitung{margin-left:auto;font-size:10px;color:var(--redup)}
+.topN{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--redup)}
+.topN input{width:64px;padding:3px 6px;font:inherit;font-size:12px;border:1px solid var(--garis);border-radius:5px}
 .bidang.tumpuk{outline:2px dashed var(--emas);outline-offset:1px;background:#FFFBEA}
 .pil.diabaikan{opacity:.45;text-decoration:line-through;text-decoration-thickness:1px}
 /* Objek desain dashboard (teks, gambar, garis) */
@@ -208,8 +216,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <input type="text" id="cariBidang" placeholder="Cari kolom" style="margin-top:8px">
     <div class="judulPanel judulAksi">Hierarki <button class="kecil" id="tambahHierarki" title="Gabungkan beberapa kolom bertingkat, mis. Provinsi › Kab/Kota › Kecamatan › Kelurahan">+ Hierarki</button></div>
     <div id="daftarHierarki"><div class="ket">Belum ada. Contoh: Provinsi › Kab/Kota › Kecamatan.</div></div>
-    <div class="judulPanel">Dimensi</div><div id="daftarDimensi"></div>
-    <div class="judulPanel">Ukuran</div><div id="daftarUkuran"></div>
+    <div class="judulPanel judulAksi">Dimensi <button class="kecil" id="tambahDimensi" title="Dimensi baru dari rumus per baris, mis. kelompok harga (seperti New column di Power BI)">+ Dimensi</button></div><div id="daftarDimensi"></div>
+    <div class="judulPanel judulAksi">Ukuran <button class="kecil" id="tambahUkuran" title="Ukuran baru dari rumus agregat, mis. SUM(laba) / SUM(penjualan) (seperti New measure di Power BI)">+ Ukuran</button></div><div id="daftarUkuran"></div>
     <p class="ket" style="margin-top:14px">Seret kolom ke rak. Klik dua kali untuk menambah cepat. Seret pil kembali ke sini untuk membuang. Seret dimensi ke atas dimensi lain = hierarki baru.</p>
   </div>
   <div class="panel marks" style="width:200px;flex:none">
@@ -243,6 +251,7 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <input type="text" class="judul" id="judulLembar" placeholder="Lembar kerja tanpa judul">
       <button class="teks" id="tukar" title="Tukar isi rak Kolom dan Baris">Tukar</button>
       <button class="teks" id="urut">Urutkan</button>
+      <label class="topN" title="Tampilkan hanya N baris teratas menurut urutan (kosong = semua). Dengan Urutkan naik = N terbawah.">N teratas <input type="number" id="topN" min="1" max="1999" placeholder="semua"></label>
       <button class="teks" id="lihatData">Lihat data</button>
       <button class="teks" id="bersihkan">Bersihkan</button>
       <button class="kedua" id="simpanBaru" title="Simpan sebagai chart baru">Simpan baru</button>

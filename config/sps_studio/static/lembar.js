@@ -111,7 +111,7 @@
     const tag = b => b.jenis === "geo" ? "Geo" : b.jenis === "tanggal" ? "Tgl" : b.jenis === "metrik" ? "f(x)" : b.jenis === "angka" ? "#" : "Abc";
     const isi = daftar => daftar.filter(b => !cari || (b.label || b.field).toLowerCase().includes(cari)).map(b =>
       `<div class="bidang ${b.peran}" draggable="true" data-f="${esc(b.field)}" data-p="${b.peran}" title="${esc(b.keterangan || b.field)}">
-        <span class="tag">${tag(b)}</span>${esc(b.label || b.field)}</div>`).join("") || '<div class="ket">–</div>';
+        <span class="tag">${tag(b)}</span>${esc(b.label || b.field)}${b.hitung ? '<span class="tandaHitung" title="Definisi Studio. Klik kanan: ubah / hapus">ƒ</span>' : ""}</div>`).join("") || '<div class="ket">–</div>';
     $("#daftarHierarki").innerHTML = L.hierarki.map(h => `<div class="bidang dimensi hierarki" draggable="true" data-h="${esc(h.nama)}"
         title="Seret ke rak. Klik kanan: hapus."><span class="tag">⛬</span>${esc(h.nama)}<small>${h.kolom.map(esc).join(" › ")}</small></div>`).join("")
       || '<div class="ket">Belum ada. Seret satu dimensi ke atas dimensi lain (mis. kecamatan ke atas kab_kota) untuk membuat hierarki.</div>';
@@ -128,6 +128,9 @@
       const b = cariBidang(el.dataset.f, el.dataset.p);
       el.ondragstart = e => e.dataTransfer.setData("text/plain", JSON.stringify({sumber: "panel", pil: salin(b)}));
       el.ondblclick = () => { (b.peran === "dimensi" ? L.kolom : L.baris).push(salin(b)); perbarui(); };
+      if (b.hitung) el.oncontextmenu = e => { e.preventDefault(); Studio.menu(e.clientX, e.clientY, [
+        {label: "Ubah rumus…", aksi: () => dialogDefinisi(b.peran, b)},
+        {label: "Hapus definisi", aksi: () => hapusDefinisi(b)}]); };
       if (b.peran === "dimensi") zonaTumpuk(el, d => dialogHierarki(null, {kolom: [b.field, d.field],
         saran: `${b.label || b.field} › ${d.label || d.field}`}));
     });
@@ -136,6 +139,58 @@
       zonaTumpuk(el, d => tambahLevel(h, d.field));
     });
   }
+  /* ---------- Ukuran & dimensi terdefinisi (definisi.py), padanan New measure / New column Power BI ---------- */
+  const CONTOH_DEF = {
+    ukuran: [["Rasio", "SUM(a) / SUM(b)"], ["Rata-rata", "AVG(a)"], ["Hitung unik", "COUNT(DISTINCT a)"],
+             ["Jumlah bersyarat", "SUM(CASE WHEN a > 0 THEN b ELSE 0 END)"], ["Selisih", "SUM(a) - SUM(b)"]],
+    dimensi: [["Kelompok nilai", "CASE WHEN a >= 1000000 THEN 'Besar' WHEN a >= 100000 THEN 'Sedang' ELSE 'Kecil' END"],
+              ["Gabung teks", "concat(a, ' - ', b)"], ["Hitung per baris", "a * b"], ["Ya/Tidak", "CASE WHEN a > 0 THEN 'Ya' ELSE 'Tidak' END"]],
+  };
+  function dialogDefinisi(jenis, lama = null) {
+    const ukuran = jenis === "ukuran";
+    const kolom = [...L.bidang.dimensi, ...L.bidang.ukuran].filter(b => !b.metrik && b.field !== "__baris__");
+    Studio.dialog({judul: lama ? `Ubah ${jenis}: ${lama.field}` : (ukuran ? "Ukuran baru" : "Dimensi baru"), ok: "Simpan", isi: `<div class="dlgDef">
+      <div class="duaKolom"><label>Nama<input type="text" id="dfNama" value="${esc(lama?.field || "")}" placeholder="${ukuran ? "mis. margin_persen" : "mis. kelompok_harga"}" maxlength="60"></label>
+        ${ukuran ? `<label>Format<select id="dfFormat"><option value="angka">Angka ringkas (1,2 jt)</option><option value="ribuan">Ribuan (1.234)</option><option value="desimal">Desimal (1.234,56)</option><option value="persen">Persen (12,3%)</option><option value="rupiah">Mata uang</option></select></label>` : "<span></span>"}</div>
+      <label style="display:block;margin-top:8px">Rumus ${ukuran ? "(agregat: SUM, AVG, COUNT, MIN, MAX…)" : "(per baris, tanpa SUM/AVG)"}
+        <textarea id="dfRumus" spellcheck="false" placeholder="${esc(CONTOH_DEF[jenis][0][1])}">${esc(lama?.rumus || "")}</textarea></label>
+      <div class="ket">Klik kolom untuk menyisipkan:</div>
+      <div class="chipKolom" id="dfKolom">${kolom.map(b => `<button type="button" data-k="${esc(b.field)}">${esc(b.field)}</button>`).join("")}</div>
+      <div class="ket">Contoh rumus (ganti a, b dengan kolom):</div>
+      <div class="chipKolom" id="dfContoh">${CONTOH_DEF[jenis].map(([n, r]) => `<button type="button" data-r="${esc(r)}" title="${esc(r)}">${esc(n)}</button>`).join("")}</div>
+      <button type="button" class="kedua kecil" id="dfUji">Uji rumus</button><div class="hasilUji" id="dfHasil"></div>
+      <p class="ket">${ukuran ? "Ukuran dihitung ulang di setiap pengelompokan, jadi rasio tetap benar per cabang, per bulan, dan total."
+        : "Dimensi dihitung per baris data, lalu bisa dipakai di rak, filter, dan hierarki."} Tersimpan di dataset: tersedia untuk semua chart & pengguna dataset ini.</p></div>`,
+      padaOk: () => { simpanDefinisi(jenis, lama); return false; }});
+    const ta = $("#dfRumus");
+    const sisip = teks => { const a = ta.selectionStart, z = ta.selectionEnd; ta.value = ta.value.slice(0, a) + teks + ta.value.slice(z); ta.focus(); ta.selectionStart = ta.selectionEnd = a + teks.length; };
+    $("#dfKolom").onclick = e => { const b = e.target.closest("[data-k]"); if (b) sisip(b.dataset.k); };
+    $("#dfContoh").onclick = e => { const b = e.target.closest("[data-r]"); if (b) { ta.value = b.dataset.r; ta.focus(); } };
+    $("#dfUji").onclick = async () => {
+      $("#dfHasil").innerHTML = "Menguji…";
+      try {
+        const r = await Studio.api(`/studio/api/definisi/${L.ds}/uji`, {jenis, rumus: ta.value});
+        $("#dfHasil").innerHTML = `<span style="color:#12805C">✓ Rumus sah.</span> Contoh hasil: <b>${r.contoh.map(v => esc(v == null ? "(kosong)" : tampilNilai(v))).join(", ") || "(tanpa baris)"}</b>`;
+      } catch (e) { $("#dfHasil").innerHTML = `<span style="color:var(--merah)">${esc(e.message)}</span>`; }
+    };
+  }
+  async function simpanDefinisi(jenis, lama) {
+    try {
+      const r = await Studio.api(`/studio/api/definisi/${L.ds}`, {jenis, nama: $("#dfNama").value.trim(), rumus: $("#dfRumus").value,
+        format: $("#dfFormat")?.value, lama: lama?.field || ""});
+      L.bidang = r.bidang; renderBidang(); Studio.tutupDialog();
+      Studio.notif(`${jenis === "ukuran" ? "Ukuran" : "Dimensi"} <b>${esc(r.definisi.nama)}</b> tersimpan. Seret ke rak untuk memakainya.`);
+      if (lama) perbarui();
+    } catch (e) { $("#dfHasil").innerHTML = `<span style="color:var(--merah)">${esc(e.message)}</span>`; }
+  }
+  async function hapusDefinisi(b) {
+    if (!confirm(`Hapus ${b.peran} "${b.field}" dari dataset?`)) return;
+    try {
+      L.bidang = (await Studio.api(`/studio/api/definisi/${L.ds}/hapus`, {jenis: b.peran, nama: b.field})).bidang;
+      renderBidang(); Studio.notif(`"${esc(b.field)}" dihapus.`);
+    } catch (e) { Studio.notif(esc(e.message), true); }
+  }
+
   // Seret dimensi dari panel ke atas dimensi lain = hierarki baru; ke atas hierarki = tambah level (seperti Tableau).
   function zonaTumpuk(el, aksi) {
     el.ondragover = e => { e.preventDefault(); e.stopPropagation(); el.classList.add("tumpuk"); };
@@ -345,7 +400,7 @@
   /* ---------- Spesifikasi & query ---------- */
   const spec = () => ({dataset_id: L.ds, judul: $("#judulLembar").value.trim(), tanda: tandaEfektif(),
     kolom: L.kolom.map(keSpec), baris: L.baris.map(keSpec), warna: keSpec(L.warna), ukuran: keSpec(L.ukuran),
-    label: L.label, filter: filterSpec(), urut: L.urut, batas: BATAS_PRATINJAU, analitik: L.analitik});
+    label: L.label, filter: filterSpec(), urut: L.urut, batas: L.topN || BATAS_PRATINJAU, analitik: L.analitik});
   const horizontal = () => L.baris.some(p => p.peran === "dimensi") && !L.kolom.some(p => p.peran === "dimensi");
 
   const kueri = Studio.tunda(async () => {
@@ -364,7 +419,7 @@
       const info = Studio.gambar($("#grafik"), L.hasil, t, {horizontal: horizontal(), label: L.label,
         klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null}) || {};
       $("#statusLembar").innerHTML = `<span>${fmtPenuh.format(L.hasil.baris.length)} baris</span><span>${esc(Studio.awal.aturan[t].label)}</span>
-        <span>${Math.round(performance.now() - mulai)} ms</span>${L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
+        <span>${Math.round(performance.now() - mulai)} ms</span>${L.topN ? `<span>${L.topN} teratas</span>` : L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
         ${info.catatan ? `<span class="peringatan">${esc(info.catatan)}</span>` : ""}
         ${hasil.diabaikan?.length ? `<span class="peringatan" title="Jenis ini memakai lebih sedikit kolom. Pilih jenis lain di Tampilkan saya untuk memakai semuanya.">Tidak dipakai ${esc(Studio.awal.aturan[t].label)}: ${esc(hasil.diabaikan.join(", "))}</span>` : ""}`;
       const abaikan = new Set(hasil.diabaikan || []);
@@ -450,6 +505,7 @@
     };
     L.kolom = (s.kolom || []).map(pil); L.baris = (s.baris || []).map(pil);
     L.warna = pil(s.warna); L.ukuran = pil(s.ukuran); L.label = !!s.label; L.urut = s.urut || "";
+    L.topN = s.batas && s.batas < BATAS_PRATINJAU ? s.batas : 0; $("#topN").value = L.topN || "";
     L.filter = [];
     const kelompok = {};
     (s.filter || []).forEach(f => {
@@ -504,7 +560,8 @@
   /* ---------- Tombol ---------- */
   function bersihkan(render = true) {
     Object.assign(L, {kolom: [], baris: [], warna: null, ukuran: null, filter: [], tanda: "otomatis", label: false, urut: "",
-                      chartId: null, analitik: {}});
+                      chartId: null, analitik: {}, topN: 0});
+    $("#topN").value = "";
     $("#judulLembar").value = ""; $("#pakaiLabel").checked = false; $("#pilihTanda").value = "otomatis";
     if (render) perbarui(); else { renderRak(); renderShowMe(); renderAnalitik(); tampilPesan("Seret <b>&nbsp;Dimensi&nbsp;</b> ke rak Kolom dan <b>&nbsp;Ukuran&nbsp;</b> ke rak Baris."); }
   }
@@ -522,8 +579,14 @@
     ["anRamalan", "anTren", "anAnomali", "anPeriode", "anGerak", "anJendela", "anRata", "anMedian", "anEkstrem", "anTarget", "anNilaiTarget"]
       .forEach(id => { $("#" + id).onchange = () => { bacaAnalitik(); perbarui(); }; });
     $("#anSiapkan").onclick = siapkanAnalitik;
+    $("#tambahUkuran").onclick = () => (L.ds ? dialogDefinisi("ukuran") : Studio.notif("Pilih sumber data dulu.", true));
+    $("#tambahDimensi").onclick = () => (L.ds ? dialogDefinisi("dimensi") : Studio.notif("Pilih sumber data dulu.", true));
+    const bolehDef = Studio.awal.izin.dataset;
+    ["tambahUkuran", "tambahDimensi"].forEach(id => { $("#" + id).disabled = !bolehDef; if (!bolehDef) $("#" + id).title = "Butuh izin mengubah dataset (role Alpha/Admin)"; });
     $("#tukar").onclick = () => { [L.kolom, L.baris] = [L.baris, L.kolom]; perbarui(); };
     $("#urut").onclick = () => { L.urut = {"": "turun", turun: "naik", naik: ""}[L.urut]; perbarui(); };
+    // N teratas (Top N seperti Tableau/Power BI): batas baris hasil; ikut tersimpan ke chart (row_limit).
+    $("#topN").onchange = () => { const n = Math.floor(+$("#topN").value); L.topN = n >= 1 ? Math.min(n, BATAS_PRATINJAU - 1) : 0; $("#topN").value = L.topN || ""; perbarui(); };
     $("#lihatData").onclick = () => {
       const t = $("#tabelData"); t.classList.toggle("tampil");
       $("#lihatData").textContent = t.classList.contains("tampil") ? "Sembunyikan data" : "Lihat data";

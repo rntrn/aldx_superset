@@ -471,7 +471,7 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
   .cari-pintas { min-width: 0; width: 38px; padding: 0; justify-content: center; border-color: transparent; box-shadow: none; background: none; }
   .cari-pintas span, .cari-pintas kbd, .hanya-lebar { display: none !important; }
   /* Ponsel (U18): komentar, filter, AI & bantuan dikumpulkan di tombol "…" agar judul halaman tidak terpotong. */
-  #bukaUlasan, #bukaFilter, #bukaAi, #bukaBantuan, .pemisah-atas { display: none !important; }
+  #bukaUlasan, #bukaTelusur, #bukaFilter, #bukaAi, #bukaBantuan, .pemisah-atas { display: none !important; }
   .jejak { min-width: 0; }
   .tab-bawah {
     display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--garis); background: var(--kaca);
@@ -553,4 +553,14 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .nilai-chip { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; font-size: 12px; padding: 1px 2px 1px 8px; border-radius: 10px;
   background: var(--aksen-muda); color: var(--teks); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cabut-nilai { border: 0; background: none; cursor: pointer; color: var(--teks-3); font-size: 14px; line-height: 1; padding: 0 4px; }
+/* Telusuri ke dashboard lain (telusur.js) */
+#bukaTelusur[hidden], .kembali-telusur[hidden] { display: none; }
+.bawa-telusur { display: flex; flex-wrap: wrap; gap: 4px; }
+.daftar-telusur { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow: auto; }
+.item-telusur { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 10px; border: 1px solid var(--garis);
+  border-radius: var(--r-kecil); background: var(--kertas); color: var(--teks); font: inherit; cursor: pointer; }
+.item-telusur:hover { border-color: var(--garis-kuat); background: var(--aksen-muda); }
+.item-telusur span { display: flex; flex-direction: column; min-width: 0; }
+.item-telusur small { color: var(--teks-3); font-size: 11.5px; }
+.kembali-telusur { max-width: 190px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
 .kecuali-fg { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--teks-2); }

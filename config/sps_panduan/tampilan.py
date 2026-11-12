@@ -38,7 +38,7 @@ NAVIGASI = [
                       ("05-login-ldap", "Login lokal & LDAP"), ("09-identitas-tema", "Identitas & tema"),
                       ("20-model-ai-lokal", "Model AI lokal (rinci)"), ("15-sizing", "Sizing CPU, RAM, disk"),
                       ("16-upgrade-downgrade", "Upgrade & downgrade"),
-                      ("29-versi-pembaruan-hapus-total", "Versi & hapus total"), ("31-catatan-versi", "Catatan versi"), ("19-runbook-faq-admin", "Runbook & FAQ"),
+                      ("29-versi-pembaruan-hapus-total", "Versi & hapus total"), ("31-catatan-versi", "Catatan versi"), ("32-perbandingan-fitur-bi", "Perbandingan fitur BI"), ("19-runbook-faq-admin", "Runbook & FAQ"),
                       ("04-troubleshooting", "Troubleshooting"), ("27-daftar-periksa-audit-keamanan", "Audit keamanan")]),
     ("Tutorial", [("tutorial/", "Ringkasan"), ("tutorial/level-1-pengguna", "Level 1 · Pengguna"),
                   ("tutorial/level-2-analis", "Level 2 · Analis"), ("tutorial/level-3-admin-data", "Level 3 · Admin data"),

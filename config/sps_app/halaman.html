@@ -25,6 +25,7 @@
     <div class="jejak" id="jejak"></div>
     <button class="cari-pintas" id="bukaPalet" type="button"><span id="teksCari">Cari atau jalankan perintah…</span><kbd>Ctrl K</kbd></button>
     <button class="tombol-ikon" id="bukaUlasan" type="button" title="Komentar & rating" aria-label="Komentar & rating" hidden></button>
+    <button class="tombol-ikon" id="bukaTelusur" type="button" title="Telusuri ke dashboard lain dengan filter yang sedang aktif" aria-label="Telusuri ke dashboard lain" hidden></button>
     <button class="tombol-ikon" id="bukaFilter" type="button" title="Filter global: berlaku di semua dashboard & Story" aria-label="Filter global"></button>
     <button class="tombol-ikon tombol-ai" id="bukaAi" type="button" title="Asisten AI (Ctrl + I)" aria-label="Asisten AI" hidden></button>
     <button class="tombol-ikon" id="bukaBantuan" type="button" title="Cara pakai halaman ini (?)" aria-label="Bantuan"></button>
@@ -86,6 +87,7 @@
 <script nonce="{{ csp_nonce() }}" src="/app/static/ai.js?v={{ versi }}"></script>
 <script nonce="{{ csp_nonce() }}" src="/app/static/ekspor.js?v={{ versi }}"></script>
 <script nonce="{{ csp_nonce() }}" src="/app/static/filter.js?v={{ versi }}"></script>
+<script nonce="{{ csp_nonce() }}" src="/app/static/telusur.js?v={{ versi }}"></script>
 <script nonce="{{ csp_nonce() }}" src="/app/static/ulasan.js?v={{ versi }}"></script>
 </body>
 </html>

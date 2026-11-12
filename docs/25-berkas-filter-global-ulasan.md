@@ -114,6 +114,24 @@ Catatan:
 - Filter global hanya mempersempit data. Hak akses & RLS tetap berlaku.
 - Filter yang Anda ubah sendiri di dashboard tidak ditimpa sampai dashboard dibuka ulang.
 
+### 2b. Telusuri ke dashboard lain (drill-through)
+
+Tombol **Telusuri** (ikon dua kotak berpanah, di kiri corong) tampil saat sebuah dashboard dibuka.
+
+1. Di dashboard, **klik batang/irisan** pada chart (klik-filter) dan/atau pilih nilai di bilah filter.
+2. Klik **Telusuri**: panel menampilkan filter yang akan dibawa (mis. `kategori: Elektronik`) dan daftar
+   **dashboard lain yang punya filter di kolom bernama sama**.
+3. Klik dashboard tujuan → terbuka **sudah tersaring**. Chip **← nama dashboard asal** di bilah atas mengantar pulang.
+
+| Hal | Penjelasan |
+|---|---|
+| Yang dibawa | semua filter aktif: pilihan, rentang angka, rentang waktu, dan klik-filter chart |
+| Syarat tujuan | punya filter dashboard di kolom yang sama (Studio › Susun dashboard › *Tambah filter*) |
+| Hak akses | hanya dashboard yang boleh Anda buka yang ditawarkan; RLS tetap berlaku di tujuan |
+| Belum ada filter aktif | panel menjelaskan cara memilih; tidak ada yang berubah |
+
+Kode: `config/sps_app/static/telusur.js`, `GET /filter-global/api/sasaran`, pembaca filter aktif di `bingkai.js`.
+
 ## 3. Komentar & rating
 
 Tombol **komentar** muncul di bilah atas saat dashboard atau chart dibuka.

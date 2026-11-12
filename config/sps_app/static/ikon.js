@@ -3,6 +3,7 @@
   "use strict";
   const P = {
     rumah: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+    telusur: "M4 4h7v7H4zM13 13h7v7h-7zM11 7.5h4.5a2 2 0 0 1 2 2V13M15 10.5l2.5 2.5 2.5-2.5",
     sambung: "M9 7H7a5 5 0 0 0 0 10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8",
     tabel: "M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 9h18M3 15h18M9 9v12",
     siapkan: "M4 6h10M4 12h16M4 18h7M17 4v4M14 6h6M14 16l2 2 4-4",
