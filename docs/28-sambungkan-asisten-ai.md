@@ -170,5 +170,8 @@ gratisnya kurang.
 | Key yang diisi lewat aplikasi tidak terbaca setelah pindah server | `SUPERSET_SECRET_KEY` berbeda | isi ulang key di layar Sambungkan AI |
 | Jawaban lambat / ngawur | model terlalu kecil untuk pertanyaannya | pakai model lebih besar (§2.1) atau layanan cloud |
 | *"terlalu lama menjawab"* | model lokal di CPU melewati batas waktu satu langkah | naikkan `batas_detik_lokal` (bawaan 240 dtk) di `config\ai.yaml`; cloud memakai `batas_detik_model` (120 dtk) |
+| *"Server '…' sedang sibuk atau bermasalah (HTTP 503…)"* | penyedia (mis. Gemini gratis) kelebihan beban | ALDx sudah mencoba ulang 2×. Tambahkan model kedua (key gratis lain atau model lokal) agar ALDx otomatis beralih; atau coba lagi beberapa menit kemudian |
+| *"Kuota/batas permintaan … habis"* (429) | batas harian/menit paket gratis | tunggu, pakai model lain, atau paket berbayar |
+| *"Nama model … tidak dikenali"* (404) | penyedia mengganti nama model | perbarui `model:` di `config\ai.yaml` sesuai halaman model penyedia |
 | *"belum selesai dalam 15 menit"* | permintaan butuh banyak langkah dan model terlalu lambat | pakai model lebih kuat (cloud, atau lokal dengan GPU), pecah permintaan, atau naikkan `batas_latar_detik` di `config\ai.yaml` |
 | *"Server memutus permintaan…"* | instalasi tanpa Redis (mode latar mati), batas ±5 menit | pastikan layanan `redis` berjalan (`docker compose ps`) |

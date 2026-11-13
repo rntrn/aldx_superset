@@ -357,6 +357,32 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"batas total AI {agen.batas_total()} tidak di bawah batas web")
                 return f"{int(df['n'][0])} baris (tidak berlipat), {len(rls)} aturan RLS tersalin; batas AI {agen.batas_total()} dtk"
 
+            @uji("Asisten AI", "Semua jenis model: alat dari teks, argumen dirapikan, cadangan aman, pindai tabel")
+            def _():
+                from sps_ai import agen, llm, tabel_db
+                from sps_ai.pengaturan import ModelAI, Pengaturan
+                t = llm.alat_dari_teks('<tool_call>{"name": "info_dataset", "arguments": {"dataset_id": "latihan_penjualan"}}</tool_call>',
+                                       {"info_dataset"})
+                if not t or llm.alat_dari_teks('{"name": "hapus_semua", "arguments": {}}', {"info_dataset"}):
+                    raise RuntimeError("pembacaan alat dari teks salah")
+                a = agen.rapikan_argumen({"dataset_id": "latihan_penjualan", "dataset_ids": "latihan_cabang, 13",
+                                          "metrik": "SUM(total)", "chart_ids": ["5", "x"]})
+                if a["dataset_id"] != P or a["dataset_ids"][1] != 13 or a["metrik"] != ["SUM(total)"] or a["chart_ids"] != [5]:
+                    raise RuntimeError(f"argumen tidak dirapikan: {a}")
+                m = lambda i, key, data: ModelAI(i, i, "http://x", "m", key, data)  # noqa: E731
+                awan_data, awan_rahasia, lokal = m("a", "k", True), m("b", "k", False), m("c", "", True)
+                atur = Pengaturan([awan_data, awan_rahasia, lokal], "a", [], 6, 500, 50, 120)
+                if agen.cadangan(atur, awan_data, ["a"]).id != "c":       # data sudah terkirim -> jangan ke model tanpa-data
+                    raise RuntimeError("cadangan melanggar privasi")
+                if agen.cadangan(atur, awan_rahasia, ["b"]).id != "a" or agen.cadangan(atur, lokal, ["a", "b", "c"]) is not None:
+                    raise RuntimeError("urutan cadangan salah")
+                if "Daftarkan" not in " ".join(agen.lanjutan(["cari_tabel"], [], "ok")) or agen.lanjutan(["cari_tabel"], [], "gagal_model"):
+                    raise RuntimeError("saran lanjutan salah")
+                h = tabel_db.cari_tabel("latihan_")
+                if not any(x["nama"] == "latihan_penjualan" and x["dataset_id"] == P for x in h["tabel"]):
+                    raise RuntimeError(f"pindai tabel tidak menemukan latihan_penjualan: {[x['nama'] for x in h['tabel']]}")
+                return f"alat dari teks ok; cadangan menjaga privasi; {h['jumlah']} tabel latihan_* di {h['database']}"
+
             @uji("Data", "Jejak data: sumber, chart & dashboard sebuah dataset")
             def _():
                 import sps_jejak

@@ -37,6 +37,7 @@ class Pengaturan:
     batas_detik_model: int
     batas_detik_lokal: int = 240
     batas_latar: int = 900          # detik total satu pertanyaan di latar belakang (tidak terikat timeout web)
+    cadangan_otomatis: bool = True  # model sibuk/kuota habis -> lanjut dengan model aktif lain (sps_ai/agen.cadangan)
 
     def batas_untuk(self, model: "ModelAI") -> int:
         """Model lokal (tanpa key, sering di CPU) diberi waktu lebih lama daripada layanan cloud."""
@@ -111,4 +112,5 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
         batas_detik_model=int(data.get("batas_detik_model", 120)),
         batas_detik_lokal=int(data.get("batas_detik_lokal", 240)),
         batas_latar=max(60, min(int(data.get("batas_latar_detik", 900)), 3600)),
+        cadangan_otomatis=bool(data.get("cadangan_otomatis", True)),
     )
