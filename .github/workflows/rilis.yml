@@ -7,6 +7,10 @@
 # Pembangunnya sama dengan di komputer pengembang: installer\setup\buat-installer.ps1 (periksa isi installer:
 # berkas wajib ada, .env/log/perkakas tidak ikut). Versi = VERSI di config/sps_versi_aplikasi.py.
 # Berkas rilis lama baru dihapus SETELAH berkas baru terunggah, jadi Releases tidak pernah kosong.
+#
+# Aturan versi: setiap perubahan aplikasi (config, docker, installer, scripts, docker-compose) WAJIB menaikkan VERSI.
+# Langkah "Periksa VERSI" menggagalkan build bila kode berubah tetapi VERSI masih sama dengan rilis yang sudah terbit.
+# Setelah berkas terunggah, rilis diterbitkan ulang agar tanggalnya di halaman Releases ikut baru.
 name: rilis
 
 on:
@@ -28,6 +32,25 @@ jobs:
       versi: ${{ steps.bangun.outputs.versi }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Periksa VERSI sudah dinaikkan
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = (Select-String -Path config/sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"([\d.]+)"').Matches[0].Groups[1].Value
+          $lama = gh release view terbaru --json name,targetCommitish 2>$null | ConvertFrom-Json
+          if (-not $lama -or $lama.name -notlike "*($v)*") { Write-Host "VERSI $v belum pernah dirilis: lanjut."; exit 0 }
+          $ubah = git diff --name-only $lama.targetCommitish HEAD -- config docker installer scripts docker-compose.yml 2>$null
+          if ($LASTEXITCODE -eq 0 -and $ubah) {
+            Write-Host "::error::Kode aplikasi berubah tetapi VERSI masih $v. Naikkan VERSI di config/sps_versi_aplikasi.py (hari yang sama: $v.2) dan catat di docs/31-catatan-versi.md."
+            $ubah | Select-Object -First 15 | ForEach-Object { Write-Host "  berubah: $_" }
+            exit 1
+          }
+          Write-Host "VERSI $v sama dengan rilis, tetapi kode aplikasi tidak berubah: lanjut."; exit 0
 
       - name: Pasang Inno Setup bila belum ada
         shell: pwsh
@@ -61,6 +84,11 @@ jobs:
           else { gh release edit terbaru --title "ALDx terbaru ($v)" --notes $catatan --target $env:GITHUB_SHA }
           gh release upload terbaru installer/setup/Output/ALDx-Setup.exe installer/setup/Output/ALDx-HapusTotal.exe --clobber
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          # Terbitkan ulang (draf -> terbit) agar tanggal rilis di halaman Releases = tanggal build ini.
+          $id = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/terbaru" --jq .id
+          gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=true --silent
+          gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=false -f tag_name=terbaru -f make_latest=true --silent
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::Rilis terbaru gagal diterbitkan ulang (masih draf). Terbitkan lewat halaman Releases."; exit 1 }
 
   image:
     runs-on: ubuntu-latest
@@ -135,3 +163,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit 1 }
           # Berkas lama yang tidak ada lagi di rilis ini (mis. .bin ke-2 dari versi sebelumnya) dihapus setelah unggahan berhasil.
           gh release view offline --json assets --jq '.assets[].name' | Where-Object { $_ -notin $baru.Name } | ForEach-Object { gh release delete-asset offline $_ -y }
+          $id = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/offline" --jq .id
+          gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=true --silent
+          gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=false -f tag_name=offline -f make_latest=false --silent
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::Rilis offline gagal diterbitkan ulang (masih draf). Terbitkan lewat halaman Releases."; exit 1 }

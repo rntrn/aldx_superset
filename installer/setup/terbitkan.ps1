@@ -42,7 +42,7 @@ if (-not $LewatiPemeriksaanGit) {
     if ([int]$maju -gt 0) { throw "$maju commit belum di-push ke origin. Jalankan git push dulu." }
 }
 $commit = git rev-parse --short HEAD
-$versi = (Select-String -Path config\sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"(\d{4}\.\d{2}\.\d{2})"' | Select-Object -First 1).Matches[0].Groups[1].Value
+$versi = (Select-String -Path config\sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"(\d{4}\.\d{2}\.\d{2}(?:\.\d+)?)"' | Select-Object -First 1).Matches[0].Groups[1].Value
 Write-Host "Versi $versi · commit $commit · repo rilis $($Repo -join ", ")"
 
 # --- 2. Bangun -------------------------------------------------------------------------------------------

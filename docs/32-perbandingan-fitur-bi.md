@@ -12,7 +12,7 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Seret-lepas kolom ke rak, *Show Me* | Tableau | ✅ | Studio Visual ([12](12-studio-visual.md)) |
 | Hierarki & telusur bertingkat (drill down) | Tableau, Power BI | ✅ | Studio › Hierarki |
 | **Ukuran & kolom terdefinisi** (*measure / calculated column*) | Power BI (DAX), Tableau, Looker (LookML) | 🆕 | Studio › **+ Ukuran / + Dimensi** |
-| **Drill-through** antar halaman dengan filter terbawa | Power BI | 🆕 | tombol **Telusuri** di dashboard ([25 §2b](25-berkas-filter-global-ulasan.md)) |
+| **Drill-through** antar halaman dengan filter terbawa | Power BI | 🆕 | tombol **Telusuri** atau **klik kanan chart** di dashboard ([25 §2b](25-berkas-filter-global-ulasan.md)) |
 | **Top N** | Tableau, Power BI | 🆕 | Studio › *N teratas* |
 | Klik-filter antar-chart (cross filter), drill to detail, drill by | Power BI, Tableau | ✅ | dashboard |
 | Ramalan, tren, garis acuan, anomali | Tableau, Power BI | ✅ | Studio › Analitik ([17](17-katalog-chart-peta-prediksi.md)) |

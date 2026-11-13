@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **159 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **160 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -197,6 +197,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | J05 | 1 Pengguna | Tinggi/asap | Filter global di semua dashboard & Story | Dashboard latihan & latihan-wilayah (keduanya punya filter Kategori) | Tombol corong → Kategori = Elektronik → Terapkan; buka dashboard lain & Story | Kedua dashboard langsung tersaring Elektronik (209B dan 5,45T); lencana corong = 1; hapus semua = kembali normal |
 | J12 | 1 Pengguna | Tinggi | Telusuri ke dashboard lain (drill-through) | Dashboard latihan & latihan-wilayah | Dashboard latihan → klik irisan Elektronik di pie → tombol Telusuri → pilih Latihan: Wilayah & Prediksi → klik chip ← di bilah atas | Panel menulis 'kategori: Elektronik' dan menawarkan dashboard Wilayah; tujuan terbuka tersaring (total 5,45 T); chip Kembali mengantar ke dashboard asal; tanpa filter aktif panel memberi petunjuk |
 | J13 | 1 Pengguna | Tinggi | Tampilan tersimpan (bookmark) | Dashboard Latihan: Wilayah & Prediksi | Pilih Kategori = Elektronik → Terapkan → Telusuri → nama 'Elektronik saja' → Simpan tampilan ini; hapus filter; Telusuri → klik 'Elektronik saja'; login akun lain; hapus dengan × | Dashboard terbuka tersaring Elektronik; tampilan tidak terlihat di akun lain; × menghapus; tanpa filter aktif kotak simpan tidak muncul |
+| J14 | 1 Pengguna | Tinggi | Drill-through lewat klik kanan | Dashboard latihan | Klik kanan sebuah sel/batang/irisan pada chart → Telusuri ke dashboard lain… → pilih dashboard tujuan; ulangi pada kotak angka | Butir muncul di menu klik kanan; panel Telusuri terbuka dengan nilai yang diklik sebagai filter; tujuan terbuka tersaring; pada kotak angka menu menutup dan panel memberi petunjuk |
 | J06 | 1 Pengguna | Sedang | Komentar & rating dimoderasi | Akun pengguna & Superadmin | Pengguna: dashboard → tombol komentar → 4 bintang + komentar → Kirim; Superadmin: Kelola → Moderasi ulasan → Tampilkan | Sebelum disetujui hanya penulis & Superadmin yang melihat; sesudahnya semua; rata-rata rating tampil |
 | J07 | 1 Pengguna | Sedang | Balasan & @sebut | J06; dua akun | A menulis komentar menyebut @B; B membalas komentar A | Saran nama muncul saat mengetik @; B mendapat titik di avatar & pemberitahuan; balasan tampil menjorok di bawah komentar A |
 | J08 | 1 Pengguna | Sedang | Filter global rentang & per akun | Dashboard latihan-wilayah (filter Tahun rentang & Rentang waktu) | Corong → Tahun dari 2024 sampai 2025 → Terapkan (lalu ganti: Rentang waktu, Tanggal tertentu 2025-01-01 : 2026-01-01); buka ALDx dari komputer/ponsel lain | Total penjualan 10T (2024-2025), lalu 5,2T (tahun 2025); filter yang sama sudah aktif di perangkat lain |

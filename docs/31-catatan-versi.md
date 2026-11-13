@@ -3,10 +3,10 @@
 Daftar perubahan per rilis, terbaru di atas. Setiap rilis punya bagian **Perlu dilakukan setelah memperbarui** untuk
 ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
-> **Untuk pengembang:** setiap rilis baru, naikkan `VERSI` di `config/sps_versi_aplikasi.py` (format `YYYY.MM.DD`; dipakai
-> halaman login, Beranda, dan pengecekan *Pembaruan tersedia*). Setiap kali menambah fitur, tambahkan baris di rilis teratas (atau buat rilis baru), lalu
-> jalankan `scripts\sinkron-laptop.ps1 -KomitInstaller -Terbitkan` (memanggil `installer\setup\terbitkan.ps1` setelah uji lulus) agar `ALDx-Setup.exe`, `ALDx-Setup-Offline.exe` dan `ALDx-HapusTotal.exe`
-> di Releases ikut berisi versi ini. Inno Setup & GitHub CLI dipasang otomatis; login GitHub dibuka di browser.
+> **Untuk pengembang:** setiap pembaruan aplikasi, naikkan `VERSI` di `config/sps_versi_aplikasi.py` (format `YYYY.MM.DD`,
+> rilis kedua di hari yang sama `YYYY.MM.DD.2`; dipakai halaman login, Beranda, dan pengecekan *Pembaruan tersedia*) dan tambahkan
+> baris di rilis teratas. Setelah masuk cabang `main`, GitHub Actions membangun dan menerbitkan `ALDx-Setup.exe`,
+> `ALDx-Setup-Offline.exe` dan `ALDx-HapusTotal.exe` ke Releases; build ditolak bila kode berubah tetapi `VERSI` tidak ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 ---
 
@@ -38,6 +38,8 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
+| Dashboard | **Klik kanan chart → Telusuri ke dashboard lain…** (drill-through satu gerakan) | [25 §2b](25-berkas-filter-global-ulasan.md) |
+| Rilis | `VERSI` wajib naik tiap pembaruan (dijaga GitHub Actions); tanggal & judul di halaman Releases selalu build terakhir; versi mendukung nomor urut harian (`2026.11.13.2`) | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
 | Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |

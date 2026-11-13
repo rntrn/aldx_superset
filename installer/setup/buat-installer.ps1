@@ -33,7 +33,7 @@ function Langkah([string]$t) { Write-Host "`n==> $t" -ForegroundColor Cyan }
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
           "$env:ProgramFiles\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $iscc) { throw "Inno Setup 6 belum terpasang. Jalankan: winget install JRSoftware.InnoSetup" }
-$versi = (Select-String -Path config\sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"(\d{4}\.\d{2}\.\d{2})"' | Select-Object -First 1).Matches[0].Groups[1].Value
+$versi = (Select-String -Path config\sps_versi_aplikasi.py -Pattern '^VERSI\s*=\s*"(\d{4}\.\d{2}\.\d{2}(?:\.\d+)?)"' | Select-Object -First 1).Matches[0].Groups[1].Value
 $commit = (git rev-parse --short HEAD 2>$null)
 Write-Host "ALDx $versi ($commit) · Inno Setup: $iscc"
 

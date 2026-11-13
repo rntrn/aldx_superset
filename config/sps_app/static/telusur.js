@@ -129,6 +129,8 @@
   tombol.addEventListener("click", () => (panel.hidden ? buka() : tutup()));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !panel.hidden) tutup(); });
   document.addEventListener("click", e => { if (!panel.hidden && e.target.isConnected && !panel.contains(e.target) && !tombol.contains(e.target)) tutup(); });
+  // Menu klik kanan chart di dashboard (bingkai.js) meminta panel ini dibuka.
+  window.addEventListener("message", e => { if (e.origin === location.origin && e.data && e.data.sps === "telusur" && dashboardKini()) buka(); });
   window.addEventListener("sps:halaman", segarkan);
   segarkan();
 })();

@@ -423,6 +423,10 @@ SKENARIO = [
      "Studio → nm_cabang × total, Batang → geser Simulasi ke +10% → Simpan baru → buka chart tersimpan",
      "Batang naik 10% (total ±667 M → ±734 M); status menulis 'hanya pratinjau'; chart tersimpan tetap nilai asli; "
      "slider mati saat Hitung dipakai"),
+    ("J14", 1, "Tinggi", "Drill-through lewat klik kanan", "Dashboard latihan",
+     "Klik kanan sebuah sel/batang/irisan pada chart → Telusuri ke dashboard lain… → pilih dashboard tujuan; ulangi pada kotak angka",
+     "Butir muncul di menu klik kanan; panel Telusuri terbuka dengan nilai yang diklik sebagai filter; tujuan terbuka "
+     "tersaring; pada kotak angka menu menutup dan panel memberi petunjuk"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",
