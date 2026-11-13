@@ -18,7 +18,7 @@ import re
 import time
 from pathlib import Path
 
-VERSI = "2026.11.13.6"
+VERSI = "2026.11.13.7"
 REPO = "rntrn/aldx_superset"
 URL_SUMBER = f"https://raw.githubusercontent.com/{REPO}/main/config/sps_versi_aplikasi.py"
 URL_RILIS = f"https://github.com/{REPO}/releases/tag/terbaru"

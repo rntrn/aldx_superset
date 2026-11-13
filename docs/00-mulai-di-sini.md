@@ -7,6 +7,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 
 | Ingin | Baca |
 |---|---|
+| **Peta semua menu**: untuk siapa, fungsinya, belajarnya di mana | [33-peta-menu-per-level.md](33-peta-menu-per-level.md) |
 | **Tampilan baru**: Beranda, sidebar, Cari `Ctrl + K`, Cara pakai `?`, bahasa (ID/EN/JA), ponsel | [22-cangkang-aplikasi.md](22-cangkang-aplikasi.md) |
 | **Alur menu** (Data › Kueri › Visual › Dashboard) & **Kueri Visual** tanpa SQL | [21-kueri-visual-dan-alur-menu.md](21-kueri-visual-dan-alur-menu.md) |
 | Belajar membaca dashboard | [tutorial/level-1-pengguna.md](tutorial/level-1-pengguna.md) |
@@ -64,11 +65,11 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 
 | Ingin | Baca |
 |---|---|
+| **Alur pelatihan** (kalender, penilaian, matriks menu × sesi, tindak lanjut) | [bahan-ajar/alur-pelatihan.md](bahan-ajar/alur-pelatihan.md) |
 | Bahan ajar per level (rencana sesi, latihan, kuis, kunci jawaban) | [bahan-ajar/](bahan-ajar/README.md) |
 | Berkas contoh untuk dicoba setelah instal (Excel penerbangan 6 tabel, s.d. 1 juta tiket lebih) | [bahan-ajar/berkas/](bahan-ajar/berkas/README.md) |
 | Pelatihan admin: runbook & simulasi gangguan | [bahan-ajar/modul-runbook-admin.md](bahan-ajar/modul-runbook-admin.md) |
 | Skenario uji (UAT) & lembar isian Excel | [pengujian/](pengujian/README.md) |
-| **Laporan QA** (temuan & urutan perbaikan) | [pengujian/laporan-qa.md](pengujian/laporan-qa.md) |
 
 ## Netral untuk siapa pun
 

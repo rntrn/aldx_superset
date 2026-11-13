@@ -62,7 +62,7 @@ tetapi tidak wajib. Model **wajib mendukung "tool calling"**; Qwen 2.5 dan Llama
 
    **OK**, lalu klik kanan ikon llama di tray → **Quit Ollama** → buka lagi **Ollama** dari menu Start.
    Bila Windows Firewall bertanya, pilih **Allow** (jaringan *Private*).
-6. Lanjut ke [§4 Memeriksa dari ALDx](#4-memeriksa-dari-sps-analytics).
+6. Lanjut ke [§4 Memeriksa dari ALDx](#4-memeriksa-dari-aldx).
 
 ## 3. Cara B: LM Studio
 

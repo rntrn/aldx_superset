@@ -20,7 +20,7 @@ LUAR = {"cara-pasang": "CARA-PASANG.md"}          # CHANGELOG = log pengembangan
 
 # Sidebar per peran: (judul kelompok, [(halaman, judul)]). Bab yang tidak terdaftar tetap bisa dibuka.
 NAVIGASI = [
-    ("Mulai", [("00-mulai-di-sini", "Peta dokumentasi"), ("cara-pasang", "Cara pasang"),
+    ("Mulai", [("00-mulai-di-sini", "Peta dokumentasi"), ("33-peta-menu-per-level", "Peta menu per level"), ("cara-pasang", "Cara pasang"),
                ("22-cangkang-aplikasi", "Mengenal aplikasi")]),
     ("Pengguna & analis", [("21-kueri-visual-dan-alur-menu", "Menu & Kueri Visual"), ("12-studio-visual", "Studio Visual"),
                            ("17-katalog-chart-peta-prediksi", "Katalog chart, peta, ramalan"),
@@ -46,7 +46,7 @@ NAVIGASI = [
     ("Bahan ajar", [("bahan-ajar/", "Ringkasan"), ("bahan-ajar/level-1-pengguna", "Level 1 · Pengguna"),
                     ("bahan-ajar/level-2-analis", "Level 2 · Analis"), ("bahan-ajar/level-3-admin-data", "Level 3 · Admin data"),
                     ("bahan-ajar/level-4-admin-server", "Level 4 · Admin server"),
-                    ("bahan-ajar/modul-runbook-admin", "Runbook admin")]),
+                    ("bahan-ajar/modul-runbook-admin", "Runbook admin"), ("bahan-ajar/alur-pelatihan", "Alur pelatihan")]),
     ("Lainnya", [("pengujian/", "Skenario uji (UAT)"), ("pdf/", "Versi PDF")]),
 ]
 
@@ -163,7 +163,7 @@ def _render(jalur: str, diubah: float, halaman: str) -> tuple[str, str, list]:
 
     def ratakan(token):                                  # judul tingkat 2 & 3 (toc_depth), urut dokumen
         for t in token:
-            daftar.append((t["id"], re.sub(r"<[^>]+>", "", t["name"]), t["level"]))
+            daftar.append((t["id"], html.unescape(re.sub(r"<[^>]+>", "", t["name"])), t["level"]))   # templat meng-escape sendiri
             ratakan(t.get("children", []))
     ratakan(md.toc_tokens)
     return _tautan(isi, halaman), (judul.group(1).strip() if judul else halaman), daftar

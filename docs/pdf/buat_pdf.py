@@ -56,7 +56,7 @@ def _dokumen_teknis() -> list[Path]:
 def daftar_berkas() -> list[Berkas]:
     tutorial = [DOCS / "tutorial" / f for f in ("README.md", "level-1-pengguna.md", "level-2-analis.md",
                                                 "level-3-admin-data.md", "level-4-admin-server.md")]
-    ajar = [DOCS / "bahan-ajar" / f for f in ("README.md", "level-1-pengguna.md", "level-2-analis.md",
+    ajar = [DOCS / "bahan-ajar" / f for f in ("README.md", "alur-pelatihan.md", "level-1-pengguna.md", "level-2-analis.md",
                                               "level-3-admin-data.md", "level-4-admin-server.md",
                                               "modul-runbook-admin.md")]
     hasil = [Berkas(f"dokumen/{p.stem}.pdf", _judul(p), (p,), "dokumen") for p in _dokumen_teknis()]
@@ -69,7 +69,7 @@ def daftar_berkas() -> list[Berkas]:
         Berkas("tutorial-semua-level.pdf", "Tutorial Semua Level", tuple(tutorial), "tutorial",
                "Tutorial bergambar Level 1 Pengguna sampai Level 4 Admin server."),
         Berkas("bahan-ajar-lengkap.pdf", "Bahan Ajar Lengkap", tuple(ajar), "bahan-ajar",
-               "Modul pengajar Level 1–4 dan modul runbook admin: rencana sesi, latihan, kunci jawaban, kuis."),
+               "Alur pelatihan, modul pengajar Level 1–4 dan modul runbook admin: rencana sesi, latihan, kunci jawaban, kuis."),
         Berkas("pengujian-uat.pdf", "Pengujian & UAT",
                (DOCS / "pengujian" / "README.md", DOCS / "pengujian" / "skenario-uji.md"), "uji",
                "Uji otomatis, uji asap, dan seluruh skenario UAT (isian di lembar-uji.xlsx)."),
@@ -94,7 +94,8 @@ def _id_dokumen(md: Path) -> str:
     return "d-" + re.sub(r"[^a-z0-9]+", "-", str(md.relative_to(AKAR)).lower()).strip("-")
 
 
-_TAG_BOLEH = re.compile(r"</?(br|b|i|kbd|sub|sup|small|details|summary)\b|<(https?://|mailto:)", re.I)
+# div/img/table dst: tata letak README (hero, kartu gambar). Sumber dokumen = repo sendiri, jadi tepercaya.
+_TAG_BOLEH = re.compile(r"</?(br|b|i|kbd|sub|sup|small|details|summary|div|img|table|thead|tbody|tr|td|th)\b|<(https?://|mailto:)", re.I)
 _KODE = re.compile(r"(```.*?```|`[^`\n]+`)", re.S)
 
 
@@ -117,7 +118,7 @@ def _slug(prefiks: str):
 def md_ke_html(md: Path, dalam_paket: set[Path]) -> str:
     """Satu dokumen -> potongan HTML. Tautan ke dokumen lain di paket yang sama menjadi tautan internal."""
     pid = _id_dokumen(md)
-    mesin = markdown.Markdown(extensions=["tables", "fenced_code", "sane_lists", "attr_list", "toc"],
+    mesin = markdown.Markdown(extensions=["tables", "fenced_code", "sane_lists", "attr_list", "toc", "md_in_html"],
                               extension_configs={"toc": {"slugify": _slug(pid), "permalink": False}})
     isi = mesin.convert(_amankan_kurung(md.read_text(encoding="utf-8")))
 
@@ -137,6 +138,7 @@ def md_ke_html(md: Path, dalam_paket: set[Path]) -> str:
         return 'data-luar="1"'                                # berkas di luar PDF: teks tanpa tautan
 
     isi = re.sub(r'(href=)"([^"]*)"', tautan, isi)
+    isi = re.sub(r'<img[^>]*src="https?://[^"]*"[^>]*>', '', isi)         # lencana/gambar online: tidak ada di PDF offline
     isi = re.sub(r'(src=)"(?!https?:|data:)([^"]*)"',
                  lambda m: f'{m.group(1)}"{(md.parent / html.unescape(m.group(2))).resolve().as_uri()}"', isi)
     return f'<section class="dok" id="{pid}">{isi}</section>'

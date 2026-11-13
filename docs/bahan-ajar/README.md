@@ -1,14 +1,15 @@
 # Bahan Ajar Pelatihan ALDx
 
 Paket untuk **pengajar/fasilitator** yang menyelenggarakan pelatihan di kantor pusat maupun cabang/unit.
+**Mulai dari [Alur pelatihan](alur-pelatihan.md)**: kalender, penilaian, matriks menu × sesi, dan tindak lanjut.
 Peserta belajar dari [tutorial](../tutorial/README.md); pengajar memakai modul di folder ini.
 
 | Modul | Peserta | Durasi | Kelas maks. |
 |---|---|---|---|
-| [Level 1 · Pengguna](level-1-pengguna.md) | semua pengguna | 1 × 90 menit | 30 |
-| [Level 2 · Analis](level-2-analis.md) | pembuat laporan | 2 × 120 menit | 20 |
-| [Level 3 · Admin data](level-3-admin-data.md) | pengelola data | 2 × 120 menit | 12 |
-| [Level 4 · Admin server](level-4-admin-server.md) | tim TI | 2 × 150 menit | 8 |
+| [Level 1 · Pengguna](level-1-pengguna.md) | semua pengguna | 1 × 90 menit (+15 modul tambahan) | 30 |
+| [Level 2 · Analis](level-2-analis.md) | pembuat laporan | 2 × 120 menit (+60 sesi tambahan) | 20 |
+| [Level 3 · Admin data](level-3-admin-data.md) | pengelola data | 2 × 120 menit (+45 sesi tambahan) | 12 |
+| [Level 4 · Admin server](level-4-admin-server.md) | tim TI | 2 × 150 menit (+60 sesi tambahan) | 8 |
 | [Modul khusus · Runbook admin](modul-runbook-admin.md) | admin server & petugas jaga | 1 × 150 menit | 8 |
 
 Setiap modul berisi: tujuan pembelajaran, persiapan, rencana sesi per menit, poin penyampaian,

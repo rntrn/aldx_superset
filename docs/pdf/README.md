@@ -2,12 +2,14 @@
 
 | Berkas | Isi |
 |---|---|
-| `manual-lengkap.pdf` | README + CARA-PASANG + dokumen teknis 00–29 dalam satu berkas (sampul, daftar isi, bookmark) |
+| `manual-lengkap.pdf` | README + CARA-PASANG + dokumen teknis 00–33 dalam satu berkas (sampul, daftar isi, bookmark) |
+| `dokumen/33-peta-menu-per-level.pdf` | **peta semua menu**: untuk siapa, fungsinya, belajarnya di mana (cocok dicetak) |
 | `dokumen/NN-*.pdf` | setiap dokumen teknis terpisah |
 | `dokumen/28-sambungkan-asisten-ai.pdf` | **menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) |
 | `dokumen/20-model-ai-lokal.pdf` | **panduan memasang model AI lokal** (Ollama / LM Studio); dibuka dari installer halaman *Asisten AI* |
 | `tutorial-semua-level.pdf` | tutorial bergambar level 1–4 |
-| `bahan-ajar-lengkap.pdf` | bahan ajar level 1–4 + modul runbook admin |
+| `bahan-ajar-lengkap.pdf` | alur pelatihan + bahan ajar level 1–4 + modul runbook admin |
+| `per-level/bahan-ajar-alur-pelatihan.pdf` | **alur pelatihan**: kalender, penilaian, matriks menu × sesi, tindak lanjut |
 | `per-level/*.pdf` | tutorial & bahan ajar per level (untuk dibagikan ke peserta/pengajar) |
 | `pengujian-uat.pdf` | panduan pengujian + 172 skenario UAT (isian tetap di `../pengujian/lembar-uji.xlsx`) |
 | `kartu-runbook-admin.pdf` | runbook & FAQ admin (cetak §7 sebagai kartu perintah) |
