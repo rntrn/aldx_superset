@@ -117,6 +117,11 @@ ALAT = [
             "Pakai cari_dataset dulu untuk mendapat id.",
             {"dataset_ids": {"type": "array", "items": {"type": "integer"}}, "nama": {"type": "string"}},
             ["dataset_ids"]),
+    _fungsi("cari_tabel", "Cari TABEL di database (termasuk yang belum jadi dataset), mis. semua tabel berawalan "
+            "data_penerbangan di ALDx Engine. pola: potongan nama atau pola *. Hasil: kolom, jumlah baris, dataset_id bila sudah ada.",
+            {"pola": {"type": "string"}, "database": {"type": "string"}, "skema": {"type": "string"}}, []),
+    _fungsi("daftarkan_tabel", "Jadikan tabel database sebagai dataset agar bisa dianalisis/digabung (yang sudah ada dipakai ulang).",
+            {"tabel": _ARR_STR, "database": {"type": "string"}, "skema": {"type": "string"}}, ["tabel"]),
     _fungsi("buat_dashboard", "Susun chart (id dari buat_chart yang tersimpan) menjadi dashboard baru.",
             {"judul": {"type": "string"}, "chart_ids": {"type": "array", "items": {"type": "integer"}}},
             ["judul", "chart_ids"]),
@@ -133,6 +138,7 @@ ALAT = [
 LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca struktur dataset",
               "ambil_data": "Mengambil data", "saran_otomatis": "Menganalisis dataset otomatis",
               "buat_chart": "Membuat chart", "buat_dashboard": "Menyusun dashboard", "gabung_dataset": "Menggabung dataset",
+              "cari_tabel": "Memindai tabel database", "daftarkan_tabel": "Mendaftarkan tabel sebagai dataset",
               "cari_dashboard": "Mencari dashboard", "cari_panduan": "Membaca panduan",
               "info_dashboard": "Membaca isi dashboard", "info_chart": "Membaca chart", "data_chart": "Mengambil angka chart",
               "daftar_koneksi": "Membaca daftar koneksi", "daftar_ekstrak": "Membaca daftar ekstrak",
@@ -195,6 +201,21 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
             return {"kolom": h["kolom"], "jumlah_baris": len(h["baris"]),
                     "baris": h["baris"][:atur.baris_ke_model]}
         return {"kolom": h["kolom"], "jumlah_baris": len(h["baris"]), "data_tidak_dikirim": True}
+    if nama == "cari_tabel":
+        from sps_ai import tabel_db
+        h = tabel_db.cari_tabel(str(arg.get("pola") or ""), arg.get("database"), arg.get("skema"))
+        ev({"tipe": "tabel", "judul": f"Tabel di {h['database']}" + (f".{h['skema']}" if h.get("skema") else ""),
+            "kolom": ["tabel", "baris", "kolom", "dataset"],
+            "baris": [{"tabel": t["nama"], "baris": t.get("baris", ""), "kolom": len(t.get("kolom") or []),
+                       "dataset": t.get("dataset_id") or "belum"} for t in h["tabel"]]})
+        return h
+    if nama == "daftarkan_tabel":
+        from sps_ai import tabel_db
+        h = tabel_db.daftarkan_tabel(arg.get("tabel") or [], arg.get("database"), arg.get("skema"))
+        for t in h["dataset"]:
+            ev({"tipe": "dataset", "judul": f"{t['nama']} ({t['kolom']} kolom)",
+                "url": f"/explore/?datasource_type=table&datasource_id={t['dataset_id']}", "id": t["dataset_id"]})
+        return h
     if nama == "gabung_dataset":
         from sps_ai import gabung
         h = gabung.gabung(arg.get("dataset_ids") or [], str(arg.get("nama") or ""))
@@ -224,7 +245,44 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
 
 def _argumen(panggilan: dict) -> dict:
     a = panggilan.get("function", {}).get("arguments") or "{}"
-    return a if isinstance(a, dict) else json.loads(a)
+    try:
+        a = a if isinstance(a, dict) else json.loads(a)
+    except ValueError:                          # model lokal kadang menulis JSON tidak sah
+        raise alat.InputSalah("Argumen alat bukan JSON yang sah; tulis ulang pemanggilan alat.") from None
+    return rapikan_argumen(a)
+
+
+def _id_dataset(v):
+    """Model sering menulis NAMA dataset, bukan id: 'latihan_penjualan' / '13' / 13 -> 13."""
+    if isinstance(v, int) or (isinstance(v, str) and v.strip().isdigit()):
+        return int(v)
+    if isinstance(v, str) and v.strip():
+        from superset import db
+        from superset.connectors.sqla.models import SqlaTable
+        nama = v.strip().rsplit(".", 1)[-1]
+        t = db.session.query(SqlaTable).filter(SqlaTable.table_name.ilike(nama)).first()
+        if t is None:
+            raise alat.InputSalah(f"Dataset '{v}' tidak ditemukan. Panggil cari_dataset untuk melihat id yang tersedia.")
+        return t.id
+    return v
+
+
+def rapikan_argumen(a: dict) -> dict:
+    """Perbaiki kesalahan argumen yang umum pada model kecil: nama dataset sebagai id, daftar ditulis sebagai teks."""
+    a = dict(a)
+    if "dataset_id" in a:
+        a["dataset_id"] = _id_dataset(a["dataset_id"])
+    if "dataset_ids" in a:
+        daftar = a["dataset_ids"]
+        if isinstance(daftar, str):
+            daftar = [x.strip() for x in daftar.replace(";", ",").split(",") if x.strip()]
+        a["dataset_ids"] = [_id_dataset(x) for x in daftar]
+    for k in ("metrik", "kelompok", "tabel", "chart_ids"):
+        if isinstance(a.get(k), str):
+            a[k] = [x.strip() for x in a[k].split(",") if x.strip()]
+    if isinstance(a.get("chart_ids"), list):
+        a["chart_ids"] = [int(x) for x in a["chart_ids"] if str(x).strip().isdigit()]
+    return a
 
 
 def _riwayat_bersih(riwayat: list[dict]) -> list[dict]:
@@ -304,11 +362,12 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     peta = any(n in peran.alat for n in ("cari_dataset", "cari_dashboard", "info_dashboard"))
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
-    jawaban, status = "", "ok"
+    jawaban, status, dicoba, catatan_model = "", "ok", [model.id], ""
     tenggat = mulai + (batas or batas_total())  # bawaan: selesai SEBELUM server web memutus permintaan
     try:
-        for langkah in range(atur.langkah_maks + 1):
-            boleh_alat = langkah < atur.langkah_maks
+        putaran = 0                                 # jawaban model yang berhasil; pengalihan model tidak dihitung
+        while True:
+            boleh_alat = putaran < atur.langkah_maks    # setelah jatah habis, model wajib menjawab tanpa alat
             sisa = int(tenggat - time.time())
             if dibatalkan and dibatalkan():
                 status, jawaban = "dibatalkan", _pesan_dibatalkan(dipakai)
@@ -319,10 +378,19 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
             try:
                 msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], min(atur.batas_untuk(model), sisa))
             except llm.GagalModel as exc:
+                lain = cadangan(atur, model, dicoba) if exc.sementara and atur.cadangan_otomatis else None
+                if lain is not None:                # penyedia sibuk/kuota habis: lanjutkan dengan model cadangan
+                    dicoba.append(lain.id)
+                    peristiwa.append({"tipe": "langkah", "teks": f"{model.nama} tidak tersedia, beralih ke {lain.nama}"})
+                    catatan_model = f"_Dijawab dengan {lain.nama} karena {model.nama} sedang tidak tersedia._\n\n"
+                    model = lain
+                    pesan[0] = {"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}
+                    continue
                 if dipakai and "terlalu lama" in str(exc):   # sebagian langkah sudah jalan: laporkan, jangan buang
                     status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai, batas)
                     break
                 raise
+            putaran += 1
             panggilan = (msg.get("tool_calls") or []) if boleh_alat else []
             if not panggilan:
                 jawaban = msg.get("content") or ""
@@ -350,7 +418,45 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
         status, jawaban = "gagal_model", str(exc)
     _catat(username, model.id, f"[{peran.perintah}] {pertanyaan}", dipakai, status, mulai)
     log.info("ALDx AI %s peran=%s model=%s alat=%s status=%s", username, peran.id, model.id, dipakai, status)
-    return {"jawaban": jawaban, "peristiwa": list(peristiwa), "status": status, "peran": peran.id}
+    if catatan_model and status == "ok":
+        jawaban = catatan_model + jawaban
+    return {"jawaban": jawaban, "peristiwa": list(peristiwa), "status": status, "peran": peran.id,
+            "model": model.id, "lanjutan": lanjutan(dipakai, list(peristiwa), status)}
+
+
+def cadangan(atur: Pengaturan, model: ModelAI, dicoba: list[str]) -> ModelAI | None:
+    """Model aktif berikutnya untuk dialihkan saat model sekarang sibuk / kuota habis / tidak terjangkau.
+
+    Privasi: bila model sekarang boleh menerima data (riwayat bisa berisi angka), cadangannya juga harus boleh
+    (kirim_data), atau model lokal. Urutan: jenis yang sama dulu (cloud -> cloud, lokal -> lokal)."""
+    calon = [m for m in atur.model if m.id not in dicoba and (not model.kirim_data or m.kirim_data or not m.api_key)]
+    calon.sort(key=lambda m: bool(m.api_key) != bool(model.api_key))
+    return calon[0] if calon else None
+
+
+def lanjutan(dipakai: list[str], peristiwa: list[dict], status: str) -> list[str]:
+    """Saran langkah berikutnya (tombol di bawah jawaban), dari alat yang dipakai dan hasilnya."""
+    if status not in ("ok",):
+        return []
+    dataset = [p for p in peristiwa if p.get("tipe") == "dataset"]
+    chart = [p for p in peristiwa if p.get("tipe") == "chart" and p.get("disimpan")]
+    saran = []
+    if dataset:
+        nama = dataset[-1]["judul"].split(" (")[0]
+        saran += [f"Apa yang menonjol di dataset {nama}?", f"Buat dashboard ringkasan dari dataset {nama}"]
+    if "cari_tabel" in dipakai and "daftarkan_tabel" not in dipakai:
+        saran.append("Daftarkan tabel-tabel itu sebagai dataset")
+    if len(chart) >= 2 and "buat_dashboard" not in dipakai:
+        saran.append("Susun chart tadi menjadi satu dashboard")
+    elif len(chart) == 1:
+        saran.append("Buat 3 chart pendukung lalu susun jadi dashboard")
+    if "buat_dashboard" in dipakai:
+        saran.append("Ringkas dashboard ini dalam 5 poin")
+    if "ambil_data" in dipakai and not chart:
+        saran.append("Buat chart dari data tadi")
+    if "saran_otomatis" in dipakai and "buat_dashboard" not in dipakai:
+        saran.append("Buat dashboard dari 4 saran teratas")
+    return list(dict.fromkeys(saran))[:3]
 
 
 def tulis_narasi(model: ModelAI, atur: Pengaturan, judul_story: str, dashboard: dict) -> str:

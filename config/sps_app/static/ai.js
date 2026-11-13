@@ -169,6 +169,13 @@
       const a = document.createElement("a");
       a.className = "tautan-ai"; a.href = "/app/?p=" + encodeURIComponent(p.url);
       a.innerHTML = `${ik({dashboard: "dashboard", dataset: "tabel"}[p.tipe] || "chart", 16)}${esc(label)}: ${esc(p.judul)}`;
+      if (p.tipe === "dataset" && p.id) {                      // integrasi: lanjutkan dataset di Studio Visual
+        const s = document.createElement("a"), alamat = `/studio/?dataset=${p.id}`;
+        s.className = "tautan-ai"; s.href = "/app/?p=" + encodeURIComponent(alamat);
+        s.innerHTML = `${ik("studio", 16)}${esc(t("Buka di Studio Visual"))}`;
+        s.onclick = e => { e.preventDefault(); SPS.buka(alamat); };
+        setTimeout(() => a.after(s));
+      }
       a.onclick = e => { e.preventDefault(); SPS.buka(p.url); };
       wadah.appendChild(a);
       if (p.id && (p.tipe === "dashboard" || (p.tipe === "chart" && p.disimpan))) {        // simpan hasil AI sebagai berkas .ald/.aldx
@@ -372,6 +379,15 @@
       wadah.insertAdjacentHTML("beforeend", `<div class="teks-ai">${md(j.jawaban)}</div>`);
       (j.peristiwa || []).filter(x => x.tipe !== "langkah").forEach(x => tampilPeristiwa(x, wadah));
       wadah.querySelectorAll(".salin-kode").forEach(b => b.onclick = () => navigator.clipboard.writeText(b.previousElementSibling.textContent).then(() => SPS.notif(t("Tersalin"))));
+      if ((j.lanjutan || []).length) {                         // saran langkah berikutnya: satu klik = kirim
+        const baris = document.createElement("div");
+        baris.className = "contoh-ai lanjutan-ai";
+        j.lanjutan.forEach(x => { const b = document.createElement("button"); b.type = "button"; b.textContent = t(x); b.onclick = () => kirim(x); baris.appendChild(b); });
+        wadah.appendChild(baris);
+      }
+      if (j.status === "ok" && j.model && j.model !== $("#modelAi").value && [...$("#modelAi").options].some(o => o.value === j.model)) {
+        $("#modelAi").value = j.model;                         // model cadangan dipakai: lanjutkan dengannya
+      }
       riwayat.push({role: "assistant", content: j.jawaban || ""});
     } catch (e) {
       tunggu.remove();

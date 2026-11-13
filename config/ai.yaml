@@ -169,3 +169,4 @@ baris_ke_model: 50       # maksimal baris yang dikirim ke model (bila kirim_data
 batas_detik_model: 120   # waktu tunggu jawaban model cloud (per langkah)
 batas_detik_lokal: 240   # waktu tunggu model LOKAL (CPU tanpa GPU bisa 1-3 menit per langkah)
 batas_latar_detik: 900   # batas total SATU pertanyaan (semua langkah). Berjalan di latar: tidak terikat timeout web
+cadangan_otomatis: true  # model sibuk/kuota habis (429/5xx) -> coba ulang 2x, lalu lanjut dengan model aktif lain

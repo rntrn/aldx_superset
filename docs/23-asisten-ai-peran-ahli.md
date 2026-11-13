@@ -66,6 +66,27 @@ lalu LEFT JOIN tabel lain. Tabel yang hubungannya **banyak-ke-banyak** (kunci ti
 pelanggan per cabang) **dilewati dengan penjelasan**, karena baris akan berlipat dan semua SUM/COUNT salah. Hak akses
 data (RLS) semua dataset asal ikut terbawa. Butuh izin membuat dataset. Kode: `config/sps_ai/gabung.py`.
 
+**Andal di semua jenis model (lokal, gratis, berbayar):**
+
+| Situasi | Yang dilakukan ALDx |
+|---|---|
+| Penyedia sibuk / kuota habis (HTTP 429, 5xx, mis. *Gemini 503*), jaringan putus | dicoba ulang 2× (jeda 2 & 6 detik), lalu **beralih otomatis ke model aktif lain**; jawaban menulis *"Dijawab dengan … karena … sedang tidak tersedia"* dan pilihan model ikut berganti |
+| Privasi saat beralih | bila model awal sudah menerima data, cadangannya harus model yang juga boleh menerima data, atau model lokal. Tidak pernah berpindah ke model "tanpa data" dengan riwayat berisi angka |
+| Model lokal kecil menulis pemanggilan alat sebagai teks (`<tool_call>…</tool_call>` atau blok JSON) | dibaca sebagai pemanggilan alat resmi (hanya alat yang memang ditawarkan) |
+| Model menulis nama dataset alih-alih id (`"latihan_penjualan"`), atau daftar sebagai teks | dirapikan otomatis sebelum alat dijalankan |
+| Galat lain | pesan yang bisa ditindaklanjuti: key salah (401/403), kuota (429), nama model berganti (404), server penyedia sibuk (5xx) |
+
+Mematikan pengalihan otomatis: `cadangan_otomatis: false` di `config\ai.yaml`.
+
+**Terintegrasi dengan ALDx:** dataset, chart, dan dashboard yang dibuat Asisten tampil sebagai tautan di bawah
+jawaban (dataset juga punya tombol **Buka di Studio Visual**). Di bawah jawaban muncul **tombol langkah berikutnya**
+(mis. *Buat dashboard ringkasan dari dataset ini*, *Daftarkan tabel-tabel itu sebagai dataset*); satu klik = kirim.
+
+**Tabel database, bukan hanya dataset:** *"scan di sps_engine seluruh tabel berawalan data_penerbangan"* → alat
+**cari_tabel** (nama, jumlah baris, kolom, sudah/belum jadi dataset) → *"daftarkan semuanya"* → **daftarkan_tabel**.
+Melihat tabel mentah butuh akses ke database itu (Admin atau role dengan akses database); pengguna lain hanya
+melihat tabel yang sudah menjadi dataset yang boleh ia akses. Kode: `config/sps_ai/tabel_db.py`.
+
 **Progres langsung & Batalkan:** pertanyaan berjalan di latar belakang server. Selama menunggu, panel menampilkan
 waktu berjalan dan setiap langkah yang selesai (*Mencari dataset ✓, Menggabung dataset ✓*). Tombol **Batalkan**
 menghentikan Asisten setelah langkah yang sedang berjalan; chart/dataset yang sudah dibuat tetap tersimpan.

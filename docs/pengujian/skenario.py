@@ -458,6 +458,14 @@ SKENARIO = [
      "Ajukan permintaan bertahap (mis. buat dashboard 4 chart)",
      "Selama menunggu tampil waktu berjalan & langkah yang selesai; Batalkan menghentikan setelah langkah berjalan; "
      "bila melewati 15 menit jawaban menyebut langkah yang sudah selesai; tidak ada pesan 'tidak terbaca'"),
+    ("K17", 1, "Tinggi", "Asisten AI: model sibuk -> model cadangan", "Dua model aktif (mis. Gemini + Groq/lokal)",
+     "Pilih Gemini saat sedang sibuk (atau matikan internet ke penyedia itu) → ajukan pertanyaan",
+     "Langkah 'X tidak tersedia, beralih ke Y' tampil; jawaban diberi catatan model pengganti; pilihan model berganti; "
+     "tanpa model kedua muncul pesan 'sedang sibuk… (HTTP 503, dari penyedia, bukan ALDx)'"),
+    ("K18", 2, "Sedang", "Asisten AI: pindai & daftarkan tabel", "Akun Admin; tabel engine belum jadi dataset",
+     "'scan di sps_engine seluruh tabel berawalan latihan' → klik tombol 'Daftarkan tabel-tabel itu sebagai dataset'",
+     "Tabel tampil dengan jumlah baris & status dataset; pendaftaran membuat dataset (yang sudah ada dipakai ulang) "
+     "dengan tautan & tombol Buka di Studio Visual; akun bukan Admin hanya melihat dataset miliknya"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",
