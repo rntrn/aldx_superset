@@ -554,7 +554,7 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
   background: var(--aksen-muda); color: var(--teks); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cabut-nilai { border: 0; background: none; cursor: pointer; color: var(--teks-3); font-size: 14px; line-height: 1; padding: 0 4px; }
 /* Telusuri ke dashboard lain (telusur.js) */
-#bukaTelusur[hidden], .kembali-telusur[hidden] { display: none; }
+#bukaTelusur[hidden], .kembali-telusur[hidden], #eksporPptx[hidden], .chip-segar[hidden] { display: none; }
 .bawa-telusur { display: flex; flex-wrap: wrap; gap: 4px; }
 .daftar-telusur { display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow: auto; }
 .item-telusur { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 10px; border: 1px solid var(--garis);

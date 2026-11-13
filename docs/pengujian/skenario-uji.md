@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **160 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **166 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -93,6 +93,8 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D27 | 2 Analis | Tinggi | Dashboard dari template | latihan_penjualan | Susun dashboard → Dari template… → dataset latihan_penjualan, ukuran utama total, Ringkasan eksekutif → Buat → Simpan dashboard → Buka; ulangi untuk dua template lain | Kanvas terisi judul, kotak angka, tren + ramalan, komposisi, 10 teratas, peta; filter Saluran/Kategori/Cabang/Rentang waktu terpasang; dashboard terbuka tanpa galat dan filter menyaring semua chart |
 | D28 | 2 Analis | Tinggi | YoY (% vs tahun lalu) | latihan_penjualan | Studio → periode ke Kolom, total ke Baris, Garis → Hitung = % vs tahun lalu (YoY) → Simpan baru → buka di Explore; ganti dimensi ke nm_cabang | 12 bulan pertama kosong; Januari 2024 ±15,8%; chart tersimpan menampilkan angka yang sama; pilihan YoY mati untuk dimensi bukan tanggal |
 | D29 | 2 Analis | Sedang | Simulasi what-if | latihan_penjualan | Studio → nm_cabang × total, Batang → geser Simulasi ke +10% → Simpan baru → buka chart tersimpan | Batang naik 10% (total ±667 M → ±734 M); status menulis 'hanya pratinjau'; chart tersimpan tetap nilai asli; slider mati saat Hitung dipakai |
+| D30 | 2 Analis | Tinggi | Dashboard bertab & tinggi kotak | Studio, 3 lembar kerja | Susun dashboard → 2 lembar kerja di tab 1, tinggi kotak pertama 'Sangat tinggi' → + Tab → klik dua kali → 'Rincian' → lembar ke-3 → Simpan → buka dashboard → buka lagi di Studio | Dashboard punya tab Tab 1 & Rincian; kotak pertama lebih tinggi; lembar yang sama ditolak di tab lain; dibuka lagi di Studio dengan tab & tinggi yang sama |
+| D31 | 2 Analis | Sedang | Tooltip kaya & Jelaskan perubahan | latihan_penjualan | Garis periode × total → arahkan kursor ke Februari 2024 → klik kanan Maret 2024 → Jelaskan perubahan | Tooltip menulis porsi dari total & ▲ 9,1% vs sebelumnya; dialog: naik ±1,6 M (+10%), saluran paling menjelaskan, Online & Grosir penyumbang terbesar |
 
 ## E. Peta & analitik prediktif
 
@@ -107,6 +109,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | E09 | 2 Analis | Tinggi | Ramalan data harian 2 juta baris | D20 | latihan_penjualan_harian → hierarki Kalender (bulan) ke Kolom, penjualan ke Baris → Ramalan 6 + Tren | Holt-Winters musiman 12; lonjakan menjelang Lebaran tiap tahun terlihat; respons < 2 detik |
 | E06 | 2 Analis | Tinggi | Ramalan tersimpan ke dashboard | E04 | Simpan → buka di Explore | Chart garis berisi seri Aktual, Ramalan, batas 80%/95%, Tren; pesan 'diperbarui otomatis tiap hari' |
 | E07 | 2 Analis | Tinggi | Ramalan mengikuti lingkup akses | Akun uji cabang: scripts\data-latihan.ps1 -AkunUji (latihan.bandung, latihan.jakarta) | Akun A menyimpan ramalan; akun B membuka chart yang sama | Akun B tidak melihat angka milik lingkup akun A |
+| E10 | 2 Analis | Sedang | Analitik per Warna | latihan_penjualan | Garis periode × total, saluran ke Warna → centang Garis tren & Ramalan → Simpan baru | Tiap saluran punya garis tren & ramalan; seri tidak bertumpuk; simpan memberi catatan 'hanya tampil di Studio' |
 
 ## F. Data, hak akses & ekstrak (Level 3)
 
@@ -154,6 +157,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | G15 | 4 Admin server | Sedang | Preset Neon & warna manual | Akun Admin | Identitas & Tema → preset Neon malam → Simpan; buka /login/ & satu dashboard; lalu ubah Warna aksen kedua manual | Login gelap dengan garis pink & cyan, tombol pink bertulisan gelap saat disorot; pratinjau berubah langsung saat warna diubah; teks di atas setiap warna tetap terbaca; chart bisa memakai skema ALDx Neon |
 | G16 | 4 Admin server | Tinggi | Preset Tinta & Sakura setelah preset lain | Akun Admin; nama perusahaan sudah diisi | Identitas & Tema → preset Hijau segar → lalu preset Tinta & Sakura | Warna kembali hitam-abu + pink (bukan tetap hijau); nama aplikasi, nama perusahaan, dan logo TIDAK berubah |
 | G14 | 4 Admin server | Tinggi | Sematkan dashboard ke web lain | .env: SPS_SEMATKAN_DOMAIN & SPS_SEMATKAN_KUNCI; halaman uji di domain itu | Sematkan → Nyalakan dashboard latihan → minta token (curl, rls nm_cabang = 'Cabang Bandung') → buka iframe /sematkan/d/<uuid>?token=…&f.kategori=Elektronik; ulangi dari domain lain; kunci salah; rls berisi ';' | Dashboard tampil tanpa login, hanya Cabang Bandung & Elektronik; domain lain diblokir; kunci salah 401; rls ';' 400; Matikan → iframe berhenti tampil; halaman ALDx biasa tetap tidak bisa dibingkai |
+| G20 | 4 Admin server | Sedang | Kesehatan kueri | Akun Admin; beberapa dashboard sudah dibuka | Kelola → Kesehatan kueri → ganti periode 24 jam / 30 hari; buka sebagai akun bukan Admin | Ringkasan (median, p95, lambat, gagal), chart & dashboard terurut p95 dengan saran; akun bukan Admin ditolak |
 
 ## H. Keamanan
 
@@ -175,6 +179,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | H16 | 4 Admin server | Sedang | Hak minimum role bawaan | build-dashboards sudah dijalankan | Pusat Kendali › Hak akses; login akun Pengguna dan cek menu | Pengguna tidak melihat menu Pusat Kendali/Databases/Action Log; peringatan kuning muncul bila ada non-Admin ber-role Alpha |
 | H11 | 4 Admin server | Tinggi | Pengaturan vital khusus Superadmin | Akun Admin biasa (bukan Superadmin) | Buka Pusat Kendali; coba buka ?tab=pengaturan; di Kelola › Pengguna beri diri sendiri role Superadmin | Tab Pengaturan, Batas data, Hak akses tidak tampil; API menjawab 403; pemberian role Superadmin ditolak |
 | H08 | 4 Admin server | Sedang | Tanpa telemetri pihak ketiga | – | Buka DevTools → Network saat membuka dashboard | Tidak ada permintaan ke scarf.sh atau domain luar selain ubin peta |
+| H17 | 4 Admin server | Tinggi | Masuk dengan SSO | Aplikasi terdaftar di Entra ID/Google/Keycloak; SSO_* di .env | Halaman login → Masuk dengan … → login di penyedia; ulangi dengan email domain lain; matikan internet lalu login password | Akun dengan domain benar masuk (dibuat otomatis bila SSO_BUAT_AKUN=1); domain lain ditolak dengan pesan; login password tetap berfungsi; tercatat di jejak audit |
 
 ## I. Kinerja
 
@@ -210,6 +215,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | ID | Level | Prioritas | Skenario | Prasyarat | Langkah | Hasil diharapkan |
 |---|---|---|---|---|---|---|
 | K13 | 1 Pengguna | Sedang | Label kesegaran data | Dashboard latihan | Buka dashboard latihan → lihat label di bilah atas → arahkan kursor → klik | Label 'Data: … lalu' tampil; tooltip merinci tiap dataset & waktu diperbarui; klik membuka Jejak data; label hilang di halaman selain dashboard |
+| K14 | 1 Pengguna | Sedang | Ekspor dashboard ke PowerPoint | Dashboard latihan-wilayah | Buka dashboard → tombol PowerPoint di bilah atas → buka berkas di PowerPoint/LibreOffice | Berkas .pptx terunduh: slide sampul + satu chart per slide dengan judul; tombol tidak tampil di halaman selain dashboard |
 | K12 | 3 Admin data | Sedang | Peringatan data | SMTP terpasang (tanpa SMTP: cek log) | Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, jadwal tiap menit, penerima email sendiri | Peringatan tercatat berjalan; email diterima (atau tercatat di log bila mode uji); masa tenang mencegah email berulang |
 | K11 | 1 Pengguna | Sedang | Asisten AI: ringkas dashboard | Model AI tersambung | Buka sebuah dashboard → panel ✦ → klik Ringkas dashboard ini dalam 5 poin | Tombol cepat hanya muncul di halaman dashboard; jawaban merujuk angka di dashboard yang sedang dibuka |
 | K01 | 2 Analis | Tinggi | Riwayat versi & pulihkan | Pemilik dashboard | Ubah judul/tata letak → Simpan → Riwayat versi → Pulihkan versi sebelumnya | Judul/tata letak kembali; versi sebelum pemulihan tercatat; pengguna bukan pemilik tidak bisa memulihkan |

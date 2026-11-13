@@ -24,6 +24,12 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Langganan laporan, riwayat versi, tata letak ponsel | semua | ✅ | [26](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Story / presentasi berurutan | Tableau | ✅ | Story |
 | Parameter *what-if* (geser angka, chart ikut berubah) | Power BI, Tableau | 🆕 (sebagian) | Studio › **Simulasi** (pratinjau, tidak tersimpan) |
+| *Explain the increase* / *Explain Data* | Power BI, Tableau | 🆕 | Studio: klik kanan periode → **Jelaskan perubahan** |
+| Tooltip kaya | Power BI, Tableau | 🆕 | Studio: porsi & perubahan di tooltip |
+| Tab & ukuran kotak di dashboard | semua | 🆕 | Studio › Susun dashboard (grid 12 kolom; posisi bebas piksel sengaja tidak) |
+| Ekspor PowerPoint | Power BI, Tableau | 🆕 | tombol PowerPoint di dashboard |
+| SSO (OpenID Connect / Azure AD) | semua | 🆕 | [05](05-login-ldap.md#masuk-dengan-sso-openid-connect) |
+| Pemantauan kinerja kueri | Tableau Server, Power BI Premium | 🆕 | Kelola › **Kesehatan kueri** |
 | Label kesegaran data | Tableau, Power BI | 🆕 | bilah atas dashboard ([26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md)) |
 | **Kalkulasi cepat** (% dari total, kumulatif, YoY) | Tableau | 🆕 | Studio › **Hitung** |
 | **Template dashboard** (*Quick create*) | Power BI, Tableau | 🆕 | Susun dashboard › **Dari template…** |

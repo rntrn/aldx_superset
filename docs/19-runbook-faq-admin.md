@@ -148,6 +148,8 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 2. Semua chart lambat → Pusat Kendali → Status: CPU/RAM penuh? antrean menumpuk?
    → naikkan batas di Pusat Kendali → Pengaturan, atau tambah node ([11](11-pusat-kendali-server.md)).
 3. Dataset besar dari sumber lambat → buat **ekstrak** ke ALDx Engine ([13](13-sps-engine-ekstrak.md)).
+4. Tidak tahu chart mana yang lambat → **Kelola › Kesehatan kueri**: chart & dashboard diurutkan menurut p95,
+   lengkap dengan saran perbaikan ([26 §7d](26-langganan-versi-ponsel-lihat-sebagai.md)).
 
 ### 4.4 Ekstrak / impor gagal
 

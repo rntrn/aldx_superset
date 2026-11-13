@@ -427,6 +427,28 @@ SKENARIO = [
      "Klik kanan sebuah sel/batang/irisan pada chart → Telusuri ke dashboard lain… → pilih dashboard tujuan; ulangi pada kotak angka",
      "Butir muncul di menu klik kanan; panel Telusuri terbuka dengan nilai yang diklik sebagai filter; tujuan terbuka "
      "tersaring; pada kotak angka menu menutup dan panel memberi petunjuk"),
+    ("D30", 2, "Tinggi", "Dashboard bertab & tinggi kotak", "Studio, 3 lembar kerja",
+     "Susun dashboard → 2 lembar kerja di tab 1, tinggi kotak pertama 'Sangat tinggi' → + Tab → klik dua kali → 'Rincian' "
+     "→ lembar ke-3 → Simpan → buka dashboard → buka lagi di Studio",
+     "Dashboard punya tab Tab 1 & Rincian; kotak pertama lebih tinggi; lembar yang sama ditolak di tab lain; dibuka "
+     "lagi di Studio dengan tab & tinggi yang sama"),
+    ("D31", 2, "Sedang", "Tooltip kaya & Jelaskan perubahan", "latihan_penjualan",
+     "Garis periode × total → arahkan kursor ke Februari 2024 → klik kanan Maret 2024 → Jelaskan perubahan",
+     "Tooltip menulis porsi dari total & ▲ 9,1% vs sebelumnya; dialog: naik ±1,6 M (+10%), saluran paling menjelaskan, "
+     "Online & Grosir penyumbang terbesar"),
+    ("E10", 2, "Sedang", "Analitik per Warna", "latihan_penjualan",
+     "Garis periode × total, saluran ke Warna → centang Garis tren & Ramalan → Simpan baru",
+     "Tiap saluran punya garis tren & ramalan; seri tidak bertumpuk; simpan memberi catatan 'hanya tampil di Studio'"),
+    ("K14", 1, "Sedang", "Ekspor dashboard ke PowerPoint", "Dashboard latihan-wilayah",
+     "Buka dashboard → tombol PowerPoint di bilah atas → buka berkas di PowerPoint/LibreOffice",
+     "Berkas .pptx terunduh: slide sampul + satu chart per slide dengan judul; tombol tidak tampil di halaman selain dashboard"),
+    ("G20", 4, "Sedang", "Kesehatan kueri", "Akun Admin; beberapa dashboard sudah dibuka",
+     "Kelola → Kesehatan kueri → ganti periode 24 jam / 30 hari; buka sebagai akun bukan Admin",
+     "Ringkasan (median, p95, lambat, gagal), chart & dashboard terurut p95 dengan saran; akun bukan Admin ditolak"),
+    ("H17", 4, "Tinggi", "Masuk dengan SSO", "Aplikasi terdaftar di Entra ID/Google/Keycloak; SSO_* di .env",
+     "Halaman login → Masuk dengan … → login di penyedia; ulangi dengan email domain lain; matikan internet lalu login password",
+     "Akun dengan domain benar masuk (dibuat otomatis bila SSO_BUAT_AKUN=1); domain lain ditolak dengan pesan; login "
+     "password tetap berfungsi; tercatat di jejak audit"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",

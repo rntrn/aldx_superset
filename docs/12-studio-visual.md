@@ -5,7 +5,7 @@ Pembuatan chart, dashboard, dan persiapan data dengan **drag & drop**, di dalam 
 | Tab | Isi |
 |---|---|
 | **Lembar kerja** | Panel Data (Dimensi/Ukuran), rak Kolom/Baris/Filter, kartu Marks (Warna, Ukuran, Label), "Tampilkan saya", saran dari data |
-| **Susun dashboard** | Seret lembar kerja ke kanvas, atur lebar ¼ ⅓ ½ ⅔ penuh, filter dashboard, klik-filter antar-chart |
+| **Susun dashboard** | Seret lembar kerja ke kanvas, atur lebar ¼ ⅓ ½ ⅔ penuh & tinggi kotak, **tab**, filter dashboard, klik-filter antar-chart |
 | **Persiapan data** | Alur langkah termasuk **gabung (join)**, profil kolom, aksi cepat, simpan sebagai dataset baru |
 
 Hasilnya **chart, dashboard, dan dataset Superset biasa**: bisa dibuka di Explore, diedit di editor
@@ -140,6 +140,22 @@ Saat disimpan memakai fitur bawaan chart Superset (*Contribution* / *Rolling cum
 sehingga chart di dashboard sama dengan pratinjau. Chart YoY tersimpan memakai rentang waktu 30 tahun terakhir
 (syarat Superset) dan serinya bernama *1 year ago*. Kode: `_kalkulasi()` di `config/sps_studio/lembar.py`.
 
+### Tooltip kaya
+
+Arahkan kursor ke batang/titik: selain nilai, tooltip menunjukkan **porsi dari total** seri itu, **porsi di titik ini**
+(bila ada beberapa seri/warna), dan **▲/▼ perubahan dari titik sebelumnya** (hanya untuk sumbu tanggal).
+
+### Jelaskan perubahan
+
+Pada Garis/Area/Batang dengan **sumbu tanggal**: **klik kanan** di sebuah periode → **Jelaskan perubahan …**.
+ALDx membandingkan periode itu dengan periode sebelumnya untuk tiap dimensi lain di dataset (teks dengan 2–50 nilai,
+maks. 6 dimensi) dan menampilkan penyumbang terbesar, misalnya:
+
+> SUM(total) naik ▲ +1,6 M (+10%) dari 2024-02-01 ke 2024-03-01. Paling menjelaskan: **saluran** (66% perubahan
+> terpusat di 2 nilai teratas) · Online +578,6 jt (37%) · Grosir +455 jt (29%) …
+
+Filter lembar kerja ikut berlaku dan hak akses data (RLS) tetap berlaku. Kode: `config/sps_studio/jelaskan.py`.
+
 ### Simulasi what-if
 
 Baris **Simulasi** di panel Marks: pilih ukuran, geser dari −50% sampai +100% → grafik langsung menunjukkan
@@ -201,8 +217,15 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
    (menambah template = satu entri `TEMPLAT` + satu fungsi `_susun_…`).
 1. Tab **Susun dashboard** → seret lembar kerja dari kiri ke kanvas.
 2. Ke **baris yang ada** = berdampingan; ke kotak **"baris baru"** = baris baru.
-3. Atur lebar tiap kotak (¼ ⅓ ½ ⅔ Penuh; total satu baris ≤ penuh). Seret kotak untuk memindah.
-4. Isi judul & keterangan → **Simpan dashboard**. Buka lagi lewat pilihan "Buka dashboard Studio".
+3. Atur lebar tiap kotak (¼ ⅓ ½ ⅔ Penuh; total satu baris ≤ penuh) dan **tingginya** (Pendek … Sangat tinggi;
+   *otomatis* = tinggi bawaan jenis chart). Seret kotak untuk memindah.
+4. **Tab** (opsional, untuk dashboard panjang): **+ Tab** di atas kanvas → isi tab baru. Klik nama tab untuk pindah,
+   klik dua kali untuk mengganti nama, **×** menghapus tab beserta isinya. Maksimal 8 tab; satu lembar kerja hanya boleh
+   muncul sekali di seluruh dashboard. Satu tab saja = dashboard biasa tanpa tab.
+5. Isi judul & keterangan → **Simpan dashboard**. Buka lagi lewat pilihan "Buka dashboard Studio".
+
+Batas tata letak: kotak mengikuti grid 12 kolom Superset (bukan posisi bebas piksel), agar dashboard tetap rapi di
+layar lebar, laptop, dan ponsel. Kombinasi lebar + tinggi + tab + objek desain menggantikan kebutuhan tata letak bebas.
 
 Dashboard tersimpan sebagai *Draft* di Superset (publikasikan dari menu **Dashboard & Story → Daftar dashboard** bila siap).
 

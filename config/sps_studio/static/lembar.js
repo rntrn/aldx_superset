@@ -206,6 +206,35 @@
         return false;
       }});
   }
+  /* ---------- Jelaskan perubahan (klik kanan titik pada sumbu waktu) ----------
+     Server membandingkan titik ini dengan titik sebelumnya per nilai tiap dimensi lain (sps_studio/jelaskan.py). */
+  function menuJelaskan(nama, ev) {
+    const xs = urutX(), n = xs.findIndex(v => String(v) === String(nama)), x = xs[n], sebelum = n > 0 ? xs[n - 1] : undefined;   // "sebelumnya" = urut waktu
+    if (x === undefined) return;                                // ramalan / di luar data
+    if (sebelum === undefined) { Studio.notif("Titik pertama tidak punya titik sebelumnya untuk dibandingkan.", true); return; }
+    Studio.menu(ev.clientX, ev.clientY, [{label: `Jelaskan perubahan ${x}`, aksi: () => dialogJelaskan(x, sebelum)}]);
+  }
+  const urutX = () => {
+    const dx = L.hasil.dimensi[0];
+    return [...new Set(L.hasil.baris.map(b => b[dx]))].sort((a, b) => (String(a) < String(b) ? -1 : 1));
+  };
+  async function dialogJelaskan(x, sebelum) {
+    Studio.dialog({judul: `Jelaskan perubahan: ${x}`, ok: "Tutup", isi: '<div id="hasilJelaskan" class="ket">Membandingkan dengan titik sebelumnya per dimensi…</div>', padaOk: () => {}});
+    let j;
+    try { j = await Studio.api("/studio/api/jelaskan", {spec: spec(), x, x_sebelum: sebelum}); }
+    catch (e) { $("#hasilJelaskan").innerHTML = `<span style="color:var(--merah)">${esc(e.message)}</span>`; return; }
+    const tanda = v => (v >= 0 ? "▲ +" : "▼ ") + fmtRingkas.format(v);
+    $("#hasilJelaskan").innerHTML = `<p><b>${esc(j.ukuran)}</b> ${j.selisih >= 0 ? "naik" : "turun"} <b>${tanda(j.selisih)}</b>
+        ${j.persen != null ? `(${j.persen >= 0 ? "+" : ""}${(Math.round(j.persen * 10) / 10).toLocaleString("id-ID")}%)` : ""} dari ${esc(j.x_sebelum)} ke ${esc(j.x)}.</p>` +
+      (j.rincian.length ? j.rincian.map((r, n) => `<div style="margin-top:10px"><b>${n === 0 ? "Paling menjelaskan: " : ""}${esc(r.dimensi)}</b>
+        <span class="ket">(${Math.round(r.pusat)}% perubahan terpusat di 2 nilai teratas)</span>
+        <table class="data" style="margin-top:4px"><tr><th>Nilai</th><th>${esc(j.x_sebelum)}</th><th>${esc(j.x)}</th><th>Selisih</th><th>Sumbangan</th></tr>
+        ${r.teratas.map(b => `<tr><td>${esc(b.nilai ?? "(kosong)")}</td><td class="n">${fmtRingkas.format(b.dulu)}</td><td class="n">${fmtRingkas.format(b.kini)}</td>
+          <td class="n" style="color:${b.selisih >= 0 ? "var(--hijau,#0B7A52)" : "var(--merah)"}">${tanda(b.selisih)}</td>
+          <td class="n">${b.porsi == null ? "–" : Math.round(b.porsi) + "%"}</td></tr>`).join("")}</table></div>`).join("")
+        : '<p class="ket">Tidak ada dimensi lain (teks dengan 2–50 nilai) untuk merinci perubahan.</p>');
+  }
+
   /* ---------- Simulasi what-if ----------
      Menggeser satu ukuran naik/turun sekian persen di browser, di atas hasil kueri. Tidak menyentuh dataset
      (tetap bisa diekstrak & di-cache) dan tidak ikut tersimpan. Garis analitik disembunyikan selama simulasi
@@ -473,8 +502,10 @@
       pesan.style.display = "none";
       isiSimulasi();
       const sim = simulasiAktif();
+      Studio.bisaJelaskan = TANDA_ANALITIK.includes(t) && hasil.dimensi.length === 1 && (hasil.waktu || []).length === 1 && !sim;
       const info = Studio.gambar($("#grafik"), denganSimulasi(L.hasil), t, {horizontal: horizontal(), label: L.label, skala: L.skala,
-        klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null}) || {};
+        klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null,
+        klikKanan: Studio.bisaJelaskan ? (i, nama, ev) => menuJelaskan(nama, ev) : null}) || {};
       if (sim) info.catatan = `Simulasi: ${sim.ukuran} ${sim.persen > 0 ? "+" : ""}${sim.persen}% (hanya pratinjau, tidak ikut tersimpan)` + (info.catatan ? ". " + info.catatan : "");
       $("#statusLembar").innerHTML = `<span>${fmtPenuh.format(L.hasil.baris.length)} baris</span><span>${esc(Studio.awal.aturan[t].label)}</span>
         <span>${Math.round(performance.now() - mulai)} ms</span>${L.topN ? `<span>${L.topN} teratas</span>` : L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
@@ -520,7 +551,10 @@
       (dilepas.length ? ` Dilepas: ${esc(dilepas.join(", "))} (pakai rak Filter untuk menyaring per nilai).` : ""));
   }
   function renderAnalitik() {
-    const bisa = TANDA_ANALITIK.includes(tandaEfektif()) && dimensi().length === 1 && L.warna?.peran !== "dimensi";
+    const satu = TANDA_ANALITIK.includes(tandaEfektif()) && dimensi().length === 1 && L.warna?.peran !== "dimensi";
+    // Analitik juga boleh per nilai Warna: 2 dimensi (sumbu + Warna) dan satu ukuran -> garis bantu per seri.
+    const perWarna = TANDA_ANALITIK.includes(tandaEfektif()) && dimensi().length === 2 && L.warna?.peran === "dimensi" && ukuran().length === 1;
+    const bisa = satu || perWarna;
     $("#panelAnalitik").classList.toggle("mati", !bisa);
     $$("#panelAnalitik input").forEach(i => { i.disabled = !bisa; });
     const a = L.analitik;
@@ -530,13 +564,14 @@
     $("#anRata").checked = !!a.rata_rata; $("#anMedian").checked = !!a.median; $("#anEkstrem").checked = !!a.ekstrem;
     $("#anTarget").checked = a.target != null; if (a.target != null) $("#anNilaiTarget").value = a.target;
     $("#anSiapkan").hidden = bisa || !dimensi().length;
-    $("#pilihKalkulasi").disabled = !bisa;                       // syarat sama dengan analitik: 1 dimensi, Garis/Area/Batang
-    const dimWaktu = bisa && !!dimensi()[0]?.waktu;            // YoY butuh dimensi tanggal
+    $("#pilihKalkulasi").disabled = !satu;                       // kalkulasi cepat: 1 dimensi, Garis/Area/Batang
+    const dimWaktu = satu && !!dimensi()[0]?.waktu;            // YoY butuh dimensi tanggal
     $('#pilihKalkulasi option[value="yoy"]').disabled = !dimWaktu;
-    if (L.kalkulasi === "yoy" && bisa && !dimWaktu) { L.kalkulasi = ""; $("#pilihKalkulasi").value = ""; }
+    if (L.kalkulasi === "yoy" && satu && !dimWaktu) { L.kalkulasi = ""; $("#pilihKalkulasi").value = ""; }
     $("#barisSkala").style.display = tandaEfektif() === "tabel" ? "" : "none";
     const r = Object.values(L.hasil?.analitik?.seri || {}).find(x => x.ramalan)?.ramalan;
-    $("#anKet").innerHTML = !bisa ? "Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan)."
+    $("#anKet").innerHTML = !bisa ? "Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan), boleh ditambah satu dimensi di Warna."
+      : perWarna && !L.hasil?.analitik ? "Dihitung per nilai Warna (maks. 8 terbesar). Hanya tampil di Studio; chart tersimpan berisi data aslinya."
       : r ? `Metode: ${esc(r.metode)}. Pita = keyakinan 80% &amp; 95%.` + (L.hasil.analitik.catatan.length ? `<br>${esc(L.hasil.analitik.catatan.join(" "))}` : "")
       : (L.hasil?.analitik?.catatan || []).map(esc).join("<br>") || "Ramalan memakai pola tren &amp; musiman data.";
   }

@@ -153,6 +153,8 @@ Seret **provinsi** ke Kolom dan **belanja** ke Baris → **(1) Peta provinsi**. 
 5. **Hitung** → *% dari total* (porsi), *Kumulatif* (akumulasi berjalan), atau *% vs tahun lalu (YoY)*; untuk Tabel centang **Skala warna sel**.
 6. Klik kanan dimensi teks → **Kelompokkan nilai…** untuk menggabung nilai (mis. cabang → Jawa / Luar Jawa) tanpa rumus.
 7. Butuh dashboard cepat? Tab **Susun dashboard** → **Dari template…** → pilih dataset & template → **Simpan dashboard**.
+   Dashboard panjang: **+ Tab** untuk membaginya menjadi beberapa halaman.
+8. Grafik naik/turun tajam? Klik kanan periode itu → **Jelaskan perubahan** untuk melihat penyumbang terbesarnya.
 
 ### 10b. Hierarki & data besar (latihan_penjualan_harian, ± 2,3 juta baris)
 

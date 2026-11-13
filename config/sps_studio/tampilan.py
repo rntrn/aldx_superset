@@ -15,7 +15,7 @@ from pathlib import Path
 from flask import Blueprint, g, jsonify, redirect, render_template_string, request
 
 from sps_ai import alat
-from sps_studio import bidang, dasbor, definisi, lembar, objek, prep, templat
+from sps_studio import bidang, dasbor, definisi, jelaskan, lembar, objek, prep, templat
 
 log = logging.getLogger(__name__)
 FOLDER = Path(__file__).resolve().parent
@@ -176,6 +176,14 @@ def api_simpan_dashboard():
 @_login()
 def api_buka_dashboard(dashboard_id: int):
     return jsonify(dasbor.buka(dashboard_id))
+
+
+@bp.route("/api/jelaskan", methods=["POST"])
+@_login()
+def api_jelaskan():
+    """{"spec": {...lembar...}, "x": "2024-03-01", "x_sebelum": "2024-02-01"} -> penyumbang perubahan per dimensi."""
+    d = _data()
+    return jsonify(jelaskan.jelaskan(d.get("spec") or {}, d.get("x"), d.get("x_sebelum")))
 
 
 @bp.route("/api/templat", methods=["POST"])

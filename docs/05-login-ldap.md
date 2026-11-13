@@ -93,6 +93,46 @@ Role per orang bisa diubah oleh Admin di **Settings → List Users**.
   akun layanan yang disimpan di server).
 - **Akun `admin` lokal** tetap ada untuk darurat (VPN/LDAP mati). Pakai password yang kuat.
 
+## Masuk dengan SSO (OpenID Connect)
+
+Tombol **Masuk dengan Microsoft / Google / …** di halaman login, memakai akun perusahaan yang sudah ada (termasuk MFA
+dan kebijakan login perusahaan). SSO adalah jalan masuk **tambahan**: formulir password (akun lokal & LDAP) tetap ada,
+sehingga Superadmin tetap bisa masuk bila penyedia SSO atau internet bermasalah.
+
+**1. Daftarkan aplikasi di penyedia**
+
+| Penyedia | Tempat mendaftar | Alamat discovery (`SSO_DISCOVERY_URL`) |
+|---|---|---|
+| Microsoft Entra ID (Azure AD) | Entra admin center › App registrations › New registration (Web) | `https://login.microsoftonline.com/<ID-tenant>/v2.0/.well-known/openid-configuration` |
+| Google Workspace | Google Cloud Console › APIs & Services › Credentials › OAuth client ID (Web) | `https://accounts.google.com/.well-known/openid-configuration` |
+| Keycloak | Realm › Clients › Create (OpenID Connect, client authentication ON) | `https://<server>/realms/<realm>/.well-known/openid-configuration` |
+| Okta | Applications › Create App Integration (OIDC, Web) | `https://<domain-okta>/.well-known/openid-configuration` |
+
+Alamat kembali (*redirect URI*) yang didaftarkan: `https://<alamat-aldx>/sso/kembali`. Catat **client ID** dan
+**client secret**.
+
+**2. Isi `.env`** (lalu `docker compose up -d`):
+
+```ini
+SSO_DISCOVERY_URL=https://login.microsoftonline.com/<ID-tenant>/v2.0/.well-known/openid-configuration
+SSO_CLIENT_ID=...
+SSO_CLIENT_SECRET=...         # rahasia, hanya di .env
+SSO_NAMA=Microsoft            # label tombol
+SSO_DOMAIN=kantor.co.id       # hanya email domain ini yang boleh masuk
+SSO_BUAT_AKUN=0               # 0 = hanya email yang sudah didaftarkan Admin; 1 = akun dibuat otomatis (role SSO_ROLE_BAWAAN)
+SSO_ROLE_BAWAAN=Gamma
+```
+
+| Hal | Perilaku |
+|---|---|
+| Akun dicocokkan | menurut **email** (klaim `email`, atau `preferred_username`/`upn` dari Microsoft) |
+| Email belum terverifikasi / domain lain | ditolak dengan pesan jelas; tercatat di jejak audit |
+| Keamanan | authorization code + PKCE, `state` & `nonce`, tanda tangan id_token diperiksa dengan kunci publik penyedia (JWKS), penerbit, audiens & kedaluwarsa |
+| Superadmin / Admin | `SPS_SUPERADMIN_USERS` & `LDAP_ADMIN_USERS` tetap berlaku (isi dengan email) |
+| Penyedia mati | pengguna melihat pesan; login password tetap bisa dipakai |
+
+Kode: `config/sps_sso.py` (rute `/sso/masuk`, `/sso/kembali`), tombol di `config/sps_identitas/login.html`.
+
 ## Mode akun lokal (tanpa LDAP)
 
 1. Kosongkan `LDAP_SERVERS` di `.env`, lalu `scripts\start.ps1`.

@@ -88,6 +88,10 @@ input:focus{outline:none}
 .galat{border-left:4px solid #DC2626;background:#FEF2F2;color:#991B1B;padding:11px 14px;font-size:13.5px;margin-bottom:22px;
   animation:goyang .45s ease}
 @keyframes goyang{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.tombol-sso{display:flex;text-decoration:none;box-sizing:border-box;margin:4px 0 0;background:#fff;color:#18181B;border:1.5px solid #18181B}
+.tombol-sso:hover,.tombol-sso:focus-visible{background:#18181B;color:#fff;outline:none}
+.atau{display:flex;align-items:center;gap:10px;margin:18px 0 6px;color:#71717A;font-size:12px}
+.atau::before,.atau::after{content:"";flex:1;height:1px;background:#E4E4E7}
 .klasik{display:inline-block;margin-top:26px;font-size:12px;color:#71717A;text-decoration:none;border-bottom:1px solid transparent}
 .klasik:hover,.klasik:focus-visible{color:var(--sps-aksen);border-bottom-color:currentColor;outline:none}
 
@@ -139,6 +143,8 @@ input:focus{outline:none}
       {% for m in pesan %}<div class="galat">{{ m }}</div>{% endfor %}
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    {% if sso %}<a class="tombol tombol-sso" id="tombolSso" href="{{ sso_alamat }}"><span>Masuk dengan {{ sso }}</span><span class="panah" aria-hidden="true">→</span></a>
+    <div class="atau"><span>atau dengan password</span></div>{% endif %}
     <div class="kolom">
       <label for="username">Email atau nama pengguna</label>
       <input type="text" id="username" name="username" autocomplete="username" required autofocus>

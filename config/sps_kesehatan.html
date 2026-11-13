@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kesehatan kueri · {{ app_name }}</title>
+<link rel="icon" href="/identitas/berkas/favicon">
+<link id="sps-tema" rel="stylesheet" href="/identitas/tema.css">
+<style>
+:root{--navy:var(--sps-utama,#1F4E79);--emas:var(--sps-aksen,#F2A900);--bg:var(--sps-latar,#F4F6F9);--garis:#D5DCE4;--teks:#1F2933;--redup:#5F6B7A;--merah:#B42318;--jingga:#B54708;--hijau:#0B7A52}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sps-font,'Plus Jakarta Sans','Segoe UI',Arial,sans-serif);background:var(--bg);color:var(--teks);font-size:13px}
+header{background:var(--navy);color:#fff;padding:10px 20px;border-bottom:3px solid var(--emas);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header .judul{font-weight:700;font-size:15px}header .sub{font-size:11.5px;opacity:.85}
+.alat{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.alat select{font:inherit;padding:5px 8px;border-radius:6px;border:1px solid var(--garis);background:#fff}
+main{max-width:1280px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:12px 14px;min-width:0}
+.kpi .kartu b{display:block;font-size:24px;margin-top:4px}.kpi .kartu small{color:var(--redup)}
+h2{font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.05em;color:var(--redup)}
+.gulir{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:6px 8px;border-top:1px solid var(--garis);text-align:left;vertical-align:top}
+th{border-top:0;color:var(--redup);font-weight:600;white-space:nowrap}td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+a{color:var(--navy)}.lambat{color:var(--merah);font-weight:600}.sedang{color:var(--jingga)}.baik{color:var(--hijau)}
+.saran{color:var(--redup);font-size:12px;margin-top:2px}.kosong{color:var(--redup)}
+.lencana{font-size:11px;border-radius:10px;padding:1px 7px;background:var(--bg);color:var(--redup);margin-left:4px}
+code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--bg);border-radius:4px;padding:1px 4px;word-break:break-all}
+</style>
+</head>
+<body>
+<header class="sps-hiasan"><div><div class="judul">Kesehatan kueri</div>
+<div class="sub">Chart & dashboard yang lambat, kueri yang gagal, dan saran perbaikannya.</div></div></header>
+<main>
+  <div class="alat"><label>Periode <select id="hari"><option value="1">24 jam</option><option value="7" selected>7 hari</option><option value="30">30 hari</option><option value="90">90 hari</option></select></label>
+    <span class="kosong">Lambat = kueri chart di atas {{ lambat }} detik. p95 = 95% kueri lebih cepat dari angka ini.</span></div>
+  <div id="isi" style="display:flex;flex-direction:column;gap:12px"><p class="kosong">Memuat…</p></div>
+</main>
+<script nonce="{{ csp_nonce() }}">
+(() => {
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+  const dtk = ms => (ms / 1000).toLocaleString("id-ID", {maximumFractionDigits: ms < 10000 ? 2 : 0}) + " dtk";
+  const kelas = (ms, ambang) => ms >= ambang ? "lambat" : ms >= ambang / 2 ? "sedang" : "baik";
+  const angka = v => Number(v).toLocaleString("id-ID");
+
+  async function muat() {
+    const j = await (await fetch("/kesehatan-kueri/api/ringkas?hari=" + $("#hari").value, {credentials: "same-origin"})).json();
+    if (j.error) { $("#isi").innerHTML = `<p class="kosong">${esc(j.error)}</p>`; return; }
+    const A = j.ambang_lambat_ms, T = j.total;
+    const baris = (d, kolomAwal) => `<td class="n">${angka(d.jalan)}</td><td class="n">${dtk(d.p50)}</td>
+      <td class="n ${kelas(d.p95, A)}">${dtk(d.p95)}</td><td class="n">${dtk(d.maks)}</td><td class="n">${d.lambat ? `<span class="lambat">${angka(d.lambat)}</span>` : "0"}</td>`;
+    const kepala = '<th class="n">Kueri</th><th class="n">Median</th><th class="n">p95</th><th class="n">Terlama</th><th class="n">Lambat</th>';
+    $("#isi").innerHTML = `
+      <div class="kpi">
+        <div class="kartu"><small>Kueri chart</small><b>${angka(T.jalan)}</b></div>
+        <div class="kartu"><small>Median waktu</small><b>${dtk(T.p50)}</b></div>
+        <div class="kartu"><small>p95 (95% kueri lebih cepat dari ini)</small><b class="${kelas(T.p95, A)}">${dtk(T.p95)}</b></div>
+        <div class="kartu"><small>Kueri lambat</small><b class="${T.lambat ? "lambat" : "baik"}">${angka(T.lambat)}</b></div>
+        <div class="kartu"><small>Gagal (SQL Lab + ekstrak)</small><b class="${j.sql_gagal.length + j.ekstrak_gagal.length ? "lambat" : "baik"}">${j.sql_gagal.length + j.ekstrak_gagal.length}</b></div>
+      </div>
+      <div class="kartu"><h2>Chart paling lambat</h2><div class="gulir">${j.chart.length ? `<table><tr><th>Chart</th><th>Dataset</th>${kepala}</tr>
+        ${j.chart.map(c => `<tr><td><a href="${esc(c.url)}" target="_top">${esc(c.judul)}</a>${c.saran.map(s => `<div class="saran">→ ${esc(s)}</div>`).join("")}</td>
+          <td>${esc(c.dataset)}${c.engine ? '<span class="lencana">ALDx Engine</span>' : '<span class="lencana">langsung</span>'}</td>${baris(c)}</tr>`).join("")}</table>`
+        : `<p class="kosong">Belum ada chart dengan minimal 3 kueri pada periode ini.</p>`}</div></div>
+      <div class="kartu"><h2>Dashboard (waktu kueri chart di dalamnya)</h2><div class="gulir">${j.dashboard.length ? `<table><tr><th>Dashboard</th>${kepala}</tr>
+        ${j.dashboard.map(d => `<tr><td><a href="${esc(d.url)}" target="_top">${esc(d.judul)}</a></td>${baris(d)}</tr>`).join("")}</table>`
+        : '<p class="kosong">Belum ada dashboard dibuka pada periode ini.</p>'}</div></div>
+      <div class="kartu"><h2>Kueri gagal</h2>
+        ${j.ekstrak_gagal.map(e => `<p><b>Ekstrak ${esc(e.nama)}</b> <span class="kosong">${esc(e.selesai)}</span><br><code>${esc(e.pesan)}</code></p>`).join("")}
+        ${j.sql_gagal.length ? `<div class="gulir"><table><tr><th>Waktu</th><th>Database</th><th>Pesan</th><th>SQL</th></tr>${j.sql_gagal.map(q =>
+          `<tr><td>${esc(q.waktu)}</td><td>${esc(q.database)}</td><td>${esc(q.pesan)}</td><td><code>${esc(q.sql)}</code></td></tr>`).join("")}</table></div>` : ""}
+        ${j.sql_gagal.length + j.ekstrak_gagal.length ? "" : '<p class="baik">Tidak ada kueri SQL Lab atau penyegaran ekstrak yang gagal.</p>'}</div>`;
+  }
+  $("#hari").onchange = muat;
+  muat();
+})();
+</script>
+</body>
+</html>

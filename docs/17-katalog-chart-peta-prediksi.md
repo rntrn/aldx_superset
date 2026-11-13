@@ -119,6 +119,12 @@ Panel pudar? Klik **Siapkan agar analitik aktif**: kolom tanggal (atau dimensi p
 
 **Musim dikenali otomatis:** data bulanan → 12, triwulanan → 4, harian → 7.
 
+**Per Warna:** tambahkan satu dimensi di rak **Warna** (mis. *saluran*) dengan satu ukuran → ramalan, tren, garis
+acuan, dll. dihitung **per nilai warna** (maks. 8 terbesar). Seri ditampilkan berdampingan (tidak bertumpuk) agar garis
+bantu terbaca. Hanya tampil di Studio; chart yang disimpan berisi data aslinya.
+
+**Kenapa naik/turun?** Klik kanan sebuah periode → **Jelaskan perubahan** ([12](12-studio-visual.md#jelaskan-perubahan)).
+
 ### Membaca ramalan
 
 - **Pita 80%**: 8 dari 10 kemungkinan nilai sebenarnya jatuh di dalam pita ini.
