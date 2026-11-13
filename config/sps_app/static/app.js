@@ -51,6 +51,8 @@
      cocok: /^\/lihat-sebagai/},
     {id: "rls", grup: "Kelola", label: "Hak akses data (RLS)", ikon: "kunci", alamat: "/rowlevelsecurity/list/", izin: "Row Level Security", cocok: /^\/rowlevelsecurity/},
     // Koneksi database (lanjutan) TIDAK jadi menu sendiri: dibuka dari Data › Hubungkan data › Koneksi tersimpan.
+    {id: "kesehatan", grup: "Kelola", label: "Kesehatan kueri", ikon: "server", alamat: "/kesehatan-kueri/", izin: "Pusat Kendali Server", admin: true,
+     tetap: true, cocok: /^\/kesehatan-kueri/},
     {id: "riwayat", grup: "Kelola", label: "Riwayat kueri", ikon: "riwayat", alamat: "/sqllab/history/", izin: "Query Search", cocok: /^\/sqllab\/history/},
     {id: "moderasi", grup: "Kelola", label: "Moderasi ulasan", ikon: "komentar", alamat: "/ulasan/moderasi/", izin: "Pusat Kendali Server", superadmin: true, cocok: /^\/ulasan\/moderasi/},
     // Log aktivitas versi terbaca = jejak audit (Pusat Kendali › Riwayat); log mentah Superset tetap di /actionlog/list.

@@ -61,7 +61,7 @@
   /* ---------- Batang / garis / area ---------- */
   function seri(hasil, tanda, opsi) {
     const [dx, dw] = hasil.dimensi, uk = hasil.ukuran;
-    const an = !dw && hasil.analitik ? hasil.analitik : null;      // ramalan/tren/anomali (prediksi.py)
+    const an = hasil.analitik && (!dw || hasil.analitik.per_warna) ? hasil.analitik : null;   // prediksi.py (per_warna: seri = nilai warna)
     let kategori = unik(hasil.baris.map(b => b[dx]));
     if (an) kategori = [...an.x];
     else if (tanda !== "batang") kategori = kategori.sort(urutNilai);
@@ -87,7 +87,7 @@
         nama.forEach(n => { if (seriData[n][i] != null) seriData[n][i] = seriData[n][i] / total * 100; });
       });
     }
-    const tumpuk = Boolean(dw) && tanda !== "garis";
+    const tumpuk = Boolean(dw) && tanda !== "garis" && !an;    // analitik per warna: seri berdampingan agar garis bantu terbaca
     const series = nama.map(n => {
       const s = {name: n, data: seriData[n], itemStyle: {color: warna(n, nama)},
                  label: {show: opsi.label, formatter: p => persen ? Math.round(p.value) + "%" : persenTotal ? fmtPersen(p.value) : fmtRingkas.format(p.value),
@@ -112,6 +112,7 @@
                tooltip: {...dasar().tooltip, trigger: "axis", axisPointer: {type: tanda === "batang" ? "shadow" : "line"},
                          ...(persen ? {valueFormatter: v => v == null ? "–" : fmtPenuh.format(v) + "%"} : {}),
                          ...(persenTotal ? {valueFormatter: fmtPersen} : {}),
+                         ...(!persen && !persenTotal && !opsi.mini ? {formatter: ps => tooltipKaya(ps, seriData, (hasil.waktu || []).includes(dx))} : {}),
                          ...(an ? {formatter: ps => tooltipAnalitik(ps, an, kategori.length)} : {})}};
     if (opsi.horizontal && tanda === "batang") { sumbuK.inverse = true; o.yAxis = sumbuK; o.xAxis = sumbuN; }
     else { o.xAxis = sumbuK; o.yAxis = sumbuN; }
@@ -174,6 +175,27 @@
       }
     });
   }
+  // Tooltip kaya: nilai, porsi terhadap total seri, porsi di titik ini (bila banyak seri), dan perubahan dari
+  // titik sebelumnya (hanya untuk sumbu waktu, di sana "sebelumnya" bermakna).
+  const totalSeri = new WeakMap();
+  function tooltipKaya(ps, seriData, sumbuWaktu) {
+    const i = ps[0].dataIndex, tampak = ps.filter(p => !p.seriesName.startsWith("_") && p.value != null);
+    const diTitik = tampak.reduce((a, p) => a + (Number(p.value) || 0), 0);
+    let html = `<b>${esc(ps[0].axisValueLabel)}</b>`;
+    tampak.forEach(p => {
+      const data = seriData[p.seriesName] || [];
+      if (!totalSeri.has(data)) totalSeri.set(data, data.reduce((a, v) => a + (Number(v) || 0), 0));
+      const total = totalSeri.get(data), v = Number(p.value) || 0, lalu = i > 0 ? data[i - 1] : null;
+      const info = [total ? `${fmtPersen1(v / total * 100)} dari total` : "",
+                    tampak.length > 1 && diTitik ? `${fmtPersen1(v / diTitik * 100)} di titik ini` : "",
+                    sumbuWaktu && lalu ? `${v >= lalu ? "▲" : "▼"} ${fmtPersen1(Math.abs((v - lalu) / lalu * 100))} vs sebelumnya` : ""].filter(Boolean);
+      html += `<br>${p.marker}${esc(p.seriesName)}: <b>${tampilNilai(p.value)}</b>` +
+        (info.length ? `<br><span style="color:#5F6B7A;padding-left:14px">${info.join(" · ")}</span>` : "");
+    });
+    return html + (sumbuWaktu && Studio.bisaJelaskan ? '<br><span style="color:#8A94A6;font-size:11px">Klik kanan: jelaskan perubahan</span>' : "");
+  }
+  const fmtPersen1 = v => (Math.round(v * 10) / 10).toLocaleString("id-ID") + "%";
+
   function tooltipAnalitik(ps, an, n) {
     const i = ps[0].dataIndex, ramalan = i >= n;
     let html = `<b>${esc(ps[0].axisValueLabel)}</b>${ramalan ? ' <span style="color:#8A6D00">ramalan</span>' : ""}`;
@@ -540,6 +562,16 @@
   function pasangKlik(c, opsi) {
     c.off("click");
     if (opsi.klik) c.on("click", e => { const nama = e.name ?? e.data?.name; if (nama !== undefined && nama !== "") opsi.klik(nama); });
+    // Klik kanan di area plot -> opsi.klikKanan(indeks, nama kategori, event) (dipakai "Jelaskan perubahan")
+    // Ditangkap di seluruh area plot (bukan hanya tepat di titik): kolom terdekat dari posisi kursor yang dipakai.
+    if (opsi.klikKanan) c.getZr().on("contextmenu", e => {
+      const p = [e.offsetX, e.offsetY];
+      if (!c.containPixel("grid", p)) return;
+      e.event.preventDefault();
+      const posisi = c.convertFromPixel({seriesIndex: 0}, p), i = Math.round(posisi[opsi.horizontal ? 1 : 0]);
+      const sumbu = c.getOption()[opsi.horizontal ? "yAxis" : "xAxis"][0].data || [];
+      if (Number.isFinite(i) && i >= 0 && i < sumbu.length) opsi.klikKanan(i, sumbu[i], e.event);   // nama kategori sesuai urutan di layar
+    });
   }
 
   /* Gambar kecil "Tampilkan Saya" (garis tipis, satu warna) */

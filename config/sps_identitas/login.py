@@ -12,6 +12,7 @@ from pathlib import Path
 
 from flask import get_flashed_messages, redirect, render_template_string, request
 
+import sps_sso
 import sps_versi_aplikasi
 
 from sps_identitas import tema
@@ -37,10 +38,12 @@ def daftarkan(app) -> None:
         if any(m.startswith("Akun dikunci") for m in pesan):   # pesan kunci sudah menjelaskan; buang pesan umum
             pesan = list(dict.fromkeys(m for m in pesan if m.startswith("Akun dikunci")))
         lanjut = request.args.get("next", "")
+        sso = sps_sso.aktif()
         return render_template_string(
             HTML.read_text(encoding="utf-8"), n=n, p=tema.palet(n), v=app.config["SPS_IDENTITAS_VERSI"],
             kaki=tema.teks_kaki(n), versi_aldx=sps_versi_aplikasi.teks_singkat(), pesan=pesan, csrf=generate_csrf(), tahun=date.today().year,
-            aksi="/login/" + (f"?next={_aman(lanjut)}" if lanjut else ""))
+            aksi="/login/" + (f"?next={_aman(lanjut)}" if lanjut else ""),
+            sso=sso.nama if sso else "", sso_alamat="/sso/masuk" + (f"?next={_aman(lanjut)}" if lanjut else ""))
 
 
 def _aman(url: str) -> str:

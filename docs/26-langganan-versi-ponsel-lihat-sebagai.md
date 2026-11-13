@@ -130,6 +130,28 @@ Saat sebuah dashboard dibuka, bilah atas menampilkan seberapa baru datanya:
 Arahkan kursor ke label untuk rincian per dataset (waktu diperbarui & jadwal berikutnya); klik membuka Jejak data.
 Label tidak tampil di layar sempit. Kode: `kesegaran()` di `config/sps_jejak.py`, `config/sps_app/static/segar.js`.
 
+### 7c. Ekspor dashboard ke PowerPoint
+
+Saat sebuah dashboard dibuka, tombol **PowerPoint** (ikon layar presentasi) di bilah atas membuat berkas `.pptx`:
+slide sampul (judul dashboard, filter aktif, waktu ekspor) + **satu chart per slide** (judul di atas, gambar dengan
+rasio terjaga). Hanya chart pada **tab yang sedang tampil** yang ikut; buka tab lain lalu ekspor lagi.
+Berkas terbuka di PowerPoint, Google Slides, Keynote, dan LibreOffice Impress.
+Kode: `config/sps_app/static/pptx.js` (memotret chart), `config/sps_pptx.py` (menyusun .pptx, tanpa pustaka tambahan).
+
+### 7d. Kesehatan kueri (Admin)
+
+Menu **Kelola › Kesehatan kueri**: periode 24 jam / 7 / 30 / 90 hari.
+
+| Bagian | Isi |
+|---|---|
+| Ringkasan | jumlah kueri chart, median, **p95** (95% kueri lebih cepat dari angka ini), kueri lambat (> 5 detik), kueri gagal |
+| Chart paling lambat | per chart: jumlah kueri, median, p95, terlama, dataset (ALDx Engine / langsung) + **saran**: ekstrak ke ALDx Engine, ringkas chart, atau atur cache |
+| Dashboard | waktu kueri chart di dalam tiap dashboard |
+| Kueri gagal | kueri SQL Lab yang gagal dan penyegaran ekstrak yang gagal, beserta pesannya |
+
+Sumber: log bawaan Superset (tabel `logs`), riwayat SQL Lab, dan status ekstrak; tidak ada tabel baru.
+Kode: `config/sps_kesehatan.py`, `config/sps_kesehatan.html`.
+
 ## 8. Untuk pengembang
 
 | Berkas | Isi |

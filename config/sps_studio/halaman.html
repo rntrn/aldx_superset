@@ -161,6 +161,10 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .swatch{display:flex;gap:4px;flex-wrap:wrap}.swatch button{width:20px;height:20px;border-radius:50%;border:1px solid var(--garis);padding:0;cursor:pointer}
 .dket{width:100%;max-width:720px;min-height:38px;margin-bottom:10px}
 .dfilter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.dtabBar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--garis)}
+.dtab{font:inherit;border:0;border-bottom:2px solid transparent;background:transparent;padding:6px 12px;cursor:pointer;color:var(--redup);display:flex;gap:8px;align-items:center}
+.dtab.aktif{color:var(--teks);border-bottom-color:var(--navy);font-weight:600}.dtab.tambah{color:var(--navy)}
+.dtab span{opacity:.5;font-size:14px;line-height:1}.dtab span:hover{opacity:1}
 .dfilter .label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--redup)}
 .fchip{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--garis);border-radius:8px;padding:5px 8px}
 .fchip b{font-weight:600}.fchip .nilai{color:var(--redup);font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -307,6 +311,7 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     </div>
     <textarea class="dket" id="ketDasbor" placeholder="Keterangan di bagian atas dashboard (opsional, mendukung Markdown)"></textarea>
     <div class="dfilter" id="filterDasbor"></div>
+    <div class="dtabBar" id="tabDasbor"></div>
     <div id="kanvasDasbor"></div>
   </div>
 </section>

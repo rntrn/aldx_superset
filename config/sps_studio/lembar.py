@@ -41,6 +41,7 @@ RUNTUN = ["#FCE4EF", "#F28CB8", "#E11D74", "#7A0F3F"]
 # Palet versi sebelumnya: warna kategori yang tersimpan di dashboard lama dipetakan ke palet baru (sps_warna.py).
 WARNA_LAMA = ["#2a5bb8", "#e0a100", "#1baf7a", "#eb6834", "#6250d6", "#e87ba4", "#008300", "#e34948"]
 TANDA_ANALITIK = ("garis", "area", "batang")   # ramalan/tren/anomali: satu dimensi berurutan
+MAKS_SERI_ANALITIK = 8                          # analitik per Warna: hanya 8 nilai warna terbesar yang dihitung
 KALKULASI = ("persen_total", "kumulatif", "yoy")
 RENTANG_YOY = "30 years ago : tomorrow"       # rentang tertutup terlebar yang wajar untuk perbandingan tahun lalu       # kalkulasi cepat; dihitung di sini & lewat fitur bawaan chart Superset
 
@@ -115,8 +116,14 @@ class Lembar:
     @property
     def pakai_analitik(self) -> bool:
         a = self.analitik
-        return (self.tanda in TANDA_ANALITIK and len(self.dimensi) == 1
+        return (self.tanda in TANDA_ANALITIK and (len(self.dimensi) == 1 or self.analitik_per_warna)
                 and any(v not in (0, False, None) for v in a.values()))
+
+    @property
+    def analitik_per_warna(self) -> bool:
+        """Dimensi kedua ada di rak Warna -> analitik dihitung per nilai warna (satu ukuran)."""
+        return (len(self.dimensi) == 2 and self.warna is not None and self.warna.peran == "dimensi"
+                and self.dimensi[1].label == self.warna.label and len(self.ukuran_semua) == 1)
 
     @property
     def pakai_kalkulasi(self) -> bool:
@@ -285,14 +292,37 @@ def jalankan(t, lembar: Lembar) -> dict:
     if kalkulasi:
         hasil["baris"] = _kalkulasi(hasil["baris"], lembar.dimensi[0].label, [p.label for p in lembar.ukuran_semua],
                                     kalkulasi, _kolom_waktu(t, lembar.dimensi[0].field))
-    analitik = (prediksi.analisis(hasil["baris"], lembar.dimensi[0].label,
-                                  [p.label for p in lembar.ukuran_semua], lembar.analitik)
-                if lembar.pakai_analitik else None)
+    analitik = None
+    if lembar.pakai_analitik and lembar.analitik_per_warna:
+        lebar, seri = _per_warna(hasil["baris"], lembar.dimensi[0].label, lembar.dimensi[1].label, lembar.ukuran_semua[0].label)
+        analitik = {**prediksi.analisis(lebar, lembar.dimensi[0].label, seri, lembar.analitik), "per_warna": True}
+        if len({b[lembar.dimensi[1].label] for b in hasil["baris"]}) > MAKS_SERI_ANALITIK:
+            analitik["catatan"].append(f"Analitik dihitung untuk {MAKS_SERI_ANALITIK} nilai warna terbesar.")
+    elif lembar.pakai_analitik:
+        analitik = prediksi.analisis(hasil["baris"], lembar.dimensi[0].label,
+                                     [p.label for p in lembar.ukuran_semua], lembar.analitik)
     return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"],
             "dimensi": [p.label for p in lembar.dimensi], "ukuran": [p.label for p in lembar.ukuran_semua],
             "dim_baris": [p.label for p in lembar.dim_baris], "diabaikan": lembar.diabaikan,
             "kalkulasi": kalkulasi,
+            "waktu": [p.label for p in lembar.dimensi if _kolom_waktu(t, p.field)],
             "geo": {p.label: peran_geo(p.field) for p in lembar.dimensi if peran_geo(p.field)}}
+
+
+def _per_warna(baris: list[dict], dx: str, dw: str, u: str) -> tuple[list[dict], list[str]]:
+    """Baris panjang (x, warna, nilai) -> baris lebar {x, <warna1>: nilai, ...} untuk prediksi.analisis.
+    Hanya MAKS_SERI_ANALITIK warna dengan total terbesar; titik kosong = 0."""
+    total: dict = {}
+    for b in baris:
+        total[b.get(dw)] = total.get(b.get(dw), 0.0) + float(b.get(u) or 0)
+    seri = [str(k) for k, _ in sorted(total.items(), key=lambda kv: -kv[1])[:MAKS_SERI_ANALITIK]]
+    lebar: dict = {}
+    for b in baris:
+        k = str(b.get(dw))
+        if k in seri:
+            baris_x = lebar.setdefault(b.get(dx), {dx: b.get(dx), **{s: 0.0 for s in seri}})
+            baris_x[k] += float(b.get(u) or 0)
+    return list(lebar.values()), seri
 
 
 def _kalkulasi_aktif(t, lembar: Lembar) -> str:
@@ -510,7 +540,9 @@ def simpan(t, lembar: Lembar, chart_id: int | None = None) -> dict:
         return {"disimpan": False, "url": alat.explore_url(t.id, params),
                 "catatan": "Anda belum punya izin menyimpan chart. Buka tautan untuk melihat di Explore."}
     sumber_id, tabel_ramalan, catatan = t.id, None, ""
-    if lembar.pakai_analitik and any(lembar.analitik.get(k) not in (0, False, None) for k in ANALITIK_SERI):
+    if lembar.pakai_analitik and lembar.analitik_per_warna:
+        catatan = "Analitik per Warna hanya tampil di Studio; chart tersimpan berisi data aslinya."
+    elif lembar.pakai_analitik and any(lembar.analitik.get(k) not in (0, False, None) for k in ANALITIK_SERI):
         # Superset tidak punya ramalan Holt-Winters: hasil disimpan sebagai dataset di ALDx Engine
         sumber_id, tabel_ramalan = ramalan.siapkan(t, lembar, chart_id)
         from superset.connectors.sqla.models import SqlaTable

@@ -231,6 +231,12 @@ def _pasang_tambahan(app) -> None:
     sps_filter_global.daftarkan(app)
     import sps_jejak
     sps_jejak.daftarkan(app)                # Jejak data (lineage): sumber -> dataset -> chart -> dashboard
+    import sps_sso
+    sps_sso.daftarkan(app)                  # Masuk dengan SSO (OpenID Connect), tambahan di samping login password
+    import sps_pptx
+    sps_pptx.daftarkan(app)                 # Ekspor dashboard ke PowerPoint (.pptx)
+    import sps_kesehatan
+    sps_kesehatan.daftarkan(app)            # Kesehatan kueri: chart lambat, kueri gagal, saran (khusus Admin)
     sps_ulasan.daftarkan(app)
     sps_menu.daftarkan(app)
     sps_app.daftarkan(app)

@@ -38,6 +38,12 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
+| Studio | Penyusun dashboard: **tab** dan **tinggi kotak** per chart | [12 §2](12-studio-visual.md#2-susun-dashboard) |
+| Studio | **Tooltip kaya** (porsi dari total, porsi di titik, ▲/▼ vs sebelumnya); **Jelaskan perubahan** (klik kanan periode → penyumbang terbesar per dimensi) | [12](12-studio-visual.md#jelaskan-perubahan) |
+| Analitik | Analitik **per Warna** (ramalan/tren per nilai dimensi warna) | [17 §4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif) |
+| Dashboard | **Ekspor ke PowerPoint** (satu chart per slide) | [26 §7c](26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Admin | **Kesehatan kueri**: chart/dashboard lambat (p95), kueri gagal, saran perbaikan | [26 §7d](26-langganan-versi-ponsel-lihat-sebagai.md) |
+| Login | **Masuk dengan SSO** (OpenID Connect: Microsoft Entra ID, Google, Okta, Keycloak), tambahan di samping login password | [05](05-login-ldap.md#masuk-dengan-sso-openid-connect) |
 | Dashboard | **Klik kanan chart → Telusuri ke dashboard lain…** (drill-through satu gerakan) | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Rilis | `VERSI` wajib naik tiap pembaruan (dijaga GitHub Actions); tanggal & judul di halaman Releases selalu build terakhir; versi mendukung nomor urut harian (`2026.11.13.2`) | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
@@ -62,7 +68,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **76/76 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **80/80 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

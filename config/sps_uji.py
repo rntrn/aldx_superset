@@ -266,6 +266,48 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"urutan batang salah: {arah}")
                 return f"YoY bulan ke-13 = {yoy[12]:.1f}%; batang mendatar: terbesar di atas"
 
+            @uji("Studio", "Jelaskan perubahan & analitik per Warna")
+            def _():
+                from sps_ai import alat
+                from sps_studio import jelaskan
+                spec = {"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}
+                xs = sorted({b["periode"] for b in lembar.jalankan(*lembar.dari_dict(spec))["baris"]})
+                j = jelaskan.jelaskan(spec, xs[14], xs[13])
+                if not j["rincian"] or j["rincian"][0]["dimensi"] == "periode":
+                    raise RuntimeError(f"tidak ada rincian: {j}")
+                if abs(j["kini"] - j["dulu"] - j["selisih"]) > 1e-6 or not all(len(r["teratas"]) <= jelaskan.TERATAS for r in j["rincian"]):
+                    raise RuntimeError("selisih/penyumbang salah")
+                try:
+                    jelaskan.jelaskan({**spec, "tanda": "pie"}, xs[1], xs[0])
+                    raise RuntimeError("jelaskan pada Pie lolos")
+                except alat.InputSalah:
+                    pass
+                t, lb = lembar.dari_dict({**spec, "warna": D("saluran"), "analitik": {"tren": True, "ramalan": 3}})
+                h = lembar.jalankan(t, lb)
+                seri = h["analitik"]["seri"] if h["analitik"] else {}
+                if not (h["analitik"] or {}).get("per_warna") or len(seri) != 4 or not all("tren" in s and "ramalan" in s for s in seri.values()):
+                    raise RuntimeError(f"analitik per warna salah: {list(seri)}")
+                return (f"{j['rincian'][0]['dimensi']} paling menjelaskan ({round(j['rincian'][0]['pusat'])}%); "
+                        f"analitik per warna: {', '.join(seri)}")
+
+            @uji("Studio", "Dashboard bertab & tinggi kotak: simpan -> buka sama")
+            def _():
+                from sps_studio import dasbor
+                cid = [x["id"] for x in lembar.daftar()][:3]
+                pos, charts, _ = dasbor.posisi("Uji", "", [], [
+                    {"judul": "Ringkasan", "baris": [[{"chart_id": cid[0], "lebar": 6, "tinggi": 90}, {"chart_id": cid[1], "lebar": 6}]]},
+                    {"judul": "Rincian", "baris": [[{"chart_id": cid[2], "lebar": 12}]]}])
+                tab = [k for k, v in pos.items() if isinstance(v, dict) and v.get("type") == "TAB"]
+                if pos["GRID_ID"]["children"] != ["TABS-sps"] or len(tab) != 2 or len(charts) != 3:
+                    raise RuntimeError(f"struktur tab salah: {pos['GRID_ID']}")
+                chart0 = pos[f"CHART-sps{cid[0]}"]
+                if chart0["meta"]["height"] != 90 or chart0["parents"][:4] != ["ROOT_ID", "GRID_ID", "TABS-sps", "TAB-sps1"]:
+                    raise RuntimeError(f"tinggi/induk chart salah: {chart0}")
+                biasa, _, _ = dasbor.posisi("Uji", "", [[{"chart_id": cid[0], "lebar": 6}]], [{"judul": "Satu", "baris": [[{"chart_id": cid[0], "lebar": 6}]]}])
+                if "TABS-sps" in biasa:
+                    raise RuntimeError("satu tab seharusnya tanpa komponen TABS")
+                return "2 tab, tinggi 90 tersimpan; satu tab = dashboard biasa"
+
             @uji("Data", "Jejak data: sumber, chart & dashboard sebuah dataset")
             def _():
                 import sps_jejak
@@ -484,7 +526,7 @@ def jalankan_semua() -> None:
         if r.status_code != 200:
             raise RuntimeError(r.status_code)
 
-    for url in ("/app/", "/studio/", "/pusat-kendali/", "/asisten/", "/kueri/", "/jejak-data/"):
+    for url in ("/app/", "/studio/", "/pusat-kendali/", "/asisten/", "/kueri/", "/jejak-data/", "/kesehatan-kueri/"):
         @uji("Halaman", f"{url} meminta login")
         def _(url=url):
             r = klien.get(url)
@@ -641,6 +683,47 @@ def jalankan_semua() -> None:
                 continue
             raise RuntimeError("berkas salah sandi / diubah tidak ditolak")
         return "AES-256-GCM, scrypt, HMAC"
+
+    @uji("Halaman", "Kesehatan kueri, ekspor PowerPoint & SSO (tanpa penyedia)")
+    def _():
+        import io
+        import zipfile
+
+        import sps_kesehatan
+        import sps_pptx
+        import sps_sso
+        if sps_kesehatan.persentil([1, 2, 3, 4], 50) != 2.5 or sps_kesehatan.persentil([], 95) != 0:
+            raise RuntimeError("persentil salah")
+        r = sps_kesehatan.ringkas(30)
+        if r["total"]["jalan"] and r["total"]["p95"] < r["total"]["p50"]:
+            raise RuntimeError("p95 < median")
+        png = bytes.fromhex("89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+                            "1f15c4890000000d49444154789c6300010000050001"
+                            "0d0a2db40000000049454e44ae426082")
+        isi = sps_pptx.buat("Uji <&>", "filter", [{"judul": "Chart & \"satu\"", "gambar": png}])
+        z = zipfile.ZipFile(io.BytesIO(isi))
+        if z.namelist()[0] != "[Content_Types].xml" or "ppt/slides/slide2.xml" not in z.namelist() or b"&amp;" not in z.read("ppt/slides/slide1.xml"):
+            raise RuntimeError("berkas pptx salah")
+        try:
+            sps_pptx.buat("x", "", [{"judul": "", "gambar": b"bukan gambar"}])
+            raise RuntimeError("gambar palsu lolos")
+        except sps_pptx.GambarSalah:
+            pass
+        s = sps_sso.Setelan("https://x/.well-known", "id", "rahasia", domain=("kantor.co.id",))
+        ok = [sps_sso.email_dari_klaim({"email": "A@Kantor.co.id"}), sps_sso.email_dari_klaim({"preferred_username": "b@kantor.co.id"})]
+        if ok != ["a@kantor.co.id", "b@kantor.co.id"] or sps_sso.domain_boleh("c@luar.com", s) or not sps_sso.domain_boleh(ok[0], s):
+            raise RuntimeError(f"aturan email/domain SSO salah: {ok}")
+        for klaim in ({"email": "x@kantor.co.id", "email_verified": False}, {"sub": "tanpa-email"}):
+            try:
+                sps_sso.email_dari_klaim(klaim)
+                raise RuntimeError(f"klaim SSO tidak sah lolos: {klaim}")
+            except sps_sso.SsoGagal:
+                pass
+        if not sps_sso.aktif():                                # tanpa pengaturan: /sso/masuk kembali ke login
+            r2 = klien.get("/sso/masuk")
+            if r2.status_code != 302 or "/login" not in r2.location:
+                raise RuntimeError(f"/sso/masuk tanpa pengaturan: {r2.status_code}")
+        return f"kueri chart 30 hari: {r['total']['jalan']}; pptx 2 slide; SSO {'aktif' if sps_sso.aktif() else 'mati'}"
 
     @uji("Tahap 3", "Filter global & tabel komentar/rating")
     def _():

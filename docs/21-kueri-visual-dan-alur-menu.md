@@ -14,7 +14,7 @@ tercakup menu lain dipindah ke **Settings** untuk admin.
 | **Kueri** | **Kueri Visual** (tanpa SQL) · SQL Lab · Kueri tersimpan | mengambil & menggabung tabel |
 | **Visual** (+ **Asisten**) | Studio Visual · Daftar chart · Asisten AI | membuat chart & analisis |
 | **Dashboard & Story** | Daftar dashboard · Story · Langganan laporan · Peringatan data | melihat, menyusun & membagikan |
-| **Settings** (kanan, admin) | Keamanan; Kelola: Pusat Kendali Server, Koneksi database (lanjutan), Riwayat kueri, … | pengelolaan |
+| **Settings** (kanan, admin) | Keamanan; Kelola: Pusat Kendali Server, Kesehatan kueri, Koneksi database (lanjutan), Riwayat kueri, … | pengelolaan |
 
 ![Menu Data](gambar/kueri/menu-data.png)
 
