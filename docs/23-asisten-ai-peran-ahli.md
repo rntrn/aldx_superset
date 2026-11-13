@@ -112,6 +112,8 @@ melihat tabel yang sudah menjadi dataset yang boleh ia akses. Kode: `config/sps_
 **Progres langsung & Batalkan:** pertanyaan berjalan di latar belakang server. Selama menunggu, panel menampilkan
 waktu berjalan dan setiap langkah yang selesai (*Mencari dataset ✓, Menggabung dataset ✓*). Tombol **Batalkan**
 menghentikan Asisten setelah langkah yang sedang berjalan; chart/dataset yang sudah dibuat tetap tersimpan.
+Bila server dimulai ulang di tengah pertanyaan, layar menulis *"Proses Asisten terhenti"* dalam ±45 detik (bukan menunggu
+selamanya) dan Anda bisa bertanya lagi.
 
 **Batas waktu:** satu pertanyaan maksimal **15 menit** (`batas_latar_detik` di `config\ai.yaml`, 60–3600), satu langkah
 model maksimal 240 detik untuk model lokal. Bila model belum selesai, Asisten berhenti dengan rapi dan menyebut langkah

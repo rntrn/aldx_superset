@@ -20,6 +20,8 @@ import uuid
 
 log = logging.getLogger(__name__)
 SIMPAN_DETIK = 3600            # status disimpan selama ini setelah dibuat
+DENYUT_DETIK = 10              # jeda tulis "denyut" selama pekerjaan hidup
+BATAS_MATI = 45                # tanpa denyut selama ini = prosesnya mati (server dimulai ulang / pekerja web didaur ulang)
 AWALAN = "sps_ai_latar:"
 
 
@@ -52,9 +54,20 @@ def kuota(username: str, batas_per_jam: int) -> bool:
     return n <= batas_per_jam
 
 
-def status(job_id: str, username: str) -> dict | None:
+def status(job_id: str, username: str, sekarang: float | None = None) -> dict | None:
+    """Status milik pengguna. Pekerjaan 'jalan' yang denyutnya berhenti ditandai gagal (thread mati bersama
+    prosesnya), supaya layar tidak menunggu selamanya dan pengguna bisa bertanya lagi."""
     j = _baca(job_id)
-    return j if j and j.get("username") == username else None
+    if not j or j.get("username") != username:
+        return None
+    sekarang = sekarang or time.time()
+    if j.get("status") == "jalan":
+        terakhir = (_baca(f"denyut:{job_id}") or {}).get("t") or j.get("mulai") or 0
+        if sekarang - terakhir > BATAS_MATI:
+            j = {**j, "status": "gagal", "galat": "Proses Asisten terhenti (server dimulai ulang atau proses web didaur "
+                                                   "ulang). Hasil yang sudah tersimpan tetap ada; ulangi pertanyaan Anda."}
+            _tulis(job_id, j)
+    return j
 
 
 def batal(job_id: str, username: str) -> bool:
@@ -68,12 +81,25 @@ def batal(job_id: str, username: str) -> bool:
 def mulai(app, user_id: int, username: str, kerja) -> str:
     """Jalankan kerja(kemajuan, dibatalkan) di thread; kembalikan id. kerja mengembalikan dict hasil agen."""
     aktif = _baca(f"pengguna:{username}")
-    if aktif and (_baca(aktif["id"]) or {}).get("status") == "jalan":
+    if aktif and (status(aktif["id"], username) or {}).get("status") == "jalan":
         raise ValueError("Masih ada pertanyaan yang berjalan. Tunggu selesai atau batalkan dulu.")
     job_id = uuid.uuid4().hex
     _tulis(job_id, {"username": username, "status": "jalan", "peristiwa": [], "mulai": time.time()})
+    _tulis(f"denyut:{job_id}", {"t": time.time()})
     _tulis(f"pengguna:{username}", {"id": job_id})
     akar = __import__("flask").request.url_root
+
+    berhenti = threading.Event()
+
+    def denyut():
+        """Tanda hidup tiap DENYUT_DETIK selama pekerjaan berjalan (termasuk saat menunggu jawaban model yang lama)."""
+        with app.app_context():
+            while not berhenti.is_set():
+                try:
+                    _tulis(f"denyut:{job_id}", {"t": time.time()})
+                except Exception:  # noqa: BLE001 - gagal menulis denyut tidak boleh menghentikan pekerjaan
+                    log.warning("ALDx AI latar: denyut tidak tersimpan")
+                berhenti.wait(DENYUT_DETIK)
 
     def jalan():
         from flask import g
@@ -98,7 +124,9 @@ def mulai(app, user_id: int, username: str, kerja) -> str:
                 log.exception("ALDx AI latar %s gagal", username)
                 _tulis(job_id, {"username": username, "status": "gagal", "galat": str(exc)[:500], "peristiwa": peristiwa})
             finally:
+                berhenti.set()
                 db.session.remove()
 
+    threading.Thread(target=denyut, name=f"ai-denyut-{job_id[:8]}", daemon=True).start()
     threading.Thread(target=jalan, name=f"ai-{job_id[:8]}", daemon=True).start()
     return job_id

@@ -348,9 +348,18 @@ def jalankan_semua() -> None:
                     db.session.commit()
                 from sps_ai import latar
                 if latar.tersedia():                        # status pertanyaan latar hanya untuk pemiliknya
-                    latar._tulis("uji__job", {"username": "uji__a", "status": "jalan", "peristiwa": [], "mulai": 0})
+                    import time as _t
+                    latar._tulis("uji__job", {"username": "uji__a", "status": "jalan", "peristiwa": [], "mulai": _t.time()})
                     if latar.status("uji__job", "uji__b") is not None or latar.status("uji__job", "uji__a") is None:
                         raise RuntimeError("status pertanyaan latar bocor ke akun lain")
+                    latar._tulis("uji__mati", {"username": "uji__a", "status": "jalan", "peristiwa": [], "mulai": _t.time() - 600})
+                    mati = latar.status("uji__mati", "uji__a")           # tanpa denyut = prosesnya mati -> gagal, bukan menunggu selamanya
+                    if mati["status"] != "gagal" or "terhenti" not in mati["galat"]:
+                        raise RuntimeError(f"pekerjaan mati tidak terdeteksi: {mati}")
+                    latar._tulis("uji__hidup", {"username": "uji__a", "status": "jalan", "peristiwa": [], "mulai": _t.time() - 600})
+                    latar._tulis("denyut:uji__hidup", {"t": _t.time()})
+                    if latar.status("uji__hidup", "uji__a")["status"] != "jalan":
+                        raise RuntimeError("pekerjaan yang masih berdenyut dianggap mati")
                 if gabung.nama_bebas("latihan_penjualan", ds["latihan_penjualan"].database_id) == "latihan_penjualan":
                     raise RuntimeError("nama dataset bentrok tidak diberi akhiran")
                 if not 60 <= agen.batas_total() <= 330:
