@@ -41,6 +41,17 @@ def _tulis(kunci: str, isi: dict) -> None:
     _cache().set(AWALAN + kunci, isi, timeout=SIMPAN_DETIK)
 
 
+def kuota(username: str, batas_per_jam: int) -> bool:
+    """Hitung satu pertanyaan; False bila pengguna melewati batas per jam. Tanpa Redis / batas 0 = selalu boleh."""
+    from superset import security_manager as sm
+    if not batas_per_jam or sm.is_admin() or not tersedia():
+        return True
+    kunci = f"kuota:{username}:{int(time.time() // 3600)}"
+    n = (_baca(kunci) or {}).get("n", 0) + 1
+    _cache().set(AWALAN + kunci, {"n": n}, timeout=3700)
+    return n <= batas_per_jam
+
+
 def status(job_id: str, username: str) -> dict | None:
     j = _baca(job_id)
     return j if j and j.get("username") == username else None

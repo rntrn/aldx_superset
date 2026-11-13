@@ -148,13 +148,20 @@ def api_peran():
                    bawaan=atur.cari_model(None).id if atur.model else "")
 
 
+PESAN_KUOTA = ("Batas {n} pertanyaan per jam untuk akun Anda tercapai (melindungi biaya & kapasitas model AI). "
+               "Coba lagi nanti, atau minta Admin menaikkan batas_pertanyaan_per_jam.")
+
+
 @bp.route("/api/chat", methods=["POST"])
 @_butuh_akses()
 def api_chat():
     """{riwayat, model?, peran?, konteks?: {alamat, judul}} -> {jawaban, peristiwa, status, peran}."""
     from sps_app.tampilan import bahasa_aktif
+    from sps_ai import latar
     d = _data()
     atur = pengaturan.muat()
+    if not latar.kuota(g.user.username, atur.batas_per_jam):
+        return jsonify(error=PESAN_KUOTA.format(n=atur.batas_per_jam)), 429
     model = atur.cari_model(d.get("model"))
     konteks = d.get("konteks") if isinstance(d.get("konteks"), dict) else None
     if konteks:
@@ -175,6 +182,8 @@ def api_chat_mulai():
         return jsonify(sinkron=True)
     d = _data()
     atur = pengaturan.muat()
+    if not latar.kuota(g.user.username, atur.batas_per_jam):
+        return jsonify(error=PESAN_KUOTA.format(n=atur.batas_per_jam)), 429
     model = atur.cari_model(d.get("model"))
     konteks = d.get("konteks") if isinstance(d.get("konteks"), dict) else None
     if konteks:

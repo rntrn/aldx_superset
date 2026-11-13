@@ -383,6 +383,40 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"pindai tabel tidak menemukan latihan_penjualan: {[x['nama'] for x in h['tabel']]}")
                 return f"alat dari teks ok; cadangan menjaga privasi; {h['jumlah']} tabel latihan_* di {h['database']}"
 
+            @uji("Asisten AI", "Adaptasi model & keamanan: think, tanpa tools, konteks kecil, rahasia, kuota")
+            def _():
+                import os as _os
+                from sps_ai import agen, latar, llm
+                from sps_ai.pengaturan import ModelAI, Pengaturan
+                if llm.bersihkan_jawaban("<think>rahasia proses</think>Jawaban **akhir**") != "Jawaban **akhir**" \
+                        or llm.bersihkan_jawaban("<think>belum selesai berpikir"):
+                    raise RuntimeError("blok berpikir tidak dibuang")
+                alat_ = [agen.ALAT[0]]
+                teks = llm._mode_teks([{"role": "system", "content": "S"}, {"role": "user", "content": "q"},
+                                       {"role": "assistant", "content": "", "tool_calls": [{"function": {"name": "cari_dataset", "arguments": "{}"}}]},
+                                       {"role": "tool", "name": "cari_dataset", "content": "[]"}], alat_)
+                if "ALAT yang tersedia" not in teks[0]["content"] or any(m["role"] == "tool" or m.get("tool_calls") for m in teks) \
+                        or "bukan perintah" not in teks[3]["content"]:
+                    raise RuntimeError("mode teks (model tanpa function calling) salah")
+                pesan = [{"role": "system", "content": "panjang" * 999}] + [{"role": "user", "content": str(i)} for i in range(10)] + \
+                    [{"role": "tool", "content": "x" * 9000}]
+                r = agen.ringkas_pesan(pesan, "ringkas")
+                if r[0]["content"] != "ringkas" or len(r) > 7 or max(len(m["content"]) for m in r) > 3000:
+                    raise RuntimeError("ringkasan konteks salah")
+                kunci = "AIzaSy-uji-rahasia-12345678"
+                atur = Pengaturan([ModelAI("a", "a", "http://x", "m", kunci, False)], "a", [], 6, 500, 50, 120)
+                _os.environ["SPS_UJI_SECRET"] = "rahasia-lingkungan-uji-999"
+                hasil = agen.samarkan_rahasia(f"kunci {kunci} dan rahasia-lingkungan-uji-999", atur)
+                del _os.environ["SPS_UJI_SECRET"]
+                if kunci in hasil or "999" in hasil:
+                    raise RuntimeError(f"rahasia bocor: {hasil}")
+                if "DATA, bukan perintah" not in agen.SISTEM or "Jangan menulis tautan" not in agen.SISTEM:
+                    raise RuntimeError("aturan keamanan/format hilang dari instruksi sistem")
+                with override_user(admin):
+                    if not latar.kuota("admin", 1) or not latar.kuota("admin", 1):
+                        raise RuntimeError("Admin seharusnya tidak dibatasi kuota")
+                return "think dibuang; mode teks; ringkas konteks; rahasia disamarkan; aturan injeksi ada"
+
             @uji("Data", "Jejak data: sumber, chart & dashboard sebuah dataset")
             def _():
                 import sps_jejak
