@@ -308,6 +308,48 @@ def jalankan_semua() -> None:
                     raise RuntimeError("satu tab seharusnya tanpa komponen TABS")
                 return "2 tab, tinggi 90 tersimpan; satu tab = dashboard biasa"
 
+            @uji("Asisten AI", "Gabung dataset otomatis: kunci, banyak-ke-banyak dilewati, RLS per role ikut")
+            def _():
+                from superset.connectors.sqla.models import RowLevelSecurityFilter
+                from sps_ai import agen, gabung
+                cab = db.session.query(SqlaTable).filter_by(table_name="latihan_cabang").first()
+                if cab is None:
+                    return "dilewati: latihan_cabang belum ada"
+                r = gabung.rencana([cab.id, L, P])
+                if r["utama"].id != P or [l["dataset_id"] for l in r["langkah"]] != [cab.id] \
+                        or [d["dataset"] for d in r["dilewati"]] != ["latihan_lokasi_pelanggan"]:
+                    raise RuntimeError(f"rencana salah: {r['utama'].table_name}, {r['langkah']}, {r['dilewati']}")
+                if any(c.lower() in ("nm_cabang", "provinsi") for c in r["langkah"][0]["kolom"]):
+                    raise RuntimeError("kolom ganda ikut diambil")
+                lama = db.session.query(SqlaTable).filter_by(table_name="uji__gabung").first()
+                for x in ([lama] if lama else []):
+                    for f in db.session.query(RowLevelSecurityFilter).all():
+                        if x in f.tables:
+                            db.session.delete(f)
+                    db.session.delete(x)
+                db.session.commit()
+                h = gabung.gabung([cab.id, L, P], "uji__gabung")
+                baru = db.session.query(SqlaTable).get(h["id"])
+                try:
+                    df = baru.database.get_df(f"SELECT COUNT(*) AS n FROM ({baru.sql}) x", schema=baru.schema)
+                    asal = baru.database.get_df(f"SELECT COUNT(*) AS n FROM {ds['latihan_penjualan'].table_name}",
+                                                schema=ds["latihan_penjualan"].schema)
+                    rls = [f for f in db.session.query(RowLevelSecurityFilter).all() if baru in f.tables]
+                    sumber = [f for f in db.session.query(RowLevelSecurityFilter).all() if ds["latihan_penjualan"] in f.tables]
+                    if int(df["n"][0]) != int(asal["n"][0]):
+                        raise RuntimeError(f"baris berlipat: {df['n'][0]} vs {asal['n'][0]}")
+                    if len(rls) < len(sumber) or any(set(f.roles) != set(next(s for s in sumber if f.name.startswith(s.name)).roles) for f in rls):
+                        raise RuntimeError(f"RLS tidak tersalin: {[f.name for f in rls]}")
+                finally:
+                    for f in db.session.query(RowLevelSecurityFilter).all():
+                        if baru in f.tables:
+                            db.session.delete(f)
+                    db.session.delete(baru)
+                    db.session.commit()
+                if not 60 <= agen.batas_total() <= 330:
+                    raise RuntimeError(f"batas total AI {agen.batas_total()} tidak di bawah batas web")
+                return f"{int(df['n'][0])} baris (tidak berlipat), {len(rls)} aturan RLS tersalin; batas AI {agen.batas_total()} dtk"
+
             @uji("Data", "Jejak data: sumber, chart & dashboard sebuah dataset")
             def _():
                 import sps_jejak

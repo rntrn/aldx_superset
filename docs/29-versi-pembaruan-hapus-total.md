@@ -58,11 +58,24 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 
 | Di mana | Cara |
 |---|---|
-| Halaman login | kaki halaman: `v2026.11.13` (versi terpasang; plus kode commit bila dipasang dengan git) |
+| Halaman login | kaki halaman: `v2026.11.13.3` (versi terpasang; plus kode commit bila dipasang dengan git) |
 | Beranda (bawah) | `ALDx v2026.11.13 · a1b2c3d · ✓ Versi terbaru`, atau **Pembaruan tersedia: v…** + tautan *Unduh installer* & *Apa yang baru* (Admin). Dicek ke GitHub tiap 6 jam; tanpa internet tertulis *tidak bisa dicek* |
 | Aplikasi | fitur terbaru terlihat? Versi November 2026: menu **Sematkan ke web lain**, bagian **Objek** di Studio › Susun dashboard, chip filter global di bilah atas. Daftar lengkap: [31 · Catatan versi](31-catatan-versi.md) |
 | Folder instalasi | `git log -1 --oneline` (bila dipasang dengan git), atau `scripts\versi.ps1` |
 | Paket offline | berkas `offline\versi.txt` (tanggal + kode commit) |
+
+### Cara termudah memperbarui (sudah terpasang)
+
+**Jalankan installer versi baru di atas instalasi lama, Next-Next.** Folder sama, `.env`, data, dashboard, dan pengguna
+tetap. Tidak perlu menghapus versi lama.
+
+| Komputer | Unduh dari Releases | Langkah |
+|---|---|---|
+| Ada internet | *ALDx terbaru*: `ALDx-Setup.exe` | klik dua kali → Next-Next → Selesai |
+| Tanpa internet | *ALDx offline*: `ALDx-Setup-Offline.exe` + semua `ALDx-Setup-Offline-*.bin` (satu folder) | klik dua kali `ALDx-Setup-Offline.exe` → Next-Next |
+
+Lalu buka ALDx dan tekan `Ctrl + F5`. Versi baru terlihat di kaki halaman login (mis. `v2026.11.13.3`). Jangan
+memakai `ALDx-HapusTotal.exe` untuk memperbarui: itu menghapus semua data.
 
 ### Menyamakan versi di komputer lain
 
@@ -74,8 +87,8 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
    Cara manual: `git pull`, lalu klik dua kali `PASANG.cmd`.
 2. **Dengan Setup.exe:** pastikan exe di Releases dibangun **setelah** perubahan terakhir, lalu jalankan di atas
    instalasi lama (folder sama, data dipertahankan).
-3. **Tanpa internet:** salin folder instalasi dari komputer yang sudah terbaru (tanpa `.env` dan `backup\`), lalu
-   jalankan `PASANG.cmd`.
+3. **Tanpa internet:** pakai installer offline (lihat tabel di atas), atau salin folder instalasi dari komputer yang
+   sudah terbaru (tanpa `.env` dan `backup\`), lalu jalankan `PASANG.cmd`.
 
 Setelah memperbarui, ikuti bagian *Perlu dilakukan setelah memperbarui* di [catatan versi](31-catatan-versi.md), lalu muat ulang browser
 dengan `Ctrl + F5`.

@@ -49,7 +49,7 @@ class Peran:
 
 
 ALAT_ANALIS = ("cari_dataset", "info_dataset", "ambil_data", "saran_otomatis", "buat_chart",
-               "buat_dashboard", "cari_dashboard", "info_dashboard", "info_chart", "data_chart")
+               "buat_dashboard", "cari_dashboard", "info_dashboard", "info_chart", "data_chart", "gabung_dataset")
 
 PERAN: tuple[Peran, ...] = (
     Peran("analis", "Analis data", "chart", "Tanya data, buat chart & dashboard otomatis", "ai", ALAT_ANALIS, """
@@ -72,7 +72,7 @@ Peran: PEMANDU APLIKASI. Jelaskan cara memakai aplikasi langkah demi langkah, ri
 - Sebutkan nama menu persis seperti di layar dan pintasan keyboard bila ada.""",
           ("Bagaimana membuat dashboard dari nol?", "Apa pintasan keyboard di SQL Lab?", "Bedanya ekstrak penuh dan inkremental?")),
     Peran("data-engineer", "Data engineer", "tabel", "Dataset, koneksi, ekstrak, SQL & kualitas data", "sql",
-          ("cari_dataset", "info_dataset", "ambil_data", "daftar_koneksi", "daftar_ekstrak", "batas_data"), """
+          ("cari_dataset", "info_dataset", "ambil_data", "daftar_koneksi", "daftar_ekstrak", "batas_data", "gabung_dataset"), """
 Peran: DATA ENGINEER senior (pemodelan data, ETL, performa kueri, SQL lintas dialek).
 - Periksa struktur nyata lewat alat (info_dataset, daftar_koneksi, daftar_ekstrak) sebelum menyarankan.
 - Saran ekstrak: pakai mode inkremental bila ada kolom tanggal/ID yang selalu naik; kolom hak akses (RLS)
@@ -80,6 +80,8 @@ Peran: DATA ENGINEER senior (pemodelan data, ETL, performa kueri, SQL lintas dia
 - Saat menulis SQL, sesuaikan dialek database (lihat daftar_koneksi: postgresql, mysql, oracle, mssql,
   clickhouse, ...), tulis di blok ```sql, hanya SELECT (koneksi ALDx selalu baca-saja).
 - Untuk cek kualitas data (kosong, duplikat, rentang), boleh pakai ambil_data dengan COUNT/MIN/MAX.
+- Dataset gabungan/denormal dari beberapa dataset: pakai gabung_dataset (kunci & hak akses otomatis); jelaskan
+  dataset yang dilewati karena banyak-ke-banyak dan sarankan dataset terpisah untuknya.
 - Anda tidak bisa menjalankan DDL/DML; arahkan pengguna ke menu yang tepat (Kueri Visual, SQL Lab, Ekstrak).""",
           ("Dataset mana yang cocok dijadikan ekstrak?", "Tuliskan SQL total penjualan per bulan", "Cek kualitas kolom di dataset latihan_penjualan")),
     Peran("ahli-ui-ux", "Ahli UI/UX", "studio", "Warna, huruf & tema yang elegan dan mudah dibaca", "admin",

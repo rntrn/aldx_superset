@@ -48,7 +48,7 @@ Pilih dengan **chip** di atas obrolan, atau ketik **`/`** lalu nama peran (panah
 
 | Perintah | Peran | Bisa apa | Siapa |
 |---|---|---|---|
-| `/analis` | Analis data | tanya data, ambil angka, buat chart & dashboard | semua pengguna Asisten AI |
+| `/analis` | Analis data | tanya data, ambil angka, buat chart & dashboard, **gabung dataset** menjadi satu dataset detail | semua pengguna Asisten AI |
 | `/panduan` | Pemandu aplikasi | menjelaskan cara memakai menu & pintasan (dari isi panel **?**) | semua pengguna Asisten AI |
 | `/data-engineer` | Data engineer | dataset, koneksi, ekstrak, batas data, menulis SQL sesuai dialek, cek kualitas data | Analis (SQL Lab) atau Admin |
 | `/ahli-ui-ux` | Ahli UI/UX | menilai & mengusulkan warna, huruf, tema; cek kontras WCAG | Admin |
@@ -59,6 +59,17 @@ menyesuaikan: Pusat Kendali › Status/Pengaturan/Batas data → `/hw-engineer`;
 Dataset, Hubungkan data, Ekstrak, Kueri Visual, SQL Lab, Persiapan data → `/data-engineer`; selain itu `/analis`.
 
 Contoh: `/hw-engineer server terasa lambat, apa yang perlu diubah?`
+
+**Gabung dataset (denormal/detail):** mis. *"dari latihan_penjualan, latihan_cabang, latihan_lokasi_pelanggan buatkan
+dataset detail"*. Asisten mencari kolom penghubung (mis. `kd_cabang`), menjadikan tabel transaksi sebagai dataset utama,
+lalu LEFT JOIN tabel lain. Tabel yang hubungannya **banyak-ke-banyak** (kunci tidak unik di kedua sisi, mis. penjualan ×
+pelanggan per cabang) **dilewati dengan penjelasan**, karena baris akan berlipat dan semua SUM/COUNT salah. Hak akses
+data (RLS) semua dataset asal ikut terbawa. Butuh izin membuat dataset. Kode: `config/sps_ai/gabung.py`.
+
+**Batas waktu:** satu pertanyaan maksimal ±5 menit (batas server web dikurangi 30 detik). Bila model belum selesai,
+Asisten berhenti dengan rapi dan menyebut langkah yang sudah selesai; chart/dataset yang sudah dibuat tetap tersimpan.
+Model lokal kecil di CPU sering lambat untuk permintaan yang butuh beberapa langkah; pakai model yang lebih kuat atau
+pecah permintaan.
 
 ## 3. Usulan & tombol Terapkan
 

@@ -164,13 +164,14 @@
       l.insertAdjacentHTML("beforeend", `<span>${ik("centang", 13)}${esc(t(p.teks))}</span>`);
     }
     if (p.tipe === "tabel") wadah.insertAdjacentHTML("beforeend", tabel(p));
-    if (p.tipe === "chart" || p.tipe === "dashboard") {
-      const label = p.tipe === "dashboard" ? t("Dashboard") : p.disimpan ? t("Chart") : t("Pratinjau chart");
+    if (p.tipe === "chart" || p.tipe === "dashboard" || p.tipe === "dataset") {
+      const label = p.tipe === "dashboard" ? t("Dashboard") : p.tipe === "dataset" ? t("Dataset") : p.disimpan ? t("Chart") : t("Pratinjau chart");
       const a = document.createElement("a");
-      a.className = "tautan-ai"; a.href = "/app/?p=" + encodeURIComponent(p.url); a.innerHTML = `${ik(p.tipe === "dashboard" ? "dashboard" : "chart", 16)}${esc(label)}: ${esc(p.judul)}`;
+      a.className = "tautan-ai"; a.href = "/app/?p=" + encodeURIComponent(p.url);
+      a.innerHTML = `${ik({dashboard: "dashboard", dataset: "tabel"}[p.tipe] || "chart", 16)}${esc(label)}: ${esc(p.judul)}`;
       a.onclick = e => { e.preventDefault(); SPS.buka(p.url); };
       wadah.appendChild(a);
-      if (p.id && (p.tipe === "dashboard" || p.disimpan)) {        // simpan hasil AI sebagai berkas .ald/.aldx
+      if (p.id && (p.tipe === "dashboard" || (p.tipe === "chart" && p.disimpan))) {        // simpan hasil AI sebagai berkas .ald/.aldx
         const b = document.createElement("a");
         const alamat = `/berkas/?jenis=${p.tipe}&id=${p.id}`;
         b.className = "tautan-ai"; b.href = "/app/?p=" + encodeURIComponent(alamat);
@@ -329,7 +330,10 @@
       const r = await fetch("/asisten/api/chat", {method: "POST", credentials: "same-origin",
         headers: {"Content-Type": "application/json", "X-CSRFToken": AWAL.csrf},
         body: JSON.stringify({riwayat, model: $("#modelAi").value, peran: peranAktif, konteks: konteksHalaman()})});
-      const j = await r.json().catch(() => ({error: t("Jawaban server tidak terbaca")}));
+      // Bukan JSON = permintaan diputus di tengah jalan (biasanya model terlalu lama, atau server dimulai ulang).
+      const j = await r.json().catch(() => ({error: [502, 503, 504].includes(r.status)
+        ? t("Server memutus permintaan karena model AI terlalu lama menjawab. Pakai model yang lebih cepat atau pecah permintaan menjadi langkah lebih kecil.")
+        : `${t("Jawaban server tidak terbaca")} (HTTP ${r.status})`}));
       tunggu.remove();
       if (!r.ok) throw new Error(j.error || r.status);
       const wadah = gelembung("ai", "");

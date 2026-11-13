@@ -284,6 +284,9 @@ Catatan:
 - **Kolom kunci**: pasangan kolom kiri = kanan (otomatis diusulkan bila namanya sama); boleh lebih dari satu.
 - **Kolom diambil**: kolom dataset kanan yang ditambahkan; nama yang bentrok diberi akhiran `_2`.
 - Hanya dataset di **database yang sama** (mis. sesama Oracle DMP) yang bisa digabung.
+- Hak akses ikut: aturan `{{ sps_akses(...) }}` dan **aturan RLS biasa per role** (mis. `kd_cabang = 'C02'` untuk role
+  *Cabang Bandung*) disalin ke dataset baru dengan role yang sama. Bila kolom aturan itu dibuang, penyimpanan ditolak.
+- Mau cepat? Minta Asisten AI: *"gabungkan dataset A, B, C jadi dataset detail"* ([23](23-asisten-ai-peran-ahli.md)).
 
 **Aksi cepat**: klik nilai di kartu profil → "Hanya nilai ini" / "Kecualikan";
 tombol **Aksi** di kartu → ganti nama, buang, ubah tipe, bersihkan, saring.

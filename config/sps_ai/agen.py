@@ -112,6 +112,11 @@ ALAT = [
             {"dataset_id": {"type": "integer"}, "jenis": {"type": "string", "enum": _semua_jenis()},
              "judul": {"type": "string"}, "metrik": _ARR_STR, "kelompok": _ARR_STR, "filter": _FILTER},
             ["dataset_id", "jenis", "judul", "metrik"]),
+    _fungsi("gabung_dataset", "Gabungkan 2-6 dataset menjadi satu dataset baru yang lebar (denormal/detail): kolom penghubung "
+            "(mis. kd_cabang) dicari otomatis, hubungan banyak-ke-banyak dilewati agar angka tidak berlipat, hak akses data ikut. "
+            "Pakai cari_dataset dulu untuk mendapat id.",
+            {"dataset_ids": {"type": "array", "items": {"type": "integer"}}, "nama": {"type": "string"}},
+            ["dataset_ids"]),
     _fungsi("buat_dashboard", "Susun chart (id dari buat_chart yang tersimpan) menjadi dashboard baru.",
             {"judul": {"type": "string"}, "chart_ids": {"type": "array", "items": {"type": "integer"}}},
             ["judul", "chart_ids"]),
@@ -127,7 +132,7 @@ ALAT = [
 
 LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca struktur dataset",
               "ambil_data": "Mengambil data", "saran_otomatis": "Menganalisis dataset otomatis",
-              "buat_chart": "Membuat chart", "buat_dashboard": "Menyusun dashboard",
+              "buat_chart": "Membuat chart", "buat_dashboard": "Menyusun dashboard", "gabung_dataset": "Menggabung dataset",
               "cari_dashboard": "Mencari dashboard", "cari_panduan": "Membaca panduan",
               "info_dashboard": "Membaca isi dashboard", "info_chart": "Membaca chart", "data_chart": "Mengambil angka chart",
               "daftar_koneksi": "Membaca daftar koneksi", "daftar_ekstrak": "Membaca daftar ekstrak",
@@ -190,6 +195,11 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
             return {"kolom": h["kolom"], "jumlah_baris": len(h["baris"]),
                     "baris": h["baris"][:atur.baris_ke_model]}
         return {"kolom": h["kolom"], "jumlah_baris": len(h["baris"]), "data_tidak_dikirim": True}
+    if nama == "gabung_dataset":
+        from sps_ai import gabung
+        h = gabung.gabung(arg.get("dataset_ids") or [], str(arg.get("nama") or ""))
+        ev({"tipe": "dataset", "judul": f"{h['nama']} ({h['kolom']} kolom)", "url": h["url"], "id": h["id"]})
+        return h
     if nama == "saran_otomatis":
         h = auto.sarankan(arg["dataset_id"], arg.get("fokus", ""), None, int(arg.get("jumlah") or 6))
         ev({"tipe": "saran", "dataset_id": arg["dataset_id"], **h})
@@ -231,6 +241,28 @@ def alat_peran(peran: P.Peran) -> list[dict]:
     return [analis.get(n) or P.ALAT_AHLI[n] for n in peran.alat]
 
 
+SISA_MINIMUM = 15          # detik; kurang dari ini tidak memulai langkah baru
+CADANGAN_WEB = 30          # detik sebelum batas server web (Pusat Kendali > web.timeout_detik)
+
+
+def batas_total() -> int:
+    """Waktu maksimal satu pertanyaan: batas web server dikurangi cadangan (bawaan 330 - 30 = 300 detik)."""
+    try:
+        from sps_server import penyimpanan
+        web = int(penyimpanan.nilai_semua()["web.timeout_detik"])
+    except Exception:  # noqa: BLE001 - pengaturan tidak terbaca: pakai bawaan
+        web = 330
+    return max(60, web - CADANGAN_WEB)
+
+
+def _pesan_waktu_habis(model: ModelAI, dipakai: list[str]) -> str:
+    selesai = ", ".join(dict.fromkeys(LABEL_ALAT.get(n, n) for n in dipakai)) or "belum ada"
+    return (f"Model '{model.nama}' belum selesai dalam {batas_total() // 60} menit (batas server). "
+            f"Langkah yang sudah selesai: {selesai}. Hasil yang sudah tersimpan (chart/dataset) tetap ada. "
+            "Agar lebih cepat: pakai model yang lebih kuat/cepat (mis. model cloud atau model lokal dengan GPU), "
+            "atau pecah permintaan menjadi langkah lebih kecil.")
+
+
 def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, peran: P.Peran | None = None,
           konteks: dict | None = None, bahasa: str = "id") -> dict:
     """Jalankan agent untuk percakapan `riwayat`. Kembalikan jawaban + peristiwa untuk layar."""
@@ -244,10 +276,21 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
     jawaban, status = "", "ok"
+    tenggat = mulai + batas_total()             # selesai SEBELUM server web memutus permintaan
     try:
         for langkah in range(atur.langkah_maks + 1):
             boleh_alat = langkah < atur.langkah_maks
-            msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], atur.batas_untuk(model))
+            sisa = int(tenggat - time.time())
+            if sisa < SISA_MINIMUM:
+                status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai)
+                break
+            try:
+                msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], min(atur.batas_untuk(model), sisa))
+            except llm.GagalModel as exc:
+                if dipakai and "terlalu lama" in str(exc):   # sebagian langkah sudah jalan: laporkan, jangan buang
+                    status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai)
+                    break
+                raise
             panggilan = (msg.get("tool_calls") or []) if boleh_alat else []
             if not panggilan:
                 jawaban = msg.get("content") or ""
