@@ -118,6 +118,50 @@
 
 **Kunci:** 1a · 2a · 3b · 4a · 5b · 6b · 7b · 8b · 9b · 10b · 11b
 
+## Sesi tambahan (60 menit): alat bantu, template, laporan
+
+| Menit | Kegiatan | Tutorial |
+|---|---|---|
+| 0–20 | kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi | [§10c](../tutorial/level-2-analis.md) |
+| 20–30 | jelaskan perubahan, tooltip kaya, analitik per Warna | [§10c](../tutorial/level-2-analis.md) |
+| 30–40 | dashboard dari template, tab, tinggi kotak | [§11a](../tutorial/level-2-analis.md) |
+| 40–50 | Auto chart & dashboard; Asisten AI membuat dashboard | [§12c](../tutorial/level-2-analis.md) |
+| 50–60 | Langganan laporan & Peringatan data; Daftar chart & Jejak data | [§12d–e](../tutorial/level-2-analis.md) |
+
+### Latihan tambahan
+
+- **T1.** Garis **periode × total**, **Hitung** = % dari total: berapa persen titik pertama dan terakhir, dan jumlah semuanya?
+- **T2.** **Kumulatif**: nilai titik terakhir? **% vs tahun lalu (YoY)**: 12 bulan pertama dan Januari 2024?
+- **T3.** Kelompokkan `nm_cabang`: *Jawa* = Jakarta + Bandung + Surabaya, sisanya *Lainnya*: total tiap kelompok?
+- **T4.** **Simulasi** +10% pada total: nilai baru, dan ikut tersimpan?
+- **T5.** Klik kanan Maret 2024 › *Jelaskan perubahan*: naik berapa, dimensi apa yang paling menjelaskan?
+- **T6.** Template *Ringkasan eksekutif* untuk `latihan_penjualan`: berapa lembar kerja? Tambah tab **Rincian**.
+- **T7.** Auto chart `latihan_penjualan`: berapa saran tercentang bawaan?
+- **T8.** Peringatan data `SUM(total)` `latihan_penjualan` `>` 600 miliar: terpenuhi?
+
+### Kunci jawaban tambahan
+
+| No | Jawaban |
+|---|---|
+| T1 | Jan 2023 **1,85%**, Des 2025 **3,41%**; jumlah semua **100%** |
+| T2 | kumulatif akhir **667B** (Rp667,4 miliar); YoY: 12 bulan pertama **kosong**, Jan 2024 **+15,8%** (Feb 2024 +13,1%) |
+| T3 | Jawa ± **Rp493 M**, Lainnya ± **Rp175 M** |
+| T4 | ± **Rp734 M** (667B × 1,1); **tidak** tersimpan (status menulis "hanya pratinjau") |
+| T5 | naik ± **Rp1,6 M (+10%)**; dimensi **saluran** (66%): Online +578,6 jt, Grosir +455,2 jt |
+| T6 | **7 lembar kerja** + judul; filter Saluran, Kategori, Cabang, Rentang waktu; tab Rincian: satu lembar hanya di satu tab |
+| T7 | **4** saran teratas |
+| T8 | **ya** (667,4 miliar > 600 miliar) |
+
+### Kuis tambahan
+
+12. Pada % dari total, jumlah semua titik… a) 1 **b) 100%** c) sama dengan total
+13. Titik terakhir kumulatif sama dengan… **a) total seluruh periode** b) rata-rata c) titik pertama
+14. YoY hanya aktif bila dimensi… **a) kolom tanggal** b) teks c) angka
+15. Simulasi what-if… a) mengubah data sumber **b) hanya pratinjau, tidak tersimpan** c) menghapus chart
+16. Peringatan data berbeda dari Langganan laporan karena… **a) email hanya dikirim bila syarat angka terpenuhi** b) selalu tiap jam c) tanpa email
+
+**Kunci:** 12b · 13a · 14a · 15b · 16a
+
 ## Daftar periksa kompetensi
 
 - [ ] Membuat batang dengan warna & urutan
@@ -129,3 +173,9 @@
 - [ ] Menggabung 2 tabel di Kueri Visual, memeriksa hasil gabung, dan menyimpannya sebagai dataset
 - [ ] Mengekspor dashboard ke .ald/.aldx berkata sandi dan mengimpornya sebagai salinan baru
 - [ ] Mengekspor hasil ke Excel/CSV/gambar dan memakai `/data-engineer` untuk SQL
+- [ ] Memakai kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi
+- [ ] Memakai *Jelaskan perubahan* dan membaca tooltip kaya
+- [ ] Membuat dashboard dari template, menambah tab, mengatur tinggi kotak
+- [ ] Memakai Auto chart & dashboard
+- [ ] Membuat Langganan laporan dan Peringatan data
+- [ ] Memeriksa dampak lewat Jejak data sebelum mengubah dataset

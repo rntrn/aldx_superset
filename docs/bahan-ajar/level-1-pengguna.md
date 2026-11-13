@@ -98,6 +98,44 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)**:
 
 **Kunci:** 1b · 2a · 3b · 4b · 5a · 6b · 7b · 8b · 9b · 10b
 
+## Modul tambahan (15 menit): dashboard lebih dalam
+
+| Menit | Kegiatan | Metode |
+|---|---|---|
+| 0–5 | telusuri ke dashboard lain (klik kanan chart), chip ← pulang | demo → peserta ikut |
+| 5–10 | tampilan tersimpan; label kesegaran data | peserta praktik |
+| 10–15 | ekspor PowerPoint; tanya jawab | demo |
+
+Tutorial: [Level 1 §6e](../tutorial/level-1-pengguna.md). Poin penyampaian: *tampilan tersimpan milik akun sendiri; PowerPoint hanya tab
+yang tampil; "Data langsung" = selalu terbaru, "Data: N jam lalu" = ada penyegaran terjadwal*.
+
+### Latihan tambahan
+
+Di dashboard **Latihan: Dashboard Penjualan (fiktif)** dan **Latihan: Wilayah & Prediksi (fiktif)**:
+
+- **T1.** Klik irisan **Elektronik** pada pie → klik kanan → *Telusuri ke dashboard lain…* → pilih tujuan. Dashboard apa dan berapa totalnya?
+- **T2.** Simpan sebagai tampilan tersimpan `Elektronik`, hapus semua filter, buka lagi tampilan itu.
+- **T3.** Apa arti label kesegaran di dashboard *Wilayah & Prediksi*?
+- **T4.** Ekspor dashboard *Wilayah & Prediksi* ke PowerPoint. Berapa slide?
+
+### Kunci jawaban tambahan
+
+| No | Jawaban |
+|---|---|
+| T1 | *Latihan: Wilayah & Prediksi* terbuka tersaring Elektronik, total ± Rp5,45 T (`5.45T`); chip **← nama dashboard asal** mengantar pulang |
+| T2 | filter Kategori = Elektronik kembali terpasang; tombol **×** menghapus tampilan |
+| T3 | *Data: N jam/hari lalu* = data di ALDx Engine terakhir diperbarui N jam/hari lalu (data latihan dimuat sekali); *Data langsung* bila membaca sumber langsung |
+| T4 | **8 slide**: sampul + 7 chart |
+
+### Kuis tambahan
+
+11. Tampilan tersimpan berguna untuk… a) menyimpan data **b) membuka dashboard dengan kombinasi filter tertentu satu klik** c) mengirim email
+12. *Data: 5 jam lalu* berarti… **a) data di ALDx Engine paling lama diperbarui 5 jam lalu** b) Anda membuka dashboard 5 jam lalu c) server menyala 5 jam
+13. PowerPoint dari dashboard berisi… a) hanya sampul **b) sampul + satu chart per slide (tab yang tampil)** c) seluruh data
+14. *Telusuri ke dashboard lain…* membawa… a) judul chart **b) filter yang sedang aktif** c) akun Anda
+
+**Kunci:** 11b · 12a · 13b · 14b
+
 ## Daftar periksa kompetensi
 
 - [ ] Login berhasil dengan akunnya
@@ -110,3 +148,7 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)**:
 - [ ] Menjelaskan perbedaan angka antar-cabang (hak akses)
 - [ ] Memasang & menghapus filter global
 - [ ] Memberi komentar & rating pada dashboard
+- [ ] Menelusuri ke dashboard lain (klik kanan chart) dan kembali lewat chip
+- [ ] Menyimpan, membuka, dan menghapus tampilan tersimpan
+- [ ] Membaca label kesegaran data
+- [ ] Mengekspor dashboard ke PowerPoint

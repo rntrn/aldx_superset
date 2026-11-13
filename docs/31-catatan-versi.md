@@ -29,7 +29,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | **+ Ukuran / + Dimensi**: definisikan ukuran (rumus agregat) & dimensi (rumus per baris) seperti *measure / column* Power BI, dengan uji rumus | [12](12-studio-visual.md#ukuran--dimensi-terdefinisi-seperti-new-measure--new-column-power-bi) |
 | Dashboard | **Telusuri ke dashboard lain** (drill-through): filter & klik-filter aktif dibawa ke dashboard lain | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Studio | **N teratas** (Top N) | [12](12-studio-visual.md#n-teratas-top-n) |
-| Studio | **Kalkulasi cepat**: *% dari total* & *Kumulatif* (pilihan **Hitung**), ikut tersimpan ke chart | [12](12-studio-visual.md#kalkulasi-cepat--dari-total--kumulatif) |
+| Studio | **Kalkulasi cepat**: *% dari total* & *Kumulatif* (pilihan **Hitung**), ikut tersimpan ke chart | [12](12-studio-visual.md#kalkulasi-cepat--dari-total-kumulatif--yoy) |
 | Studio | **Skala warna sel** pada Tabel; **Kelompokkan nilai…** (klik kanan dimensi → kelompok bernama tanpa menulis rumus) | [12](12-studio-visual.md#skala-warna-tabel) |
 | Dashboard | **Dari template…**: Ringkasan eksekutif, Tren & ramalan, Perbandingan kategori; kolom dipilih otomatis, kanvas & filter terisi | [12 §2](12-studio-visual.md#2-susun-dashboard) |
 | Studio | Kalkulasi cepat **% vs tahun lalu (YoY)**; batang mendatar tersimpan kini terbesar di atas (sama dengan pratinjau) | [12](12-studio-visual.md) |
@@ -38,6 +38,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
+| Dokumentasi | README ditulis ulang (lebih menarik & mudah dipahami); **[Peta menu per level](33-peta-menu-per-level.md)** (29 menu); **[Alur pelatihan](bahan-ajar/alur-pelatihan.md)**; tutorial & bahan ajar kini mencakup semua menu (Daftar chart, Langganan laporan, Peringatan data, Auto chart, Jejak data, Sematkan, Kesehatan kueri, SSO, dll.) dengan latihan **T1…**, kunci, dan kuis tambahan | [33](33-peta-menu-per-level.md) |
 | Asisten AI | Menyesuaikan diri dengan model apa pun: blok `<think>` dibuang, **mode teks** untuk model tanpa function calling, **ringkas otomatis** untuk model berkonteks kecil, tabel markdown dirender rapi | [23](23-asisten-ai-peran-ahli.md) |
 | Asisten AI | Keamanan: pertahanan *prompt injection*, rahasia disamarkan di jawaban, maks. 12 objek baru per pertanyaan, maks. 60 pertanyaan/pengguna/jam (Admin bebas) | [23](23-asisten-ai-peran-ahli.md), [27](27-daftar-periksa-audit-keamanan.md) |
 | Asisten AI | Andal di semua jenis model: **coba ulang** saat penyedia sibuk (429/5xx, mis. Gemini 503), **beralih otomatis ke model cadangan** (aturan privasi dijaga), pesan galat per jenis | [23](23-asisten-ai-peran-ahli.md) |
@@ -76,7 +77,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **83/83 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **84/84 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

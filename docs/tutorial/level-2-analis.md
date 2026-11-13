@@ -170,6 +170,29 @@ Ramalan meneruskan pola lama; kebijakan baru tidak diketahui model.
 
 ---
 
+### 10c. Alat bantu analisis cepat
+
+Semua ada di Studio Visual, pada Garis/Area/Batang dengan satu dimensi (kecuali disebut lain). Cobalah dengan
+`latihan_penjualan`: **periode** di Kolom, **total** di Baris, jenis **Garis**.
+
+| Alat | Cara | Yang akan Anda lihat |
+|---|---|---|
+| **% dari total** | panel Marks › **Hitung** › *% dari total* | tiap titik = porsinya; semua titik berjumlah 100% (Jan 2023 = 1,85%, Des 2025 = 3,41%) |
+| **Kumulatif** | **Hitung** › *Kumulatif (berjalan)* | garis selalu naik; titik terakhir = total seluruh periode (667B) |
+| **% vs tahun lalu (YoY)** | **Hitung** › *% vs tahun lalu (YoY)* | 12 bulan pertama kosong (belum ada tahun lalu); Jan 2024 = +15,8%. Hanya aktif bila dimensinya **tanggal** |
+| **Skala warna** | jenis **Tabel** › centang *Skala warna sel* | sel makin pekat untuk nilai makin besar |
+| **Kelompokkan nilai** | klik kanan dimensi teks (mis. `nm_cabang`) › **Kelompokkan nilai…** | dimensi baru, mis. *Jawa* (Jakarta, Bandung, Surabaya) vs *Lainnya* |
+| **Simulasi what-if** | baris **Simulasi**: pilih ukuran, geser −50%…+100% | grafik menunjukkan bila ukuran itu naik/turun; **hanya pratinjau**, tidak ikut tersimpan |
+| **Tooltip kaya** | arahkan kursor ke titik/batang | nilai + porsi dari total + ▲/▼ dibanding titik sebelumnya (sumbu tanggal) |
+| **Jelaskan perubahan** | **klik kanan** sebuah periode › *Jelaskan perubahan …* | penyumbang terbesar per dimensi, mis. Mar 2024 naik ±Rp1,6 M, paling dijelaskan oleh *saluran* |
+| **Analitik per Warna** | taruh dimensi di rak **Warna** + centang Tren/Ramalan | garis tren & ramalan **per nilai warna** (maks. 8 terbesar), hanya tampil di Studio |
+
+![Jelaskan perubahan](../gambar/app/n1-jelaskan-perubahan.png)
+
+![Kelompokkan nilai](../gambar/app/n5-kelompok-nilai.png)
+
+Detail & batasan: [docs/12](../12-studio-visual.md), [docs/17 §4](../17-katalog-chart-peta-prediksi.md).
+
 ## 11. Menyusun dashboard
 
 ![Penyusun dashboard](../gambar/tutorial/l2-10-penyusun-dashboard.png)
@@ -187,6 +210,18 @@ Ramalan meneruskan pola lama; kebijakan baru tidak diketahui model.
 Klik-filter antar-chart otomatis aktif.
 
 ---
+
+### 11a. Dashboard dari template, tab & tinggi kotak
+
+![Dashboard dari template](../gambar/app/n3-dashboard-template.png)
+
+1. Tab **Susun dashboard** › **Dari template…** › pilih dataset (`latihan_penjualan`), **ukuran utama** (`total`), dan template:
+   *Ringkasan eksekutif*, *Tren & ramalan*, atau *Perbandingan kategori*.
+2. ALDx memilih kolom tanggal, kategori, dan provinsi sendiri, membuat 7–8 lembar kerja, dan mengisi kanvas beserta filter
+   (Saluran, Kategori, Cabang, Rentang waktu). Periksa, ubah bila perlu, lalu **Simpan dashboard**.
+3. **Tab:** klik **+ Tab** di atas kanvas, seret lembar kerja ke tab baru. Klik dua kali nama tab untuk mengganti nama.
+   Satu lembar kerja hanya boleh muncul di satu tab.
+4. **Tinggi kotak:** pilihan *Pendek … Sangat tinggi* di tiap kotak (otomatis = tinggi bawaan jenis chart).
 
 ## 12. Menggabung tabel dengan Kueri Visual (tanpa SQL)
 
@@ -235,6 +270,38 @@ Detail: [docs/25](../25-berkas-filter-global-ulasan.md).
 
 Detail: [docs/26](../26-langganan-versi-ponsel-lihat-sebagai.md).
 
+## 12c. Auto chart & dashboard (dan gabung dataset lewat Asisten AI)
+
+**Auto chart & dashboard** (menu *Asisten*): ALDx mempelajari data lalu mengusulkan chart berskor.
+
+1. Menu **Asisten › Auto chart & dashboard** → pilih **Dataset** (`latihan_penjualan`), **Fokus angka**, **Jumlah saran** (8).
+2. **Analisis dataset** → daftar saran dengan skor dan alasan (4 teratas sudah tercentang; judul bisa diubah).
+3. **Buat chart terpilih**, atau isi *Judul dashboard* lalu **Buat dashboard dari pilihan**. Buka hasilnya di Studio Visual.
+
+**Lewat Asisten AI** (`Ctrl + I`, peran `/analis`): *"buat dashboard dari dataset latihan_penjualan"* atau *"gabungkan dataset A dan
+B"*. Progres langkah tampil langsung, tombol **Batalkan** tersedia, dan tautan hasilnya muncul di bawah jawaban.
+Detail: [docs/23](../23-asisten-ai-peran-ahli.md).
+
+## 12d. Langganan laporan & Peringatan data
+
+| | **Langganan laporan** | **Peringatan data** |
+|---|---|---|
+| Fungsi | kirim chart/dashboard lewat email **terjadwal** | email **hanya bila syarat angka terpenuhi** |
+| Menu | Dashboard & Story › **Langganan laporan** › **+ Laporan** | Dashboard & Story › **Peringatan data** › **+ Peringatan** |
+| Isi | pilih chart/dashboard, jadwal, penerima, format (CSV/teks langsung; PNG/PDF butuh peramban di image) | database + **SQL yang menghasilkan satu angka**, syarat (mis. `>` 600 miliar), jadwal, masa tenang |
+| Contoh | dashboard penjualan tiap Senin 07.00 | `SELECT SUM(total) FROM latihan_penjualan` syarat `> 600000000000` |
+
+Butuh **email (SMTP)** yang diisi admin server ([docs/26 §1](../26-langganan-versi-ponsel-lihat-sebagai.md)); tanpa SMTP, pengiriman hanya
+tercatat di log (mode uji). Data diambil **sebagai pemilik laporan**: jangan kirim ke orang yang tidak berhak atas datanya.
+
+## 12e. Daftar chart & Jejak data
+
+- **Visual › Daftar chart**: cari chart lewat nama/dataset/pembuat, buka, ubah, atau hapus milik sendiri.
+- **Data › Jejak data**: pilih dataset di kiri → empat kolom **Sumber → Dataset → Chart → Dashboard**. Arahkan kursor ke sebuah chart
+  untuk menyorot dashboard pemakainya. **Pakai sebelum mengubah atau menghapus** sesuatu: halaman menulis
+  *"Mengubah atau menghapus … berdampak pada N chart dan M dashboard"*. Chart milik orang lain yang tidak boleh Anda lihat
+  dihitung sebagai "tersembunyi" tanpa nama.
+
 ## 13. Latihan mandiri
 
 1. Buat grafik **Garis** penjualan per bulan, warna per **kategori**. Bulan apa yang selalu tinggi?
@@ -246,7 +313,16 @@ Detail: [docs/26](../26-langganan-versi-ponsel-lihat-sebagai.md).
 7. Ekspor hasil nomor 6 ke **Excel**, lalu jumlahkan kolom belanja di Excel. Apakah sama dengan Studio Visual?
 8. Ekspor dashboard nomor 5 sebagai **.aldx** berkata sandi, lalu impor kembali sebagai **Salinan baru**. Apa akhiran judul dashboard hasil impor?
 9. Ubah judul dashboard nomor 5, simpan, lalu kembalikan judul lama lewat **Riwayat versi**. Berapa versi yang tercatat?
+- **T1.** Garis **periode × total**: pakai **Hitung** › *% dari total*. Berapa persen titik pertama dan terakhir, dan berapa jumlah semuanya?
+- **T2.** Ganti ke *Kumulatif*. Berapa nilai titik terakhir? Lalu coba *% vs tahun lalu (YoY)*: bagaimana 12 bulan pertama, dan Januari 2024?
+- **T3.** Batang `nm_cabang × total`: **Kelompokkan nilai…** `Jawa` = Jakarta + Bandung + Surabaya, sisanya *Lainnya*. Berapa total tiap kelompok?
+- **T4.** Geser **Simulasi** ke +10% pada garis **periode × total**. Berapa totalnya sekarang, dan apakah ikut tersimpan?
+- **T5.** **Klik kanan** Maret 2024 › *Jelaskan perubahan*. Berapa naiknya dibanding Februari, dan dimensi apa yang paling menjelaskan?
+- **T6.** **Dari template…**: `latihan_penjualan`, ukuran utama `total`, *Ringkasan eksekutif*. Berapa lembar kerja dibuat? Tambahkan
+    tab **Rincian** berisi satu lembar kerja lain.
+- **T7.** **Auto chart & dashboard** untuk `latihan_penjualan`: berapa saran yang tercentang bawaan? Buat dashboard dari pilihan.
+- **T8.** Buat **Peringatan data**: `SELECT SUM(total) FROM latihan_penjualan` (skema `sps_engine`), syarat `>` 600 miliar. Apakah syaratnya terpenuhi?
 
-Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban).
+Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban); latihan **T1–T8**: [kunci tambahan](../bahan-ajar/level-2-analis.md#kunci-jawaban-tambahan).
 
 Lanjut ke [Level 3 · Admin data](level-3-admin-data.md).

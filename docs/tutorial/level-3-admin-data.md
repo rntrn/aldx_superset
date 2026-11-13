@@ -211,6 +211,43 @@ minta Superadmin menaikkan batas ([24](../24-superadmin-dan-batas-data.md)).
 
 ---
 
+### 6a. Jejak data: periksa dampak sebelum mengubah
+
+![Jejak data](../gambar/app/n4-jejak-data.png)
+
+Menu **Data › Jejak data** → pilih dataset → **Sumber → Dataset → Chart → Dashboard**. Untuk dataset virtual (SQL), kolom
+*Sumber* menunjukkan tabel yang dibaca SQL itu. **Wajib dibuka sebelum menghapus dataset, mengganti nama kolom, atau
+mengubah SQL**: kalimat di atas halaman menyebut jumlah chart & dashboard terdampak. Anda hanya melihat objek yang
+memang boleh Anda buka.
+
+### 6b. Asisten AI untuk data: pindai tabel & gabung dataset
+
+Buka panel ✦ (`Ctrl + I`) dengan peran `/data-engineer` atau `/analis`:
+
+| Permintaan | Alat yang dipakai | Hasil |
+|---|---|---|
+| *"scan di sps_engine semua tabel berawalan latihan_"* | `cari_tabel` | daftar tabel + jumlah baris + kolom + status dataset (sudah/belum) |
+| *"daftarkan semuanya sebagai dataset"* | `daftarkan_tabel` | dataset dibuat (yang sudah ada dipakai ulang), tautan + tombol **Buka di Studio Visual** |
+| *"gabungkan latihan_cabang, latihan_lokasi_pelanggan, latihan_penjualan jadi dataset detail"* | `gabung_dataset` | satu dataset lebar; kolom penghubung (mis. `kd_cabang`) dicari otomatis |
+
+Aturan keselamatan gabung:
+- **Banyak-ke-banyak dilewati.** Bila kunci tidak unik di kedua sisi (mis. pelanggan per cabang × penjualan per cabang),
+  tabel itu **dilewati dengan penjelasan** karena baris akan berlipat dan SUM/COUNT menjadi salah. Buat dataset terpisah.
+- **Hak akses ikut:** aturan RLS semua dataset asal disalin (dengan role yang sama). Bila kolom aturan itu hilang, penyimpanan ditolak.
+- Melihat tabel mentah butuh akses ke database itu (Admin); membuat dataset butuh izin *Kelola dataset*.
+- Model AI kecil kadang salah; **periksa hasilnya** di Jejak data dan Dataset sebelum dipakai pengguna. Detail: [docs/23](../23-asisten-ai-peran-ahli.md).
+
+### 6c. Kesegaran data di dashboard
+
+Label di bilah atas dashboard (*Data: 2 jam lalu* / *Data langsung*) dihitung dari **waktu ekstrak terakhir** (atau waktu
+tabel engine terakhir ditulis). Atur jadwal ekstrak sesuai kebutuhan pembaca (harian/jam); ekstrak **gagal** membuat label
+berbingkai jingga. Dataset yang membaca sumber langsung berlabel *Data langsung*.
+
+### 6d. Riwayat kueri
+
+**Kelola › Riwayat kueri** menampilkan kueri SQL Lab (siapa, kapan, status, lama). Pakai untuk menemukan kueri yang gagal atau
+lambat dari analis. Untuk chart & dashboard (bukan SQL Lab) yang lambat, pakai **Kesehatan kueri** (Level 4).
+
 ## 7. Daftar periksa sebelum dataset dipakai pengguna
 
 - [ ] Nama dataset & kolom jelas, kolom tanggal ditandai *temporal*
@@ -238,6 +275,12 @@ minta Superadmin menaikkan batas ([24](../24-superadmin-dan-batas-data.md)).
    maskapai mana yang pendapatannya terbesar (tanpa tiket Refund)? Berapa jadwal dari/ke DPS yang batal pada
    12–13 November 2024? Kamus data: [bahan-ajar/berkas/README.md](../bahan-ajar/berkas/README.md).
 
-Kunci jawaban: [bahan ajar Level 3](../bahan-ajar/level-3-admin-data.md#kunci-jawaban).
+- **T1.** Buat sebuah chart baru dari `latihan_penjualan`, lalu buka **Jejak data**. Apa yang berubah pada dataset itu?
+- **T2.** Panel ✦ `/data-engineer`: *"scan tabel berawalan latihan_ di sps_engine"*. Berapa tabel ditemukan?
+- **T3.** Minta Asisten menggabungkan `latihan_cabang`, `latihan_lokasi_pelanggan`, dan `latihan_penjualan`. Bagaimana hasilnya, dan apa yang
+    terjadi dengan tabel pelanggan? Login akun *Cabang Bandung*: apa yang terlihat di dataset hasil?
+- **T4.** Jalankan satu `SELECT` di SQL Lab, lalu cari kueri itu di **Riwayat kueri**.
+
+Kunci jawaban: [bahan ajar Level 3](../bahan-ajar/level-3-admin-data.md#kunci-jawaban); latihan **T1–T4**: [kunci tambahan](../bahan-ajar/level-3-admin-data.md#kunci-jawaban-tambahan).
 
 Lanjut ke [Level 4 · Admin server](level-4-admin-server.md).

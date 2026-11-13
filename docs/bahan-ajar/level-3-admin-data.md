@@ -94,6 +94,40 @@
 
 **Kunci:** 1b · 2b · 3a · 4b · 5b · 6a
 
+## Sesi tambahan (45 menit): Jejak data & Asisten AI untuk data
+
+| Menit | Kegiatan | Tutorial |
+|---|---|---|
+| 0–10 | Jejak data: baca dampak sebelum mengubah | [§6a](../tutorial/level-3-admin-data.md) |
+| 10–30 | Asisten AI: pindai tabel, daftarkan, gabung; diskusikan banyak-ke-banyak | [§6b](../tutorial/level-3-admin-data.md) |
+| 30–40 | kesegaran data & jadwal ekstrak; Riwayat kueri | [§6c–d](../tutorial/level-3-admin-data.md) |
+| 40–45 | tanya jawab | |
+
+### Latihan tambahan
+
+- **T1.** Buat chart baru dari `latihan_penjualan`, buka **Jejak data**: apa yang berubah?
+- **T2.** `/data-engineer`: *"scan tabel berawalan latihan_ di sps_engine"*: berapa tabel?
+- **T3.** Gabungkan `latihan_cabang`, `latihan_lokasi_pelanggan`, `latihan_penjualan` lewat Asisten: hasil, nasib tabel pelanggan, dan apa yang dilihat akun *Cabang Bandung*?
+- **T4.** Jalankan satu `SELECT` di SQL Lab, lalu temukan di **Riwayat kueri**.
+
+### Kunci jawaban tambahan
+
+| No | Jawaban |
+|---|---|
+| T1 | jumlah chart dataset bertambah **1**; chart baru tampil di kolom Chart; jumlah dashboard **tidak** bertambah (belum dipakai) |
+| T2 | **5** tabel: `latihan_cabang`, `latihan_lokasi_pelanggan`, `latihan_outlet`, `latihan_penjualan`, `latihan_penjualan_harian`, lengkap dengan jumlah baris dan status dataset |
+| T3 | dataset baru = penjualan + kolom cabang: **4.320 baris**, total **667B** (sama dengan asal); `latihan_lokasi_pelanggan` **dilewati** (banyak-ke-banyak: `kd_cabang` tidak unik di kedua sisi → SUM berlipat); akun Bandung hanya melihat `kd_cabang = 'C02'` (aturan RLS tersalin) |
+| T4 | kueri tampil dengan pengguna, waktu, status, dan lama |
+
+### Kuis tambahan
+
+7. Sebelum menghapus dataset, buka Jejak data karena… a) cepat **b) terlihat chart & dashboard yang terdampak** c) diwajibkan Superset
+8. Hubungan banyak-ke-banyak dilewati saat menggabung karena… **a) baris berlipat sehingga SUM/COUNT salah** b) tabel terlalu besar c) kolom bernama sama
+9. Dataset gabungan dari dataset ber-RLS… **a) mewarisi aturan hak akses semua dataset asal** b) terbuka untuk semua c) tanpa aturan
+10. Label *Data langsung* berarti… **a) dataset membaca sumber langsung (selalu terbaru)** b) ekstrak gagal c) server mati
+
+**Kunci:** 7b · 8a · 9a · 10a
+
 ## Daftar periksa kompetensi
 
 - [ ] Menghubungkan satu database lewat wizard (uji → simpan) dan mengimpor berkas Excel/Access
@@ -102,3 +136,7 @@
 - [ ] Membuat aturan RLS **dan membuktikan** dengan akun berlingkup terbatas
 - [ ] Membuat ekstrak terjadwal dan memindahkan chart
 - [ ] Mengunggah CSV ke ALDx Engine
+- [ ] Memeriksa dampak lewat Jejak data sebelum mengubah/menghapus dataset
+- [ ] Memindai & mendaftarkan tabel, serta menggabung dataset lewat Asisten AI, dan menjelaskan mengapa banyak-ke-banyak dilewati
+- [ ] Menjelaskan arti label kesegaran data dan mengatur jadwal ekstrak
+- [ ] Menemukan kueri analis di Riwayat kueri

@@ -163,12 +163,29 @@ Komentar tampil untuk orang lain setelah disetujui Superadmin. Detail: [docs/25]
 - Avatar › **Tampilan** › *Gelap* (atau *Ikuti sistem*). Dashboard ikut gelap; nyaman untuk layar pantau.
 - Di ponsel, tombol komentar, filter, Asisten & bantuan ada di tombol **…** kanan atas.
 
+## 6e. Dashboard lebih dalam: telusuri, tampilan tersimpan, kesegaran data, PowerPoint
+
+![Tampilan tersimpan](../gambar/app/n2-tampilan-tersimpan.png)
+
+| Ingin | Cara | Hasil yang benar |
+|---|---|---|
+| Melihat angka yang sama di dashboard lain | klik batang/irisan (mis. *Elektronik*) → **klik kanan** → **Telusuri ke dashboard lain…** → pilih dashboard tujuan | tujuan terbuka **sudah tersaring**; chip **← nama dashboard asal** di bilah atas mengantar pulang |
+| Menyimpan kombinasi filter | atur filter → tombol **Telusuri** (ikon dua kotak berpanah) → **Tampilan tersimpan** → ketik nama → **Simpan tampilan ini** | nama tampil di daftar; klik = dashboard terbuka dengan filter itu; **×** menghapus |
+| Tahu seberapa baru datanya | lihat bilah atas dashboard | **Data: 2 jam lalu** = data di ALDx Engine paling lama diperbarui 2 jam lalu · **Data langsung** = dibaca langsung dari sumber · bingkai jingga = lebih dari 2 hari atau penyegaran terakhir gagal |
+| Membuat slide presentasi | tombol **PowerPoint** (ikon layar presentasi) di bilah atas | berkas `.pptx`: sampul (judul, filter aktif, waktu) + **satu chart per slide** |
+
+Catatan:
+- Tampilan tersimpan **milik akun Anda** (maksimal 20 per dashboard); orang lain tidak melihatnya.
+- PowerPoint memuat chart pada **tab yang sedang tampil**; buka tab lain lalu ekspor lagi bila perlu.
+- Arahkan kursor ke label kesegaran untuk rincian per dataset. Detail: [docs/25 §2b–2c](../25-berkas-filter-global-ulasan.md),
+  [docs/26 §7b–7c](../26-langganan-versi-ponsel-lihat-sebagai.md).
+
 ---
 
 ## 7. Latihan mandiri
 
 Kerjakan di dashboard **Latihan: Dashboard Penjualan (fiktif)**. Jawaban di
-[bahan ajar Level 1](../bahan-ajar/level-1-pengguna.md#kunci-jawaban).
+[bahan ajar Level 1](../bahan-ajar/level-1-pengguna.md#kunci-jawaban); latihan **T1–T4**: [kunci tambahan](../bahan-ajar/level-1-pengguna.md#kunci-jawaban-tambahan).
 
 1. Berapa total penjualan seluruh data latihan?
 2. Cabang mana penjualannya paling besar?
@@ -178,6 +195,11 @@ Kerjakan di dashboard **Latihan: Dashboard Penjualan (fiktif)**. Jawaban di
 6. Buka panel Asisten AI (`Ctrl + I`), tanyakan *"penjualan per cabang"*, lalu ekspor tabel jawabannya ke Excel.
 7. Tulis komentar di dashboard latihan yang menyebut rekan Anda dengan `@`. Apa yang terlihat di avatar rekan itu
    setelah komentar disetujui?
+- **T1.** Di dashboard **Latihan: Dashboard Penjualan (fiktif)**, klik irisan **Elektronik** pada pie, **klik kanan** → *Telusuri ke
+   dashboard lain…* → pilih tujuan. Dashboard apa yang terbuka dan berapa total penjualannya?
+- **T2.** Simpan keadaan itu sebagai **tampilan tersimpan** bernama `Elektronik`, hapus semua filter, lalu buka tampilan itu lagi.
+- **T3.** Baca label kesegaran di dashboard *Latihan: Wilayah & Prediksi*. Apa artinya?
+- **T4.** Ekspor dashboard *Latihan: Wilayah & Prediksi* ke **PowerPoint**. Berapa slide yang dihasilkan?
 
 ## 8. Ringkasan
 
@@ -186,5 +208,8 @@ Kerjakan di dashboard **Latihan: Dashboard Penjualan (fiktif)**. Jawaban di
 - **⋮** di tiap chart: unduh, layar penuh, lihat tabel.
 - **✦ / `Ctrl + I`**: Asisten AI di halaman mana pun; **Ekspor** di tabel & grafik halaman ALDx.
 - Angka mengikuti hak akses Anda secara otomatis.
+- **Klik kanan** chart → telusuri ke dashboard lain; **Tampilan tersimpan** menyimpan filter bernama; label **Data: … lalu**
+  menunjukkan kesegaran; tombol **PowerPoint** membuat slide dari dashboard.
+- Peta semua menu & siapa yang memakainya: [docs/33](../33-peta-menu-per-level.md).
 
 Lanjut ke [Level 2 · Analis](level-2-analis.md) untuk membuat chart sendiri.

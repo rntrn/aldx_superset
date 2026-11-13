@@ -97,6 +97,25 @@ Tidak ada yang berubah sampai Anda menekan **Terapkan**; semua tercatat di Riway
 Peran **/ahli-ui-ux** (tab Identitas & Tema) bekerja sama untuk warna & huruf, lengkap dengan cek kontras.
 Rincian: [23](../23-asisten-ai-peran-ahli.md), [24](../24-superadmin-dan-batas-data.md).
 
+### 4c. Atur Asisten AI: model, cadangan, batas & keamanan
+
+Model dipasang di **Kelola › Asisten AI** (key dienkripsi) dan/atau `config\ai.yaml`. ALDx menyesuaikan diri dengan model lokal,
+gratis, maupun berbayar; yang perlu Anda atur:
+
+| Pengaturan (`config\ai.yaml`) | Bawaan | Fungsi |
+|---|---|---|
+| `bawaan` | model pertama | model yang terpilih pertama kali |
+| `batas_detik_model` / `batas_detik_lokal` | 120 / 240 | waktu tunggu **satu langkah** model cloud / lokal |
+| `batas_latar_detik` | 900 | batas total **satu pertanyaan** (berjalan di latar, tidak terikat timeout web) |
+| `cadangan_otomatis` | `true` | model sibuk/kuota habis (429/5xx, mis. Gemini 503) → coba ulang 2×, lalu beralih ke model aktif lain |
+| `batas_pertanyaan_per_jam` | 60 | per pengguna (Admin bebas); melindungi biaya model berbayar |
+| `kirim_data` (per model) | `false` untuk cloud | boleh/tidaknya angka dikirim ke model itu; pengalihan cadangan menghormatinya |
+
+Saran: **pasang minimal dua model** (mis. satu cloud gratis + satu lokal) agar pengalihan otomatis berguna.
+Lapisan keamanan bawaan: semua alat berjalan sebagai pengguna yang bertanya, isi data dianggap data (bukan perintah),
+API key disamarkan bila muncul di jawaban, maksimal 12 objek baru per pertanyaan. Uji berkala dengan butir 4.8–4.9 di
+[daftar periksa audit](../27-daftar-periksa-audit-keamanan.md). Detail: [docs/23](../23-asisten-ai-peran-ahli.md), [docs/28](../28-sambungkan-asisten-ai.md).
+
 ## 5. Hak akses kemampuan
 
 ![Hak akses](../gambar/tutorial/l4-04-izin.png)
@@ -133,6 +152,19 @@ Tab **Hak akses** menampilkan kotak kuning bila ada pengguna non-Admin yang bisa
 cabut role itu di Kelola › Pengguna kecuali memang disengaja.
 
 ---
+
+### 6a. Kesehatan kueri
+
+Menu **Kelola › Kesehatan kueri** (Admin): pilih periode 24 jam / 7 / 30 / 90 hari.
+
+| Bagian | Cara membaca |
+|---|---|
+| Ringkasan | jumlah kueri, **median**, **p95** (95% kueri lebih cepat dari angka ini), kueri lambat (> 5 detik), kueri gagal |
+| Chart paling lambat | diurutkan menurut p95; lencana *ALDx Engine* atau *langsung*; **saran**: ekstrak ke ALDx Engine, ringkas chart, atau atur cache |
+| Dashboard | waktu kueri chart di dalam tiap dashboard |
+| Kueri gagal | kueri SQL Lab dan penyegaran ekstrak yang gagal, beserta pesannya |
+
+Alur kerja: p95 tinggi → buka chart terlambat → ikuti sarannya (biasanya **ekstrak**) → ulangi pemeriksaan keesokan hari.
 
 ## 7. Ekstrak & engine
 
@@ -178,6 +210,31 @@ powershell -ExecutionPolicy Bypass -File scripts\jadwal-cadangan.ps1 -Salin \\na
 | **Urutan menyala, SOP, FAQ admin** | [19-runbook-faq-admin.md](../19-runbook-faq-admin.md) |
 | Identitas (nama, logo, warna) | Pusat Kendali → **Identitas & Tema** ([09](../09-identitas-tema.md)) |
 
+### 9a. Memperbarui ALDx (cara termudah)
+
+**Jalankan installer versi baru di atas instalasi lama, Next-Next.** Folder sama; `.env`, data, dashboard, dan pengguna tetap.
+
+| Komputer | Unduh dari Releases | Langkah |
+|---|---|---|
+| Ada internet | *ALDx terbaru*: `ALDx-Setup.exe` | klik dua kali → Next-Next |
+| Tanpa internet | *ALDx offline*: `ALDx-Setup-Offline.exe` + semua `.bin` (satu folder) | klik dua kali `.exe` → Next-Next |
+
+Setelah selesai: `Ctrl + F5` di browser; cek versi di kaki halaman login (mis. `v2026.11.13.6`); baca *Perlu dilakukan setelah
+memperbarui* di [catatan versi](../31-catatan-versi.md); jalankan `scripts\uji.ps1`. **Jangan** memakai `ALDx-HapusTotal.exe`
+untuk memperbarui (itu menghapus data). Panduan lengkap: [docs/29](../29-versi-pembaruan-hapus-total.md).
+
+### 9b. Masuk dengan SSO (OpenID Connect)
+
+Tombol **Masuk dengan Microsoft / Google / …** di halaman login, **tambahan** di samping password (akun lokal & LDAP tetap ada,
+sehingga Superadmin tetap bisa masuk bila penyedia SSO bermasalah).
+
+1. Daftarkan aplikasi di penyedia (Entra ID, Google, Keycloak, Okta) dengan alamat kembali `https://<alamat-aldx>/sso/kembali`.
+2. Isi `.env`: `SSO_DISCOVERY_URL`, `SSO_CLIENT_ID`, `SSO_CLIENT_SECRET`, `SSO_NAMA`, `SSO_DOMAIN` (domain email yang boleh),
+   `SSO_BUAT_AKUN` (0 = hanya email yang sudah didaftarkan; 1 = akun dibuat otomatis dengan role `SSO_ROLE_BAWAAN`).
+3. `docker compose up -d`, buka halaman login: tombol muncul. Coba dengan email domain benar dan domain lain (harus ditolak).
+
+Detail & tabel penyedia: [docs/05](../05-login-ldap.md#masuk-dengan-sso-openid-connect).
+
 ## 10. Prosedur bila ada gangguan
 
 ```
@@ -192,6 +249,24 @@ powershell -ExecutionPolicy Bypass -File scripts\jadwal-cadangan.ps1 -Salin \\na
 
 Pohon keputusan lengkap per gejala (web tidak terbuka, login gagal, lambat, ekstrak gagal):
 [19-runbook-faq-admin.md §4](../19-runbook-faq-admin.md#4-mencari-penyebab-gangguan-pohon-keputusan).
+
+## 10a. Sematkan dashboard ke web lain
+
+1. `.env`: `SPS_SEMATKAN_DOMAIN` (asal situs induk), `SPS_SEMATKAN_KUNCI` (acak ≥ 32 karakter, **hanya di server induk**),
+   `SPS_SEMATKAN_MENIT`; lalu `scripts\start.ps1`.
+2. Menu **Dashboard & Story › Sematkan ke web lain** → **Nyalakan** pada dashboard yang boleh disematkan → tombol **Cara pakai**
+   menampilkan contoh kode berisi alamat & id dashboard.
+3. **Server** aplikasi induk meminta token (`POST /sematkan/api/token` dengan header `X-ALDx-Kunci`, isi `rls` = baris yang
+   boleh dilihat penonton), lalu halaman memasang `<iframe src="…/sematkan/d/<uuid>?token=…&f.cabang=Bandung">`.
+4. **Matikan** kapan saja: semua halaman yang menyematkannya langsung berhenti menampilkannya.
+
+Tiga lapis pembatas: **RLS token** (baris), **filter URL** (tampilan), **domain** (situs yang boleh membingkai). Detail: [docs/30](../30-sematkan-dashboard.md).
+
+## 10b. Email: Langganan laporan & Peringatan data
+
+Isi di `.env` lalu `docker compose up -d`: `SMTP_HOST`, `SMTP_PORT` (587), `SMTP_STARTTLS=1`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_MAIL_FROM`.
+Tanpa `SMTP_HOST`, laporan & peringatan tetap terjadwal tetapi hanya **tercatat di log** (mode uji). Uji: buat satu Peringatan data
+dengan syarat yang pasti terpenuhi dan jadwal tiap menit, pastikan email tiba, lalu nonaktifkan. Detail: [docs/26 §1](../26-langganan-versi-ponsel-lihat-sebagai.md).
 
 ## 11. Latihan (di server uji)
 
@@ -208,4 +283,11 @@ Pohon keputusan lengkap per gejala (web tidak terbuka, login gagal, lambat, ekst
 9. Minta **/hw-engineer** mengusulkan pengaturan, **Abaikan** usulannya, lalu cek Riwayat: adakah perubahan?
 10. Login dengan akun uji dan password salah 5 kali. Apa pesannya? Buka kuncinya dari tab Riwayat, lalu cari kejadiannya di jejak audit.
 
-Kunci jawaban: [bahan ajar Level 4](../bahan-ajar/level-4-admin-server.md#kunci-jawaban).
+- **T1.** Buka **Kesehatan kueri** (24 jam). Catat median dan p95, chart paling lambat, dan sarannya.
+- **T2.** Pasang dua model di Asisten AI; rusak key satu model (mis. isi key salah) lalu ajukan pertanyaan memakai model itu. Apa yang terjadi?
+- **T3.** Set `batas_pertanyaan_per_jam: 3`; dari akun Analis kirim 4 pertanyaan. Apa yang terjadi, dan bagaimana dengan Admin? Kembalikan ke 60.
+- **T4.** Nyalakan sematan untuk satu dashboard, minta token dengan `curl`, tampilkan di halaman HTML sederhana, lalu coba `rls` berbeda.
+- **T5.** (Bila ada penyedia SSO) aktifkan tombol SSO dan uji email domain benar dan salah.
+- **T6.** Jalankan installer terbaru di atas instalasi lama pada server uji. Apa yang tetap, dan di mana Anda memeriksa versinya?
+
+Kunci jawaban: [bahan ajar Level 4](../bahan-ajar/level-4-admin-server.md#kunci-jawaban); latihan **T1–T6**: [kunci tambahan](../bahan-ajar/level-4-admin-server.md#kunci-jawaban-tambahan).

@@ -988,6 +988,34 @@ def jalankan_semua() -> None:
             raise RuntimeError("pencarian tidak menemukan 'ollama'")
         return f"{sum(len(i) for _, i in P.NAVIGASI)} halaman menu, {len(isi)} halaman terindeks"
 
+    @uji("Dokumentasi", "Tautan & gambar relatif di semua dokumen tidak mati; setiap menu tercakup tutorial")
+    def _():
+        import re as _re
+        from sps_panduan import tampilan as P
+        mati, jumlah = [], 0
+        for md in sorted(P.DOCS.rglob("*.md")):
+            teks = _re.sub(r"`[^`\n]*`", "", _re.sub(r"```.*?```", "", md.read_text(encoding="utf-8"), flags=_re.S))
+            for t in _re.findall(r"!?\[[^\]]*\]\(([^)\s]+)", teks) + _re.findall(r'(?:src|href)="([^"]+)"', teks):
+                if _re.match(r"(https?:|mailto:|#|\{)", t) or "releases" in t:
+                    continue
+                jumlah += 1
+                tujuan = (md.parent / t.split("#")[0]).resolve()
+                try:
+                    tujuan.relative_to(P.DOCS.resolve())
+                except ValueError:                       # menunjuk ke luar docs/ (README, docker/, ...): tidak ada di container
+                    continue
+                if t.split("#")[0] and not tujuan.exists():
+                    mati.append(f"{md.relative_to(P.DOCS)} -> {t}")
+        if mati:
+            raise RuntimeError(f"{len(mati)} tautan mati: " + "; ".join(mati[:4]))
+        peta = (P.DOCS / "33-peta-menu-per-level.md").read_text(encoding="utf-8")
+        tanpa = [n for n in ("Hubungkan data", "Jejak data", "Studio Visual", "Daftar chart", "Langganan laporan", "Peringatan data",
+                             "Sematkan ke web lain", "Auto chart & dashboard", "Kesehatan kueri", "Jejak audit", "Moderasi ulasan")
+                 if f"**{n}**" not in peta]
+        if tanpa:
+            raise RuntimeError("peta menu tidak memuat: " + ", ".join(tanpa))
+        return f"{jumlah} tautan/gambar diperiksa, semuanya ada; peta menu lengkap"
+
     @uji("2026.11.10", "Asisten AI: peta pengetahuan, konteks dashboard, kunci terenkripsi")
     def _():
         from sps_ai import kunci_api, status, pengaturan, wawasan

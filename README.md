@@ -1,24 +1,168 @@
-# ALDx — Advanced Learning & Data eXperience
+<div align="center" markdown="1">
 
-Platform dashboard & BI **siap pakai untuk perusahaan/instansi mana pun**, berbasis Apache Superset.
-Semua komponen berjalan di **Docker**: web, backgrounder, metadata (PostgreSQL), **ALDx Engine**
-(ClickHouse), cache (Redis), dan gateway. Nama, logo, dan warna bisa diganti kapan saja (white-label).
+# ALDx
+### Advanced Learning & Data eXperience
 
-## Memasang (pengguna biasa)
+**Dari data mentah ke dashboard, ramalan, dan jawaban AI, dalam satu aplikasi yang Anda miliki sendiri.**
 
-> **Baca [CARA-PASANG.md](CARA-PASANG.md)** — satu halaman, tanpa istilah teknis. Versi PDF: [docs/pdf/cara-pasang.pdf](docs/pdf/cara-pasang.pdf).
+![Rilis terakhir](https://img.shields.io/github/release-date/rntrn/aldx_superset?label=rilis%20terakhir&color=E11D74)
+![Apache Superset](https://img.shields.io/badge/Apache%20Superset-6.1-1F4E79)
+![Docker](https://img.shields.io/badge/Docker-siap%20pakai-0F9488)
+![Bahasa](https://img.shields.io/badge/bahasa-ID%20%C2%B7%20EN%20%C2%B7%20%E6%97%A5%E6%9C%AC%E8%AA%9E-6B7280)
+![Lisensi](https://img.shields.io/badge/lisensi-Apache%202.0-111827)
 
-1. **Tim TI, sekali:** pasang Docker Desktop, masukkan akun pengguna ke grup `docker-users`.
-2. **Unduh `ALDx-Setup.exe`**: [Releases › ALDx terbaru](../../releases/latest) (atau dari tim TI).
-3. **Klik dua kali `ALDx-Setup.exe`** › Lanjut › Lanjut › **Pasang** › Selesai › isi **akun Superadmin** › **Pasang** › **Buka aplikasi**.
+[Pasang](#pasang-dalam-3-langkah) · [Perjalanan](#dari-data-ke-keputusan-5-langkah) · [Fitur](#fitur-unggulan) · [Asisten AI](#asisten-ai-bintang-aplikasi) · [Belajar](#belajar-aldx-per-level) · [Dokumentasi](#dokumentasi)
 
-Tanpa internet: **`ALDx-Setup-Offline.exe`** + semua `.bin` ([Releases › ALDx offline](../../releases/tag/offline)), satu folder.
-Tanpa Setup.exe: Download ZIP › Extract All › klik dua kali `PASANG.cmd` (wizard yang sama).
-Menghapus: Settings › Apps › ALDx › Uninstall (container ikut terhapus; data hanya bila dipilih, dicadangkan dulu).
-Bersih tanpa sisa: **`ALDx-HapusTotal.exe`** (Releases) atau menu Start › *Hapus total (bersih)* ([docs/29](docs/29-versi-pembaruan-hapus-total.md)).
-Memperbarui: jalankan Setup terbaru di atas instalasi lama (data dipertahankan); yang baru & langkahnya: [docs/31](docs/31-catatan-versi.md).
+<img src="docs/gambar/app/a1-beranda.png" width="880" alt="Beranda ALDx: pencarian, langkah siap-pakai, dan menu sesuai alur kerja BI">
+
+</div>
+
+ALDx adalah platform **BI (dashboard & analitik) siap pakai untuk perusahaan atau instansi mana pun**, dibangun di atas
+Apache Superset. Semua berjalan di komputer/server **Anda sendiri** dengan Docker. Nama, logo, dan warna bisa diganti kapan saja.
+
+## Kenapa ALDx
+
+| | | |
+|---|---|---|
+| **🧩 Pasang tanpa ribet**<br>Installer Next-Next, versi online & offline, hapus bersih bila perlu | **🎨 Seret-lepas**<br>23 jenis chart, peta, ramalan, template dashboard, tanpa SQL | **🤖 Asisten AI di setiap halaman**<br>Model lokal, gratis, atau berbayar; menyesuaikan diri dengan modelnya |
+| **⚡ Cepat**<br>ALDx Engine (ClickHouse) untuk jutaan baris; ekstrak terjadwal | **🔐 Aman**<br>Hak akses per baris (RLS), SSO, LDAP, jejak audit, berkas terenkripsi | **🏠 Milik Anda**<br>Data tetap di server Anda, white-label, lisensi Apache 2.0 |
+
+## Pasang dalam 3 langkah
+
+> Panduan satu halaman tanpa istilah teknis: **[CARA-PASANG.md](CARA-PASANG.md)** · PDF: [docs/pdf/cara-pasang.pdf](docs/pdf/cara-pasang.pdf)
+
+| # | Langkah |
+|---|---|
+| 1 | **Tim TI, sekali:** pasang Docker Desktop dan masukkan akun pengguna ke grup `docker-users`. |
+| 2 | **Unduh [`ALDx-Setup.exe`](../../releases/tag/terbaru)** (Releases › *ALDx terbaru*). |
+| 3 | **Klik dua kali** › Lanjut › **Pasang** › isi **akun Superadmin** › **Buka aplikasi**. |
+
+| Keadaan | Caranya |
+|---|---|
+| **Tanpa internet** | `ALDx-Setup-Offline.exe` + semua `.bin` di satu folder ([Releases › ALDx offline](../../releases/tag/offline)) |
+| **Memperbarui** | jalankan installer baru **di atas** instalasi lama, Next-Next (data, dashboard, pengguna tetap) → [docs/29](docs/29-versi-pembaruan-hapus-total.md) |
+| **Menghapus** | Settings › Apps › ALDx › Uninstall; bersih tanpa sisa: `ALDx-HapusTotal.exe` |
+| **Tanpa Setup.exe** | Download ZIP › Extract All › klik dua kali `PASANG.cmd` (wizard yang sama) |
+
+Versi terpasang tampil di kaki halaman login dan bawah Beranda; yang baru di setiap versi: [docs/31](docs/31-catatan-versi.md).
+
+## Dari data ke keputusan: 5 langkah
+
+Sidebar ALDx disusun mengikuti alur kerja; angka 1–5 menunjukkan urutan membuat laporan.
+
+| Langkah | Menu | Yang dilakukan |
+|---|---|---|
+| **1 · Hubungkan** | Hubungkan data · Dataset | sambung database/data warehouse/Excel/CSV/Access; impor banyak tabel sekaligus |
+| **2 · Siapkan** | Persiapan data · Kueri Visual · Ekstrak | bersihkan, gabung tabel tanpa SQL, salin ke mesin cepat |
+| **3 · Visualkan** | Studio Visual | seret kolom → chart; peta; ramalan; kalkulasi cepat |
+| **4 · Susun** | Susun dashboard · Auto chart | dashboard dengan tab, filter, objek desain; atau dari template |
+| **5 · Bagikan** | Story · Langganan · PowerPoint · Sematkan | presentasi, email terjadwal, slide, tampil di web lain |
+
+Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33-peta-menu-per-level.md)**.
+
+## Fitur unggulan
+
+<table>
+<tr>
+<td width="50%"><img src="docs/gambar/tutorial/l2-07-ramalan.png" alt="Ramalan dengan pita keyakinan"></td>
+<td width="50%"><img src="docs/gambar/app/n1-jelaskan-perubahan.png" alt="Jelaskan perubahan: penyumbang terbesar per dimensi"></td>
+</tr>
+<tr>
+<td><b>Studio Visual</b>: 23 jenis chart, peta provinsi/titik, ramalan Holt-Winters dengan pita keyakinan, tren, anomali.</td>
+<td><b>Jelaskan perubahan</b>: klik kanan sebuah periode, lihat siapa penyumbang terbesar naik/turunnya.</td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/gambar/app/n3-dashboard-template.png" alt="Dashboard dari template"></td>
+<td width="50%"><img src="docs/gambar/app/n2-tampilan-tersimpan.png" alt="Tampilan tersimpan di panel Telusuri"></td>
+</tr>
+<tr>
+<td><b>Dashboard dari template</b>: pilih dataset, ALDx menyusun angka utama, tren, peringkat, peta, dan filter.</td>
+<td><b>Telusuri & tampilan tersimpan</b>: pindah ke dashboard lain dengan filter terbawa; simpan kombinasi filter dengan nama.</td>
+</tr>
+</table>
+
+| Area | Isi |
+|---|---|
+| **Analitik** | % dari total · kumulatif · YoY · rata bergerak · target · simulasi what-if · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
+| **Dashboard** | tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
+| **Berbagi** | ekspor PNG/PDF/Excel/CSV · **PowerPoint** · berkas `.ald/.aldx` terenkripsi · Story · langganan laporan & peringatan data via email · sematkan ke web lain dengan RLS per penonton |
+| **Data** | 14+ jenis database + Access/Excel/CSV · jejak data (lineage) · persiapan data tanpa SQL · gabung otomatis · ekstrak ke ALDx Engine |
+| **Admin** | Pusat Kendali (pengaturan, batas, topologi) · kesehatan kueri · jejak audit · cadangan & pulihkan · multi-node · HTTPS |
+| **Tampilan** | white-label (preset **Tinta & Sakura**, Neon malam, warna manual) · mode gelap · Indonesia / English / 日本語 · ponsel |
+
+## Asisten AI: bintang aplikasi
+
+<img src="docs/gambar/app/a10-panel-ai.png" width="720" alt="Panel Asisten AI">
+
+Tekan **`Ctrl + I`** di halaman mana pun. Asisten paham isi aplikasi (dataset, chart, dashboard) dan halaman yang sedang dibuka.
+
+| Anda minta | Asisten melakukan |
+|---|---|
+| *"penjualan per cabang bulan ini?"* | mengambil angka dengan hak akses Anda, menampilkan tabel, bisa diekspor |
+| *"buat dashboard dari dataset latihan_penjualan"* | membuat chart lalu dashboard, tautan langsung di bawah jawaban |
+| *"scan tabel berawalan data_ di sps_engine"* | memindai tabel database, jumlah baris, status dataset |
+| *"gabungkan dataset A, B, C jadi dataset detail"* | menggabung otomatis; menolak gabungan yang membuat angka berlipat; RLS ikut |
+| *"ringkas dashboard ini dalam 5 poin"* | membaca dashboard yang terbuka lalu meringkas |
+
+**Bekerja dengan model apa pun**
+
+| Jenis | Contoh | Penyesuaian otomatis |
+|---|---|---|
+| **Lokal** | Ollama, LM Studio (Qwen, Llama, …) | model bernalar (`<think>`) dibersihkan; model tanpa function calling memakai mode teks; konteks kecil diringkas |
+| **Gratis** | Gemini, Groq, OpenRouter, Cerebras, Mistral, GitHub Models | penyedia sibuk/kuota habis → coba ulang, lalu **beralih ke model cadangan** |
+| **Berbayar** | OpenAI, Azure, Anthropic, DeepSeek, dan API setara OpenAI | batas pertanyaan per pengguna per jam melindungi biaya |
+
+**Terintegrasi:** progres langkah tampil langsung dan bisa **dibatalkan**; hasil berupa tautan ke Studio Visual; tombol saran langkah berikutnya.
+**Aman:** semua alat berjalan sebagai **pengguna yang bertanya** (RLS berlaku), isi data diperlakukan sebagai data (bukan perintah), API key disamarkan,
+maksimal 12 objek baru per pertanyaan, angka hanya dikirim ke model yang diizinkan (`kirim_data`).
+Panduan: [docs/28 · Sambungkan Asisten AI](docs/28-sambungkan-asisten-ai.md) · [docs/23 · Peran ahli, keamanan](docs/23-asisten-ai-peran-ahli.md).
+
+## Belajar ALDx per level
+
+Setiap level punya **tutorial bergambar** (untuk peserta), **bahan ajar** (untuk pengajar: rencana sesi, latihan, kunci jawaban, kuis),
+dan **PDF** siap cetak. Data latihan fiktif dimuat otomatis oleh installer, jadi semua latihan bisa dicoba di instalasi baru.
+
+| Level | Untuk siapa | Bisa apa setelah selesai | Waktu | Materi |
+|---|---|---|---|---|
+| **1 · Pengguna** | semua pengguna | membaca & menyaring dashboard, telusuri, PowerPoint, bertanya ke AI | 1 jam | [tutorial](docs/tutorial/level-1-pengguna.md) · [bahan ajar](docs/bahan-ajar/level-1-pengguna.md) |
+| **2 · Analis** | pembuat laporan | chart, peta, ramalan, dashboard, Kueri Visual, laporan terjadwal | 3 jam | [tutorial](docs/tutorial/level-2-analis.md) · [bahan ajar](docs/bahan-ajar/level-2-analis.md) |
+| **3 · Admin data** | pengelola data | sumber data, dataset, persiapan data, hak akses (RLS), ekstrak, AI untuk data | 3 jam | [tutorial](docs/tutorial/level-3-admin-data.md) · [bahan ajar](docs/bahan-ajar/level-3-admin-data.md) |
+| **4 · Admin server** | tim TI | memasang, memantau, keamanan, SSO, sematan, cadangan, pembaruan | 4 jam | [tutorial](docs/tutorial/level-4-admin-server.md) · [bahan ajar](docs/bahan-ajar/level-4-admin-server.md) |
+
+Untuk penyelenggara pelatihan: **[Alur pelatihan](docs/bahan-ajar/alur-pelatihan.md)** (kalender, penilaian, tindak lanjut) dan
+**[Peta menu per level](docs/33-peta-menu-per-level.md)** (semua menu × level × tempat belajarnya). PDF: [`docs/pdf/`](docs/pdf/README.md)
+(tutorial semua level, bahan ajar lengkap, manual lengkap, skenario UAT).
+
+## Keamanan ringkas
+
+| Lapisan | Perlindungan |
+|---|---|
+| **Data** | hak akses per baris (RLS) per role atau otomatis dari profil; sematan dengan RLS per penonton; uji dengan *Lihat sebagai…* |
+| **Login** | akun lokal, LDAP/Active Directory, **SSO (OpenID Connect)**; akun terkunci otomatis setelah salah berulang; HTTPS opsional |
+| **Berkas** | `.ald/.aldx` selalu terenkripsi; tanpa password koneksi; impor tertutup untuk orang lain |
+| **Jejak** | audit login, unduh data, ekspor/impor, perubahan hak akses; role bawaan berhak minimum |
+| **AI** | berjalan dengan hak pengguna, pertahanan *prompt injection*, rahasia disamarkan, batas pemakaian |
+| **Mutu** | uji otomatis (`scripts\uji.ps1`) dan [daftar periksa audit keamanan](docs/27-daftar-periksa-audit-keamanan.md) |
+
+## Dokumentasi
+
+| Saya… | Baca |
+|---|---|
+| bingung mulai dari mana | **[docs/00 · Mulai di sini](docs/00-mulai-di-sini.md)** (peta per peran) |
+| ingin tahu fungsi tiap menu | [docs/33 · Peta menu per level](docs/33-peta-menu-per-level.md) |
+| memasang atau memperbarui | [CARA-PASANG.md](CARA-PASANG.md) · [docs/29](docs/29-versi-pembaruan-hapus-total.md) |
+| membuat chart & dashboard | [docs/12 · Studio Visual](docs/12-studio-visual.md) · [docs/17 · Katalog chart](docs/17-katalog-chart-peta-prediksi.md) |
+| mengelola data & hak akses | [docs/06](docs/06-sumber-data.md) · [docs/08](docs/08-hak-akses-data.md) · [docs/13](docs/13-sps-engine-ekstrak.md) |
+| mengelola server | [docs/11 · Pusat Kendali](docs/11-pusat-kendali-server.md) · [docs/19 · Runbook](docs/19-runbook-faq-admin.md) |
+| ingin tahu yang baru | [docs/31 · Catatan versi](docs/31-catatan-versi.md) |
+| membandingkan dengan Tableau, Power BI, Looker | [docs/32](docs/32-perbandingan-fitur-bi.md) |
+
+Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar isi, mode gelap, tanpa internet).
 
 ---
+
+<details markdown="1">
+<summary><b>Ringkasan teknis lengkap</b> (untuk tim TI)</summary>
 
 ## Ringkasan teknis
 
@@ -52,7 +196,7 @@ Memperbarui: jalankan Setup terbaru di atas instalasi lama (data dipertahankan);
 | Versi | versi terpasang di halaman login & bawah Beranda, dengan status *Versi terbaru / Pembaruan tersedia* ([docs/29](docs/29-versi-pembaruan-hapus-total.md)) |
 | Mutu | `scripts\uji.ps1` di server; daftar periksa audit keamanan [docs/27](docs/27-daftar-periksa-audit-keamanan.md) |
 
-**Mulai membaca:** [`docs/00-mulai-di-sini.md`](docs/00-mulai-di-sini.md) (peta dokumentasi per peran). **Apa yang baru:** [`docs/31-catatan-versi.md`](docs/31-catatan-versi.md).
+</details>
 
 ---
 

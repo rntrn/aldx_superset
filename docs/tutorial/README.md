@@ -5,14 +5,17 @@ angka di dalam lingkaran emas pada gambar menunjukkan urutan bagian yang dibahas
 
 | Level | Untuk siapa | Bisa apa setelah selesai | Waktu belajar |
 |---|---|---|---|
-| [Level 1 · Pengguna](level-1-pengguna.md) | semua pengguna | login, membaca & menyaring dashboard, mengunduh data, bertanya ke Asisten AI | 1 jam |
-| [Level 2 · Analis](level-2-analis.md) | pembuat laporan di unit kerja | membuat chart & dashboard sendiri dengan seret-lepas, peta, ramalan | 3 jam |
-| [Level 3 · Admin data](level-3-admin-data.md) | pengelola data di unit/divisi | menghubungkan sumber data, menyiapkan dataset, ekstrak, hak akses data | 3 jam |
-| [Level 4 · Admin server](level-4-admin-server.md) | tim TI pengelola server | memasang, memantau, mengatur kapasitas, mencadangkan, upgrade | 4 jam |
+| [Level 1 · Pengguna](level-1-pengguna.md) | semua pengguna | login, membaca & menyaring dashboard, telusuri, tampilan tersimpan, PowerPoint, bertanya ke Asisten AI | 1 jam |
+| [Level 2 · Analis](level-2-analis.md) | pembuat laporan di unit kerja | chart & dashboard dengan seret-lepas, peta, ramalan, template, tab, Auto chart, laporan & peringatan email | 3 jam |
+| [Level 3 · Admin data](level-3-admin-data.md) | pengelola data di unit/divisi | sumber data, dataset, ekstrak, hak akses data, jejak data, pindai & gabung dataset lewat AI | 3 jam |
+| [Level 4 · Admin server](level-4-admin-server.md) | tim TI pengelola server | memasang, memantau, kapasitas, cadangan, upgrade, SSO, sematan, kesehatan kueri, pengaturan AI | 4 jam |
 
 Setiap level mengandaikan level sebelumnya sudah dikuasai.
 
-**Bahan untuk pengajar** (rencana sesi, latihan, kuis, kunci jawaban): [../bahan-ajar/](../bahan-ajar/README.md)
+**Tidak yakin menu mana untuk siapa?** Lihat [peta menu per level](../33-peta-menu-per-level.md): semua menu, fungsinya, dan bagian tutorial yang membahasnya.
+
+**Bahan untuk pengajar** (rencana sesi, latihan, kuis, kunci jawaban): [../bahan-ajar/](../bahan-ajar/README.md) ·
+**alur pelatihan** (kalender, penilaian, tindak lanjut): [../bahan-ajar/alur-pelatihan.md](../bahan-ajar/alur-pelatihan.md)
 
 ## Data latihan
 
