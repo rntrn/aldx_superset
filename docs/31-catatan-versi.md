@@ -38,6 +38,8 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
+| Asisten AI | Menyesuaikan diri dengan model apa pun: blok `<think>` dibuang, **mode teks** untuk model tanpa function calling, **ringkas otomatis** untuk model berkonteks kecil, tabel markdown dirender rapi | [23](23-asisten-ai-peran-ahli.md) |
+| Asisten AI | Keamanan: pertahanan *prompt injection*, rahasia disamarkan di jawaban, maks. 12 objek baru per pertanyaan, maks. 60 pertanyaan/pengguna/jam (Admin bebas) | [23](23-asisten-ai-peran-ahli.md), [27](27-daftar-periksa-audit-keamanan.md) |
 | Asisten AI | Andal di semua jenis model: **coba ulang** saat penyedia sibuk (429/5xx, mis. Gemini 503), **beralih otomatis ke model cadangan** (aturan privasi dijaga), pesan galat per jenis | [23](23-asisten-ai-peran-ahli.md) |
 | Asisten AI | Ketepatan model lokal: pemanggilan alat yang ditulis sebagai teks dibaca, nama dataset dirapikan jadi id | [23](23-asisten-ai-peran-ahli.md) |
 | Asisten AI | Alat **cari_tabel** & **daftarkan_tabel** (pindai tabel database, mis. berawalan `data_penerbangan`); **tombol langkah berikutnya** & **Buka di Studio Visual** di bawah jawaban | [23](23-asisten-ai-peran-ahli.md) |
@@ -74,7 +76,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 | Cara memasang | Langkah |
 |---|---|
-| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **82/82 LULUS**) → browser `Ctrl + F5` |
+| **git** | `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\sinkron-laptop.ps1` (folder hasil Setup.exe: tambah `-JadikanGit` sekali; ambil versi baru, terapkan, uji: harus **83/83 LULUS**) → browser `Ctrl + F5` |
 | **ALDx-Setup.exe** (online) | pastikan tanggal exe di Releases **setelah** rilis ini → jalankan di atas instalasi lama (folder sama; data & `.env` dipertahankan) → `Ctrl + F5` |
 | **ALDx-Setup-Offline.exe** + `.bin` | sama dengan online; semua fitur baru jalan **tanpa internet** (huruf, peta, ECharts, gambar tersimpan lokal) |
 

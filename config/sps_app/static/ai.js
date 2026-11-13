@@ -88,8 +88,20 @@
     let html = "";
     for (let i = 0; i < bagian.length; i++) {
       if (i % 3 === 0) {
-        html += esc(bagian[i]).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")
-          .replace(/^\s*[-*] (.*)$/gm, "• $1").replace(/\n/g, "<br>");
+        // Tabel markdown (| a | b |) -> tabel kecil; judul "## x" -> tebal. Semua teks tetap di-escape.
+        const teks = bagian[i].replace(/((?:^\|.*\|[ \t]*\n?)+)/gm, blok => {
+          const baris = blok.trim().split("\n").filter(b => !/^\|[\s:|-]+\|$/.test(b.trim()));
+          const sel = b => b.trim().replace(/^\||\|$/g, "").split("|").map(x => x.trim());
+          return baris.length < 2 ? blok : `\u0000${btoa(unescape(encodeURIComponent(JSON.stringify(baris.map(sel)))))}\u0000\n`;
+        });
+        html += esc(teks).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>")
+          .replace(/^#{1,4}\s+(.*)$/gm, "<b>$1</b>")
+          .replace(/^\s*[-*] (.*)$/gm, "• $1").replace(/\n/g, "<br>")
+          .replace(/\u0000([A-Za-z0-9+/=]+)\u0000/g, (_, k) => {
+            const [kepala, ...isi] = JSON.parse(decodeURIComponent(escape(atob(k))));
+            return `<div class="tabel-ai"><table><tr>${kepala.map(x => `<th>${esc(x)}</th>`).join("")}</tr>` +
+              isi.map(b => `<tr>${b.map(x => `<td>${esc(x)}</td>`).join("")}</tr>`).join("") + "</table></div>";
+          }).replace(/<\/div><br>/g, "</div>");
       } else if (i % 3 === 2) {
         html += `<div class="kode-ai" data-ekspor="${esc(bagian[i - 1] || "kode")}"><pre>${esc(bagian[i].trim())}</pre>` +
                 `<button type="button" class="salin-kode">${esc(t("Salin"))}</button></div>`;
