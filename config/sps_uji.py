@@ -346,6 +346,13 @@ def jalankan_semua() -> None:
                             db.session.delete(f)
                     db.session.delete(baru)
                     db.session.commit()
+                from sps_ai import latar
+                if latar.tersedia():                        # status pertanyaan latar hanya untuk pemiliknya
+                    latar._tulis("uji__job", {"username": "uji__a", "status": "jalan", "peristiwa": [], "mulai": 0})
+                    if latar.status("uji__job", "uji__b") is not None or latar.status("uji__job", "uji__a") is None:
+                        raise RuntimeError("status pertanyaan latar bocor ke akun lain")
+                if gabung.nama_bebas("latihan_penjualan", ds["latihan_penjualan"].database_id) == "latihan_penjualan":
+                    raise RuntimeError("nama dataset bentrok tidak diberi akhiran")
                 if not 60 <= agen.batas_total() <= 330:
                     raise RuntimeError(f"batas total AI {agen.batas_total()} tidak di bawah batas web")
                 return f"{int(df['n'][0])} baris (tidak berlipat), {len(rls)} aturan RLS tersalin; batas AI {agen.batas_total()} dtk"

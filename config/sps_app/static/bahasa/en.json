@@ -640,6 +640,8 @@
 "Asisten AI belum bisa dihubungi.": "The AI Assistant cannot be reached yet.",
 "Berpikir…": "Thinking…",
 "Jawaban server tidak terbaca": "The server reply could not be read",
+"Membatalkan setelah langkah ini…": "Cancelling after this step…",
+"Asisten gagal menjawab": "The assistant failed to answer",
 "Server memutus permintaan karena model AI terlalu lama menjawab. Pakai model yang lebih cepat atau pecah permintaan menjadi langkah lebih kecil.": "The server cut the request because the AI model took too long. Use a faster model or split the request into smaller steps.",
 "Salin": "Copy",
 "Tersalin": "Copied",

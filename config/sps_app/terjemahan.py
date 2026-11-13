@@ -431,6 +431,8 @@ TAHAP2 = [
     ('Asisten AI belum bisa dihubungi.', 'The AI Assistant cannot be reached yet.', 'AI アシスタントに接続できません。'),
     ('Berpikir…', 'Thinking…', '考え中…'),
     ('Jawaban server tidak terbaca', 'The server reply could not be read', 'サーバーの応答を読み取れません'),
+    ('Membatalkan setelah langkah ini…', 'Cancelling after this step…', 'この手順の後でキャンセルします…'),
+    ('Asisten gagal menjawab', 'The assistant failed to answer', 'アシスタントが回答できませんでした'),
     ('Server memutus permintaan karena model AI terlalu lama menjawab. Pakai model yang lebih cepat atau pecah permintaan menjadi langkah lebih kecil.',
      'The server cut the request because the AI model took too long. Use a faster model or split the request into smaller steps.',
      'AI モデルの応答が遅すぎるため、サーバーが要求を切断しました。より高速なモデルを使うか、要求を小さく分けてください。'),

@@ -38,6 +38,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Data | Halaman **Jejak data** (lineage): sumber → dataset → chart → dashboard, untuk melihat dampak sebelum mengubah dataset | [26 §7](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Dashboard | **Label kesegaran data** di bilah atas (*Data: 2 jam lalu* / *Data langsung*), rincian per dataset | [26 §7b](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Studio | **Simulasi what-if**: geser satu ukuran −50%…+100% (hanya pratinjau) | [12](12-studio-visual.md#simulasi-what-if) |
+| Asisten AI | **Progres langsung** (waktu & langkah yang selesai) dan tombol **Batalkan**; pertanyaan berjalan di latar belakang hingga 15 menit, tidak lagi terpotong batas web | [23](23-asisten-ai-peran-ahli.md) |
 | Asisten AI | Alat **gabung dataset** (denormal/detail): kunci otomatis, banyak-ke-banyak dilewati, RLS ikut. Pertanyaan berhenti rapi sebelum batas server (pesan langkah yang sudah selesai) | [23](23-asisten-ai-peran-ahli.md) |
 | Persiapan data | Aturan RLS biasa per role kini ikut disalin saat menggabung/menyimpan dataset (sebelumnya ditolak) | [12](12-studio-visual.md#gabung-data-join) |
 | Studio | Penyusun dashboard: **tab** dan **tinggi kotak** per chart | [12 §2](12-studio-visual.md#2-susun-dashboard) |

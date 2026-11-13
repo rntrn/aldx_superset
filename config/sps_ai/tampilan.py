@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from functools import wraps
 from pathlib import Path
 
@@ -160,6 +161,50 @@ def api_chat():
         konteks = {k: str(konteks.get(k) or "")[:lim] for k, lim in (("alamat", 400), ("judul", 120), ("teks", 4000))}
     return jsonify(agen.jawab(d.get("riwayat") or [], model, atur, g.user.username,
                               peran.ambil(d.get("peran")), konteks, bahasa_aktif()))
+
+
+@bp.route("/api/chat/mulai", methods=["POST"])
+@_butuh_akses()
+def api_chat_mulai():
+    """Sama dengan /api/chat, tetapi di latar belakang: {id}. Tanpa Redis -> {sinkron: true} (pakai /api/chat)."""
+    from flask import current_app
+
+    from sps_ai import latar
+    from sps_app.tampilan import bahasa_aktif
+    if not latar.tersedia():
+        return jsonify(sinkron=True)
+    d = _data()
+    atur = pengaturan.muat()
+    model = atur.cari_model(d.get("model"))
+    konteks = d.get("konteks") if isinstance(d.get("konteks"), dict) else None
+    if konteks:
+        konteks = {k: str(konteks.get(k) or "")[:lim] for k, lim in (("alamat", 400), ("judul", 120), ("teks", 4000))}
+    riwayat, p, bahasa, username = d.get("riwayat") or [], peran.ambil(d.get("peran")), bahasa_aktif(), g.user.username
+
+    def kerja(kemajuan, dibatalkan):
+        return agen.jawab(riwayat, model, atur, username, p, konteks, bahasa,
+                          kemajuan=kemajuan, dibatalkan=dibatalkan, batas=atur.batas_latar)
+    try:
+        return jsonify(id=latar.mulai(current_app._get_current_object(), g.user.id, username, kerja))
+    except ValueError as e:
+        return jsonify(error=str(e)), 409
+
+
+@bp.route("/api/chat/status/<job_id>")
+@_butuh_akses()
+def api_chat_status(job_id: str):
+    from sps_ai import latar
+    j = latar.status(job_id, g.user.username)
+    if j is None:
+        return jsonify(error="Pertanyaan tidak ditemukan (sudah kedaluwarsa atau milik akun lain)."), 404
+    return jsonify({**j, "detik": int(time.time() - j["mulai"]) if j.get("mulai") else None})
+
+
+@bp.route("/api/chat/batal/<job_id>", methods=["POST"])
+@_butuh_akses()
+def api_chat_batal(job_id: str):
+    from sps_ai import latar
+    return jsonify(ok=latar.batal(job_id, g.user.username))
 
 
 # --- Auto chart / dashboard ---------------------------------------------------------------

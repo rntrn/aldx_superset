@@ -312,6 +312,42 @@
   }
 
   // ---------------- Kirim ----------------
+  const kirimJson = (alamat, isi) => fetch(alamat, {method: "POST", credentials: "same-origin",
+    headers: {"Content-Type": "application/json", "X-CSRFToken": AWAL.csrf}, body: isi});
+  const jedaMs = ms => new Promise(r => setTimeout(r, ms));
+  // Bukan JSON = permintaan diputus di tengah jalan (biasanya model terlalu lama, atau server dimulai ulang).
+  const bacaJson = r => r.json().catch(() => ({error: [502, 503, 504].includes(r.status)
+    ? t("Server memutus permintaan karena model AI terlalu lama menjawab. Pakai model yang lebih cepat atau pecah permintaan menjadi langkah lebih kecil.")
+    : `${t("Jawaban server tidak terbaca")} (HTTP ${r.status})`}));
+
+  // Mode latar (sps_ai/latar.py): pertanyaan berjalan di server, panel menanyakan statusnya tiap 1,5 detik
+  // -> langkah tampil langsung, tidak terikat timeout web, bisa dibatalkan. null = server tanpa mode latar.
+  async function tanyaLatar(isi, tunggu) {
+    const r = await kirimJson("/asisten/api/chat/mulai", isi), awal = await bacaJson(r);
+    if (!r.ok) throw new Error(awal.error || r.status);
+    if (awal.sinkron) return null;
+    const tombol = tunggu.querySelector(".batal-ai"), jejak = tunggu.querySelector(".langkah-ai"), teks = tunggu.querySelector(".status-ai");
+    tombol.hidden = false;
+    tombol.onclick = () => { tombol.disabled = true; teks.textContent = t("Membatalkan setelah langkah ini…"); kirimJson(`/asisten/api/chat/batal/${awal.id}`, "{}"); };
+    let tampil = 0;
+    for (;;) {
+      await jedaMs(1500);
+      const s = await bacaJson(await fetch(`/asisten/api/chat/status/${awal.id}`, {credentials: "same-origin"}));
+      if (s.error) throw new Error(s.error);
+      (s.peristiwa || []).slice(tampil).forEach(x => jejak.insertAdjacentHTML("beforeend", `<span>${ik("centang", 13)}${esc(t(x.teks))}</span>`));
+      tampil = (s.peristiwa || []).length;
+      if (!tombol.disabled && s.detik != null) teks.textContent = `${t("Berpikir…")} ${Math.floor(s.detik / 60)}:${String(s.detik % 60).padStart(2, "0")}`;
+      $("#obrolanAi").scrollTop = 1e9;
+      if (s.status === "selesai") return s.hasil;
+      if (s.status === "gagal") throw new Error(s.galat || t("Asisten gagal menjawab"));
+    }
+  }
+  async function tanyaLangsung(isi) {
+    const r = await kirimJson("/asisten/api/chat", isi), j = await bacaJson(r);
+    if (!r.ok) throw new Error(j.error || r.status);
+    return j;
+  }
+
   async function kirim(teks) {
     teks = String(teks || "").trim();
     if (!teks || sibuk) return;
@@ -324,18 +360,13 @@
     gelembung("saya", `${riwayat.length && riwayat.peranTerakhir === peranAktif ? "" : `<span class="label-peran">${esc(p.perintah)}</span>`}${esc(teks)}`);
     riwayat.peranTerakhir = peranAktif;
     riwayat.push({role: "user", content: teks});
-    const tunggu = gelembung("ai memuat", `<span class="titik"><i></i><i></i><i></i></span> ${esc(t("Berpikir…"))}`);
+    const tunggu = gelembung("ai memuat", `<span class="titik"><i></i><i></i><i></i></span> <span class="status-ai">${esc(t("Berpikir…"))}</span>
+      <div class="langkah-ai langsung"></div><button type="button" class="batal-ai" hidden>${esc(t("Batalkan"))}</button>`);
     sibuk = true; $("#kirimAi").disabled = true;
     try {
-      const r = await fetch("/asisten/api/chat", {method: "POST", credentials: "same-origin",
-        headers: {"Content-Type": "application/json", "X-CSRFToken": AWAL.csrf},
-        body: JSON.stringify({riwayat, model: $("#modelAi").value, peran: peranAktif, konteks: konteksHalaman()})});
-      // Bukan JSON = permintaan diputus di tengah jalan (biasanya model terlalu lama, atau server dimulai ulang).
-      const j = await r.json().catch(() => ({error: [502, 503, 504].includes(r.status)
-        ? t("Server memutus permintaan karena model AI terlalu lama menjawab. Pakai model yang lebih cepat atau pecah permintaan menjadi langkah lebih kecil.")
-        : `${t("Jawaban server tidak terbaca")} (HTTP ${r.status})`}));
+      const isi = JSON.stringify({riwayat, model: $("#modelAi").value, peran: peranAktif, konteks: konteksHalaman()});
+      const j = await tanyaLatar(isi, tunggu) || await tanyaLangsung(isi);
       tunggu.remove();
-      if (!r.ok) throw new Error(j.error || r.status);
       const wadah = gelembung("ai", "");
       (j.peristiwa || []).filter(x => x.tipe === "langkah").forEach(x => tampilPeristiwa(x, wadah));
       wadah.insertAdjacentHTML("beforeend", `<div class="teks-ai">${md(j.jawaban)}</div>`);

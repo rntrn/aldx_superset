@@ -36,6 +36,7 @@ class Pengaturan:
     baris_ke_model: int
     batas_detik_model: int
     batas_detik_lokal: int = 240
+    batas_latar: int = 900          # detik total satu pertanyaan di latar belakang (tidak terikat timeout web)
 
     def batas_untuk(self, model: "ModelAI") -> int:
         """Model lokal (tanpa key, sering di CPU) diberi waktu lebih lama daripada layanan cloud."""
@@ -109,4 +110,5 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
         baris_ke_model=int(data.get("baris_ke_model", 50)),
         batas_detik_model=int(data.get("batas_detik_model", 120)),
         batas_detik_lokal=int(data.get("batas_detik_lokal", 240)),
+        batas_latar=max(60, min(int(data.get("batas_latar_detik", 900)), 3600)),
     )
