@@ -74,6 +74,34 @@
   catch (e) { induk = null; }
   if (!induk || window.__spsBingkai) return;
   window.__spsBingkai = true;
+
+  // ---- Klik kanan chart di dashboard -> "Telusuri ke dashboard lain…" (drill-through ala Power BI) ----
+  // Butir ditambahkan ke menu klik kanan bawaan chart. Saat dipilih: nilai yang diklik dijadikan klik-filter
+  // (bila chart mendukung), lalu panel Telusuri di cangkang dibuka dengan filter itu (telusur.js).
+  if (location.pathname.startsWith("/superset/dashboard/")) {
+    const TEKS = {id: "Telusuri ke dashboard lain…", en: "Drill through to another dashboard…", ja: "別のダッシュボードへドリルスルー…"};
+    const sisipkan = menu => {
+      const daftar = menu.querySelector("ul.ant-dropdown-menu");
+      if (!daftar || daftar.querySelector("[data-sps-telusur]")) return;
+      const butir = document.createElement("li");
+      butir.className = "ant-dropdown-menu-item ant-dropdown-menu-item-only-child"; butir.setAttribute("role", "menuitem");
+      butir.dataset.spsTelusur = "1";
+      butir.innerHTML = '<span class="ant-dropdown-menu-title-content"></span>';
+      butir.firstChild.textContent = TEKS[(document.documentElement.lang || "id").slice(0, 2)] || TEKS.id;
+      butir.onmouseenter = () => butir.classList.add("ant-dropdown-menu-item-active");
+      butir.onmouseleave = () => butir.classList.remove("ant-dropdown-menu-item-active");
+      butir.onclick = () => {
+        const silang = daftar.querySelector('[data-menu-id$="cross-filtering-menu-item"]');
+        const bisa = silang && !silang.classList.contains("ant-dropdown-menu-item-disabled") && !/hapus|remove|解除|削除/i.test(silang.textContent);
+        if (bisa) silang.click();                              // menu menutup sendiri
+        else daftar.dispatchEvent(new KeyboardEvent("keydown", {key: "Escape", keyCode: 27, which: 27, bubbles: true}));   // tutup menu
+        setTimeout(() => induk.postMessage({sps: "telusur"}, location.origin), bisa ? 600 : 0);   // tunggu klik-filter tercatat
+      };
+      daftar.appendChild(butir);
+    };
+    new MutationObserver(() => document.querySelectorAll('[data-test="chart-context-menu"]').forEach(sisipkan))
+      .observe(document.body, {childList: true, subtree: true});
+  }
   const VERSI = new URL(document.currentScript.src).searchParams.get("v") || "";
   const halamanSps = !document.getElementById("app");
   document.documentElement.classList.add("sps-bingkai");

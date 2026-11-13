@@ -123,6 +123,10 @@ Tombol **Telusuri** (ikon dua kotak berpanah, di kiri corong) tampil saat sebuah
    **dashboard lain yang punya filter di kolom bernama sama**.
 3. Klik dashboard tujuan → terbuka **sudah tersaring**. Chip **← nama dashboard asal** di bilah atas mengantar pulang.
 
+**Jalan pintas (klik kanan):** klik kanan batang/irisan pada chart → **Telusuri ke dashboard lain…**. Nilai yang diklik
+langsung dijadikan klik-filter dan panel Telusuri terbuka, jadi langkah 1–2 menjadi satu gerakan. Pada chart yang
+tidak mendukung klik-filter (mis. kotak angka), panel tetap terbuka dengan filter yang sudah aktif.
+
 | Hal | Penjelasan |
 |---|---|
 | Yang dibawa | semua filter aktif: pilihan, rentang angka, rentang waktu, dan klik-filter chart |
@@ -130,7 +134,7 @@ Tombol **Telusuri** (ikon dua kotak berpanah, di kiri corong) tampil saat sebuah
 | Hak akses | hanya dashboard yang boleh Anda buka yang ditawarkan; RLS tetap berlaku di tujuan |
 | Belum ada filter aktif | panel menjelaskan cara memilih; tidak ada yang berubah |
 
-Kode: `config/sps_app/static/telusur.js`, `GET /filter-global/api/sasaran`, pembaca filter aktif di `bingkai.js`.
+Kode: `config/sps_app/static/telusur.js`, `GET /filter-global/api/sasaran`, pembaca filter aktif & butir menu klik kanan di `bingkai.js`.
 
 ### 2c. Tampilan tersimpan (bookmark)
 

@@ -15,6 +15,17 @@ berbeda bisa menjalankan versi yang berbeda.
 (`.github/workflows/rilis.yml`): installer online, pembersih total, dan paket offline diterbitkan ke Releases dalam
 ± 30 menit, tanpa komputer pengembang. Judul rilis memuat versinya, catatannya memuat kode commit.
 
+**Aturan versi (wajib tiap pembaruan):**
+
+1. Naikkan `VERSI` di `config/sps_versi_aplikasi.py` = tanggal rilis (`2026.11.13`). Rilis kedua di hari yang sama
+   memakai nomor urut: `2026.11.13.2`, `2026.11.13.3`.
+2. Catat perubahannya di [31 · Catatan versi](31-catatan-versi.md).
+3. Push ke `main`. GitHub Actions **menolak membangun** (langkah *Periksa VERSI*) bila berkas aplikasi (`config`,
+   `docker`, `installer`, `scripts`, `docker-compose.yml`) berubah tetapi `VERSI` masih sama dengan rilis yang sudah
+   terbit. Perubahan dokumentasi saja tidak perlu menaikkan versi.
+4. Setelah berkas terunggah, rilis diterbitkan ulang sehingga **tanggal dan judul di halaman Releases** selalu
+   menunjukkan build terakhir.
+
 **Unduhan resmi:** halaman **Releases** repo: *ALDx terbaru* (`ALDx-Setup.exe`, `ALDx-HapusTotal.exe`) dan *ALDx offline*
 (`ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-1.bin` + `ALDx-HapusTotal.exe`). Ukuran berkas di Releases dicocokkan dengan
 hasil build sebelum diumumkan.
@@ -47,8 +58,8 @@ your PC"* saat pertama dibuka: klik **More info › Run anyway** (lihat [18 › 
 
 | Di mana | Cara |
 |---|---|
-| Halaman login | kaki halaman: `v2026.11.12` (versi terpasang; plus kode commit bila dipasang dengan git) |
-| Beranda (bawah) | `ALDx v2026.11.12 · a1b2c3d · ✓ Versi terbaru`, atau **Pembaruan tersedia: v…** + tautan *Unduh installer* & *Apa yang baru* (Admin). Dicek ke GitHub tiap 6 jam; tanpa internet tertulis *tidak bisa dicek* |
+| Halaman login | kaki halaman: `v2026.11.13` (versi terpasang; plus kode commit bila dipasang dengan git) |
+| Beranda (bawah) | `ALDx v2026.11.13 · a1b2c3d · ✓ Versi terbaru`, atau **Pembaruan tersedia: v…** + tautan *Unduh installer* & *Apa yang baru* (Admin). Dicek ke GitHub tiap 6 jam; tanpa internet tertulis *tidak bisa dicek* |
 | Aplikasi | fitur terbaru terlihat? Versi November 2026: menu **Sematkan ke web lain**, bagian **Objek** di Studio › Susun dashboard, chip filter global di bilah atas. Daftar lengkap: [31 · Catatan versi](31-catatan-versi.md) |
 | Folder instalasi | `git log -1 --oneline` (bila dipasang dengan git), atau `scripts\versi.ps1` |
 | Paket offline | berkas `offline\versi.txt` (tanggal + kode commit) |

@@ -470,7 +470,8 @@ def jalankan_semua() -> None:
     def _():
         import re as _re
         import sps_versi_aplikasi as va
-        if not _re.fullmatch(r"\d{4}\.\d{2}\.\d{2}", va.VERSI):
+        if not _re.fullmatch(r"\d{4}\.\d{2}\.\d{2}(\.\d+)?", va.VERSI) or \
+                not va.urutan("2026.11.13.10") > va.urutan("2026.11.13.9") > va.urutan("2026.11.13"):
             raise RuntimeError(f"format VERSI salah: {va.VERSI}")
         if f"v{va.VERSI}" not in klien.get("/login/").get_data(as_text=True):
             raise RuntimeError("versi tidak tampil di halaman login")
