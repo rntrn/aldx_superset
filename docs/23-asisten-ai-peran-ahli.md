@@ -66,10 +66,15 @@ lalu LEFT JOIN tabel lain. Tabel yang hubungannya **banyak-ke-banyak** (kunci ti
 pelanggan per cabang) **dilewati dengan penjelasan**, karena baris akan berlipat dan semua SUM/COUNT salah. Hak akses
 data (RLS) semua dataset asal ikut terbawa. Butuh izin membuat dataset. Kode: `config/sps_ai/gabung.py`.
 
-**Batas waktu:** satu pertanyaan maksimal ±5 menit (batas server web dikurangi 30 detik). Bila model belum selesai,
-Asisten berhenti dengan rapi dan menyebut langkah yang sudah selesai; chart/dataset yang sudah dibuat tetap tersimpan.
-Model lokal kecil di CPU sering lambat untuk permintaan yang butuh beberapa langkah; pakai model yang lebih kuat atau
-pecah permintaan.
+**Progres langsung & Batalkan:** pertanyaan berjalan di latar belakang server. Selama menunggu, panel menampilkan
+waktu berjalan dan setiap langkah yang selesai (*Mencari dataset ✓, Menggabung dataset ✓*). Tombol **Batalkan**
+menghentikan Asisten setelah langkah yang sedang berjalan; chart/dataset yang sudah dibuat tetap tersimpan.
+
+**Batas waktu:** satu pertanyaan maksimal **15 menit** (`batas_latar_detik` di `config\ai.yaml`, 60–3600), satu langkah
+model maksimal 240 detik untuk model lokal. Bila model belum selesai, Asisten berhenti dengan rapi dan menyebut langkah
+yang sudah selesai. Model lokal kecil di CPU tetap lambat untuk permintaan bertahap; pakai model yang lebih kuat atau
+pecah permintaan. (Mode latar butuh Redis, yang selalu ada di instalasi standar; tanpa Redis panel memakai cara lama
+dengan batas ±5 menit.)
 
 ## 3. Usulan & tombol Terapkan
 

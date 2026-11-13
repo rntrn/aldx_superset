@@ -456,7 +456,8 @@ SKENARIO = [
      "dilewati dengan alasan banyak-ke-banyak; akun Bandung hanya melihat kd_cabang C02"),
     ("K16", 1, "Sedang", "Asisten AI: model lambat", "Model lokal kecil tanpa GPU",
      "Ajukan permintaan bertahap (mis. buat dashboard 4 chart)",
-     "Bila melewati ±5 menit, jawaban menyebut langkah yang sudah selesai dan saran; tidak ada pesan 'tidak terbaca'"),
+     "Selama menunggu tampil waktu berjalan & langkah yang selesai; Batalkan menghentikan setelah langkah berjalan; "
+     "bila melewati 15 menit jawaban menyebut langkah yang sudah selesai; tidak ada pesan 'tidak terbaca'"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",

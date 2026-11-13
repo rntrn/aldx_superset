@@ -120,13 +120,25 @@ def rencana(dataset_ids: list[int]) -> dict:
     return {"utama": utama, "langkah": langkah, "dilewati": dilewati}
 
 
+def nama_bebas(nama: str, database_id: int) -> str:
+    """Nama dataset yang belum dipakai: detail_x, detail_x_2, detail_x_3, ... (maks. 30 karakter)."""
+    from superset import db
+    from superset.connectors.sqla.models import SqlaTable
+    dasar = re.sub(r"[^a-z0-9_]", "_", nama)[:27].strip("_") or "gabungan"
+    for n in range(1, 100):
+        calon = dasar if n == 1 else f"{dasar}_{n}"
+        if not db.session.query(SqlaTable).filter_by(table_name=calon, database_id=database_id).first():
+            return calon
+    raise alat.InputSalah("Terlalu banyak dataset bernama sama; beri nama lain.")
+
+
 def gabung(dataset_ids: list[int], nama: str = "") -> dict:
     from sps_studio import prep
     r = rencana(dataset_ids)
     if not r["langkah"]:
         raise alat.InputSalah("Tidak ada dataset yang aman digabung. " +
                               " ".join(f"{d['dataset']}: {d['alasan']}" for d in r["dilewati"]))
-    nama = (nama or f"detail_{r['utama'].table_name}")[:30]
+    nama = nama_bebas((nama or f"detail_{r['utama'].table_name}").lower(), r["utama"].database_id)
     langkah = [{k: v for k, v in l.items() if not k.startswith("_")} for l in r["langkah"]]
     hasil = prep.simpan(r["utama"].id, langkah, nama)
     return {**hasil, "dataset_utama": r["utama"].table_name,

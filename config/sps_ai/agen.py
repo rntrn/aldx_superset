@@ -255,40 +255,72 @@ def batas_total() -> int:
     return max(60, web - CADANGAN_WEB)
 
 
-def _pesan_waktu_habis(model: ModelAI, dipakai: list[str]) -> str:
-    selesai = ", ".join(dict.fromkeys(LABEL_ALAT.get(n, n) for n in dipakai)) or "belum ada"
-    return (f"Model '{model.nama}' belum selesai dalam {batas_total() // 60} menit (batas server). "
+class _Peristiwa(list):
+    """Daftar peristiwa yang juga meneruskan setiap tambahan ke kemajuan (progres langsung di mode latar)."""
+    def __init__(self, kemajuan: Callable[[dict], None] | None):
+        super().__init__()
+        self._kemajuan = kemajuan
+
+    def append(self, ev) -> None:
+        super().append(ev)
+        if self._kemajuan:
+            try:
+                self._kemajuan(ev)
+            except Exception:  # noqa: BLE001 - progres gagal ditulis tidak boleh menghentikan jawaban
+                log.warning("ALDx AI: progres tidak tersimpan")
+
+
+def _selesai(dipakai: list[str]) -> str:
+    return ", ".join(dict.fromkeys(LABEL_ALAT.get(n, n) for n in dipakai)) or "belum ada"
+
+
+def _pesan_dibatalkan(dipakai: list[str]) -> str:
+    return f"Dibatalkan. Langkah yang sudah selesai: {_selesai(dipakai)}. Hasil yang sudah tersimpan (chart/dataset) tetap ada."
+
+
+def _pesan_waktu_habis(model: ModelAI, dipakai: list[str], batas: int | None = None) -> str:
+    selesai = _selesai(dipakai)
+    return (f"Model '{model.nama}' belum selesai dalam {(batas or batas_total()) // 60} menit. "
             f"Langkah yang sudah selesai: {selesai}. Hasil yang sudah tersimpan (chart/dataset) tetap ada. "
             "Agar lebih cepat: pakai model yang lebih kuat/cepat (mis. model cloud atau model lokal dengan GPU), "
             "atau pecah permintaan menjadi langkah lebih kecil.")
 
 
 def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, peran: P.Peran | None = None,
-          konteks: dict | None = None, bahasa: str = "id") -> dict:
-    """Jalankan agent untuk percakapan `riwayat`. Kembalikan jawaban + peristiwa untuk layar."""
+          konteks: dict | None = None, bahasa: str = "id", kemajuan: Callable[[dict], None] | None = None,
+          dibatalkan: Callable[[], bool] | None = None, batas: int | None = None) -> dict:
+    """Jalankan agent untuk percakapan `riwayat`. Kembalikan jawaban + peristiwa untuk layar.
+
+    kemajuan(peristiwa)  dipanggil setiap ada langkah (mode latar: progres tampil langsung)
+    dibatalkan()         True = berhenti sebelum langkah berikutnya
+    batas                detik total; bawaan batas_total() (di bawah timeout web). Mode latar memakai batas_latar."""
     from superset import db
     from superset.exceptions import SupersetSecurityException
 
     peran = peran or P.PETA_PERAN["analis"]
     daftar_alat = alat_peran(peran)
-    mulai, peristiwa, dipakai = time.time(), [], []
+    mulai, dipakai = time.time(), []
+    peristiwa = _Peristiwa(kemajuan)
     peta = any(n in peran.alat for n in ("cari_dataset", "cari_dashboard", "info_dashboard"))
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
     jawaban, status = "", "ok"
-    tenggat = mulai + batas_total()             # selesai SEBELUM server web memutus permintaan
+    tenggat = mulai + (batas or batas_total())  # bawaan: selesai SEBELUM server web memutus permintaan
     try:
         for langkah in range(atur.langkah_maks + 1):
             boleh_alat = langkah < atur.langkah_maks
             sisa = int(tenggat - time.time())
+            if dibatalkan and dibatalkan():
+                status, jawaban = "dibatalkan", _pesan_dibatalkan(dipakai)
+                break
             if sisa < SISA_MINIMUM:
-                status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai)
+                status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai, batas)
                 break
             try:
                 msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], min(atur.batas_untuk(model), sisa))
             except llm.GagalModel as exc:
                 if dipakai and "terlalu lama" in str(exc):   # sebagian langkah sudah jalan: laporkan, jangan buang
-                    status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai)
+                    status, jawaban = "waktu_habis", _pesan_waktu_habis(model, dipakai, batas)
                     break
                 raise
             panggilan = (msg.get("tool_calls") or []) if boleh_alat else []
@@ -318,7 +350,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
         status, jawaban = "gagal_model", str(exc)
     _catat(username, model.id, f"[{peran.perintah}] {pertanyaan}", dipakai, status, mulai)
     log.info("ALDx AI %s peran=%s model=%s alat=%s status=%s", username, peran.id, model.id, dipakai, status)
-    return {"jawaban": jawaban, "peristiwa": peristiwa, "status": status, "peran": peran.id}
+    return {"jawaban": jawaban, "peristiwa": list(peristiwa), "status": status, "peran": peran.id}
 
 
 def tulis_narasi(model: ModelAI, atur: Pengaturan, judul_story: str, dashboard: dict) -> str:

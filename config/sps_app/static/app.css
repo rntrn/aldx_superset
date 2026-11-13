@@ -411,6 +411,11 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .langkah-ai { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--teks-3); }
 .langkah-ai span { display: inline-flex; align-items: center; gap: 4px; }
 .langkah-ai .ikon { color: var(--sukses); }
+.langkah-ai.langsung { margin-top: 6px; }
+.langkah-ai.langsung:empty { display: none; }
+.batal-ai { margin-top: 8px; font: inherit; font-size: 12px; padding: 4px 10px; border-radius: var(--r); border: 1px solid var(--garis); background: transparent; color: var(--teks-2, var(--teks)); cursor: pointer; }
+.batal-ai:hover { border-color: var(--garis-kuat); }
+.batal-ai[hidden] { display: none; }
 .tabel-ai, .kode-ai { background: var(--kertas); border: 1px solid var(--garis); border-radius: 12px; overflow: auto; max-height: 320px; }
 .tabel-ai table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 .tabel-ai th { position: sticky; top: 0; background: var(--kertas); text-align: left; font-weight: 650; color: var(--teks-2); }
