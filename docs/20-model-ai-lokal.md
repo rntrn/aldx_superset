@@ -135,7 +135,8 @@ dinyalakan, klik **Periksa lagi** (tanpa menunggu, tanpa restart).
 | "Model tidak bisa dihubungi" / *connection refused* | Ollama/LM Studio mati, atau hanya menerima dari komputer itu sendiri | nyalakan; Ollama: `OLLAMA_HOST=0.0.0.0` lalu buka ulang; LM Studio: *Serve on Local Network* |
 | Installer: *tidak terdeteksi* padahal sudah dipasang | aplikasi belum dibuka / server LM Studio belum *Start* | buka aplikasinya, klik **Periksa** lagi |
 | "model not found" | model dihapus setelah terdeteksi | klik **Periksa lagi** di layar Sambungkan AI, atau pilih model lain |
-| Jawaban sangat lambat (> 2 menit) | RAM kurang / tanpa GPU | tutup aplikasi lain, pakai model 7B, atau naikkan `batas_detik_model` di `ai.yaml` |
+| Jawaban sangat lambat (> 2 menit) | RAM kurang / tanpa GPU | tutup aplikasi lain, pakai model 7B, atau naikkan `batas_detik_lokal` di `ai.yaml` |
+| Permintaan bertahap (gabung dataset, buat dashboard) berhenti *"belum selesai dalam 5 menit"* | tiap langkah model lokal butuh 1–3 menit | pakai model dengan GPU / cloud, atau minta satu hal per pertanyaan |
 | Jawaban ngawur / tidak memakai data | model terlalu kecil / tanpa tool calling | pakai Qwen 2.5 7B ke atas |
 | Komputer jadi berat | model memakai RAM besar | Ollama melepas model setelah ± 5 menit tidak dipakai; LM Studio: *Eject* model |
 | `ollama pull` / LM Studio gagal mengunduh: sertifikat / TLS / *network error* | keamanan jaringan kantor | [§3b](#3b-bila-jaringan-kantor-memblokir-unduhan-model): unduh `.gguf` lewat browser lalu impor ke LM Studio |

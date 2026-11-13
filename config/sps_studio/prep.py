@@ -21,6 +21,8 @@ KEAMANAN
     - Dataset baru mewarisi aturan hak akses {{ sps_akses(...) }} dataset asal; kolom hak
       akses (mis. KD_CABANG) wajib tetap ada dan tidak diubah, kalau tidak penyimpanan ditolak.
     - Rumus kolom hitung diperiksa sqlglot: tanpa subquery / perintah SQL / kolom asing.
+    - Aturan RLS biasa per role (mis. kd_cabang = 'C02' untuk role "Cabang Bandung") ikut disalin ke dataset baru
+      dengan role & jenis yang sama; nama kolom disesuaikan. Aturan yang kolomnya hilang -> penyimpanan ditolak.
     - Gabung (join): dataset kanan harus boleh diakses user & di database yang sama. Dataset baru
       memakai hak akses KEDUA sisi (AND); untuk left join, baris kanan yang kosong tetap boleh
       (tidak membawa data). Hanya role yang boleh memakai SEMUA dataset asal yang diberi akses.
@@ -50,6 +52,7 @@ DILARANG = (exp.Select, exp.Subquery, exp.Union, exp.Insert, exp.Update, exp.Del
             exp.Drop, exp.Create, exp.Command, exp.Table)
 POLA_AKSES = re.compile(r"(\w+)\s*=\s*'([^']*)'")
 BARIS_PRATINJAU = 500
+DIALEK_SQLGLOT = {"postgresql": "postgres", "mssql": "tsql"}     # nama backend Superset -> nama dialek sqlglot
 
 
 @dataclass
@@ -277,12 +280,9 @@ def _aturan_akses(t) -> dict[str, str] | None:
     from superset import db
     from superset.connectors.sqla.models import RowLevelSecurityFilter
 
-    aturan = [r for r in db.session.query(RowLevelSecurityFilter).all() if t in r.tables]
+    aturan = [r for r in db.session.query(RowLevelSecurityFilter).all() if t in r.tables and "sps_akses" in (r.clause or "")]
     if not aturan:
         return None
-    if any("sps_akses" not in (r.clause or "") for r in aturan):
-        raise alat.InputSalah(f"Dataset '{t.table_name}' memakai aturan hak akses khusus; "
-                              "minta Admin menyiapkan dataset ini.")
     peta: dict[str, str] = {}
     for r in aturan:
         peta.update(dict(POLA_AKSES.findall(r.clause)))
@@ -337,6 +337,56 @@ def klausa_akses(t, alur: Alur) -> str | None:
     return " AND ".join(bagian) if bagian else None
 
 
+def _aturan_lain(t) -> list:
+    """Aturan RLS biasa (bukan {{ sps_akses(...) }}) yang berlaku pada dataset t."""
+    from superset import db
+    from superset.connectors.sqla.models import RowLevelSecurityFilter
+    return [r for r in db.session.query(RowLevelSecurityFilter).all() if t in r.tables and "sps_akses" not in (r.clause or "")]
+
+
+def aturan_salinan(t, alur: Alur) -> list[tuple[Any, str]]:
+    """(aturan asal, klausa untuk dataset baru) untuk setiap aturan RLS biasa di dataset asal & yang digabung.
+
+    Kolom di klausa diganti ke nama kolom hasil. Untuk sisi kanan LEFT JOIN, baris tanpa pasangan (kolom kanan kosong)
+    tetap boleh: (klausa) OR kolom IS NULL. Klausa yang tidak terbaca (mis. template Jinja) -> ditolak."""
+    from superset import db
+    from superset.connectors.sqla.models import SqlaTable
+
+    sumber = [(t, lambda k: k, None, "inner")] + [
+        (db.session.query(SqlaTable).get(i), lambda k, i=i: asal_kanan(i, k), pasangan, tipe) for i, tipe, pasangan in alur.gabung]
+    hasil, lihat = [], set()
+    for ds, penanda, pasangan, tipe in sumber:
+        for r in _aturan_lain(ds):
+            try:
+                pohon = sqlglot.parse_one(r.clause)
+            except sqlglot.errors.ParseError:
+                raise alat.InputSalah(f"Aturan hak akses '{r.name}' pada '{ds.table_name}' tidak bisa disalin otomatis; "
+                                      "minta Admin menyiapkan dataset ini.") from None
+            kolom = sorted({c.name for c in pohon.find_all(exp.Column)})
+            peta = _petakan(ds, {k: k for k in kolom}, alur.asal, penanda, pasangan)
+            for c in list(pohon.find_all(exp.Column)):          # daftar dulu: pohon diubah saat diganti
+                c.replace(exp.column(peta[c.name]))
+            klausa = pohon.sql(dialect=DIALEK_SQLGLOT.get(t.database.backend, t.database.backend)
+                               if DIALEK_SQLGLOT.get(t.database.backend, t.database.backend) in sqlglot.dialects.DIALECTS else None)
+            lewat_kiri = all(not alur.asal.get(k, "").startswith("#") for k in peta.values())
+            if tipe == "left" and not lewat_kiri:
+                klausa = f"({klausa}) OR {next(iter(peta.values()))} IS NULL"
+            if (r.id, klausa) not in lihat:
+                lihat.add((r.id, klausa))
+                hasil.append((r, klausa))
+    return hasil
+
+
+def _pasang_salinan(baru, salinan: list[tuple[Any, str]]) -> None:
+    from superset import db
+    from superset.connectors.sqla.models import RowLevelSecurityFilter
+    for r, klausa in salinan:
+        db.session.add(RowLevelSecurityFilter(
+            name=f"{r.name} › {baru.table_name}"[:255], filter_type=r.filter_type, group_key=r.group_key,
+            description=f"Disalin dari aturan '{r.name}' oleh Studio (persiapan data).",
+            roles=list(r.roles), tables=[baru], clause=klausa))
+
+
 def simpan(dataset_id: int, langkah: list[dict], nama: str) -> dict:
     from flask import g
     from superset import db, security_manager
@@ -351,6 +401,7 @@ def simpan(dataset_id: int, langkah: list[dict], nama: str) -> dict:
 
     alur = _susun(t, langkah, pakai_rls=False)
     klausa = klausa_akses(t, alur)              # galat bila kolom hak akses hilang -> tidak tersimpan
+    salinan = aturan_salinan(t, alur)           # aturan RLS biasa per role (galat bila kolomnya hilang)
 
     baru = SqlaTable(table_name=nama, database=t.database, schema=t.schema, sql=_sql(t, alur.query),
                      description=f"Dibuat di Studio (persiapan data) dari '{t.table_name}'.",
@@ -360,11 +411,12 @@ def simpan(dataset_id: int, langkah: list[dict], nama: str) -> dict:
     baru.fetch_metadata()
     if klausa:
         _pasang_rls(baru, klausa)
+    _pasang_salinan(baru, salinan)
     asal_semua = [t] + [db.session.query(SqlaTable).get(i) for i, _, _ in alur.gabung]
     _salin_akses(asal_semua, baru)
     db.session.commit()
     return {"id": baru.id, "nama": baru.table_name, "kolom": len(baru.columns),
-            "hak_akses": klausa or "tanpa aturan (sama seperti asal)",
+            "hak_akses": "; ".join(filter(None, [klausa, *(f"{r.name}: {k}" for r, k in salinan)])) or "tanpa aturan (sama seperti asal)",
             "url": f"/explore/?datasource_type=table&datasource_id={baru.id}"}
 
 

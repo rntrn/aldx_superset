@@ -449,6 +449,14 @@ SKENARIO = [
      "Halaman login → Masuk dengan … → login di penyedia; ulangi dengan email domain lain; matikan internet lalu login password",
      "Akun dengan domain benar masuk (dibuat otomatis bila SSO_BUAT_AKUN=1); domain lain ditolak dengan pesan; login "
      "password tetap berfungsi; tercatat di jejak audit"),
+    ("K15", 2, "Tinggi", "Asisten AI: gabung dataset detail", "Model AI tersambung; izin membuat dataset",
+     "Panel ✦ → 'dari latihan_cabang, latihan_lokasi_pelanggan, latihan_penjualan buatkan dataset detail' → buka tautan "
+     "dataset → hitung baris; login akun Latihan Cabang Bandung",
+     "Dataset baru = latihan_penjualan + kolom cabang (4.320 baris, total sama dengan asal); latihan_lokasi_pelanggan "
+     "dilewati dengan alasan banyak-ke-banyak; akun Bandung hanya melihat kd_cabang C02"),
+    ("K16", 1, "Sedang", "Asisten AI: model lambat", "Model lokal kecil tanpa GPU",
+     "Ajukan permintaan bertahap (mis. buat dashboard 4 chart)",
+     "Bila melewati ±5 menit, jawaban menyebut langkah yang sudah selesai dan saran; tidak ada pesan 'tidak terbaca'"),
     ("K12", 3, "Sedang", "Peringatan data", "SMTP terpasang (tanpa SMTP: cek log)",
      "Dashboard & Story → Peringatan data → + Peringatan → SQL SELECT SUM(total) FROM latihan_penjualan, syarat > 0, "
      "jadwal tiap menit, penerima email sendiri",
