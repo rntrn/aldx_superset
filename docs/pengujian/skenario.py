@@ -49,6 +49,10 @@ SKENARIO = [
      "(Get-FileHash .\\ALDx-Setup.exe -Algorithm SHA256).Hash.ToLower(); setelah pasang klik nomor versi di Beranda",
      "Sidik sama persis dengan baris ALDx-Setup.exe di ALDx-SHA256.txt; versi di login = nama tag; klik versi membuka "
      "rilis versi itu; catatan rilis memuat commit & isi bagian versi dari catatan versi"),
+    ("A02d", 4, "Sedang", "Uji otomatis & uji tampilan di CI", "Pull request ke main",
+     "Buka PR → GitHub › Actions › workflow uji; unduh artefak hasil-uji; (opsional) bash scripts/uji-ci.sh di Linux/WSL kosong",
+     "Workflow uji hijau: sps_uji.py semua LULUS dan 5/5 uji tampilan lulus; artefak berisi tangkapan layar tiap uji; "
+     "PR dengan uji merah tidak di-merge"),
     ("A03", 4, "Tinggi", "Pemeriksaan prasyarat menolak kondisi tidak layak", "Docker Desktop DIMATIKAN",
      "Jalankan PASANG.cmd", "Baris 'Docker Desktop menyala' GAGAL, tombol Lanjut nonaktif; setelah Docker dinyalakan & Periksa ulang: OK"),
     ("A04", 4, "Tinggi", "Pindah metadata lama ke PostgreSQL", "Instalasi lama (MYSQL_HOST=host.docker.internal + XAMPP menyala, atau MariaDB)",
@@ -451,9 +455,24 @@ SKENARIO = [
      "SDM, Operasional",
      "Penjualan: 9 lembar kerja (ukuran total, kategori pertama 'kategori', ada % vs tahun lalu & peta); tiap template "
      "membuat chart tanpa galat atau pesan jelas bila kolom yang dibutuhkan tidak ada; dashboard terbuka dan filter bekerja"),
+    ("D34", 2, "Sedang", "Mini-chart di tooltip Batang/Pie", "latihan_penjualan",
+     "Batang nm_cabang × total → arahkan kursor ke Cabang Jakarta; ganti ke Pie; ganti dimensi ke periode",
+     "Tooltip memuat garis kecil 2025-01 – 2025-12 (hijau ▲ ±38,6% untuk Jakarta); muncul juga di Pie; tidak muncul untuk "
+     "dimensi tanggal (Garis/Batang periode)"),
+    ("D35", 2, "Tinggi", "Simulasi disimpan sebagai skenario", "latihan_penjualan",
+     "Batang nm_cabang × total → Simulasi +10% → centang Simpan sebagai skenario → Simpan baru → buka di Explore & dashboard; "
+     "buka lagi di Studio; ulangi tanpa centang",
+     "Chart tersimpan berlabel SUM(total) (+10%), Jakarta ±257,6 M; dibuka lagi di Studio: simulasi +10% & centang kembali; "
+     "tanpa centang: chart tersimpan berisi nilai asli; status di bawah grafik menyebut mana yang berlaku"),
     ("E10", 2, "Sedang", "Analitik per Warna", "latihan_penjualan",
      "Garis periode × total, saluran ke Warna → centang Garis tren & Ramalan → Simpan baru",
      "Tiap saluran punya garis tren & ramalan; seri tidak bertumpuk; simpan memberi catatan 'hanya tampil di Studio'"),
+    ("K15", 1, "Tinggi", "Ringkasan AI otomatis di dashboard", "Model lokal atau kirim_data: true aktif; dashboard latihan-wilayah",
+     "Buka dashboard → tunggu chip ✦ Ringkasan AI → klik → Perbarui → Tanya lanjut; buka ulang dashboard; ulangi dengan "
+     "akun cabang (RLS); set ringkasan_dashboard: klik lalu mati",
+     "Chip 'Meringkas…' lalu siap; kartu 3–5 poin berangka + Perlu perhatian; angka cocok dengan chart tanpa filter; buka "
+     "ulang memakai simpanan (cepat); akun cabang hanya melihat angka cabangnya; mode klik menampilkan Buat ringkasan; mode "
+     "mati: chip hilang; hanya model cloud kirim_data: false → pesan cara menyambungkan"),
     ("K14", 1, "Sedang", "Ekspor dashboard ke PowerPoint", "Dashboard latihan-wilayah",
      "Buka dashboard → tombol PowerPoint di bilah atas → buka berkas di PowerPoint/LibreOffice",
      "Berkas .pptx terunduh: slide sampul + satu chart per slide dengan judul; tombol tidak tampil di halaman selain dashboard"),

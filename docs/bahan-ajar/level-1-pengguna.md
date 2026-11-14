@@ -104,7 +104,7 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)**:
 |---|---|---|
 | 0–5 | telusuri ke dashboard lain (klik kanan chart), chip ← pulang | demo → peserta ikut |
 | 5–10 | tampilan tersimpan; label kesegaran data | peserta praktik |
-| 10–15 | ekspor PowerPoint; tanya jawab | demo |
+| 10–15 | ekspor PowerPoint; **Ringkasan AI** di bilah atas dashboard; tanya jawab | demo |
 
 Tutorial: [Level 1 §6e](../tutorial/level-1-pengguna.md). Poin penyampaian: *tampilan tersimpan milik akun sendiri; PowerPoint hanya tab
 yang tampil; "Data langsung" = selalu terbaru, "Data: N jam lalu" = ada penyegaran terjadwal*.
@@ -117,6 +117,7 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)** dan **Latihan: Wilayah & 
 - **T2.** Simpan sebagai tampilan tersimpan `Elektronik`, hapus semua filter, buka lagi tampilan itu.
 - **T3.** Apa arti label kesegaran di dashboard *Wilayah & Prediksi*?
 - **T4.** Ekspor dashboard *Wilayah & Prediksi* ke PowerPoint. Berapa slide?
+- **T5.** Klik chip **✦ Ringkasan AI** di dashboard *Wilayah & Prediksi*: berapa poin, apa baris *Perlu perhatian*, dan cocokkah satu angkanya dengan chart?
 
 ### Kunci jawaban tambahan
 
@@ -126,6 +127,7 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)** dan **Latihan: Wilayah & 
 | T2 | filter Kategori = Elektronik kembali terpasang; tombol **×** menghapus tampilan |
 | T3 | *Data: N jam/hari lalu* = data di ALDx Engine terakhir diperbarui N jam/hari lalu (data latihan dimuat sekali); *Data langsung* bila membaca sumber langsung |
 | T4 | **8 slide**: sampul + 7 chart |
+| T5 | **3–5 poin** berangka + baris *Perlu perhatian* (isi tergantung model AI); angka harus cocok dengan chart **tanpa filter** (mis. total penjualan ± 20,3 T). Bila tidak cocok: laporkan, AI bisa salah. Tanpa model lokal / `kirim_data` kartu menjelaskan cara menyambungkan |
 
 ### Kuis tambahan
 
@@ -134,7 +136,9 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)** dan **Latihan: Wilayah & 
 13. PowerPoint dari dashboard berisi… a) hanya sampul **b) sampul + satu chart per slide (tab yang tampil)** c) seluruh data
 14. *Telusuri ke dashboard lain…* membawa… a) judul chart **b) filter yang sedang aktif** c) akun Anda
 
-**Kunci:** 11b · 12a · 13b · 14b
+15. Ringkasan AI di dashboard memakai angka… a) semua cabang walau saya dibatasi **b) sesuai hak akses saya, tanpa filter dashboard** c) dari internet
+
+**Kunci:** 11b · 12a · 13b · 14b · 15b
 
 ## Daftar periksa kompetensi
 
@@ -152,3 +156,4 @@ Di dashboard **Latihan: Dashboard Penjualan (fiktif)** dan **Latihan: Wilayah & 
 - [ ] Menyimpan, membuka, dan menghapus tampilan tersimpan
 - [ ] Membaca label kesegaran data
 - [ ] Mengekspor dashboard ke PowerPoint
+- [ ] Membaca Ringkasan AI dashboard dan mencocokkan angkanya dengan chart

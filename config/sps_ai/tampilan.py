@@ -216,6 +216,20 @@ def api_chat_batal(job_id: str):
     return jsonify(ok=latar.batal(job_id, g.user.username))
 
 
+# --- Ringkasan AI otomatis di dashboard (sps_ai/ringkasan.py) --------------------------------
+@bp.route("/api/ringkasan/<kunci>")
+@_butuh_akses()
+def api_ringkasan(kunci: str):
+    """?auto=1 (dashboard baru dibuka) / ?segar=1 (Perbarui) -> {status, poin?, model?, dibuat?, galat?}."""
+    from flask import current_app
+
+    from sps_ai import ringkasan, wawasan
+    from sps_app.tampilan import bahasa_aktif
+    d = wawasan.info_dashboard(kunci)
+    return jsonify(ringkasan.minta(current_app._get_current_object(), d["id"], g.user, bahasa_aktif(),
+                                   auto=request.args.get("auto") == "1", segar=request.args.get("segar") == "1"))
+
+
 # --- Auto chart / dashboard ---------------------------------------------------------------
 @bp.route("/api/auto/saran", methods=["POST"])
 @_butuh_akses()

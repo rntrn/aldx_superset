@@ -172,6 +172,7 @@ gratisnya kurang.
 | *"terlalu lama menjawab"* | model lokal di CPU melewati batas waktu satu langkah | naikkan `batas_detik_lokal` (bawaan 240 dtk) di `config\ai.yaml`; cloud memakai `batas_detik_model` (120 dtk) |
 | *"Server '…' sedang sibuk atau bermasalah (HTTP 503…)"* | penyedia (mis. Gemini gratis) kelebihan beban | ALDx sudah mencoba ulang 2×. Tambahkan model kedua (key gratis lain atau model lokal) agar ALDx otomatis beralih; atau coba lagi beberapa menit kemudian |
 | *"Batas … pertanyaan per jam untuk akun Anda tercapai"* | pembatas pemakaian ALDx (melindungi biaya) | tunggu jam berikutnya, atau Admin menaikkan `batas_pertanyaan_per_jam` di `config\ai.yaml` |
+| Kartu **Ringkasan AI**: *"butuh model yang boleh membaca angka"* | hanya model cloud `kirim_data: false` yang aktif | pasang model lokal, atau (dengan izin resmi) `kirim_data: true` pada model cloud; atau `ringkasan_dashboard: mati` |
 | *"Pertanyaan & riwayat terlalu panjang untuk model …"* | konteks model terlalu kecil walau sudah diringkas otomatis | mulai percakapan baru (tombol +), atau pakai model berkonteks lebih besar |
 | *"Kuota/batas permintaan … habis"* (429) | batas harian/menit paket gratis | tunggu, pakai model lain, atau paket berbayar |
 | *"Nama model … tidak dikenali"* (404) | penyedia mengganti nama model | perbarui `model:` di `config\ai.yaml` sesuai halaman model penyedia |

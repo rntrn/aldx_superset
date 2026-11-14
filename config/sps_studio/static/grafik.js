@@ -112,7 +112,7 @@
                tooltip: {...dasar().tooltip, trigger: "axis", axisPointer: {type: tanda === "batang" ? "shadow" : "line"},
                          ...(persen ? {valueFormatter: v => v == null ? "–" : fmtPenuh.format(v) + "%"} : {}),
                          ...(persenTotal ? {valueFormatter: fmtPersen} : {}),
-                         ...(!persen && !persenTotal && !opsi.mini ? {formatter: ps => tooltipKaya(ps, seriData, (hasil.waktu || []).includes(dx))} : {}),
+                         ...(!persen && !persenTotal && !opsi.mini ? {formatter: ps => tooltipKaya(ps, seriData, (hasil.waktu || []).includes(dx), hasil.tren_mini)} : {}),
                          ...(an ? {formatter: ps => tooltipAnalitik(ps, an, kategori.length)} : {})}};
     if (opsi.horizontal && tanda === "batang") { sumbuK.inverse = true; o.yAxis = sumbuK; o.xAxis = sumbuN; }
     else { o.xAxis = sumbuK; o.yAxis = sumbuN; }
@@ -178,7 +178,21 @@
   // Tooltip kaya: nilai, porsi terhadap total seri, porsi di titik ini (bila banyak seri), dan perubahan dari
   // titik sebelumnya (hanya untuk sumbu waktu, di sana "sebelumnya" bermakna).
   const totalSeri = new WeakMap();
-  function tooltipKaya(ps, seriData, sumbuWaktu) {
+  // Tooltip mini-chart (lembar.py tren_mini): garis kecil 12 bulan terakhir untuk kategori di bawah kursor.
+  function sparkline(mini, kategori) {
+    const v = mini && mini.seri[String(kategori)];
+    if (!v) return "";
+    const L = 150, T = 34, maks = Math.max(...v), min = Math.min(...v), r = maks - min || 1;
+    const titik = v.map((x, i) => `${(i / (v.length - 1) * L).toFixed(1)},${(T - 3 - (x - min) / r * (T - 6)).toFixed(1)}`).join(" ");
+    const akhir = v.at(-1), awal = v[0], naik = akhir >= awal;
+    return `<div style="margin-top:6px;border-top:1px solid #E5E7EB;padding-top:4px">
+      <svg width="${L}" height="${T}" viewBox="0 0 ${L} ${T}" style="display:block"><polyline points="${titik}" fill="none"
+        stroke="${naik ? "#0B7A52" : "#DC2626"}" stroke-width="1.6"/></svg>
+      <span style="color:#5F6B7A;font-size:11px">${esc(mini.periode[0])} – ${esc(mini.periode.at(-1))}: ${naik ? "▲" : "▼"}
+        ${awal ? fmtPersen1(Math.abs((akhir - awal) / awal * 100)) : "–"}</span></div>`;
+  }
+  Studio.sparkline = sparkline;
+  function tooltipKaya(ps, seriData, sumbuWaktu, mini) {
     const i = ps[0].dataIndex, tampak = ps.filter(p => !p.seriesName.startsWith("_") && p.value != null);
     const diTitik = tampak.reduce((a, p) => a + (Number(p.value) || 0), 0);
     let html = `<b>${esc(ps[0].axisValueLabel)}</b>`;
@@ -192,6 +206,7 @@
       html += `<br>${p.marker}${esc(p.seriesName)}: <b>${tampilNilai(p.value)}</b>` +
         (info.length ? `<br><span style="color:#5F6B7A;padding-left:14px">${info.join(" · ")}</span>` : "");
     });
+    if (mini && ps.length) html += sparkline(mini, ps[0].axisValueLabel);
     return html + (sumbuWaktu && Studio.bisaJelaskan ? '<br><span style="color:#8A94A6;font-size:11px">Klik kanan: jelaskan perubahan</span>' : "");
   }
   const fmtPersen1 = v => (Math.round(v * 10) / 10).toLocaleString("id-ID") + "%";
@@ -218,7 +233,9 @@
     }
     const nama = data.map(x => x.name);
     data.forEach(x => { x.itemStyle = {color: x.name === "Lainnya" ? ABU : warna(x.name, nama.filter(n => n !== "Lainnya"))}; });
-    return {...dasar(opsi.mini), tooltip: {...dasar().tooltip, trigger: "item"},
+    return {...dasar(opsi.mini), tooltip: {...dasar().tooltip, trigger: "item",
+              formatter: p => `${p.marker}<b>${esc(p.name)}</b>: ${tampilNilai(p.value)} (${fmtPersen1(p.percent)})` +
+                (opsi.mini ? "" : sparkline(hasil.tren_mini, p.name))},
             legend: {...legenda(data.length, opsi.mini), orient: "vertical", right: 0, top: "middle"},
             series: [{type: "pie", radius: ["45%", "72%"], center: ["40%", "52%"], data,
                       itemStyle: {borderColor: "#fff", borderWidth: 2},

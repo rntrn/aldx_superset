@@ -38,7 +38,7 @@ izin itu (Analis ke atas biasanya); **Admin** / **Superadmin** = khusus peran te
 
 | Menu | Fungsi | Level | Akses | Bagian tutorial |
 |---|---|---|---|---|
-| **Studio Visual** | seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, ambang, simulasi, susun dashboard (tab, template umum & per bidang) | L2 | semua yang boleh membuat chart | L2 §1–11a |
+| **Studio Visual** | seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, ambang, simulasi & skenario tersimpan, mini-chart tooltip, susun dashboard (tab, template umum & per bidang) | L2 | semua yang boleh membuat chart | L2 §1–11a |
 | **Daftar chart** | mencari, membuka, mengubah, menghapus chart yang pernah dibuat | L2 | izin | L2 §12e |
 
 ## Dashboard & Story
@@ -82,6 +82,7 @@ Bukan menu sidebar, tetapi dipakai semua level:
 |---|---|---|---|
 | **Cari / perintah** | `Ctrl + K` | L1 | L1 §1 |
 | **Asisten AI** (panel ✦) | `Ctrl + I`; peran `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer` | L1 (pakai) · L3–L4 (data/server) | L1 §6, L3 §6b, L4 §4c |
+| **Ringkasan AI** (bilah atas dashboard) | chip ✦ Ringkasan AI: 3–5 poin berangka + *Perlu perhatian*; Perbarui, Tanya lanjut | L1 (baca) · L4 (mode `otomatis`/`klik`/`mati`) | L1 §6, L4 §4c |
 | **Cara pakai halaman** | tombol `?` | L1 | L1 §1 |
 | **Ekspor** tabel & grafik | tombol Ekspor di pojok: PNG, PDF, Excel, CSV, TXT, salin | L1 | L1 §6a |
 | **Filter global** | tombol corong di bilah atas | L1 | L1 §6b |

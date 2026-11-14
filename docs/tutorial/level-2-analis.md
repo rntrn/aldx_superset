@@ -183,8 +183,8 @@ Semua ada di Studio Visual, pada Garis/Area/Batang dengan satu dimensi (kecuali 
 | **Skala warna** | jenis **Tabel** › centang *Skala warna sel* | sel makin pekat untuk nilai makin besar |
 | **Ambang (target)** | jenis **Angka** / **Angka + tren** / **Tabel** › baris **Ambang**: isi *Hijau ≥* dan/atau *Merah ≤* | nilai yang mencapai target hijau ▲, yang di bawah batas merah ▼; **ikut tersimpan** ke chart & dashboard |
 | **Kelompokkan nilai** | klik kanan dimensi teks (mis. `nm_cabang`) › **Kelompokkan nilai…** | dimensi baru, mis. *Jawa* (Jakarta, Bandung, Surabaya) vs *Lainnya* |
-| **Simulasi what-if** | baris **Simulasi**: pilih ukuran, geser −50%…+100% | grafik menunjukkan bila ukuran itu naik/turun; **hanya pratinjau**, tidak ikut tersimpan |
-| **Tooltip kaya** | arahkan kursor ke titik/batang | nilai + porsi dari total + ▲/▼ dibanding titik sebelumnya (sumbu tanggal) |
+| **Simulasi what-if** | baris **Simulasi**: pilih ukuran, geser −50%…+100% | grafik menunjukkan bila ukuran itu naik/turun; bawaan **hanya pratinjau**. Centang **Simpan sebagai skenario** agar ikut tersimpan (label mis. `SUM(total) (+10%)`) |
+| **Tooltip kaya** | arahkan kursor ke titik/batang | nilai + porsi dari total + ▲/▼ dibanding titik sebelumnya (sumbu tanggal); pada **Batang/Pie** per kategori ada **mini-chart tren 12 bulan** kategori itu |
 | **Jelaskan perubahan** | **klik kanan** sebuah periode › *Jelaskan perubahan …* | penyumbang terbesar per dimensi, mis. Mar 2024 naik ±Rp1,6 M, paling dijelaskan oleh *saluran* |
 | **Analitik per Warna** | taruh dimensi di rak **Warna** + centang Tren/Ramalan | garis tren & ramalan **per nilai warna** (maks. 8 terbesar), hanya tampil di Studio |
 
@@ -332,7 +332,9 @@ tercatat di log (mode uji). Data diambil **sebagai pemilik laporan**: jangan kir
     dengan *Hijau ≥* `120000000000` dan *Merah ≤* `60000000000`: cabang mana yang hijau dan mana yang merah? Simpan, lalu buka chart-nya.
 - **T10.** **Dari template…** › *Per bidang* › **Penjualan**, dataset `latihan_penjualan`, ukuran utama *Otomatis*. Berapa lembar kerja,
     dan ukuran serta kategori apa yang dipilih?
+- **T11.** Batang `nm_cabang × total`: arahkan kursor ke **Cabang Jakarta**. Periode apa yang digambar mini-chart, dan naik/turunkah?
+    Lalu geser **Simulasi** +10%, centang **Simpan sebagai skenario**, **Simpan baru**, dan buka chart-nya. Berapa nilai Jakarta?
 
-Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban); latihan **T1–T10**: [kunci tambahan](../bahan-ajar/level-2-analis.md#kunci-jawaban-tambahan).
+Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban); latihan **T1–T11**: [kunci tambahan](../bahan-ajar/level-2-analis.md#kunci-jawaban-tambahan).
 
 Lanjut ke [Level 3 · Admin data](level-3-admin-data.md).

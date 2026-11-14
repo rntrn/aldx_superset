@@ -267,6 +267,42 @@ def jalankan_semua() -> None:
                 total = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "angka", "baris": [U("total")]}))["baris"][0]["SUM(total)"]
                 return f"2 ambang salah ditolak; total {total:,.0f} {'≥' if total >= 6e11 else '<'} 600 miliar (hijau)"
 
+            @uji("Studio", "Simulasi what-if tersimpan sebagai skenario: SQL (agregat) * faktor, label berakhiran")
+            def _():
+                from sps_ai import alat
+                spec = {"dataset_id": P, "tanda": "batang", "kolom": [D("nm_cabang")], "baris": [U("total")],
+                        "analitik": {"tren": True}, "simulasi": {"ukuran": "SUM(total)", "persen": 10}}
+                t, lb = lembar.dari_dict(spec)
+                p = lembar.ke_superset(t, lb)[1]
+                m = p["metrics"][0]
+                if lb.analitik or m.get("label") != "SUM(total) (+10%)" or "* 1.1" not in m.get("sqlExpression", ""):
+                    raise RuntimeError(f"metrik skenario salah: {m}, analitik={lb.analitik}")
+                asli = alat.jalankan_objek(t, [lembar._metrik(lb.ukuran_semua[0])], [], [], [], 1)["baris"][0]["SUM(total)"]
+                sken = alat.jalankan_objek(t, [m], [], [], [], 1)["baris"][0]["SUM(total) (+10%)"]
+                if abs(sken - asli * 1.1) > 1:
+                    raise RuntimeError(f"skenario {sken} != 1,1 × {asli}")
+                for salah in ({"ukuran": "SUM(total)", "persen": 999}, {"ukuran": "ngawur", "persen": 5}):
+                    try:
+                        lembar.dari_dict({**spec, "simulasi": salah})
+                        raise RuntimeError(f"skenario salah lolos: {salah}")
+                    except alat.InputSalah:
+                        pass
+                if lembar.dari_dict({**spec, "simulasi": {"ukuran": "SUM(total)", "persen": 0}})[1].simulasi:
+                    raise RuntimeError("persen 0 tetap dianggap skenario")
+                return f"skenario +10%: {sken:,.0f} = 1,1 × {asli:,.0f}; 2 skenario salah ditolak"
+
+            @uji("Studio", "Tooltip mini-chart: tren 12 bulan per kategori untuk Batang/Pie")
+            def _():
+                h = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "batang", "kolom": [D("nm_cabang")], "baris": [U("total")]}))
+                m = h["tren_mini"]
+                if not m or len(m["periode"]) != lembar.PERIODE_TREN_MINI or set(m["seri"]) != {b["nm_cabang"] for b in h["baris"]} \
+                        or any(len(v) != len(m["periode"]) for v in m["seri"].values()):
+                    raise RuntimeError(f"tren mini salah: {m and (m['periode'], list(m['seri']))}")
+                garis = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}))
+                if garis["tren_mini"] is not None:
+                    raise RuntimeError("tren mini muncul di Garis bertanggal")
+                return f"{len(m['seri'])} kategori × {len(m['periode'])} bulan ({m['periode'][0]} – {m['periode'][-1]})"
+
             @uji("Studio", "YoY (% vs tahun lalu) & urutan batang mendatar")
             def _():
                 dasar = {"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}
@@ -1059,6 +1095,25 @@ def jalankan_semua() -> None:
         if tanpa:
             raise RuntimeError("peta menu tidak memuat: " + ", ".join(tanpa))
         return f"{jumlah} tautan/gambar diperiksa, semuanya ada; peta menu lengkap"
+
+    @uji("Asisten AI", "Ringkasan dashboard: poin rapi, hanya model yang boleh membaca angka, mode dari ai.yaml")
+    def _():
+        from sps_ai import ringkasan
+        from sps_ai.pengaturan import ModelAI, Pengaturan
+        teks = "Ringkasan:\n1. **Penjualan** naik 12%\n2. Jakarta terbesar 234 M\n* Margin 24,5%\n- a\n- b\n- Perlu perhatian: Makassar turun"
+        p = ringkasan.poin(teks)
+        if len(p) != 5 or p[0] != "Penjualan naik 12%" or not p[-1].startswith("Perlu perhatian"):
+            raise RuntimeError(f"poin salah: {p}")
+        m = lambda i, kirim, key="": ModelAI(i, i, "http://x", "m", key, kirim)          # noqa: E731
+        atur = Pengaturan([m("cloud", False, "k" * 20), m("lokal", True), m("cloud2", True, "k" * 20)], "cloud", [], 6, 500, 50, 120)
+        if ringkasan.pilih_model(atur).id != "lokal":
+            raise RuntimeError("model tanpa izin data terpilih / lokal tidak didahulukan")
+        if ringkasan.pilih_model(Pengaturan([m("cloud", False, "k" * 20)], "cloud", [], 6, 500, 50, 120)) is not None:
+            raise RuntimeError("model kirim_data: false dipakai untuk ringkasan")
+        if (ringkasan.mode({"ringkasan_dashboard": "klik"}), ringkasan.mode({"ringkasan_dashboard": "aneh"}), ringkasan.mode({})) != \
+                ("klik", "otomatis", "otomatis") or ringkasan.menit({"ringkasan_menit": 1}) != 5:
+            raise RuntimeError("mode/menit ai.yaml salah dibaca")
+        return f"{len(p)} poin; model terpilih: lokal; kirim_data: false ditolak; mode {ringkasan.mode()}"
 
     @uji("Dokumentasi", "Catatan versi untuk VERSI ini ada (dipakai rilis v<VERSI>); tanpa perbandingan merek produk lain")
     def _():

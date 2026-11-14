@@ -127,6 +127,11 @@ Tips bertanya:
 - Asisten bisa salah. Cocokkan angka penting dengan dashboard resmi.
 - Di Beranda, ketik pertanyaan di kotak Cari lalu klik **Tanya AI**.
 
+**Ringkasan AI otomatis.** Saat membuka dashboard, chip **✦ Ringkasan AI** di bilah atas menulis *Meringkas…*,
+lalu siap diklik: kartu berisi 3–5 poin berangka dan satu baris **Perlu perhatian**. **Perbarui** membuat ulang,
+**Tanya lanjut** membuka panel Asisten. Angkanya mengikuti hak akses Anda, dari keadaan awal dashboard (tanpa filter).
+Bila admin memilih mode *klik*, ringkasan baru dibuat setelah Anda menekan **Buat ringkasan**.
+
 Penjelasan lengkap peran: [23-asisten-ai-peran-ahli.md](../23-asisten-ai-peran-ahli.md).
 
 ---
@@ -185,7 +190,7 @@ Catatan:
 ## 7. Latihan mandiri
 
 Kerjakan di dashboard **Latihan: Dashboard Penjualan (fiktif)**. Jawaban di
-[bahan ajar Level 1](../bahan-ajar/level-1-pengguna.md#kunci-jawaban); latihan **T1–T4**: [kunci tambahan](../bahan-ajar/level-1-pengguna.md#kunci-jawaban-tambahan).
+[bahan ajar Level 1](../bahan-ajar/level-1-pengguna.md#kunci-jawaban); latihan **T1–T5**: [kunci tambahan](../bahan-ajar/level-1-pengguna.md#kunci-jawaban-tambahan).
 
 1. Berapa total penjualan seluruh data latihan?
 2. Cabang mana penjualannya paling besar?
@@ -200,6 +205,8 @@ Kerjakan di dashboard **Latihan: Dashboard Penjualan (fiktif)**. Jawaban di
 - **T2.** Simpan keadaan itu sebagai **tampilan tersimpan** bernama `Elektronik`, hapus semua filter, lalu buka tampilan itu lagi.
 - **T3.** Baca label kesegaran di dashboard *Latihan: Wilayah & Prediksi*. Apa artinya?
 - **T4.** Ekspor dashboard *Latihan: Wilayah & Prediksi* ke **PowerPoint**. Berapa slide yang dihasilkan?
+- **T5.** Buka dashboard *Latihan: Wilayah & Prediksi*, tunggu chip **✦ Ringkasan AI** siap, lalu klik. Berapa poin yang tampil,
+   apa isi baris *Perlu perhatian*, dan cocokkan satu angkanya dengan chart di dashboard.
 
 ## 8. Ringkasan
 

@@ -99,6 +99,7 @@ class Lembar:
     kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" | "yoy" (kalkulasi cepat)
     skala_warna: bool = False         # tabel: latar sel makin pekat untuk nilai makin besar
     ambang: dict = field(default_factory=dict)   # angka/tabel: {"atas": x} hijau bila >= x, {"bawah": y} merah bila <= y
+    simulasi: dict = field(default_factory=dict) # skenario what-if tersimpan: {"ukuran": label, "persen": 10}
 
     # --- Turunan --------------------------------------------------------------------
     @property
@@ -151,7 +152,8 @@ class Lembar:
                 "kolom": [pil(p) for p in self.kolom], "baris": [pil(p) for p in self.baris],
                 "warna": pil(self.warna), "ukuran": pil(self.ukuran), "label": self.label,
                 "filter": self.filter, "urut": self.urut, "batas": self.batas, "analitik": self.analitik,
-                "kalkulasi": self.kalkulasi, "skala_warna": self.skala_warna, "ambang": self.ambang}
+                "kalkulasi": self.kalkulasi, "skala_warna": self.skala_warna, "ambang": self.ambang,
+                "simulasi": self.simulasi}
 
 
 def _unik(pils: list[Pil]) -> list[Pil]:
@@ -202,6 +204,9 @@ def dari_dict(d: dict) -> tuple[Any, Lembar]:
         kalkulasi=str(d.get("kalkulasi") or "") if d.get("kalkulasi") in KALKULASI else "",
         skala_warna=bool(d.get("skala_warna")), ambang=_ambang(d.get("ambang")) if tanda in TANDA_AMBANG else {})
     pangkas(t, lembar)
+    lembar.simulasi = _simulasi(d.get("simulasi"), lembar)
+    if lembar.simulasi:                 # analitik dihitung dari nilai asli: tidak dicampur dengan skenario
+        lembar.analitik = {}
     return t, lembar
 
 
@@ -233,6 +238,50 @@ def pangkas(t, lembar: Lembar) -> None:
 
 
 TANDA_AMBANG = ("angka", "angka_tren", "tabel")
+BATAS_SIMULASI = (-90, 500)        # persen skenario what-if yang boleh disimpan
+
+
+def _simulasi(s: dict | None, lembar: "Lembar") -> dict:
+    """Skenario what-if tersimpan: ukuran (label pil) dikali (1 + persen/100). Kosong bila tidak dipakai."""
+    if not s or not s.get("persen"):
+        return {}
+    try:
+        persen = round(float(s["persen"]), 2)
+    except (TypeError, ValueError):
+        raise alat.InputSalah("Persen simulasi harus angka, mis. 10 atau -5.") from None
+    if not BATAS_SIMULASI[0] <= persen <= BATAS_SIMULASI[1]:
+        raise alat.InputSalah(f"Persen simulasi harus di antara {BATAS_SIMULASI[0]}% dan +{BATAS_SIMULASI[1]}%.")
+    if lembar.kalkulasi:
+        raise alat.InputSalah("Skenario simulasi tidak bisa disimpan bersama kalkulasi cepat (% total, kumulatif, YoY).")
+    label = str(s.get("ukuran") or "")
+    if label not in {p.label for p in lembar.ukuran_semua}:
+        raise alat.InputSalah(f"Ukuran simulasi '{label}' tidak ada di lembar kerja.")
+    return {"ukuran": label, "persen": persen}
+
+
+def label_ukuran(lembar: "Lembar", p: Pil) -> str:
+    """Label kolom hasil di chart tersimpan: ukuran yang disimulasikan diberi akhiran, mis. 'SUM(total) (+10%)'."""
+    s = lembar.simulasi
+    if s and s["ukuran"] == p.label:
+        return f"{p.label} ({'+' if s['persen'] > 0 else ''}{s['persen']:g}%)"
+    return p.label
+
+
+def _metrik_simpan(t, lembar: "Lembar", p: Pil) -> Any:
+    """Metrik untuk chart tersimpan; ukuran skenario menjadi SQL '(agregat) * faktor' (dihitung di database)."""
+    m = _metrik(p)
+    s = lembar.simulasi
+    if not s or s["ukuran"] != p.label:
+        return m
+    if p.metrik:
+        dasar = next(x.expression for x in t.metrics if x.metric_name == p.field)
+    elif p.field == BARIS:
+        dasar = "COUNT(*)"
+    else:
+        kolom = t.database.get_dialect().identifier_preparer.quote(p.field)
+        dasar = f"COUNT(DISTINCT {kolom})" if p.agg == "COUNT_DISTINCT" else f"{p.agg}({kolom})"
+    faktor = 1 + s["persen"] / 100
+    return {"expressionType": "SQL", "sqlExpression": f"({dasar}) * {faktor:g}", "label": label_ukuran(lembar, p)}
 
 
 def _ambang(a: dict | None) -> dict:
@@ -331,12 +380,49 @@ def jalankan(t, lembar: Lembar) -> dict:
     elif lembar.pakai_analitik:
         analitik = prediksi.analisis(hasil["baris"], lembar.dimensi[0].label,
                                      [p.label for p in lembar.ukuran_semua], lembar.analitik)
-    return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"],
+    return {"analitik": analitik, "kolom": hasil["kolom"], "baris": hasil["baris"], "tren_mini": tren_mini(t, lembar, hasil),
             "dimensi": [p.label for p in lembar.dimensi], "ukuran": [p.label for p in lembar.ukuran_semua],
             "dim_baris": [p.label for p in lembar.dim_baris], "diabaikan": lembar.diabaikan,
             "kalkulasi": kalkulasi,
             "waktu": [p.label for p in lembar.dimensi if _kolom_waktu(t, p.field)],
             "geo": {p.label: peran_geo(p.field) for p in lembar.dimensi if peran_geo(p.field)}}
+
+
+TANDA_TREN_MINI = ("batang", "pie")
+MAKS_TREN_MINI = 30                # kategori yang diberi tren mini (sesuai jumlah batang wajar)
+PERIODE_TREN_MINI = 12             # bulan terakhir yang digambar di tooltip
+
+
+def tren_mini(t, lembar: Lembar, hasil: dict) -> dict | None:
+    """Tren bulanan tiap kategori untuk tooltip mini-chart (Batang/Pie, satu dimensi bukan tanggal, dataset bertanggal).
+
+    Satu kueri tambahan: dimensi × bulan (kolom waktu utama dataset) untuk ukuran pertama, dibatasi kategori yang
+    tampil. Hasil {"periode": [...12 bulan terakhir], "seri": {kategori: [nilai...]}, "ukuran": label}; None bila
+    tidak berlaku atau gagal (tooltip biasa tetap jalan). Hak akses & RLS sama dengan kueri utama."""
+    waktu = t.main_dttm_col or next((c.column_name for c in t.columns if c.is_dttm), None)
+    if (lembar.tanda not in TANDA_TREN_MINI or len(lembar.dimensi) != 1 or not waktu or lembar.kalkulasi
+            or _kolom_waktu(t, lembar.dimensi[0].field) or not lembar.ukuran_semua):
+        return None
+    d, u = lembar.dimensi[0], lembar.ukuran_semua[0]
+    kategori = [b.get(d.label) for b in hasil["baris"]][:MAKS_TREN_MINI]
+    if not kategori or len(hasil["baris"]) > MAKS_TREN_MINI * 4:
+        return None
+    bulan = {"label": "__bulan", "sqlExpression": waktu, "expressionType": "SQL", "columnType": "BASE_AXIS",
+             "timeGrain": "P1M"}
+    saring = _filter(t, lembar) + [{"col": d.field, "op": "IN", "val": [k for k in kategori if k is not None]}]
+    try:
+        h = alat.jalankan_objek(t, [_metrik(u)], [bulan, d.field], saring, [], 10000)
+    except Exception:  # noqa: BLE001 - tren mini hanya pelengkap tooltip
+        return None
+    periode = sorted({str(b["__bulan"])[:7] for b in h["baris"] if b.get("__bulan")})[-PERIODE_TREN_MINI:]
+    if len(periode) < 3:
+        return None
+    seri: dict[str, list] = {}
+    for b in h["baris"]:
+        p = str(b.get("__bulan"))[:7]
+        if p in periode:
+            seri.setdefault(str(b.get(d.field)), [0.0] * len(periode))[periode.index(p)] += float(b.get(u.label) or 0)
+    return {"periode": periode, "seri": seri, "ukuran": u.label}
 
 
 def _per_warna(baris: list[dict], dx: str, dw: str, u: str) -> tuple[list[dict], list[str]]:
@@ -414,7 +500,8 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     """Ubah lembar kerja menjadi viz_type + params chart Superset."""
     periksa_tanda(lembar)
     D = [p.field for p in lembar.dimensi]
-    M = [_metrik(p) for p in lembar.ukuran_semua]
+    M = [_metrik_simpan(t, lembar, p) for p in lembar.ukuran_semua]
+    L0 = label_ukuran(lembar, lembar.ukuran_semua[0]) if lembar.ukuran_semua else ""
     viz = ATURAN_TANDA[lembar.tanda]["viz"]
     p: dict[str, Any] = {
         "viz_type": viz, "row_limit": lembar.batas, "color_scheme": SKEMA_WARNA,
@@ -435,16 +522,16 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     if tanda == "angka":
         p.update(metric=M[0], y_axis_format="SMART_NUMBER", header_font_size=0.4)
         if lembar.ambang:
-            p["conditional_formatting"] = format_ambang(lembar.ukuran_semua[0].label, lembar.ambang)
+            p["conditional_formatting"] = format_ambang(L0, lembar.ambang)
     elif tanda == "tabel":
         if M:
             p.update(query_mode="aggregate", groupby=D, metrics=M, order_desc=True,
                      show_cell_bars=not (lembar.skala_warna or lembar.ambang), server_page_length=25)
             if lembar.skala_warna:      # operator "None" = gradasi dari nilai terkecil ke terbesar
-                p["conditional_formatting"] = [{"column": u.label, "operator": "None", "colorScheme": WARNA[0]}
+                p["conditional_formatting"] = [{"column": label_ukuran(lembar, u), "operator": "None", "colorScheme": WARNA[0]}
                                                for u in lembar.ukuran_semua]
             if lembar.ambang:           # ambang berlaku untuk ukuran pertama; aturan terakhir menang di Superset
-                p.setdefault("conditional_formatting", []).extend(format_ambang(lembar.ukuran_semua[0].label, lembar.ambang))
+                p.setdefault("conditional_formatting", []).extend(format_ambang(L0, lembar.ambang))
         else:
             p.update(query_mode="raw", all_columns=D, server_page_length=25)
     elif tanda in ("batang", "garis", "area"):
@@ -474,7 +561,7 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                 p.update(x_axis_sort_series="sum", x_axis_sort_series_ascending=lembar.urut == "naik")
             else:
                 # batang mendatar digambar dari bawah: urutan dibalik agar yang pertama tetap di atas (= pratinjau)
-                p.update(x_axis_sort=lembar.ukuran_semua[0].label,
+                p.update(x_axis_sort=L0,
                          x_axis_sort_asc=(lembar.urut == "naik") != lembar.horizontal)
     elif tanda == "pie":
         p.update(groupby=D[:1], metric=M[0], donut=True, show_labels=True, label_type="key_percent",
@@ -490,7 +577,7 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
                  start_y_axis_at_zero=True, y_axis_format="SMART_NUMBER", header_font_size=0.4,
                  subheader_font_size=0.15, rolling_type="None")
         if lembar.ambang:
-            p["conditional_formatting"] = format_ambang(lembar.ukuran_semua[0].label, lembar.ambang)
+            p["conditional_formatting"] = format_ambang(L0, lembar.ambang)
     elif tanda == "gauge":
         p.update(groupby=[], metric=M[0], min_val=0, start_angle=225, end_angle=-45, show_progress=True,
                  overlap=True, show_pointer=True, number_format="SMART_NUMBER", font_size=15,

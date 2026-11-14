@@ -40,6 +40,28 @@ dashboard, angka sudah disertakan sehingga biasanya cukup satu langkah. Untuk ja
 layanan cloud ([28](28-sambungkan-asisten-ai.md)). Bila sering melewati batas waktu, naikkan `batas_detik_lokal` (model lokal, bawaan 240 dtk)
 atau `batas_detik_model` (cloud, 120 dtk) di `config\ai.yaml`.
 
+## 1c. Ringkasan AI otomatis di dashboard
+
+Saat dashboard dibuka, chip **✦ Ringkasan AI** muncul di bilah atas. Tulisannya *Meringkas…* (berdenyut) selama AI membaca
+angka tiap chart, lalu klik untuk melihat kartu berisi **3–5 poin berangka** dan satu baris **Perlu perhatian**. Tombol:
+**Perbarui** (buat ulang) dan **Tanya lanjut** (membuka panel Asisten dengan pertanyaan tindak lanjut).
+
+| Aturan | Isi |
+|---|---|
+| Hak akses | angka diambil sebagai pengguna yang membuka (RLS berlaku); disimpan terpisah per pengguna, bahasa & versi dashboard |
+| Privasi | hanya model yang boleh membaca angka: model lokal atau `kirim_data: true`; tanpa itu kartu menjelaskan cara menyambungkannya |
+| Model sibuk | beralih ke model cadangan, sama dengan panel |
+| Biaya | dihitung ke `batas_pertanyaan_per_jam` hanya saat dibuat; membuka ulang dalam `ringkasan_menit` memakai simpanan |
+| Siapa yang melihat | pengguna yang boleh memakai Asisten AI (tombol ✦ tampil) |
+
+| Pengaturan (`config\ai.yaml`) | Bawaan | Fungsi |
+|---|---|---|
+| `ringkasan_dashboard` | `otomatis` | `otomatis` = dibuat saat dashboard dibuka · `klik` = saat chip diklik (hemat model berbayar) · `mati` = chip tidak tampil |
+| `ringkasan_menit` | 60 | lama ringkasan disimpan (5–1440 menit) |
+
+Angka di ringkasan **tanpa filter dashboard** (keadaan awal dashboard). Untuk pertanyaan atas filter yang sedang dipilih,
+pakai **Tanya lanjut**. Kode: `config/sps_ai/ringkasan.py`, `config/sps_app/static/ringkasan.js`.
+
 ## 2. Peran ahli
 
 Pilih dengan **chip** di atas obrolan, atau ketik **`/`** lalu nama peran (panah ↑ ↓, `Enter`).

@@ -6,7 +6,7 @@ Tiga lapis pengujian, dari yang otomatis sampai uji oleh pengguna.
 |---|---|---|---|---|
 | 1. **Uji otomatis** | 84 pemeriksaan: container, koneksi, backgrounder, 23 chart, ramalan (termasuk tipe angka ClickHouse), engine, halaman & menu, keamanan & Superadmin, batas data, ekspor, peran AI, hierarki dimensi, objek dashboard, Tampilkan saya & analitik lengkap, preset tema, kolom ID, data latihan harian, impor banyak tabel, versi aplikasi, ukuran & dimensi terdefinisi, kalkulasi cepat, template dashboard, data pendukung latihan, berkas .ald/.aldx, filter global & ulasan, driver Hubungkan data, HTTPS gateway, penguncian akun & audit, hak minimum, ketahanan (ekspor latar & cadangan) | admin server | setiap instalasi, upgrade, perubahan pengaturan | `scripts\uji.ps1` → `config/sps_uji.py` |
 | 2. **Uji asap** | 12 skenario manual inti (± 20 menit) | admin server | setelah lapis 1 | skenario bertanda *asap* |
-| 3. **UAT** | 175 skenario per level & area | perwakilan pengguna tiap level | sebelum dipakai pengguna, dan setelah upgrade mayor | [skenario-uji.md](skenario-uji.md), [lembar-uji.xlsx](lembar-uji.xlsx) |
+| 3. **UAT** | 179 skenario per level & area | perwakilan pengguna tiap level | sebelum dipakai pengguna, dan setelah upgrade mayor | [skenario-uji.md](skenario-uji.md), [lembar-uji.xlsx](lembar-uji.xlsx) |
 
 
 ## 1. Uji otomatis
@@ -26,11 +26,34 @@ Contoh hasil:
 [Studio]
   LULUS  chart Batang                               24 baris -> echarts_timeseries_bar
   ...
-86/86 lulus
+89/89 lulus
 ```
 
 Uji ini **tidak mengubah data pengguna** (tabel sementara `uji__otomatis` dibuat lalu dihapus) dan
 butuh data latihan (`scripts\data-latihan.ps1`).
+
+## 1b. Uji tampilan otomatis (CI)
+
+Setiap pull request ke `main` menjalankan workflow **uji** (`.github/workflows/uji.yml`) di GitHub Actions:
+
+| Langkah | Isi |
+|---|---|
+| Pasang dari nol | `scripts/uji-ci.sh`: image, metadata, admin bersandi acak, dashboard & data latihan (seperti installer) |
+| Uji otomatis | `sps_uji.py`: semua harus LULUS |
+| Uji tampilan | `tests/e2e/uji_tampilan.py` (Playwright): login & versi, Beranda, Studio (Ambang), dashboard latihan (chart tanpa galat, label kesegaran, Telusuri), Panduan, Pusat Kendali, tanpa galat JavaScript |
+
+PR di-merge hanya bila uji hijau, sehingga installer di Releases selalu dibangun dari kode yang lulus. Gagal: buka run
+› artefak **hasil-uji** (tangkapan layar tiap uji + keluaran `sps_uji.py`).
+
+Menjalankan sendiri di Linux/WSL **kosong** (nama container ALDx tetap, jangan di komputer yang sudah terpasang):
+`bash scripts/uji-ci.sh`. Uji tampilan saja terhadap ALDx yang sudah jalan:
+
+```bash
+pip install playwright && python -m playwright install chromium
+ALDX_URL=http://localhost:8088 ALDX_USER=admin ALDX_PASSWORD='...' python tests/e2e/uji_tampilan.py
+```
+
+Menambah uji tampilan: satu fungsi `uji_<nama>(hal)` di `tests/e2e/uji_tampilan.py`, daftarkan di `UJI`.
 
 ## 2. UAT: cara menyelenggarakan
 

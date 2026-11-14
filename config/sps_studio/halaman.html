@@ -238,8 +238,9 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <div class="barisRak"><label title="Kalkulasi cepat untuk Garis/Area/Batang dengan satu dimensi">Hitung</label><select id="pilihKalkulasi">
         <option value="">Nilai asli</option><option value="persen_total">% dari total</option><option value="kumulatif">Kumulatif (berjalan)</option>
         <option value="yoy">% vs tahun lalu (YoY)</option></select></div>
-      <div class="barisRak" title="What-if: geser untuk melihat grafik bila ukuran ini naik/turun sekian persen. Hanya pratinjau; tidak mengubah data dan tidak ikut tersimpan."><label>Simulasi</label>
+      <div class="barisRak" title="What-if: geser untuk melihat grafik bila ukuran ini naik/turun sekian persen. Tidak mengubah data; ikut tersimpan hanya bila 'Simpan sebagai skenario' dicentang."><label>Simulasi</label>
         <select id="simUkuran" style="flex:1;min-width:0"></select><input type="range" id="simPersen" min="-50" max="100" step="5" value="0" style="flex:1;min-width:60px;padding:0"><span id="simNilai" style="min-width:42px;text-align:right">0%</span></div>
+      <div class="barisRak" id="barisSimSimpan" title="Centang agar skenario ikut tersimpan ke chart: ukuran itu dihitung ulang di database sebagai (agregat) × faktor, berlabel mis. 'SUM(total) (+10%)'."><label></label><label style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--teks)"><input type="checkbox" id="simSimpan"> Simpan sebagai skenario</label></div>
       <div class="barisRak" id="barisSkala"><label>Tabel</label><label style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--teks)"><input type="checkbox" id="pakaiSkala"> Skala warna sel</label></div>
       <div class="barisRak" id="barisAmbang" title="Format bersyarat untuk ukuran pertama: hijau ▲ bila nilai ≥ angka kiri, merah ▼ bila ≤ angka kanan. Ikut tersimpan ke chart."><label>Ambang</label>
         <input type="number" id="ambangAtas" placeholder="Hijau ≥" step="any" style="flex:1;min-width:0"><input type="number" id="ambangBawah" placeholder="Merah ≤" step="any" style="flex:1;min-width:0"></div>

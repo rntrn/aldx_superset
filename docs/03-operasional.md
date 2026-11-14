@@ -13,6 +13,8 @@ Urutan menyala, SOP, dan FAQ gangguan ada di [19-runbook-faq-admin.md](19-runboo
 | Uji otomatis | `powershell -ExecutionPolicy Bypass -File scripts\uji.ps1` |
 | Cadangkan | `powershell -ExecutionPolicy Bypass -File scripts\cadangkan.ps1 [-Engine]` |
 | Versi komponen | `powershell -ExecutionPolicy Bypass -File scripts\versi.ps1` |
+| Uji lengkap dari nol di Linux/WSL kosong (sama dengan CI) | `bash scripts/uji-ci.sh` |
+| Uji tampilan terhadap ALDx yang jalan | `ALDX_PASSWORD=... python tests/e2e/uji_tampilan.py` ([pengujian §1b](pengujian/README.md#1b-uji-tampilan-otomatis-ci)) |
 | Pratinjau catatan rilis satu versi (dipakai GitHub Actions untuk rilis `v<VERSI>`) | `pwsh -File scripts\catatan-rilis.ps1 -Versi 2026.11.14` |
 | Bersihkan storage Docker | `powershell -ExecutionPolicy Bypass -File scripts\cleanup.ps1` |
 

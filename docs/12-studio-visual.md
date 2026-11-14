@@ -145,6 +145,11 @@ sehingga chart di dashboard sama dengan pratinjau. Chart YoY tersimpan memakai r
 Arahkan kursor ke batang/titik: selain nilai, tooltip menunjukkan **porsi dari total** seri itu, **porsi di titik ini**
 (bila ada beberapa seri/warna), dan **▲/▼ perubahan dari titik sebelumnya** (hanya untuk sumbu tanggal).
 
+**Mini-chart di tooltip:** pada **Batang** dan **Pie** dengan satu dimensi bukan tanggal (mis. `nm_cabang`), tooltip juga
+menggambar **tren 12 bulan terakhir** kategori itu (hijau = naik, merah = turun, dengan % perubahan awal → akhir). Syarat:
+dataset punya kolom tanggal; maks. 30 kategori. Satu kueri tambahan (hak akses & RLS sama); hanya di Studio.
+Kode: `config/sps_studio/lembar.py` (`tren_mini`).
+
 ### Jelaskan perubahan
 
 Pada Garis/Area/Batang dengan **sumbu tanggal**: **klik kanan** di sebuah periode → **Jelaskan perubahan …**.
@@ -161,8 +166,11 @@ Filter lembar kerja ikut berlaku dan hak akses data (RLS) tetap berlaku. Kode: `
 Baris **Simulasi** di panel Marks: pilih ukuran, geser dari −50% sampai +100% → grafik langsung menunjukkan
 keadaan bila ukuran itu naik/turun sekian persen (mis. *bagaimana bila penjualan naik 10%?*).
 
-Hanya pratinjau di Studio: **tidak mengubah data dan tidak ikut tersimpan** ke chart (status di bawah grafik
-menuliskannya). Garis analitik disembunyikan selama simulasi; simulasi mati saat **Hitung** dipakai.
+Bawaan: hanya pratinjau, **tidak mengubah data dan tidak ikut tersimpan**. Centang **Simpan sebagai skenario** agar
+ikut tersimpan ke chart: ukuran itu dihitung di database sebagai `(agregat) × faktor` dan diberi label, mis.
+`SUM(total) (+10%)`, sehingga tampil sama di Explore & dashboard. Batas skenario −90%…+500%. Status di bawah grafik
+menuliskan mana yang berlaku. Garis analitik disembunyikan dan **tidak disimpan** selama simulasi (dihitung dari nilai
+asli); simulasi mati saat **Hitung** dipakai. Kode: `config/sps_studio/lembar.py` (`_metrik_simpan`).
 
 ### Skala warna tabel
 
