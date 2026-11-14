@@ -162,11 +162,73 @@ klik dua kali `PASANG.cmd`: image dimuat dari `offline\` tanpa internet.
 
 ### 8. Menghapus total tanpa .exe
 
+Ada dua cara; keduanya **mencadangkan data dulu**, lalu tidak menyisakan apa pun dari ALDx. Docker Desktop, Ollama/LM Studio,
+dan project Docker lain **tidak** disentuh. Docker Desktop harus menyala.
+
+**Cara A: satu skrip** (sama persis dengan `ALDx-HapusTotal.exe`)
+
 ```powershell
 cd D:\ALDx
 powershell -ExecutionPolicy Bypass -File scripts\hapus-total.ps1 -Simulasi   # lihat dulu apa yang akan dihapus
 powershell -ExecutionPolicy Bypass -File scripts\hapus-total.ps1             # cadangkan ke Dokumen, lalu hapus semua
 ```
+
+Pilihan: `-SimpanCadangan D:\Arsip\ALDx` (folder cadangan lain) · `-SimpanFolder` (folder instalasi dibiarkan) ·
+`-TanpaCadangan` (data hilang permanen).
+
+**Cara B: manual, langkah demi langkah** (bila skrip pun diblokir kebijakan kantor). Jalankan berurutan di PowerShell:
+
+| # | Langkah | Perintah |
+|---|---|---|
+| 1 | Masuk folder instalasi | `cd D:\ALDx` |
+| 2 | **Cadangkan data** (metadata + ALDx Engine + `.env`) ke luar folder instalasi | lihat blok di bawah tabel |
+| 3 | Hapus container, volume data, jaringan & image ALDx | `docker compose --profile pindah down --volumes --remove-orphans --rmi all` |
+| 4 | Sisa dengan nama ALDx (instalasi lain / versi lama) | lihat blok di bawah tabel |
+| 5 | Tugas terjadwal cadangan | `Unregister-ScheduledTask -TaskName "ALDx Cadangan Harian","ALDx Uji Pulih Mingguan" -Confirm:$false -ErrorAction SilentlyContinue` |
+| 6 | Sertifikat HTTPS ALDx yang pernah dipercayai | lihat blok di bawah tabel (Windows menanyakan konfirmasi: **Yes**) |
+| 7 | Pintasan Desktop & menu Start | `Remove-Item "$([Environment]::GetFolderPath('Desktop'))\ALDx.lnk", "$([Environment]::GetFolderPath('Programs'))\ALDx" -Recurse -Force -ErrorAction SilentlyContinue` |
+| 8 | Entri di *Settings › Apps* (bila pernah memakai Setup.exe) | `Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{6D3C2A61-4E0B-4C5E-9B7A-1A1D0C000001}_is1" -Recurse -ErrorAction SilentlyContinue` |
+| 9 | Folder instalasi | `cd \` lalu `Remove-Item D:\ALDx -Recurse -Force` |
+
+Langkah 2, cadangan (berhenti di sini bila ada galat; jangan lanjut menghapus):
+
+```powershell
+$cadangan = "$([Environment]::GetFolderPath('MyDocuments'))\ALDx-cadangan-$(Get-Date -Format yyyyMMdd-HHmm)"
+New-Item -ItemType Directory -Force $cadangan | Out-Null
+docker compose up -d metadb engine
+powershell -ExecutionPolicy Bypass -File scripts\cadangkan.ps1 -Engine -Salin $cadangan
+Copy-Item .env "$cadangan\env-RAHASIA.env"; Copy-Item backup\* $cadangan -Recurse -Force -ErrorAction SilentlyContinue
+Get-ChildItem $cadangan                                            # pastikan ada berkas .dump & cadangan engine
+```
+
+Skrip `cadangkan.ps1` pun diblokir? Cadangan metadata (dashboard, chart, pengguna, pengaturan) tanpa skrip:
+
+```powershell
+docker exec sps_metadb sh -c 'pg_dump -U "$POSTGRES_USER" -Fc -f /tmp/metadata.dump "$POSTGRES_DB"'
+docker cp sps_metadb:/tmp/metadata.dump "$cadangan\metadata.dump"
+```
+
+Data di ALDx Engine (ekstrak & impor berkas) dicadangkan oleh `cadangkan.ps1 -Engine`; tanpa skrip, ekstrak bisa dibuat
+ulang dari sumbernya setelah memasang lagi.
+
+Langkah 4, sisa dengan nama ALDx:
+
+```powershell
+docker ps -aq --filter "name=^sps_" | % { docker rm -f $_ }
+docker volume ls -q | ? { $_ -match '^(sps_|aldx)' } | % { docker volume rm -f $_ }
+docker images --format "{{.Repository}}:{{.Tag}}" | ? { $_ -match '^sps-superset' } | % { docker rmi -f $_ }
+docker network ls -q --filter "name=superset" | % { docker network rm $_ }
+```
+
+Langkah 6, sertifikat:
+
+```powershell
+Get-ChildItem Cert:\CurrentUser\Root | Where-Object Subject -match '(^|, )O=ALDx(,|$)' | Remove-Item
+```
+
+Cek bersih: `docker ps -a --filter "name=^sps_"` dan `docker volume ls` tidak lagi menampilkan `sps_…`. Cadangan berisi
+**rahasia** (password di `env-RAHASIA.env`): simpan aman atau hapus bila tidak diperlukan. Memasang lagi nanti dan
+memakai data lama: pasang ALDx, lalu `scripts\cadangkan.ps1 -Pulihkan <berkas .dump>` ([docs/29](docs/29-versi-pembaruan-hapus-total.md)).
 
 ### Masalah umum
 

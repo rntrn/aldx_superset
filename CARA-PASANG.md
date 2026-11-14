@@ -107,6 +107,7 @@ Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *
 ALDx › **Hapus total (bersih)**. Bisa juga bila folder ALDx sudah terhapus. Data dicadangkan dulu ke
 *Dokumen\ALDx-cadangan-…*, lalu container, data, image, sertifikat, pintasan, entri Apps, dan folder ALDx dihapus.
 Rinci & cara mencoba dulu (`-Simulasi`): [docs/29](docs/29-versi-pembaruan-hapus-total.md).
+Dihapus antivirus kantor? Langkah manual tanpa .exe: [README › Menghapus total tanpa .exe](README.md#8-menghapus-total-tanpa-exe).
 
 **Komputer lain berbeda tampilan/fitur?** Setup.exe membekukan versi saat dibangun; `git pull` selalu terbaru.
 Lihat [docs/29 §1](docs/29-versi-pembaruan-hapus-total.md).

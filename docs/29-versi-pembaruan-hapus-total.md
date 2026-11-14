@@ -136,6 +136,7 @@ Tiga cara, hasilnya sama:
 | **ALDx-HapusTotal.exe** (Releases, satu berkas 2 MB) | paling mudah; juga bila folder ALDx sudah terhapus, Settings › Apps rusak, atau ALDx dipasang dari git/ZIP. Klik dua kali › pilih folder ALDx (terisi otomatis) › **Hapus** |
 | Menu Start › ALDx › **Hapus total (bersih)** | ALDx dipasang dengan Setup.exe |
 | PowerShell (di bawah) | otomatisasi / pilihan lanjutan |
+| **Manual, langkah demi langkah** | antivirus kantor menghapus `ALDx-HapusTotal.exe` dan/atau skrip diblokir: [README › Menghapus total tanpa .exe](../README.md#8-menghapus-total-tanpa-exe) (cadangan dulu, lalu 9 langkah) |
 
 Bila folder ALDx sudah tidak ada, data tidak bisa dicadangkan, tetapi container, image, volume, Kubernetes, dan jejak
 Windows ALDx tetap dibersihkan (dicari dari namanya).
