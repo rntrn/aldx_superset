@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.14.4 | perbaikan pemasang: port web otomatis tidak lagi memilih 8089 (bentrok dengan port diagnosa ALDx) |
 | 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
 | 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
 | 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
@@ -31,6 +32,23 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.14.4 · Perbaikan pemasang: port web bentrok
+
+### Diperbaiki
+
+| Masalah | Penyebab & perbaikan |
+|---|---|
+| Pasang gagal di *Menyalakan semua container*: *Bind for 127.0.0.1:8089 failed: port is already allocated* (`sps_gateway`) | port 8088 dipakai program lain, wizard otomatis memilih 8089, padahal 8089 adalah port diagnosa web ALDx (`NODE_WEB_PORT`). Kini port web otomatis melewati semua port ALDx (8089, 5433, 8124, 6379); isian port web yang bentrok ditolak dengan pesan jelas; pemasangan yang terlanjur memakai 8089 dipindah otomatis ke port bebas berikutnya saat `PASANG.cmd` dijalankan lagi |
+
+### Perlu dilakukan setelah memperbarui
+
+| Keadaan | Langkah |
+|---|---|
+| Pemasangan sempat gagal karena port 8089 | ambil versi ini (`git pull` / Setup terbaru), jalankan `PASANG.cmd` lagi di folder yang sama; alamat web baru tertulis di halaman Selesai (mis. `http://localhost:8090`) |
+| Sudah terpasang normal | tidak ada |
 
 ---
 
