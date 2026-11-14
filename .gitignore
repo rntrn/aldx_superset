@@ -50,3 +50,7 @@ docker/wheels/hdbcli-*.whl
 
 # Versi kode terpasang (ditulis scripts\sinkron-laptop.ps1, dibaca Beranda)
 config/versi.json
+
+# Hasil uji tampilan (scripts/uji-ci.sh, tests/e2e)
+tests/e2e/hasil/
+tests/e2e/uji-otomatis.txt

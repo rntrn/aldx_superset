@@ -109,6 +109,8 @@ gratis, maupun berbayar; yang perlu Anda atur:
 | `batas_latar_detik` | 900 | batas total **satu pertanyaan** (berjalan di latar, tidak terikat timeout web) |
 | `cadangan_otomatis` | `true` | model sibuk/kuota habis (429/5xx, mis. Gemini 503) → coba ulang 2×, lalu beralih ke model aktif lain |
 | `batas_pertanyaan_per_jam` | 60 | per pengguna (Admin bebas); melindungi biaya model berbayar |
+| `ringkasan_dashboard` | `otomatis` | ringkasan AI di bilah atas dashboard: `otomatis` / `klik` (hemat biaya) / `mati` |
+| `ringkasan_menit` | 60 | ringkasan disimpan sekian menit per pengguna & dashboard |
 | `kirim_data` (per model) | `false` untuk cloud | boleh/tidaknya angka dikirim ke model itu; pengalihan cadangan menghormatinya |
 
 Saran: **pasang minimal dua model** (mis. satu cloud gratis + satu lokal) agar pengalihan otomatis berguna.
@@ -208,6 +210,7 @@ powershell -ExecutionPolicy Bypass -File scripts\jadwal-cadangan.ps1 -Salin \\na
 | Rincian model AI lokal | [20-model-ai-lokal.md](../20-model-ai-lokal.md) |
 | Beda versi antar komputer, **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](../29-versi-pembaruan-hapus-total.md) |
 | **Urutan menyala, SOP, FAQ admin** | [19-runbook-faq-admin.md](../19-runbook-faq-admin.md) |
+| **Uji otomatis & uji tampilan di CI** (sebelum upgrade Superset / setiap pull request), `scripts/uji-ci.sh` | [pengujian §1b](../pengujian/README.md#1b-uji-tampilan-otomatis-ci) |
 | Identitas (nama, logo, warna) | Pusat Kendali → **Identitas & Tema** ([09](../09-identitas-tema.md)) |
 
 ### 9a. Memperbarui ALDx (cara termudah)

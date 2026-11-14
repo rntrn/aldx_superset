@@ -238,7 +238,8 @@
 
   /* ---------- Simulasi what-if ----------
      Menggeser satu ukuran naik/turun sekian persen di browser, di atas hasil kueri. Tidak menyentuh dataset
-     (tetap bisa diekstrak & di-cache) dan tidak ikut tersimpan. Garis analitik disembunyikan selama simulasi
+     (tetap bisa diekstrak & di-cache). Bawaan: hanya pratinjau. "Simpan sebagai skenario" = ikut tersimpan ke chart
+     (server: lembar._metrik_simpan, SQL "(agregat) * faktor"). Garis analitik disembunyikan selama simulasi
      karena dihitung dari nilai asli. */
   function simulasiAktif() {
     const s = L.simulasi;
@@ -256,6 +257,7 @@
     $("#simUkuran").innerHTML = ukuran.map(u => `<option ${u === L.simulasi.ukuran ? "selected" : ""}>${esc(u)}</option>`).join("");
     $("#simUkuran").disabled = $("#simPersen").disabled = !ukuran.length || L.hasil.kalkulasi !== "";
     if ($("#simPersen").disabled) L.simulasi.persen = 0;
+    $("#simSimpan").disabled = !L.simulasi.persen; $("#simSimpan").checked = !!L.simSimpan;
     $("#simPersen").value = L.simulasi.persen; $("#simNilai").textContent = `${L.simulasi.persen > 0 ? "+" : ""}${L.simulasi.persen}%`;
   }
   async function simpanDefinisi(jenis, lama) {
@@ -485,7 +487,8 @@
   const spec = () => ({dataset_id: L.ds, judul: $("#judulLembar").value.trim(), tanda: tandaEfektif(),
     kolom: L.kolom.map(keSpec), baris: L.baris.map(keSpec), warna: keSpec(L.warna), ukuran: keSpec(L.ukuran),
     label: L.label, filter: filterSpec(), urut: L.urut, batas: L.topN || BATAS_PRATINJAU, analitik: L.analitik,
-    kalkulasi: L.kalkulasi || "", skala_warna: !!L.skala, ambang: TANDA_AMBANG.includes(tandaEfektif()) ? L.ambang : {}});
+    kalkulasi: L.kalkulasi || "", skala_warna: !!L.skala, ambang: TANDA_AMBANG.includes(tandaEfektif()) ? L.ambang : {},
+    simulasi: L.simSimpan && simulasiAktif() ? {ukuran: L.simulasi.ukuran, persen: L.simulasi.persen} : null});
   const horizontal = () => L.baris.some(p => p.peran === "dimensi") && !L.kolom.some(p => p.peran === "dimensi");
 
   const kueri = Studio.tunda(async () => {
@@ -508,7 +511,8 @@
         ambang: TANDA_AMBANG.includes(t) && Object.keys(L.ambang || {}).length ? L.ambang : null,
         klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null,
         klikKanan: Studio.bisaJelaskan ? (i, nama, ev) => menuJelaskan(nama, ev) : null}) || {};
-      if (sim) info.catatan = `Simulasi: ${sim.ukuran} ${sim.persen > 0 ? "+" : ""}${sim.persen}% (hanya pratinjau, tidak ikut tersimpan)` + (info.catatan ? ". " + info.catatan : "");
+      if (sim) info.catatan = `Simulasi: ${sim.ukuran} ${sim.persen > 0 ? "+" : ""}${sim.persen}% ` +
+        (L.simSimpan ? "(ikut tersimpan sebagai skenario)" : "(hanya pratinjau, tidak ikut tersimpan)") + (info.catatan ? ". " + info.catatan : "");
       $("#statusLembar").innerHTML = `<span>${fmtPenuh.format(L.hasil.baris.length)} baris</span><span>${esc(Studio.awal.aturan[t].label)}</span>
         <span>${Math.round(performance.now() - mulai)} ms</span>${L.topN ? `<span>${L.topN} teratas</span>` : L.hasil.baris.length >= BATAS_PRATINJAU ? "<span>Dibatasi " + BATAS_PRATINJAU + " baris</span>" : ""}
         ${info.catatan ? `<span class="peringatan">${esc(info.catatan)}</span>` : ""}
@@ -609,6 +613,7 @@
     L.topN = s.batas && s.batas < BATAS_PRATINJAU ? s.batas : 0; $("#topN").value = L.topN || "";
     L.kalkulasi = s.kalkulasi || ""; L.skala = !!s.skala_warna;
     $("#pilihKalkulasi").value = L.kalkulasi; $("#pakaiSkala").checked = L.skala;
+    L.simulasi = s.simulasi && s.simulasi.persen ? {...s.simulasi} : null; L.simSimpan = !!L.simulasi;
     L.ambang = s.ambang || {}; $("#ambangAtas").value = L.ambang.atas ?? ""; $("#ambangBawah").value = L.ambang.bawah ?? "";
     L.filter = [];
     const kelompok = {};
@@ -664,7 +669,7 @@
   /* ---------- Tombol ---------- */
   function bersihkan(render = true) {
     Object.assign(L, {kolom: [], baris: [], warna: null, ukuran: null, filter: [], tanda: "otomatis", label: false, urut: "",
-                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false, ambang: {}, simulasi: null});
+                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false, ambang: {}, simulasi: null, simSimpan: false});
     $("#topN").value = ""; $("#pilihKalkulasi").value = ""; $("#pakaiSkala").checked = false;
     $("#judulLembar").value = ""; $("#pakaiLabel").checked = false; $("#pilihTanda").value = "otomatis";
     if (render) perbarui(); else { renderRak(); renderShowMe(); renderAnalitik(); tampilPesan("Seret <b>&nbsp;Dimensi&nbsp;</b> ke rak Kolom dan <b>&nbsp;Ukuran&nbsp;</b> ke rak Baris."); }
@@ -693,6 +698,7 @@
     $("#ambangAtas").onchange = ubahAmbang; $("#ambangBawah").onchange = ubahAmbang;
     $("#simUkuran").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
     $("#simPersen").oninput = () => { $("#simNilai").textContent = `${$("#simPersen").value > 0 ? "+" : ""}${$("#simPersen").value}%`; };
+    $("#simSimpan").onchange = () => { L.simSimpan = $("#simSimpan").checked; perbarui(); };
     $("#simPersen").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
     ["anRamalan", "anTren", "anAnomali", "anPeriode", "anGerak", "anJendela", "anRata", "anMedian", "anEkstrem", "anTarget", "anNilaiTarget"]
       .forEach(id => { $("#" + id).onchange = () => { bacaAnalitik(); perbarui(); }; });

@@ -190,6 +190,8 @@ Keterbatasan: skor dari sampel, jadi angka di skor bisa sedikit berbeda dari tot
 | `baris_maks` | 500 | maks. baris yang ditampilkan |
 | `baris_ke_model` | 50 | maks. baris dikirim ke model (`kirim_data: true`) |
 | `batas_detik_model` | 120 | waktu tunggu jawaban model |
+| `ringkasan_dashboard` | `otomatis` | ringkasan AI di bilah atas dashboard: `otomatis` / `klik` / `mati` ([23 §1c](23-asisten-ai-peran-ahli.md#1c-ringkasan-ai-otomatis-di-dashboard)) |
+| `ringkasan_menit` | 60 | ringkasan disimpan sekian menit per pengguna & dashboard |
 
 ## 8. Log & audit
 

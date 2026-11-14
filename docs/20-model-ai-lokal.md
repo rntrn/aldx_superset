@@ -146,5 +146,7 @@ dinyalakan, klik **Periksa lagi** (tanpa menunggu, tanpa restart).
 - Model lokal berjalan di komputer kantor: pertanyaan & angka **tidak dikirim ke internet**
   (internet hanya dipakai saat mengunduh model).
 - Asisten AI selalu bertanya ke data **sebagai pengguna yang login**, jadi hak akses data (RLS) tetap berlaku.
+- **Ringkasan AI otomatis di dashboard** mendahulukan model lokal (boleh membaca angka tanpa data keluar kantor);
+  model cloud `kirim_data: false` tidak pernah dipakai untuk ringkasan ([23 §1c](23-asisten-ai-peran-ahli.md#1c-ringkasan-ai-otomatis-di-dashboard)).
 - Model cloud (Gemini, Groq, OpenRouter, Cerebras, Mistral, GitHub Models, Grok, OpenAI, Anthropic) memakai `kirim_data: false`: angka hasil query tidak dikirim ke
   penyedia kecuali admin mengubahnya dengan izin resmi ([10-asisten-ai.md](10-asisten-ai.md)).

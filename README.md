@@ -85,8 +85,8 @@ Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33
 
 | Area | Isi |
 |---|---|
-| **Analitik** | % dari total · kumulatif · YoY · **ambang hijau/merah** · rata bergerak · target · simulasi what-if · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
-| **Dashboard** | tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
+| **Analitik** | % dari total · kumulatif · YoY · **ambang hijau/merah** · rata bergerak · target · simulasi what-if (bisa disimpan sebagai skenario) · mini-chart tren di tooltip · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
+| **Dashboard** | **ringkasan AI otomatis** · tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
 | **Berbagi** | ekspor PNG/PDF/Excel/CSV · **PowerPoint** · berkas `.ald/.aldx` terenkripsi · Story · langganan laporan & peringatan data via email · sematkan ke web lain dengan RLS per penonton |
 | **Data** | 14+ jenis database + Access/Excel/CSV · jejak data (lineage) · persiapan data tanpa SQL · gabung otomatis · ekstrak ke ALDx Engine |
 | **Admin** | Pusat Kendali (pengaturan, batas, topologi) · kesehatan kueri · jejak audit · cadangan & pulihkan · multi-node · HTTPS |
@@ -105,6 +105,7 @@ Tekan **`Ctrl + I`** di halaman mana pun. Asisten paham isi aplikasi (dataset, c
 | *"scan tabel berawalan data_ di sps_engine"* | memindai tabel database, jumlah baris, status dataset |
 | *"gabungkan dataset A, B, C jadi dataset detail"* | menggabung otomatis; menolak gabungan yang membuat angka berlipat; RLS ikut |
 | *"ringkas dashboard ini dalam 5 poin"* | membaca dashboard yang terbuka lalu meringkas |
+| (tanpa bertanya) | **Ringkasan AI otomatis** di bilah atas setiap dashboard: 3–5 poin berangka + *Perlu perhatian*, sesuai hak akses Anda |
 
 **Bekerja dengan model apa pun**
 
@@ -184,7 +185,7 @@ Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar is
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
-| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **ambang** (format bersyarat hijau/merah pada angka & tabel), **dashboard dari template** (umum & per bidang: Penjualan, Keuangan, SDM, Operasional; dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
+| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **ambang** (format bersyarat hijau/merah pada angka & tabel), **dashboard dari template** (umum & per bidang: Penjualan, Keuangan, SDM, Operasional; dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya** (dengan mini-chart tren per kategori), **skenario what-if tersimpan**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
 | Pusat Kendali | `/pusat-kendali/`: proses, cache, batas, identitas, hubungkan data, ekstrak (termasuk **impor banyak tabel sekaligus dengan cek kapasitas**), hak akses, multi-node |
 | Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
 | Ekspor | tombol **Ekspor** di setiap tabel & grafik halaman ALDx: gambar PNG, PDF, Excel, CSV, TXT, salin |
@@ -276,6 +277,7 @@ D:\superset
 │   ├── cadangkan.ps1       # Cadangan & pemulihan metadb (+ engine)
 │   ├── versi.ps1           # Versi tiap komponen
 │   ├── catatan-rilis.ps1   # Catatan rilis v<VERSI> dari docs/31 (GitHub Actions)
+│   ├── uji-ci.sh           # Pasang dari nol di Linux + semua uji (GitHub Actions: workflow uji)
 │   ├── sinkron-laptop.ps1  # Ambil versi terbaru dari GitHub, terapkan, uji, (opsional) terbitkan installer
 │   ├── data-latihan.ps1    # Muat data latihan fiktif
 │   ├── data-penerbangan.ps1 # Buat Excel/CSV latihan penerbangan ukuran besar
@@ -290,6 +292,7 @@ D:\superset
 │   ├── test-ldap.ps1, diagnose.ps1, cleanup.ps1
 │   └── _umum.ps1           # Fungsi bersama (jangan dijalankan langsung)
 ├── sql/                    # HANYA untuk instalasi lama berbasis XAMPP (lihat sql/README.md)
+├── tests/e2e/              # Uji tampilan Playwright (tidak ikut installer)
 └── docs/
     ├── 00-mulai-di-sini.md # Peta dokumentasi per peran
     ├── 01..19-*.md         # Dokumentasi teknis (arsitektur s.d. runbook admin)

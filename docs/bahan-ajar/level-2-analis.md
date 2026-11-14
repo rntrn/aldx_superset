@@ -140,6 +140,7 @@
 - **T8.** Peringatan data `SUM(total)` `latihan_penjualan` `>` 600 miliar: terpenuhi?
 - **T9.** **Ambang**: Angka total dengan *Hijau ≥* 600 miliar; Tabel `nm_cabang × total` dengan *Hijau ≥* 120 miliar & *Merah ≤* 60 miliar.
 - **T10.** Template **Penjualan** (per bidang), ukuran utama *Otomatis*: berapa lembar kerja, ukuran & kategori apa yang dipilih?
+- **T11.** Mini-chart tooltip **Cabang Jakarta** (Batang `nm_cabang × total`); lalu skenario +10% disimpan: nilai Jakarta di chart tersimpan?
 
 ### Kunci jawaban tambahan
 
@@ -155,6 +156,7 @@
 | T8 | **ya** (667,4 miliar > 600 miliar) |
 | T9 | Angka **hijau ▲ 667B**. Tabel: **hijau** Jakarta (234,2 M), Surabaya (137,1 M), Bandung (121,2 M); **merah** Makassar (45,5 M); Medan & Balikpapan biasa. Chart tersimpan menampilkan warna yang sama |
 | T10 | **9 lembar kerja** + judul; ukuran utama **total**, kategori pertama **kategori**; ada % vs tahun lalu dan peta provinsi |
+| T11 | mini-chart **2025-01 – 2025-12**, hijau ▲ (± 38,6%); chart tersimpan berlabel `SUM(total) (+10%)`, Jakarta **± 257,6 M** (234,2 M × 1,1), sama dengan pratinjau Studio |
 
 ### Kuis tambahan
 
@@ -166,8 +168,9 @@
 
 17. Ambang *Hijau ≥ 100* dan *Merah ≤ 50*; nilai 75 tampil… a) hijau b) merah **c) warna biasa**
 18. Template per bidang memilih kolom berdasarkan… a) urutan abjad **b) kecocokan nama kolom dengan bidangnya** c) acak
+19. Simulasi yang **disimpan sebagai skenario**… a) mengubah data sumber **b) dihitung di database sebagai (agregat) × faktor pada chart itu** c) hanya tampil di Studio
 
-**Kunci:** 12b · 13a · 14a · 15b · 16a · 17c · 18b
+**Kunci:** 12b · 13a · 14a · 15b · 16a · 17c · 18b · 19b
 
 ## Daftar periksa kompetensi
 
@@ -180,7 +183,8 @@
 - [ ] Menggabung 2 tabel di Kueri Visual, memeriksa hasil gabung, dan menyimpannya sebagai dataset
 - [ ] Mengekspor dashboard ke .ald/.aldx berkata sandi dan mengimpornya sebagai salinan baru
 - [ ] Mengekspor hasil ke Excel/CSV/gambar dan memakai `/data-engineer` untuk SQL
-- [ ] Memakai kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi
+- [ ] Memakai kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi (pratinjau & skenario tersimpan)
+- [ ] Membaca mini-chart tren di tooltip Batang/Pie
 - [ ] Memakai *Jelaskan perubahan* dan membaca tooltip kaya
 - [ ] Memberi **ambang** (hijau/merah) pada Angka atau Tabel dan menjelaskan artinya
 - [ ] Membuat dashboard dari template (umum & per bidang), menambah tab, mengatur tinggi kotak

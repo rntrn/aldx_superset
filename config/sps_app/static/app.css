@@ -568,6 +568,22 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .item-telusur span { display: flex; flex-direction: column; min-width: 0; }
 .chip-segar { cursor: default; padding: 0 10px; font-size: 12px; color: var(--teks-2, var(--teks)); white-space: nowrap; }
 .chip-segar.lama { border-color: #E8A33D; }
+/* Ringkasan AI dashboard (ringkasan.js) */
+.chip-ringkas[hidden], .kartu-ringkas[hidden] { display: none; }
+.chip-ringkas, .chip-segar { flex: none; max-width: none; }
+.chip-ringkas { cursor: pointer; padding: 0 10px; font-size: 12px; font-weight: 600; color: var(--aksen-teks); white-space: nowrap; }
+.chip-ringkas.sibuk { animation: denyut-ringkas 1.4s ease-in-out infinite; }
+.chip-ringkas.siap { background: var(--kertas); border-color: var(--aksen); }
+@keyframes denyut-ringkas { 50% { opacity: .5; } }
+.kartu-ringkas { position: fixed; z-index: 60; width: min(440px, calc(100vw - 24px)); padding: 14px 16px; border: 1px solid var(--garis);
+  border-radius: var(--r); background: var(--kertas); color: var(--teks); box-shadow: var(--bayang-2); }
+.judul-ringkas { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.tutup-ringkas { border: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer; color: var(--teks-3); }
+.kartu-ringkas ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.kartu-ringkas li.perhatian { list-style: none; margin-left: -18px; padding: 6px 10px; border-radius: var(--r-kecil); background: var(--aksen-muda); }
+.ket-ringkas { margin: 10px 0 0; font-size: 11.5px; color: var(--teks-3); }
+.galat-ringkas { margin: 4px 0 0; color: var(--bahaya); }
+.aksi-ringkas { display: flex; gap: 8px; margin-top: 12px; }
 .simpan-tampilan { display: flex; gap: 6px; margin: 6px 0 8px; }
 .simpan-tampilan input { flex: 1; min-width: 0; padding: 7px 10px; border: 1px solid var(--garis); border-radius: var(--r); background: var(--latar); color: var(--teks); font: inherit; }
 .baris-tampilan { display: flex; gap: 4px; align-items: stretch; }

@@ -169,6 +169,11 @@ query Studio (23 jenis chart), ekstrak (buat-segarkan-hapus), ramalan, dan izin 
 Lalu lakukan uji manual singkat dari [pengujian/skenario-uji.md](pengujian/skenario-uji.md)
 (bagian "Uji asap", ±15 menit).
 
+**Upgrade versi Superset (mayor)** wajib lulus **uji tampilan** lebih dulu: ubah `SUPERSET_VERSION` di `.env.example`
+pada cabang baru, buka pull request, dan tunggu workflow **uji** (GitHub Actions) hijau. Uji tampilan memeriksa bagian
+ALDx yang menempel pada tampilan Superset (bingkai aplikasi, bilah atas dashboard, Telusuri, Studio), yang paling mudah
+rusak saat Superset berubah ([pengujian §1b](pengujian/README.md#1b-uji-tampilan-otomatis-ci)).
+
 ## 9. Jadwal perawatan yang disarankan
 
 | Kapan | Apa |

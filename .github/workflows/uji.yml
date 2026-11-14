@@ -1,0 +1,54 @@
+# Uji otomatis + uji tampilan di setiap pull request ke main (dan manual: Actions > uji > Run workflow).
+#
+#   1. Linux runner memasang ALDx dari nol (scripts/uji-ci.sh): image, metadata, admin acak, dashboard & data latihan
+#   2. sps_uji.py   : uji modul/API (harus semua LULUS)
+#   3. tests/e2e    : uji tampilan Playwright (login, Beranda, Studio, dashboard, Panduan, Pusat Kendali)
+#
+# PR baru di-merge setelah uji ini hijau, jadi rilis installer (rilis.yml) hanya dibangun dari kode yang lulus.
+# Gagal? Unduh artefak "hasil-uji" (tangkapan layar + keluaran uji) dari halaman run.
+name: uji
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore: ["docs/pdf/**", "**/*.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uji-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  uji:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lapangkan disk runner
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL && df -h /
+
+      - name: Pasang Playwright (Chromium)
+        run: |
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+
+      - name: Pasang ALDx & jalankan semua uji
+        run: bash scripts/uji-ci.sh
+
+      - name: Log container bila gagal
+        if: failure()
+        run: docker compose logs --tail 150 superset superset-worker gateway || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hasil-uji
+          path: |
+            tests/e2e/hasil/
+            tests/e2e/uji-otomatis.txt
+          retention-days: 7
+          if-no-files-found: ignore

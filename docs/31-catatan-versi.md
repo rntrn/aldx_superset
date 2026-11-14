@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
 | 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
 | 2026.11.13.8 | AI: pekerjaan yang prosesnya mati dilaporkan |
 | 2026.11.13.7 | README baru, peta menu, alur pelatihan, tutorial & bahan ajar lengkap |
@@ -29,6 +30,27 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.14.2 · Ringkasan AI otomatis, skenario what-if, mini-chart tooltip, uji tampilan
+
+### Baru
+
+| Area | Perubahan | Dokumen |
+|---|---|---|
+| Asisten AI | **Ringkasan AI otomatis** saat dashboard dibuka: chip ✦ di bilah atas → 3–5 poin berangka + *Perlu perhatian*, **Perbarui**, **Tanya lanjut**. Sesuai hak akses (RLS), hanya model yang boleh membaca angka, model cadangan, disimpan 60 menit. `ai.yaml`: `ringkasan_dashboard` (`otomatis`/`klik`/`mati`), `ringkasan_menit` | [23 §1c](23-asisten-ai-peran-ahli.md#1c-ringkasan-ai-otomatis-di-dashboard) |
+| Studio | **Simulasi what-if bisa disimpan sebagai skenario**: centang *Simpan sebagai skenario* → chart berisi `(agregat) × faktor`, berlabel mis. `SUM(total) (+10%)` | [12](12-studio-visual.md#simulasi-what-if) |
+| Studio | **Mini-chart di tooltip** Batang/Pie: tren 12 bulan terakhir kategori di bawah kursor | [12](12-studio-visual.md#tooltip-kaya) |
+| Pengujian | **Uji tampilan otomatis di CI** (workflow *uji* di setiap pull request): ALDx dipasang dari nol di Linux, `sps_uji.py` + uji Playwright (`tests/e2e`); `scripts/uji-ci.sh` | [pengujian §1b](pengujian/README.md#1b-uji-tampilan-otomatis-ci) |
+
+### Perlu dilakukan setelah memperbarui
+
+| Cara memasang | Langkah |
+|---|---|
+| ALDx-Setup.exe / Offline | jalankan installer versi baru di atas instalasi lama (Next-Next), lalu `Ctrl + F5` |
+| git | `git pull`, `docker compose restart superset superset-worker superset-beat`, `Ctrl + F5` |
+| Memakai model AI berbayar | pertimbangkan `ringkasan_dashboard: klik` di `config\ai.yaml` agar ringkasan hanya dibuat saat diminta |
 
 ---
 
