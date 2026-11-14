@@ -14,12 +14,16 @@ Cara termudah memasang, memperbarui, atau memindahkan ALDx. Yang **wajib** hanya
 dan masih baru, jadi Windows **SmartScreen** ("Windows protected your PC") dan sebagian **antivirus** curiga.
 Ini wajar untuk semua program baru tanpa tanda tangan, bukan berarti ada virus.
 
-| Cara | Untuk | Langkah |
+**Bila antivirus kantor menghapus berkas Setup / HapusTotal** (CrowdStrike Falcon, Microsoft Defender yang dikelola TI,
+dan Anda tidak boleh mematikannya), pilih salah satu. **Jangan mematikan atau mengakali antivirus kantor.**
+
+| Cara | Siapa | Langkah |
 |---|---|---|
-| **Salin lewat flashdisk / folder jaringan** | cara cepat | berkas yang tidak diunduh lewat browser tidak diberi tanda "dari internet", jadi SmartScreen tidak muncul. Bila terlanjur diunduh: klik kanan berkas › *Properties* › centang **Unblock** › OK |
-| **Pengecualian antivirus kantor** | tim TI | tambahkan pengecualian untuk berkas Setup (berdasarkan hash SHA-256: `Get-FileHash ALDx-Setup.exe`, cocokkan dengan `ALDx-SHA256.txt` di rilis) dan folder `D:\superset` di konsol antivirus kantor |
-| **Laporkan salah deteksi** | sekali per versi | Microsoft Defender: <https://www.microsoft.com/wdsi/filesubmission> (pilih *Software developer*, *Incorrectly detected*). Antivirus lain: formulir *false positive* di situs vendornya. Jangan mengunggah ke situs pemindai publik bila kode dianggap rahasia |
-| **Tanda tangan digital** (permanen) | produksi | beli sertifikat *code signing* (penerbit tepercaya, mis. lewat layanan tanda tangan cloud) atau minta sertifikat dari CA internal kantor. Simpan sebagai secret GitHub `CODESIGN_PFX_BASE64` (isi berkas .pfx dalam base64) & `CODESIGN_PASSWORD`; `setup.yml` & `setup-offline.yml` otomatis menandatangani Setup dan uninstaller-nya (`/DTandaTangan`, `signtool`). Reputasi SmartScreen tetap naik bertahap seiring banyaknya pengguna |
+| **Pasang lewat git, tanpa .exe** | pengguna | `git clone` + `PASANG.cmd`, perbarui dengan `sinkron-laptop.ps1`, hapus total dengan `scripts\hapus-total.ps1`: [README › Pasang & perbarui dengan git](../README.md#pasang--perbarui-dengan-git-tanpa-exe). Hasilnya sama dengan Setup.exe |
+| **Izinkan berdasarkan hash** | tim TI | ambil SHA-256 dari `ALDx-SHA256.txt` di rilis versi itu (`v<VERSI>`). **CrowdStrike Falcon**: *Endpoint security › IOC management* › tambah *SHA256* dengan aksi **Allow** (+ pengecualian *Machine learning* untuk folder `D:\ALDx` bila skrip PowerShell ikut diblokir). **Microsoft Defender for Endpoint**: *Settings › Endpoints › Indicators › File hashes* › **Allow**. Hash berubah setiap versi, jadi ulangi per rilis |
+| **Laporkan salah deteksi** | pengguna/TI, sekali per versi | Microsoft: <https://www.microsoft.com/wdsi/filesubmission> (*Software developer* › *Incorrectly detected*). CrowdStrike: lewat tim TI ke dukungan CrowdStrike (*false positive*). Sertakan tautan rilis & `ALDx-SHA256.txt` |
+| **Salin lewat flashdisk / folder jaringan** | SmartScreen saja | berkas yang tidak diunduh lewat browser tidak bertanda "dari internet"; atau klik kanan › *Properties* › **Unblock**. Tidak menolong bila antivirus yang menghapus |
+| **Tanda tangan digital** (permanen) | pemilik produk | belum diaktifkan di build. Pilihan: layanan tanda tangan cloud (mis. Azure Trusted Signing), program gratis untuk proyek sumber terbuka (mis. SignPath Foundation), atau sertifikat dari CA internal kantor. Setelah bertanda tangan, TI cukup mengizinkan **penerbitnya** sekali (bukan hash tiap versi). Pilih penyedia, lalu langkah tanda tangan dipasang di `rilis.yml` (skrip Inno Setup sudah mendukung `/DTandaTangan`) |
 
 Agar tidak mirip pola program jahat, pintasan **ALDx** memakai `scripts\buka.cmd` (bukan PowerShell tersembunyi) dan
 berkas Setup memuat keterangan penerbit/versi.

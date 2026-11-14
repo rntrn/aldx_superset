@@ -107,6 +107,7 @@ Settings › **Apps** › ALDx › **Uninstall** (atau menu Start › ALDx › *
 ALDx › **Hapus total (bersih)**. Bisa juga bila folder ALDx sudah terhapus. Data dicadangkan dulu ke
 *Dokumen\ALDx-cadangan-…*, lalu container, data, image, sertifikat, pintasan, entri Apps, dan folder ALDx dihapus.
 Rinci & cara mencoba dulu (`-Simulasi`): [docs/29](docs/29-versi-pembaruan-hapus-total.md).
+Dihapus antivirus kantor? Langkah manual tanpa .exe: [README › Menghapus total tanpa .exe](README.md#8-menghapus-total-tanpa-exe).
 
 **Komputer lain berbeda tampilan/fitur?** Setup.exe membekukan versi saat dibangun; `git pull` selalu terbaru.
 Lihat [docs/29 §1](docs/29-versi-pembaruan-hapus-total.md).
@@ -137,7 +138,7 @@ Bila hanya punya folder proyek atau ZIP dari GitHub (**Code › Download ZIP**):
 | Pemeriksaan: **Internet – peringatan** | pemasangan pertama mengunduh ± 3 GB | sambungkan internet / proxy kantor. Tanpa internet: [docs/18-installer.md §6](docs/18-installer.md) |
 | **Pasang** berhenti dengan pesan merah | lihat baris terakhir pesannya | klik **Kembali** bila ada isian salah, lalu **Pasang** lagi (aman diulang). Kirim berkas terbaru di `installer\log\` ke TI bila tetap gagal |
 | Pasang gagal: *password authentication failed for user "superset"* | folder ALDx dihapus, tetapi data lama masih ada di Docker | pakai Setup/PASANG versi terbaru: halaman **Data sebelumnya** muncul → pilih *Mulai baru* (data lama dicadangkan dulu) atau *Pakai data lama* |
-| Antivirus memblokir / menghapus Setup | Setup baru & belum bertanda tangan digital (salah deteksi) | minta TI menambah pengecualian antivirus; laporkan salah deteksi ([docs/18](docs/18-installer.md#peringatan-windows--antivirus)) |
+| Antivirus (CrowdStrike, Defender) menghapus Setup / HapusTotal | Setup baru & belum bertanda tangan digital (salah deteksi) | **jangan matikan antivirus**. Pasang tanpa .exe lewat git: [README › Pasang & perbarui dengan git](README.md#pasang--perbarui-dengan-git-tanpa-exe); atau minta TI mengizinkan hash dari `ALDx-SHA256.txt` ([docs/18](docs/18-installer.md#peringatan-windows--antivirus)) |
 | Browser: *"Koneksi tidak pribadi"* | HTTPS dengan sertifikat buatan sendiri | klik *Advanced* › *Proceed*. Agar hilang permanen: [docs/11 §9b](docs/11-pusat-kendali-server.md#https) |
 | Password Superadmin ditolak / lupa | salah ketik, Caps Lock, atau akun terkunci setelah 5× salah | menu Start › ALDx › **Atur ulang password** (atau `scripts\atur-password.ps1`). Login dengan **email** (bukan *admin*) |
 

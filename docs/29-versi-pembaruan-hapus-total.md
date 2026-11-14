@@ -110,7 +110,7 @@ memakai `ALDx-HapusTotal.exe` untuk memperbarui: itu menghapus semua data.
    (folder hasil Setup.exe: tambah `-JadikanGit` sekali untuk menjadikannya folder git; `.env` & data tidak disentuh). Skrip ini mengambil versi terbaru,
    menerapkannya ke Docker, memperbarui menu & izin, lalu menjalankan uji. Data & pengaturan dipertahankan.
    Tambah `-KomitInstaller -Terbitkan` untuk sekalian menerbitkan installer baru ke Releases (pengembang).
-   Cara manual: `git pull`, lalu klik dua kali `PASANG.cmd`.
+   Cara manual langkah demi langkah (termasuk memilih/kembali ke versi tertentu): [README › Pasang & perbarui dengan git](../README.md#pasang--perbarui-dengan-git-tanpa-exe).
 2. **Dengan Setup.exe:** pastikan exe di Releases dibangun **setelah** perubahan terakhir, lalu jalankan di atas
    instalasi lama (folder sama, data dipertahankan).
 3. **Tanpa internet:** pakai installer offline (lihat tabel di atas), atau salin folder instalasi dari komputer yang
@@ -136,6 +136,7 @@ Tiga cara, hasilnya sama:
 | **ALDx-HapusTotal.exe** (Releases, satu berkas 2 MB) | paling mudah; juga bila folder ALDx sudah terhapus, Settings › Apps rusak, atau ALDx dipasang dari git/ZIP. Klik dua kali › pilih folder ALDx (terisi otomatis) › **Hapus** |
 | Menu Start › ALDx › **Hapus total (bersih)** | ALDx dipasang dengan Setup.exe |
 | PowerShell (di bawah) | otomatisasi / pilihan lanjutan |
+| **Manual, langkah demi langkah** | antivirus kantor menghapus `ALDx-HapusTotal.exe` dan/atau skrip diblokir: [README › Menghapus total tanpa .exe](../README.md#8-menghapus-total-tanpa-exe) (cadangan dulu, lalu 9 langkah) |
 
 Bila folder ALDx sudah tidak ada, data tidak bisa dicadangkan, tetapi container, image, volume, Kubernetes, dan jejak
 Windows ALDx tetap dibersihkan (dicari dari namanya).
