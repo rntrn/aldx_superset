@@ -42,7 +42,7 @@ tunggu_sehat sps_metadb 120; tunggu_sehat sps_engine 180; tunggu_sehat sps_redis
 
 echo "==> Metadata, admin, role"
 docker compose run --rm superset superset db upgrade
-docker compose run --rm superset sh -c 'superset fab create-admin --username "$ADMIN_USERNAME" --password "$ADMIN_PASSWORD" --email "$ADMIN_EMAIL" --firstname "$ADMIN_FIRSTNAME" --lastname "$ADMIN_LASTNAME"'
+docker compose run --rm superset sh /app/pythonpath/sps_buat_admin.sh
 docker compose run --rm superset superset init
 
 echo "==> Menyalakan semua layanan"

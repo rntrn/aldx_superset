@@ -182,6 +182,7 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Ringkasan AI di dashboard terlalu sering memakai model berbayar | `config\ai.yaml`: `ringkasan_dashboard: klik` (atau `mati`), naikkan `ringkasan_menit` |
 | Antivirus kantor menghapus `ALDx-Setup.exe` / `ALDx-HapusTotal.exe` | pasang/perbarui/hapus lewat git & skrip ([README](../README.md#pasang--perbarui-dengan-git-tanpa-exe)); TI mengizinkan hash dari `ALDx-SHA256.txt` ([18](18-installer.md#peringatan-windows--antivirus)) |
 | `powershell` *is not recognized* saat menjalankan `powershell -ExecutionPolicy Bypass -File scripts\…` | jalankan langsung di jendela PowerShell: `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\atur-password.ps1` (berlaku untuk skrip mana pun) |
+| Pasang gagal di *Membuat akun admin*: *Got unexpected extra argument* | versi ≤ 2026.11.14.2 dengan nama Superadmin berspasi: perbarui ke 2026.11.14.3+ (`git pull`), jalankan `PASANG.cmd` lagi |
 | Lupa password Superadmin | `.\scripts\atur-password.ps1` (email = `ADMIN_USERNAME` di `.env`); skrip diblokir: `docker compose exec superset superset fab reset-password --username <email> --password <baru>` lalu ganti lagi dari profil |
 | Memastikan installer asli & utuh | `Get-FileHash ALDx-Setup.exe` = baris di `ALDx-SHA256.txt` rilis `v<VERSI>` ([29](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github)) |
 | Masuk ke dalam container | `docker compose exec superset bash` (keluar: `exit`) |

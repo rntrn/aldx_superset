@@ -60,7 +60,7 @@ Invoke-Step "Membuat tabel metadata" {
 }
 
 Invoke-Step "Membuat akun admin" {
-    docker compose run --rm superset sh -c 'superset fab create-admin --username $ADMIN_USERNAME --password $ADMIN_PASSWORD --email $ADMIN_EMAIL --firstname $ADMIN_FIRSTNAME --lastname $ADMIN_LASTNAME'
+    docker compose run --rm superset sh /app/pythonpath/sps_buat_admin.sh   # nama/password berspasi tetap utuh
 }
 
 Invoke-Step "Menyiapkan role & permission" {

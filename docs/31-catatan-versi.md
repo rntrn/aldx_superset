@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
 | 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
 | 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
 | 2026.11.13.8 | AI: pekerjaan yang prosesnya mati dilaporkan |
@@ -30,6 +31,23 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.14.3 · Perbaikan pemasang: akun admin
+
+### Diperbaiki
+
+| Masalah | Penyebab & perbaikan |
+|---|---|
+| Pasang berhenti di *Membuat akun admin* dengan *Error: Got unexpected extra argument (…)*, lalu login tidak bisa karena akun admin belum ada | nama Superadmin tiga kata atau lebih (mis. *Budi Santoso S*), atau password berisi spasi / karakter `$ * ;`, terpecah saat dikirim ke container. Akun admin kini dibuat oleh `config/sps_buat_admin.sh` sehingga nilai sampai utuh |
+
+### Perlu dilakukan setelah memperbarui
+
+| Keadaan | Langkah |
+|---|---|
+| Pemasangan sempat gagal di *Membuat akun admin* | ambil versi ini (`git pull`, atau unduh Setup terbaru), lalu jalankan `PASANG.cmd` / Setup lagi di folder yang sama; data yang sudah terbentuk dipakai, akun admin dibuat |
+| Sudah terpasang normal | tidak ada |
 
 ---
 
