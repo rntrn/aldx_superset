@@ -48,7 +48,7 @@ Kolom dibagi otomatis (`config/sps_studio/bidang.py`):
 **Ukuran** = kolom angka yang bukan kode/ID/waktu, metrik tersimpan dataset, dan "Jumlah baris".
 **Dimensi** = teks, tanggal/periode (`tahun`, `bulan`), kode (`kd_*`, `npwp`, `nip`).
 
-### Tampilkan saya (Show Me)
+### Tampilkan saya
 
 Jenis yang bisa dipakai menyala; **bingkai emas = rekomendasi**. Aturan kebutuhan ada di satu tempat:
 `ATURAN_TANDA` di `config/sps_studio/lembar.py` (dipakai server & browser).
@@ -99,7 +99,7 @@ Beberapa kolom bertingkat dipakai seperti **satu kolom**, mis. *Wilayah* = provi
 Data latihan `latihan_penjualan_harian` sudah membawa hierarki **Wilayah** (pulau › provinsi › kab/kota › kecamatan ›
 kelurahan › outlet), **Kalender** (tahun › kuartal › bulan › tanggal), dan **Produk** (kategori › subkategori).
 
-### Ukuran & dimensi terdefinisi (seperti *New measure / New column* Power BI)
+### Ukuran & dimensi terdefinisi
 
 Panel Data › **+ Ukuran** atau **+ Dimensi** (butuh izin mengubah dataset: Alpha/Admin).
 
@@ -169,6 +169,22 @@ menuliskannya). Garis analitik disembunyikan selama simulasi; simulasi mati saat
 Jenis **Tabel** → centang **Skala warna sel**: latar sel ukuran makin pekat untuk nilai makin besar (per kolom),
 sehingga nilai tinggi/rendah langsung terlihat tanpa membaca angka. Ikut tersimpan (format bersyarat Superset).
 
+### Ambang (format bersyarat)
+
+Jenis **Angka**, **Angka + tren**, dan **Tabel** → baris **Ambang** di panel kiri: isi **Hijau ≥** dan/atau **Merah ≤**.
+
+| Nilai | Tampilan |
+|---|---|
+| ≥ batas hijau | hijau dengan ▲ (target tercapai) |
+| ≤ batas merah | merah dengan ▼ (perlu perhatian) |
+| di antaranya / kosong | warna biasa |
+
+Contoh: angka *Total penjualan* hijau bila ≥ `25000000000`, merah bila ≤ `15000000000`. Di Tabel, ambang berlaku untuk
+**ukuran pertama** dan mengalahkan *Skala warna sel* pada sel yang memenuhi syarat. Ambang **ikut tersimpan** ke chart
+(aturan *Conditional formatting* Superset, warnanya mengikuti tema & mode gelap), jadi tampil juga di dashboard.
+Di dashboard, sel tabel makin pekat makin jauh nilainya dari batas; batang sel (*cell bars*) dimatikan agar tidak
+mengaburkan warna ambang. Batas hijau harus lebih besar daripada batas merah. Kode: `config/sps_studio/lembar.py` (`format_ambang`).
+
 ### Kelompokkan nilai (Group)
 
 Klik kanan sebuah **dimensi teks** → **Kelompokkan nilai…** → beri nama kelompok (mis. *Jawa*, *Luar Jawa*), pilih
@@ -179,7 +195,7 @@ chart. Butuh izin mengubah dataset; maksimal 4 kelompok dan 300 nilai (lebih dar
 ### Tampilkan saya dengan banyak kolom
 
 Jenis grafik bisa dipilih selama **kebutuhan minimalnya** terpenuhi. Kolom yang melebihi kapasitas jenis itu
-**tidak dipakai**: pilnya tampil pudar dicoret dan status menulis *Tidak dipakai Pie: …* (seperti Tableau).
+**tidak dipakai**: pilnya tampil pudar dicoret dan status menulis *Tidak dipakai Pie: …*.
 Urutan pemakaian: jenis berbasis waktu mendahulukan kolom tanggal, peta titik mendahulukan lintang/bujur, peta
 provinsi mendahulukan kolom wilayah, jenis komposisi (Pie, Treemap, Corong) mendahulukan kategori; selebihnya
 urutan rak (Kolom, Baris, Warna). Chart yang disimpan memakai kolom yang sama dengan pratinjau.
@@ -211,6 +227,15 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
    | Ringkasan eksekutif | angka utama, tren + ramalan, komposisi, 10 teratas, peta provinsi |
    | Tren & ramalan | angka utama, tren + ramalan + garis tren, kumulatif, perbandingan ukuran, tabel berskala warna |
    | Perbandingan kategori | angka utama, peringkat, % dari total, peta, peta panas, tabel berskala warna |
+   | **Penjualan** (per bidang) | angka utama, tren + ramalan, angka + tren, % vs tahun lalu, 10 teratas, peta/porsi, rincian |
+   | **Keuangan** (per bidang) | pendapatan vs biaya per periode, akumulasi, waterfall per pos/akun, % dari total, rincian |
+   | **SDM** (per bidang) | jumlah karyawan, karyawan per departemen, komposisi, rata-rata gaji/ukuran per departemen, tren |
+   | **Operasional** (per bidang) | volume/durasi, tren + anomali + rata bergerak 7, lokasi tertinggi, peta panas, rincian |
+
+   Template **per bidang** mendahulukan kolom yang namanya cocok dengan bidangnya, mis. Penjualan: *omzet, penjualan,
+   qty* & *produk, cabang*; Keuangan: *pendapatan, biaya, laba* & *akun, pos*; SDM: *gaji, lembur* & *departemen,
+   jabatan*; Operasional: *durasi, terlambat* & *status, lokasi, rute*. Tanpa kolom yang cocok, kolom lain tetap dipakai.
+   **Ukuran utama** = *Otomatis (sesuai template)* atau pilih sendiri.
 
    Lembar kerja template tersimpan sebagai chart biasa (bisa dibuka & diubah di tab Lembar kerja). Template yang
    butuh kolom tanggal/kategori memberi pesan jelas bila dataset tidak memilikinya. Kode: `config/sps_studio/templat.py`
@@ -231,7 +256,7 @@ Dashboard tersimpan sebagai *Draft* di Superset (publikasikan dari menu **Dashbo
 
 ### Objek desain: teks, gambar, garis
 
-Panel kiri bagian **Objek** (padanan *Objects* di Tableau / Power BI). Seret ke kanvas, atau klik untuk menambah di
+Panel kiri bagian **Objek**. Seret ke kanvas, atau klik untuk menambah di
 baris paling bawah. Kotak teks & gambar punya tombol **Atur**.
 
 | Objek | Yang bisa diatur |

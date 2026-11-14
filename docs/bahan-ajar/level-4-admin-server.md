@@ -71,7 +71,7 @@
 
 | No | Jawaban |
 |---|---|
-| 1 | **84 uji**, semua LULUS pada instalasi sehat (4 komponen, 1 data, 23 chart Studio, 2 analitik, 2 engine, 8 halaman termasuk Kueri Visual & cangkang, 3 keamanan termasuk Superadmin, 5 Tahap 2: batas data, ekspor Excel, peran AI, Oracle ROWNUM, skema terpilih, 2 Tahap 3: berkas .ald/.aldx & filter global/ulasan, 1 Hubungkan data (driver opsional seperti SAP HANA yang belum dipasang tetap LULUS, dengan catatan), 1 HTTPS gateway, 2 keamanan: penguncian & audit, hak minimum, 1 ketahanan: ekspor latar & cadangan, 1 hierarki dimensi Studio, 1 objek dashboard, 1 tipe angka ClickHouse & tanggal ISO (syarat ramalan), 5 tambahan: Tampilkan saya banyak kolom, analitik lengkap, data latihan harian, kolom ID, preset tema, impor banyak tabel, versi aplikasi, ukuran & dimensi terdefinisi, data pendukung latihan, kalkulasi cepat & skala warna, template dashboard, YoY & urutan batang, jejak data, jelaskan perubahan & analitik per warna, dashboard bertab, kesehatan kueri/PowerPoint/SSO, gabung dataset Asisten AI, keandalan semua jenis model AI, adaptasi model & keamanan AI, tautan dokumentasi) |
+| 1 | **86 uji**, semua LULUS pada instalasi sehat (4 komponen, 1 data, 23 chart Studio, 2 analitik, 2 engine, 8 halaman termasuk Kueri Visual & cangkang, 3 keamanan termasuk Superadmin, 5 Tahap 2: batas data, ekspor Excel, peran AI, Oracle ROWNUM, skema terpilih, 2 Tahap 3: berkas .ald/.aldx & filter global/ulasan, 1 Hubungkan data (driver opsional seperti SAP HANA yang belum dipasang tetap LULUS, dengan catatan), 1 HTTPS gateway, 2 keamanan: penguncian & audit, hak minimum, 1 ketahanan: ekspor latar & cadangan, 1 hierarki dimensi Studio, 1 objek dashboard, 1 tipe angka ClickHouse & tanggal ISO (syarat ramalan), 5 tambahan: Tampilkan saya banyak kolom, analitik lengkap, data latihan harian, kolom ID, preset tema, impor banyak tabel, versi aplikasi, ukuran & dimensi terdefinisi, data pendukung latihan, kalkulasi cepat & skala warna, template dashboard, YoY & urutan batang, jejak data, jelaskan perubahan & analitik per warna, dashboard bertab, kesehatan kueri/PowerPoint/SSO, gabung dataset Asisten AI, keandalan semua jenis model AI, adaptasi model & keamanan AI, tautan dokumentasi, ambang format bersyarat, catatan versi & bebas merek) |
 | 2 | Pusat Kendali → **Riwayat**: waktu, oleh siapa, sebelum **5.000** (bawaan) → sesudah **10.000**. Berlaku ±10 detik tanpa restart |
 | 3 | **Topologi** (kolom backgrounder ekstrak = 2) dan Status → antrean |
 | 4 | Ya, chart kembali. Chart/dashboard yang dibuat setelah cadangan **hilang** (dicatat & dibuat ulang) |
@@ -100,7 +100,7 @@
 |---|---|---|
 | 0–15 | Asisten AI: model, cadangan otomatis, batas pemakaian, keamanan | [§4c](../tutorial/level-4-admin-server.md) |
 | 15–25 | Kesehatan kueri: p95, chart lambat, saran | [§6a](../tutorial/level-4-admin-server.md) |
-| 25–35 | Memperbarui ALDx (installer di atas instalasi lama); SSO | [§9a–b](../tutorial/level-4-admin-server.md) |
+| 25–35 | Memperbarui ALDx (installer di atas instalasi lama), rilis tetap `v<VERSI>` & sidik SHA-256; SSO | [§9a–b](../tutorial/level-4-admin-server.md) |
 | 35–55 | Sematkan dashboard; email Langganan & Peringatan | [§10a–b](../tutorial/level-4-admin-server.md) |
 | 55–60 | tanya jawab | |
 
@@ -112,6 +112,7 @@
 - **T4.** Sematan: nyalakan, minta token dengan `curl`, tampilkan di `<iframe>`, coba `rls` berbeda.
 - **T5.** (Opsional, bila ada penyedia) SSO: email domain benar dan salah.
 - **T6.** Pasang installer terbaru di atas instalasi lama: apa yang tetap, dan di mana memeriksa versi?
+- **T7.** Cocokkan `Get-FileHash ALDx-Setup.exe` dengan `ALDx-SHA256.txt` rilis `v2026.11.14`; klik nomor versi di Beranda.
 
 ### Kunci jawaban tambahan
 
@@ -122,7 +123,8 @@
 | T3 | pertanyaan ke-4 **ditolak** dengan pesan batas per jam; Admin **tidak dibatasi**; kembalikan ke 60 |
 | T4 | `rls` membatasi baris: penonton hanya melihat barisnya; token kedaluwarsa setelah `SPS_SEMATKAN_MENIT` |
 | T5 | domain benar masuk (akun dibuat bila `SSO_BUAT_AKUN=1`); domain lain ditolak dengan pesan; login password tetap bisa; tercatat di jejak audit |
-| T6 | `.env`, data, dashboard, pengguna **tetap**; versi di **kaki halaman login** (mis. `v2026.11.13.6`) dan kolom *Pembaruan* di Beranda |
+| T6 | `.env`, data, dashboard, pengguna **tetap**; versi di **kaki halaman login** (mis. `v2026.11.14`) dan kolom *Pembaruan* di Beranda |
+| T7 | sidik **sama persis** (huruf kecil, 64 karakter) = unduhan utuh & asli; beda = unduh ulang. Klik versi membuka rilis **ALDx 2026.11.14** (tag `v2026.11.14`); catatannya memuat kode commit build dan isi bagian `## 2026.11.14` dari catatan versi |
 
 ### Kuis tambahan
 
@@ -131,8 +133,9 @@
 10. SSO di ALDx adalah… a) pengganti login password **b) jalan masuk tambahan; login password tetap ada** c) hanya untuk Admin
 11. Memperbarui ALDx cukup… **a) menjalankan installer baru di atas yang lama** b) menghapus data lalu pasang ulang c) ganti `.env`
 12. Token sematan diminta oleh… a) browser penonton **b) server aplikasi induk dengan kunci rahasia** c) pengguna ALDx
+13. Rilis `v2026.11.14` di GitHub… a) ditimpa setiap build **b) tetap, tag-nya menunjuk commit build versi itu** c) hanya berisi paket offline
 
-**Kunci:** 8b · 9a · 10b · 11a · 12b
+**Kunci:** 8b · 9a · 10b · 11a · 12b · 13b
 
 ## Daftar periksa kompetensi
 
@@ -148,4 +151,5 @@
 - [ ] Mengatur model AI (dua model), memahami cadangan otomatis dan batas pemakaian
 - [ ] Membaca Kesehatan kueri dan menindaklanjuti sarannya
 - [ ] Memperbarui ALDx dengan installer di atas instalasi lama dan memverifikasi versi
+- [ ] Memeriksa unduhan installer dengan `Get-FileHash` terhadap `ALDx-SHA256.txt` dan mencocokkan versi dengan tag rilis
 - [ ] Menyiapkan sematan dashboard, SSO (bila dipakai), dan email laporan

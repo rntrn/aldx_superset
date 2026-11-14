@@ -23,6 +23,8 @@ Setelah ini, langkah B / C **tidak** memerlukan hak admin.
 
 1. Ambil berkas **`ALDx-Setup.exe`** (± 100 MB):
    dari tim TI (flashdisk / folder jaringan), atau GitHub › **Releases** › **ALDx terbaru** › `ALDx-Setup.exe`.
+   Versi tertentu: rilis **ALDx 2026.11.14** (tag `v2026.11.14`). Opsional, memastikan unduhan utuh: cocokkan
+   `Get-FileHash ALDx-Setup.exe` dengan `ALDx-SHA256.txt` di rilis yang sama ([docs/29](docs/29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github)).
 2. Pastikan **Docker Desktop menyala**: ikon paus di pojok kanan bawah layar diam (tidak bergerak).
 3. **Klik dua kali `ALDx-Setup.exe`**. Muncul *"Windows protected your PC"*? Klik **More info** › **Run anyway**.
    Peringatan ini muncul karena Setup belum bertanda tangan digital, bukan karena virus. Agar tidak muncul: salin Setup lewat
@@ -84,7 +86,8 @@ Paket offline berisi semua yang dibutuhkan (± 3 GB), termasuk Docker Desktop: *
 
 ## Memperbarui ALDx (versi baru)
 
-1. Unduh **ALDx-Setup.exe** terbaru (atau paket offline terbaru), lihat tanggalnya di Releases.
+1. Unduh **ALDx-Setup.exe** terbaru (atau paket offline terbaru), lihat versi di judul rilis (*ALDx terbaru (2026.11.14)*).
+   Tiap versi juga punya rilis tetap `v<VERSI>`, mis. untuk memasang ulang versi yang sama di komputer lain.
 2. Klik dua kali, pasang ke **folder yang sama**. Data, akun, dan pengaturan tetap ada.
 3. Buka aplikasi, tekan **Ctrl + F5**.
 

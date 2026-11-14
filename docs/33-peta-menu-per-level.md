@@ -38,7 +38,7 @@ izin itu (Analis ke atas biasanya); **Admin** / **Superadmin** = khusus peran te
 
 | Menu | Fungsi | Level | Akses | Bagian tutorial |
 |---|---|---|---|---|
-| **Studio Visual** | seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, simulasi, susun dashboard (tab, template) | L2 | semua yang boleh membuat chart | L2 §1–11a |
+| **Studio Visual** | seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, ambang, simulasi, susun dashboard (tab, template umum & per bidang) | L2 | semua yang boleh membuat chart | L2 §1–11a |
 | **Daftar chart** | mencari, membuka, mengubah, menghapus chart yang pernah dibuat | L2 | izin | L2 §12e |
 
 ## Dashboard & Story

@@ -307,7 +307,7 @@ def api_simpan_milik():
     return jsonify(ok=True)
 
 
-# --- Tampilan tersimpan (bookmark, padanan Power BI) ------------------------------------------------
+# --- Tampilan tersimpan (bookmark) ------------------------------------------------
 # Keadaan filter sebuah dashboard disimpan dengan nama, per akun. Membuka tampilan = membuka dashboard yang sama
 # dengan filter itu terpasang (parameter URL native_filters), jadi hak akses & RLS tetap berlaku seperti biasa.
 MAKS_TAMPILAN = 20          # per akun per dashboard

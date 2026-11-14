@@ -11,6 +11,10 @@
 # Aturan versi: setiap perubahan aplikasi (config, docker, installer, scripts, docker-compose) WAJIB menaikkan VERSI.
 # Langkah "Periksa VERSI" menggagalkan build bila kode berubah tetapi VERSI masih sama dengan rilis yang sudah terbit.
 # Setelah berkas terunggah, rilis diterbitkan ulang agar tanggalnya di halaman Releases ikut baru.
+#
+# Versi yang bisa dicocokkan: setiap VERSI juga mendapat rilis TETAP bertag v<VERSI> (mis. v2026.11.14) yang menunjuk
+# commit build-nya, berisi installer online + ALDx-HapusTotal.exe + ALDx-SHA256.txt (sidik semua berkas, termasuk
+# paket offline) dan catatan versi dari docs/31-catatan-versi.md. "terbaru" & "offline" tetap tautan bergulir.
 name: rilis
 
 on:
@@ -82,7 +86,9 @@ jobs:
           gh release view terbaru *> $null
           if ($LASTEXITCODE -ne 0) { gh release create terbaru --title "ALDx terbaru ($v)" --notes $catatan --latest }
           else { gh release edit terbaru --title "ALDx terbaru ($v)" --notes $catatan --target $env:GITHUB_SHA }
-          gh release upload terbaru installer/setup/Output/ALDx-Setup.exe installer/setup/Output/ALDx-HapusTotal.exe --clobber
+          # Sidik SHA-256: pengguna bisa memastikan unduhan utuh & asli (Get-FileHash ALDx-Setup.exe).
+          Get-ChildItem installer/setup/Output/*.exe | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name } | Set-Content -Encoding ascii installer/setup/Output/ALDx-SHA256.txt
+          gh release upload terbaru installer/setup/Output/ALDx-Setup.exe installer/setup/Output/ALDx-HapusTotal.exe installer/setup/Output/ALDx-SHA256.txt --clobber
           if ($LASTEXITCODE -ne 0) { exit 1 }
           # Terbitkan ulang (draf -> terbit) agar tanggal rilis di halaman Releases = tanggal build ini.
           $id = gh api "repos/$env:GITHUB_REPOSITORY/releases/tags/terbaru" --jq .id
@@ -125,6 +131,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Periksa catatan versi
+        shell: pwsh
+        run: ./scripts/catatan-rilis.ps1 -Versi "${{ needs.online.outputs.versi }}" -Keluar catatan-rilis.md
+
       - uses: actions/download-artifact@v4
         with:
           name: offline
@@ -158,6 +168,8 @@ jobs:
           gh release view offline *> $null
           if ($LASTEXITCODE -ne 0) { gh release create offline --title "ALDx offline ($v)" --notes $catatan --latest=false }
           else { gh release edit offline --title "ALDx offline ($v)" --notes $catatan --target $env:GITHUB_SHA }
+          # Sidik semua berkas versi ini (online + offline) dalam satu daftar; ikut ke rilis "offline" & rilis tetap v<VERSI>.
+          @(Get-ChildItem installer/setup/Output/* -Exclude ALDx-SHA256.txt) + @(Get-Item online/ALDx-Setup.exe) | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name } | Set-Content -Encoding ascii installer/setup/Output/ALDx-SHA256.txt
           $baru = Get-ChildItem installer/setup/Output/*
           gh release upload offline $baru.FullName --clobber
           if ($LASTEXITCODE -ne 0) { exit 1 }
@@ -167,3 +179,21 @@ jobs:
           gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=true --silent
           gh api -X PATCH "repos/$env:GITHUB_REPOSITORY/releases/$id" -F draft=false -f tag_name=offline -f make_latest=false --silent
           if ($LASTEXITCODE -ne 0) { Write-Host "::error::Rilis offline gagal diterbitkan ulang (masih draf). Terbitkan lewat halaman Releases."; exit 1 }
+
+      - name: Terbitkan rilis tetap v<VERSI> (cocok dengan tag git & commit)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ needs.online.outputs.versi }}"; $tag = "v$v"; $o = "installer/setup/Output"
+          $berkas = @("online/ALDx-Setup.exe", "$o/ALDx-HapusTotal.exe", "$o/ALDx-SHA256.txt")
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            # Tag baru menunjuk commit build ini. Bukan "Latest": tombol unduh utama tetap rilis "terbaru".
+            gh release create $tag $berkas --target $env:GITHUB_SHA --title "ALDx $v" --notes-file catatan-rilis.md --latest=false
+          } else {
+            # VERSI sama dibangun ulang (hanya dokumentasi berubah): tag tidak dipindah, berkas & catatan diperbarui.
+            gh release edit $tag --notes-file catatan-rilis.md
+            gh release upload $tag $berkas --clobber
+          }
+          if ($LASTEXITCODE -ne 0) { Write-Host "::error::Rilis $tag gagal dibuat."; exit 1 }

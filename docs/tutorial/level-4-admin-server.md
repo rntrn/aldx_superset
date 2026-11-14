@@ -219,7 +219,15 @@ powershell -ExecutionPolicy Bypass -File scripts\jadwal-cadangan.ps1 -Salin \\na
 | Ada internet | *ALDx terbaru*: `ALDx-Setup.exe` | klik dua kali → Next-Next |
 | Tanpa internet | *ALDx offline*: `ALDx-Setup-Offline.exe` + semua `.bin` (satu folder) | klik dua kali `.exe` → Next-Next |
 
-Setelah selesai: `Ctrl + F5` di browser; cek versi di kaki halaman login (mis. `v2026.11.13.6`); baca *Perlu dilakukan setelah
+**Versi tertentu / memeriksa unduhan:** tiap versi punya rilis tetap `v<VERSI>` (mis. *ALDx 2026.11.14*, tag `v2026.11.14`).
+Sebelum memasang di server, cocokkan sidiknya:
+
+```powershell
+(Get-FileHash .\ALDx-Setup.exe -Algorithm SHA256).Hash.ToLower()   # harus sama dengan baris di ALDx-SHA256.txt
+```
+
+Setelah selesai: `Ctrl + F5` di browser; cek versi di kaki halaman login (mis. `v2026.11.14`, sama dengan nama tag rilis;
+di Beranda nomor versi bisa diklik untuk membuka rilisnya); baca *Perlu dilakukan setelah
 memperbarui* di [catatan versi](../31-catatan-versi.md); jalankan `scripts\uji.ps1`. **Jangan** memakai `ALDx-HapusTotal.exe`
 untuk memperbarui (itu menghapus data). Panduan lengkap: [docs/29](../29-versi-pembaruan-hapus-total.md).
 
@@ -289,5 +297,7 @@ dengan syarat yang pasti terpenuhi dan jadwal tiap menit, pastikan email tiba, l
 - **T4.** Nyalakan sematan untuk satu dashboard, minta token dengan `curl`, tampilkan di halaman HTML sederhana, lalu coba `rls` berbeda.
 - **T5.** (Bila ada penyedia SSO) aktifkan tombol SSO dan uji email domain benar dan salah.
 - **T6.** Jalankan installer terbaru di atas instalasi lama pada server uji. Apa yang tetap, dan di mana Anda memeriksa versinya?
+- **T7.** Unduh `ALDx-Setup.exe` dan `ALDx-SHA256.txt` dari rilis `v2026.11.14`. Cocokkan sidiknya dengan `Get-FileHash`. Lalu klik
+    nomor versi di bawah Beranda: rilis mana yang terbuka, dan commit apa yang tertulis di catatannya?
 
-Kunci jawaban: [bahan ajar Level 4](../bahan-ajar/level-4-admin-server.md#kunci-jawaban); latihan **T1–T6**: [kunci tambahan](../bahan-ajar/level-4-admin-server.md#kunci-jawaban-tambahan).
+Kunci jawaban: [bahan ajar Level 4](../bahan-ajar/level-4-admin-server.md#kunci-jawaban); latihan **T1–T7**: [kunci tambahan](../bahan-ajar/level-4-admin-server.md#kunci-jawaban-tambahan).

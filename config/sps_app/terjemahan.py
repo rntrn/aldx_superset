@@ -767,6 +767,7 @@ PUSAT = [
     ('Unduh installer', 'Download installer', 'インストーラーをダウンロード'),
     ('Apa yang baru', "What's new", '新機能'),
     ('Versi terbaru', 'Latest version', '最新バージョン'),
+    ('Rilis versi ini di GitHub', 'This version\'s release on GitHub', 'GitHub のこのバージョンのリリース'),
     ('Kode terpasang', 'Installed code', 'インストール済みコード'),
     ('Tidak bisa dicek (tanpa internet atau diblokir proxy).', 'Cannot check (no internet or blocked by proxy).', '確認できません（インターネットなし、またはプロキシで遮断）。'),
     ('Impor banyak tabel sekaligus', 'Import many tables at once', '複数テーブルを一括インポート'),

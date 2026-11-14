@@ -44,7 +44,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Upgrade / downgrade komponen | [16-upgrade-downgrade.md](16-upgrade-downgrade.md) |
 | **Beda versi antar komputer** (Setup.exe vs offline vs git), **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](29-versi-pembaruan-hapus-total.md) |
 | **Apa yang baru** & langkah setelah memperbarui | [31-catatan-versi.md](31-catatan-versi.md) |
-| Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma & peta jalan | [32-perbandingan-fitur-bi.md](32-perbandingan-fitur-bi.md) |
+| Peta fitur & peta jalan | [32-peta-fitur.md](32-peta-fitur.md) |
 | **Menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) | [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md) |
 | Rincian model AI lokal (RAM, jaringan kantor, masalah) | [20-model-ai-lokal.md](20-model-ai-lokal.md) |
 | Pusat Kendali, auto-tuning, multi-node | [11-pusat-kendali-server.md](11-pusat-kendali-server.md) |

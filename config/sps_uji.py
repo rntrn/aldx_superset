@@ -240,6 +240,33 @@ def jalankan_semua() -> None:
                     raise RuntimeError("skala warna tabel tidak ikut ke chart Superset")
                 return f"% total = {sum(persen):.0f}; kumulatif akhir = total ({kum[-1]:,.0f}); skala warna tersimpan"
 
+            @uji("Studio", "Ambang (format bersyarat): validasi, aturan chart Superset untuk Angka & Tabel")
+            def _():
+                from sps_ai import alat
+                for salah in ({"atas": "abc"}, {"atas": 5, "bawah": 9}):
+                    try:
+                        lembar.dari_dict({"dataset_id": P, "tanda": "angka", "baris": [U("total")], "ambang": salah})
+                        raise RuntimeError(f"ambang salah lolos: {salah}")
+                    except alat.InputSalah:
+                        pass
+                ambang = {"atas": 6e11, "bawah": 1e11}
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "angka", "baris": [U("total")], "ambang": ambang})
+                aturan = lembar.ke_superset(t, lb)[1].get("conditional_formatting") or []
+                if [(a["operator"], a["targetValue"], a["colorScheme"]) for a in aturan] != \
+                        [("≥", 6e11, "colorSuccess"), ("≤", 1e11, "colorError")] or aturan[0]["column"] != "SUM(total)":
+                    raise RuntimeError(f"aturan angka salah: {aturan}")
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "tabel", "baris": [D("nm_cabang")], "kolom": [U("total")],
+                                          "skala_warna": True, "ambang": {"atas": 1e11}})
+                aturan = lembar.ke_superset(t, lb)[1]["conditional_formatting"]
+                if [a["operator"] for a in aturan] != ["None", "≥"] or lembar.ke_superset(t, lb)[1]["show_cell_bars"]:
+                    raise RuntimeError(f"tabel: skala + ambang salah: {aturan}")
+                t, lb = lembar.dari_dict({"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")],
+                                          "ambang": ambang})
+                if lb.ambang or "conditional_formatting" in lembar.ke_superset(t, lb)[1]:
+                    raise RuntimeError("ambang terpasang di Garis (seharusnya hanya Angka/Tabel)")
+                total = lembar.jalankan(*lembar.dari_dict({"dataset_id": P, "tanda": "angka", "baris": [U("total")]}))["baris"][0]["SUM(total)"]
+                return f"2 ambang salah ditolak; total {total:,.0f} {'≥' if total >= 6e11 else '<'} 600 miliar (hijau)"
+
             @uji("Studio", "YoY (% vs tahun lalu) & urutan batang mendatar")
             def _():
                 dasar = {"dataset_id": P, "tanda": "garis", "kolom": [D("periode")], "baris": [U("total")]}
@@ -447,7 +474,7 @@ def jalankan_semua() -> None:
                     raise RuntimeError(f"kesegaran salah: {segar}")
                 return f"{len(j['chart'])} chart, {len(j['dashboard'])} dashboard; tabel sumber SQL terbaca"
 
-            @uji("Studio", "Template dashboard: 3 template menghasilkan lembar kerja yang sah")
+            @uji("Studio", "Template dashboard: semua template (umum & per bidang) menghasilkan lembar kerja yang sah")
             def _():
                 from sps_ai import alat
                 from sps_studio import templat
@@ -469,7 +496,15 @@ def jalankan_semua() -> None:
                     raise RuntimeError("template tak dikenal lolos")
                 except alat.InputSalah:
                     pass
-                return ", ".join(f"{k}: {n} lembar" for k, n in jumlah.items())
+                # Per bidang tanpa ukuran pilihan: kolom yang namanya cocok didahulukan.
+                if templat.skor_kata("biaya_operasional", templat.KATA["keuangan"]["ukuran"]) >= \
+                        templat.skor_kata("jumlah_transaksi", templat.KATA["keuangan"]["ukuran"]):
+                    raise RuntimeError("skor kata kunci terbalik")
+                p = templat.petakan(P, "", templat.KATA["penjualan"])
+                if p["ukuran"][0]["field"] != "total" or (p["kategori"] and
+                        templat.skor_kata(p["kategori"][0], templat.KATA["penjualan"]["kategori"]) == len(templat.KATA["penjualan"]["kategori"])):
+                    raise RuntimeError(f"pemetaan Penjualan salah: {p['ukuran'][0]}, {p['kategori']}")
+                return ", ".join(f"{k}: {n}" for k, n in jumlah.items()) + f"; Penjualan otomatis: {p['ukuran'][0]['field']} per {p['kategori'][0]}"
 
             @uji("Analitik", "Saran chart: banyak jenis & semuanya bisa dibangun")
             def _():
@@ -1024,6 +1059,20 @@ def jalankan_semua() -> None:
         if tanpa:
             raise RuntimeError("peta menu tidak memuat: " + ", ".join(tanpa))
         return f"{jumlah} tautan/gambar diperiksa, semuanya ada; peta menu lengkap"
+
+    @uji("Dokumentasi", "Catatan versi untuk VERSI ini ada (dipakai rilis v<VERSI>); tanpa perbandingan merek produk lain")
+    def _():
+        import re as _re
+        import sps_versi_aplikasi as va
+        from sps_panduan import tampilan as P
+        catatan = (P.DOCS / "31-catatan-versi.md").read_text(encoding="utf-8")
+        if not _re.search(rf"^## {_re.escape(va.VERSI)}(\s|$)", catatan, _re.M):
+            raise RuntimeError(f"bagian '## {va.VERSI}' belum ada di docs/31 (rilis v{va.VERSI} akan ditolak)")
+        merek = _re.compile(r"\b(Tableau|Power ?BI|Looker|Qlik|Metabase|ThoughtSpot|Sisense|Spotfire|MicroStrategy|LookML|DAX)\b")
+        kena = [f"{md.relative_to(P.DOCS)}" for md in P.DOCS.rglob("*.md") if merek.search(md.read_text(encoding="utf-8"))]
+        if kena:
+            raise RuntimeError("masih menyebut merek lain: " + ", ".join(kena[:5]))
+        return f"## {va.VERSI} ada; {sum(1 for _ in P.DOCS.rglob('*.md'))} dokumen bebas merek lain"
 
     @uji("2026.11.10", "Asisten AI: peta pengetahuan, konteks dashboard, kunci terenkripsi")
     def _():

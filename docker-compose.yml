@@ -1,13 +1,13 @@
 # =============================================================================
-#  NODE UTAMA — semua proses ALDx (padanan topologi Tableau Server):
+#  NODE UTAMA — semua proses ALDx:
 #
 #    gateway          nginx: pintu masuk http://localhost:8088, bagi beban ke node web
-#    superset         web (Gunicorn)          ~ VizQL Server + Application Server
-#    superset-worker  backgrounder (Celery)   ~ Backgrounder
-#    superset-beat    penjadwal tugas         ~ Backgrounder scheduler
-#    redis            cache & antrean         ~ Cache Server
-#    metadb           PostgreSQL: metadata    ~ Repository (PostgreSQL di Tableau)
-#    engine           ClickHouse: ALDx Engine  ~ Data Engine (Hyper): ekstrak & upload
+#    superset         web (Gunicorn): halaman & API
+#    superset-worker  backgrounder (Celery): ekstrak, laporan, tugas latar
+#    superset-beat    penjadwal tugas
+#    redis            cache & antrean
+#    metadb           PostgreSQL: metadata
+#    engine           ClickHouse: ALDx Engine (ekstrak & upload)
 #
 #  Semua komponen di Docker (tanpa XAMPP). Data metadb & engine disimpan di volume
 #  Docker "sps_metadb" & "sps_engine" (tetap ada walau container dihapus).

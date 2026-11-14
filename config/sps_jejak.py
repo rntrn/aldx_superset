@@ -3,7 +3,7 @@
     sumber (database · skema · tabel)  ->  dataset  ->  chart  ->  dashboard
 
 Kegunaan: sebelum mengubah/menghapus dataset atau kolom, lihat dulu chart & dashboard mana yang terdampak
-(padanan "Lineage / Impact analysis" Tableau & Power BI).
+(asal-usul data & analisis dampak perubahan).
 
     GET /jejak-data/                    halaman (wajib login)
     GET /jejak-data/api/daftar?q=       dataset yang boleh diakses pengguna + jumlah chart

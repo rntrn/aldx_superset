@@ -17,7 +17,7 @@ Ini wajar untuk semua program baru tanpa tanda tangan, bukan berarti ada virus.
 | Cara | Untuk | Langkah |
 |---|---|---|
 | **Salin lewat flashdisk / folder jaringan** | cara cepat | berkas yang tidak diunduh lewat browser tidak diberi tanda "dari internet", jadi SmartScreen tidak muncul. Bila terlanjur diunduh: klik kanan berkas › *Properties* › centang **Unblock** › OK |
-| **Pengecualian antivirus kantor** | tim TI | tambahkan pengecualian untuk berkas Setup (berdasarkan hash SHA-256: `Get-FileHash ALDx-Setup.exe`) dan folder `D:\superset` di konsol antivirus kantor |
+| **Pengecualian antivirus kantor** | tim TI | tambahkan pengecualian untuk berkas Setup (berdasarkan hash SHA-256: `Get-FileHash ALDx-Setup.exe`, cocokkan dengan `ALDx-SHA256.txt` di rilis) dan folder `D:\superset` di konsol antivirus kantor |
 | **Laporkan salah deteksi** | sekali per versi | Microsoft Defender: <https://www.microsoft.com/wdsi/filesubmission> (pilih *Software developer*, *Incorrectly detected*). Antivirus lain: formulir *false positive* di situs vendornya. Jangan mengunggah ke situs pemindai publik bila kode dianggap rahasia |
 | **Tanda tangan digital** (permanen) | produksi | beli sertifikat *code signing* (penerbit tepercaya, mis. lewat layanan tanda tangan cloud) atau minta sertifikat dari CA internal kantor. Simpan sebagai secret GitHub `CODESIGN_PFX_BASE64` (isi berkas .pfx dalam base64) & `CODESIGN_PASSWORD`; `setup.yml` & `setup-offline.yml` otomatis menandatangani Setup dan uninstaller-nya (`/DTandaTangan`, `signtool`). Reputasi SmartScreen tetap naik bertahap seiring banyaknya pengguna |
 

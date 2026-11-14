@@ -64,6 +64,8 @@ button:disabled{opacity:.45;cursor:default}
 .angkaBesar .nilai{font-size:56px;font-weight:700;color:var(--navy)}.angkaBesar .lbl{color:var(--redup);margin-top:4px}
 .angkaBesar.tren{justify-content:flex-start;padding-top:12%}.angkaBesar .spark{width:80%;height:30%;margin-top:12px}
 .naik{color:#0B7A52;font-weight:600}.turun{color:var(--merah);font-weight:600}
+.angkaBesar .nilai.naik{color:#0B7A52}.angkaBesar .nilai.turun{color:var(--merah)}.ambangTanda{font-size:.55em;vertical-align:middle;margin-right:6px}
+td.ambang-naik{background:rgba(11,122,82,.16);color:#0B7A52;font-weight:600}td.ambang-turun{background:rgba(220,38,38,.14);color:var(--merah);font-weight:600}
 .awanKata{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2px 10px;padding:14px;overflow:hidden;line-height:1.1}
 .awanKata span{font-weight:600;white-space:nowrap;cursor:default}
 table.pivot td.tot,table.pivot tr.tot td{font-weight:700;background:#F7F9FB}table.pivot th .ket{font-weight:400}
@@ -220,8 +222,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <input type="text" id="cariBidang" placeholder="Cari kolom" style="margin-top:8px">
     <div class="judulPanel judulAksi">Hierarki <button class="kecil" id="tambahHierarki" title="Gabungkan beberapa kolom bertingkat, mis. Provinsi › Kab/Kota › Kecamatan › Kelurahan">+ Hierarki</button></div>
     <div id="daftarHierarki"><div class="ket">Belum ada. Contoh: Provinsi › Kab/Kota › Kecamatan.</div></div>
-    <div class="judulPanel judulAksi">Dimensi <button class="kecil" id="tambahDimensi" title="Dimensi baru dari rumus per baris, mis. kelompok harga (seperti New column di Power BI)">+ Dimensi</button></div><div id="daftarDimensi"></div>
-    <div class="judulPanel judulAksi">Ukuran <button class="kecil" id="tambahUkuran" title="Ukuran baru dari rumus agregat, mis. SUM(laba) / SUM(penjualan) (seperti New measure di Power BI)">+ Ukuran</button></div><div id="daftarUkuran"></div>
+    <div class="judulPanel judulAksi">Dimensi <button class="kecil" id="tambahDimensi" title="Dimensi baru dari rumus per baris, mis. kelompok harga">+ Dimensi</button></div><div id="daftarDimensi"></div>
+    <div class="judulPanel judulAksi">Ukuran <button class="kecil" id="tambahUkuran" title="Ukuran baru dari rumus agregat, mis. SUM(laba) / SUM(penjualan)">+ Ukuran</button></div><div id="daftarUkuran"></div>
     <p class="ket" style="margin-top:14px">Seret kolom ke rak. Klik dua kali untuk menambah cepat. Seret pil kembali ke sini untuk membuang. Seret dimensi ke atas dimensi lain = hierarki baru.</p>
   </div>
   <div class="panel marks" style="width:200px;flex:none">
@@ -239,6 +241,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <div class="barisRak" title="What-if: geser untuk melihat grafik bila ukuran ini naik/turun sekian persen. Hanya pratinjau; tidak mengubah data dan tidak ikut tersimpan."><label>Simulasi</label>
         <select id="simUkuran" style="flex:1;min-width:0"></select><input type="range" id="simPersen" min="-50" max="100" step="5" value="0" style="flex:1;min-width:60px;padding:0"><span id="simNilai" style="min-width:42px;text-align:right">0%</span></div>
       <div class="barisRak" id="barisSkala"><label>Tabel</label><label style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--teks)"><input type="checkbox" id="pakaiSkala"> Skala warna sel</label></div>
+      <div class="barisRak" id="barisAmbang" title="Format bersyarat untuk ukuran pertama: hijau ▲ bila nilai ≥ angka kiri, merah ▼ bila ≤ angka kanan. Ikut tersimpan ke chart."><label>Ambang</label>
+        <input type="number" id="ambangAtas" placeholder="Hijau ≥" step="any" style="flex:1;min-width:0"><input type="number" id="ambangBawah" placeholder="Merah ≤" step="any" style="flex:1;min-width:0"></div>
     </div>
     <div class="judulPanel">Analitik</div>
     <div class="analitik" id="panelAnalitik">

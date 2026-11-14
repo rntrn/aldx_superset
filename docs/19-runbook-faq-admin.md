@@ -179,6 +179,7 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Uji otomatis | `scripts\uji.ps1` (rinci: `-Rinci`) |
 | Diagnosa lengkap | `scripts\diagnose.ps1` → `diagnosa.txt` |
 | Versi semua komponen | `scripts\versi.ps1` |
+| Memastikan installer asli & utuh | `Get-FileHash ALDx-Setup.exe` = baris di `ALDx-SHA256.txt` rilis `v<VERSI>` ([29](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github)) |
 | Masuk ke dalam container | `docker compose exec superset bash` (keluar: `exit`) |
 | Query metadb langsung | `docker compose exec metadb psql -U superset -d sps_superset` (keluar: `\q`) |
 | Query engine langsung | `docker compose exec engine clickhouse-client` (keluar: `exit`) |

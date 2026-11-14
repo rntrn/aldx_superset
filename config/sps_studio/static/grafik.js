@@ -259,14 +259,18 @@
   }
 
   /* ---------- Angka + tren (garis kecil) ---------- */
+  // Ambang format bersyarat (lembar.py: format_ambang): "naik" bila >= atas, "turun" bila <= bawah, "" bila di antaranya.
+  Studio.kelasAmbang = (v, a) => !a || !angka(v) ? "" : a.atas != null && v >= a.atas ? "naik" : a.bawah != null && v <= a.bawah ? "turun" : "";
+  const tandaAmbang = k => k ? `<span class="ambangTanda">${k === "naik" ? "▲" : "▼"}</span>` : "";
   function angkaTren(el, hasil, opsi) {
     const [d] = hasil.dimensi, [u] = hasil.ukuran;
     const titik = hasil.baris.filter(b => b[d] != null).sort((a, b) => urutNilai(a[d], b[d]));
     const akhir = titik.at(-1)?.[u] ?? 0, sebelum = titik.at(-2)?.[u];
     const ubah = angka(sebelum) && sebelum !== 0 ? (akhir - sebelum) / Math.abs(sebelum) : null;
     hapusSemua(el);
-    el.innerHTML = `<div class="angkaBesar tren"><div class="nilai" style="${opsi.mini ? "font-size:30px" : ""}"
-      title="${esc(tampilNilai(akhir))}">${esc(fmtRingkas.format(akhir))}</div>
+    const kAmbang = Studio.kelasAmbang(akhir, opsi.ambang);
+    el.innerHTML = `<div class="angkaBesar tren"><div class="nilai ${kAmbang}" style="${opsi.mini ? "font-size:30px" : ""}"
+      title="${esc(tampilNilai(akhir))}">${tandaAmbang(kAmbang)}${esc(fmtRingkas.format(akhir))}</div>
       <div class="lbl">${esc(u)} · ${esc(titik.at(-1)?.[d] ?? "")}${ubah == null ? "" :
         ` · <span class="${ubah >= 0 ? "naik" : "turun"}">${ubah >= 0 ? "+" : ""}${(ubah * 100).toLocaleString("id-ID", {maximumFractionDigits: 1})}%</span>`}</div>
       <div class="spark"></div></div>`;
@@ -515,7 +519,7 @@
     if (el._anak) { instans.delete(el._anak); el._anak.dispose(); el._anak = null; }
   }
   const HTML = {                                             // jenis yang digambar sebagai HTML biasa
-    tabel: (h, o) => `<div style="position:absolute;inset:0;overflow:auto">${Studio.tabelHtml(h.kolom, h.baris, 500, o && o.skala ? h.ukuran : null)}</div>`,
+    tabel: (h, o) => `<div style="position:absolute;inset:0;overflow:auto">${Studio.tabelHtml(h.kolom, h.baris, 500, o && o.skala ? h.ukuran : null, o && o.ambang ? {kolom: h.ukuran[0], ...o.ambang} : null)}</div>`,
     tabel_pivot: h => `<div style="position:absolute;inset:0;overflow:auto">${pivotHtml(h)}</div>`,
     awan_kata: (h, o) => awanKata(h, o),
   };
@@ -536,9 +540,9 @@
     }
     if (tanda === "angka") {
       hapusSemua(el);
-      const u = hasil.ukuran[0];
-      el.innerHTML = `<div class="angkaBesar"><div class="nilai" style="${opsi.mini ? "font-size:32px" : ""}"
-        title="${esc(tampilNilai(hasil.baris[0][u]))}">${esc(fmtRingkas.format(hasil.baris[0][u] ?? 0))}</div><div class="lbl">${esc(u)}</div></div>`;
+      const u = hasil.ukuran[0], kAmbang = Studio.kelasAmbang(hasil.baris[0][u], opsi.ambang);
+      el.innerHTML = `<div class="angkaBesar"><div class="nilai ${kAmbang}" style="${opsi.mini ? "font-size:32px" : ""}"
+        title="${esc(tampilNilai(hasil.baris[0][u]))}">${tandaAmbang(kAmbang)}${esc(fmtRingkas.format(hasil.baris[0][u] ?? 0))}</div><div class="lbl">${esc(u)}</div></div>`;
       return {};
     }
     if (tanda === "angka_tren") { angkaTren(el, hasil, opsi); return {}; }

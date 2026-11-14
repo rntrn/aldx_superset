@@ -1,4 +1,4 @@
-"""Objek desain dashboard Studio: teks/label, gambar, garis pemisah (padanan "Objects" di Tableau / Power BI).
+"""Objek desain dashboard Studio: teks/label, gambar, garis pemisah.
 
 Bentuk dari browser (satu kotak di baris penyusun dashboard, lihat dasbor.py):
     {"jenis": "teks", "lebar": 12, "tinggi": 10, "teks": "Kinerja 2025", "huruf": "playfair-display",

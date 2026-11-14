@@ -1,4 +1,4 @@
-"""Hierarki dimensi Studio Visual: beberapa kolom bertingkat dipakai seperti satu kolom (seperti Tableau).
+"""Hierarki dimensi Studio Visual: beberapa kolom bertingkat dipakai seperti satu kolom.
 
 Contoh: Wilayah = provinsi > kabupaten > kecamatan > kelurahan. Di rak, hierarki tampil di level teratas
 (teragregasi); pengguna menelusuri ke level berikutnya (semua nilai) atau ke dalam satu nilai (klik di chart).

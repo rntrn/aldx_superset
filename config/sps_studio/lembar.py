@@ -96,8 +96,9 @@ class Lembar:
     batas: int = 1000
     analitik: dict = field(default_factory=dict)
     diabaikan: list[str] = field(default_factory=list)   # kolom di rak yang tidak dipakai jenis tanda ini
-    kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" | "yoy" (kalkulasi cepat ala Tableau)
+    kalkulasi: str = ""               # "" | "persen_total" | "kumulatif" | "yoy" (kalkulasi cepat)
     skala_warna: bool = False         # tabel: latar sel makin pekat untuk nilai makin besar
+    ambang: dict = field(default_factory=dict)   # angka/tabel: {"atas": x} hijau bila >= x, {"bawah": y} merah bila <= y
 
     # --- Turunan --------------------------------------------------------------------
     @property
@@ -150,7 +151,7 @@ class Lembar:
                 "kolom": [pil(p) for p in self.kolom], "baris": [pil(p) for p in self.baris],
                 "warna": pil(self.warna), "ukuran": pil(self.ukuran), "label": self.label,
                 "filter": self.filter, "urut": self.urut, "batas": self.batas, "analitik": self.analitik,
-                "kalkulasi": self.kalkulasi, "skala_warna": self.skala_warna}
+                "kalkulasi": self.kalkulasi, "skala_warna": self.skala_warna, "ambang": self.ambang}
 
 
 def _unik(pils: list[Pil]) -> list[Pil]:
@@ -199,13 +200,13 @@ def dari_dict(d: dict) -> tuple[Any, Lembar]:
         urut=str(d.get("urut") or ""), batas=max(1, min(int(d.get("batas") or 1000), 10000)),
         analitik=_analitik(d.get("analitik")),
         kalkulasi=str(d.get("kalkulasi") or "") if d.get("kalkulasi") in KALKULASI else "",
-        skala_warna=bool(d.get("skala_warna")))
+        skala_warna=bool(d.get("skala_warna")), ambang=_ambang(d.get("ambang")) if tanda in TANDA_AMBANG else {})
     pangkas(t, lembar)
     return t, lembar
 
 
 def pangkas(t, lembar: Lembar) -> None:
-    """Kolom melebihi kapasitas jenis tanda -> tidak dipakai (seperti Tableau), bukan jenisnya yang dimatikan.
+    """Kolom melebihi kapasitas jenis tanda -> tidak dipakai, bukan jenisnya yang dimatikan.
 
     Mis. Pie (1 dimensi) dengan rak berisi kategori + saluran: kategori dipakai, saluran diabaikan dan ditandai di
     layar. Prioritas: dimensi waktu untuk jenis berbasis waktu, lintang/bujur untuk peta titik, lalu urutan rak."""
@@ -229,6 +230,35 @@ def pangkas(t, lembar: Lembar) -> None:
     lembar.warna = lembar.warna if tetap(lembar.warna) else None
     lembar.ukuran = lembar.ukuran if tetap(lembar.ukuran) else None
     lembar.diabaikan = [p.label for p in buang]
+
+
+TANDA_AMBANG = ("angka", "angka_tren", "tabel")
+
+
+def _ambang(a: dict | None) -> dict:
+    """Ambang format bersyarat: {"atas": 100, "bawah": 50} (salah satu boleh kosong). Atas harus > bawah."""
+    hasil = {}
+    for k in ("atas", "bawah"):
+        v = (a or {}).get(k)
+        if v in (None, ""):
+            continue
+        try:
+            hasil[k] = float(v)
+        except (TypeError, ValueError):
+            raise alat.InputSalah("Ambang harus angka, mis. 25000000.") from None
+    if len(hasil) == 2 and hasil["atas"] <= hasil["bawah"]:
+        raise alat.InputSalah("Ambang hijau harus lebih besar daripada ambang merah.")
+    return hasil
+
+
+def format_ambang(kolom: str, ambang: dict) -> list[dict]:
+    """Aturan conditional_formatting Superset: hijau (>= atas) & merah (<= bawah). Warna = token tema (ikut mode gelap)."""
+    aturan = []
+    if "atas" in ambang:
+        aturan.append({"column": kolom, "operator": "≥", "targetValue": ambang["atas"], "colorScheme": "colorSuccess"})
+    if "bawah" in ambang:
+        aturan.append({"column": kolom, "operator": "≤", "targetValue": ambang["bawah"], "colorScheme": "colorError"})
+    return aturan
 
 
 def _analitik(a: dict | None) -> dict:
@@ -404,13 +434,17 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
     tanda = lembar.tanda
     if tanda == "angka":
         p.update(metric=M[0], y_axis_format="SMART_NUMBER", header_font_size=0.4)
+        if lembar.ambang:
+            p["conditional_formatting"] = format_ambang(lembar.ukuran_semua[0].label, lembar.ambang)
     elif tanda == "tabel":
         if M:
             p.update(query_mode="aggregate", groupby=D, metrics=M, order_desc=True,
-                     show_cell_bars=not lembar.skala_warna, server_page_length=25)
+                     show_cell_bars=not (lembar.skala_warna or lembar.ambang), server_page_length=25)
             if lembar.skala_warna:      # operator "None" = gradasi dari nilai terkecil ke terbesar
                 p["conditional_formatting"] = [{"column": u.label, "operator": "None", "colorScheme": WARNA[0]}
                                                for u in lembar.ukuran_semua]
+            if lembar.ambang:           # ambang berlaku untuk ukuran pertama; aturan terakhir menang di Superset
+                p.setdefault("conditional_formatting", []).extend(format_ambang(lembar.ukuran_semua[0].label, lembar.ambang))
         else:
             p.update(query_mode="raw", all_columns=D, server_page_length=25)
     elif tanda in ("batang", "garis", "area"):
@@ -455,6 +489,8 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
         p.update(x_axis=D[0], metric=M[0], time_grain_sqla="P1D", show_trend_line=True,
                  start_y_axis_at_zero=True, y_axis_format="SMART_NUMBER", header_font_size=0.4,
                  subheader_font_size=0.15, rolling_type="None")
+        if lembar.ambang:
+            p["conditional_formatting"] = format_ambang(lembar.ukuran_semua[0].label, lembar.ambang)
     elif tanda == "gauge":
         p.update(groupby=[], metric=M[0], min_val=0, start_angle=225, end_angle=-45, show_progress=True,
                  overlap=True, show_pointer=True, number_format="SMART_NUMBER", font_size=15,

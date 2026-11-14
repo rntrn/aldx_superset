@@ -44,6 +44,11 @@ SKENARIO = [
      "Buka /login/ (lihat kaki halaman); login → gulir ke bawah Beranda",
      "Login menulis vYYYY.MM.DD; Beranda menulis ALDx vYYYY.MM.DD (+ kode commit bila dipasang dengan git) dan "
      "'✓ Versi terbaru' atau 'Pembaruan tersedia' dengan tautan Unduh installer; tanpa internet tertulis 'Tidak bisa dicek'"),
+    ("A02c", 4, "Sedang", "Rilis tetap per versi & sidik SHA-256", "Komputer dengan internet",
+     "GitHub › Releases › rilis 'ALDx <VERSI>' (tag v<VERSI>) → unduh ALDx-Setup.exe & ALDx-SHA256.txt → "
+     "(Get-FileHash .\\ALDx-Setup.exe -Algorithm SHA256).Hash.ToLower(); setelah pasang klik nomor versi di Beranda",
+     "Sidik sama persis dengan baris ALDx-Setup.exe di ALDx-SHA256.txt; versi di login = nama tag; klik versi membuka "
+     "rilis versi itu; catatan rilis memuat commit & isi bagian versi dari catatan versi"),
     ("A03", 4, "Tinggi", "Pemeriksaan prasyarat menolak kondisi tidak layak", "Docker Desktop DIMATIKAN",
      "Jalankan PASANG.cmd", "Baris 'Docker Desktop menyala' GAGAL, tombol Lanjut nonaktif; setelah Docker dinyalakan & Periksa ulang: OK"),
     ("A04", 4, "Tinggi", "Pindah metadata lama ke PostgreSQL", "Instalasi lama (MYSQL_HOST=host.docker.internal + XAMPP menyala, atau MariaDB)",
@@ -436,6 +441,16 @@ SKENARIO = [
      "Garis periode × total → arahkan kursor ke Februari 2024 → klik kanan Maret 2024 → Jelaskan perubahan",
      "Tooltip menulis porsi dari total & ▲ 9,1% vs sebelumnya; dialog: naik ±1,6 M (+10%), saluran paling menjelaskan, "
      "Online & Grosir penyumbang terbesar"),
+    ("D32", 2, "Tinggi", "Ambang (format bersyarat) Angka & Tabel", "latihan_penjualan",
+     "Angka total → Ambang Hijau ≥ 600000000000 → Simpan baru; Tabel nm_cabang × total → Hijau ≥ 120000000000, "
+     "Merah ≤ 60000000000 → Simpan baru → buka keduanya di Explore & dashboard; coba Hijau 5, Merah 9",
+     "Angka hijau ▲ 667B; tabel: Jakarta/Surabaya/Bandung hijau ▲, Makassar merah ▼, Medan & Balikpapan biasa; chart "
+     "tersimpan berwarna sama (tanpa batang sel); Hijau ≤ Merah ditolak dengan pesan; baris Ambang hanya tampil untuk Angka/Tabel"),
+    ("D33", 2, "Tinggi", "Template per bidang", "latihan_penjualan",
+     "Susun dashboard → Dari template… → Per bidang: Penjualan, ukuran utama Otomatis → Buat → Simpan; ulangi Keuangan, "
+     "SDM, Operasional",
+     "Penjualan: 9 lembar kerja (ukuran total, kategori pertama 'kategori', ada % vs tahun lalu & peta); tiap template "
+     "membuat chart tanpa galat atau pesan jelas bila kolom yang dibutuhkan tidak ada; dashboard terbuka dan filter bekerja"),
     ("E10", 2, "Sedang", "Analitik per Warna", "latihan_penjualan",
      "Garis periode × total, saluran ke Warna → centang Garis tren & Ramalan → Simpan baru",
      "Tiap saluran punya garis tren & ramalan; seri tidak bertumpuk; simpan memberi catatan 'hanya tampil di Studio'"),

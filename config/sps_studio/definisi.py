@@ -1,8 +1,8 @@
-"""Ukuran & dimensi TERDEFINISI di Studio (padanan "New measure" / "New column" Power BI).
+"""Ukuran & dimensi TERDEFINISI di Studio.
 
     Ukuran  = rumus AGREGAT atas kolom dataset, mis.  SUM(laba) / SUM(penjualan)
               -> metrik tersimpan dataset (SqlMetric). Dihitung ulang di setiap tingkat pengelompokan,
-                 jadi rasio tetap benar per cabang, per bulan, maupun total (seperti measure DAX).
+                 jadi rasio tetap benar per cabang, per bulan, maupun total.
     Dimensi = rumus PER BARIS, mis.  CASE WHEN penjualan >= 1000000 THEN 'Besar' ELSE 'Kecil' END
               -> kolom hitung dataset (TableColumn.expression). Bisa dipakai di rak, filter, hierarki.
 
