@@ -1,13 +1,17 @@
 """Template dashboard: pilih dataset -> ALDx membuat lembar kerja & susunan dashboard siap pakai.
 
-Alur (padanan "Quick create" Power BI / "Dashboard Starter" Tableau):
+Alur:
     1. petakan(dataset)  : pilih kolom waktu, kategori (2-50 nilai), wilayah, dan ukuran secara otomatis
     2. rancang(...)      : susun daftar lembar kerja menurut template (lihat TEMPLAT)
     3. buat(...)         : simpan lembar kerja sebagai chart, kembalikan susunan untuk kanvas "Susun dashboard"
 Dashboard TIDAK langsung disimpan: pengguna melihat hasilnya di kanvas, mengubah bila perlu, lalu Simpan.
 
-Menambah template baru: tambah satu entri di TEMPLAT + satu fungsi _susun_<kunci>() yang mengembalikan
-daftar baris berisi (spesifikasi lembar, lebar). Spesifikasi memakai bentuk yang sama dengan lembar.dari_dict().
+Template per bidang (Penjualan, Keuangan, SDM, Operasional) memakai kata kunci nama kolom (KATA) untuk memilih
+ukuran & kategori yang paling cocok, mis. "omzet" untuk Penjualan, "gaji" untuk SDM. Tanpa kolom yang cocok, kolom
+lain tetap dipakai, jadi template tidak pernah kosong.
+
+Menambah template baru: tambah satu entri di TEMPLAT (+ KATA bila per bidang) + satu fungsi _susun_<kunci>() yang
+mengembalikan daftar baris berisi (spesifikasi lembar, lebar). Spesifikasi = bentuk lembar.dari_dict().
 """
 
 from __future__ import annotations
@@ -23,6 +27,32 @@ TEMPLAT = {
              "ket": "Fokus waktu: tren tiap ukuran, ramalan 6 periode, akumulasi berjalan, dan tabel rincian."},
     "perbandingan": {"label": "Perbandingan kategori",
                      "ket": "Fokus kategori/wilayah: peringkat, porsi (% dari total), peta, dan tabel berskala warna."},
+    "penjualan": {"label": "Penjualan", "kelompok": "Per bidang",
+                  "ket": "Omzet & jumlah terjual, tren + ramalan, % vs tahun lalu, produk/cabang teratas, peta."},
+    "keuangan": {"label": "Keuangan", "kelompok": "Per bidang",
+                 "ket": "Pendapatan, biaya, laba: perbandingan per periode, akumulasi, komposisi pos, tabel berambang."},
+    "sdm": {"label": "SDM", "kelompok": "Per bidang",
+            "ket": "Jumlah karyawan, gaji/kehadiran, sebaran per departemen, jabatan & jenis kelamin, tren."},
+    "operasional": {"label": "Operasional", "kelompok": "Per bidang",
+                    "ket": "Volume & durasi/keterlambatan, tren dengan deteksi anomali, lokasi terburuk, peta panas."},
+}
+# Kata kunci nama kolom per bidang (huruf kecil, dicari sebagai bagian nama). Urutan = prioritas.
+KATA = {
+    "penjualan": {"ukuran": ("omzet", "penjualan", "sales", "pendapatan", "revenue", "harga", "nilai", "total",
+                             "qty", "jumlah", "unit", "terjual", "laba"),
+                  "kategori": ("produk", "kategori", "cabang", "toko", "outlet", "kanal", "saluran", "merek",
+                               "pelanggan", "wilayah", "kota", "provinsi")},
+    "keuangan": {"ukuran": ("pendapatan", "revenue", "biaya", "beban", "cost", "laba", "profit", "margin", "kas",
+                            "anggaran", "realisasi", "nilai", "total"),
+                 "kategori": ("akun", "pos", "jenis", "kategori", "unit", "divisi", "cabang", "proyek", "pusat")},
+    "sdm": {"ukuran": ("karyawan", "pegawai", "gaji", "upah", "lembur", "hadir", "absen", "cuti", "jam", "usia",
+                       "masa_kerja", "skor", "nilai"),
+            "kategori": ("departemen", "divisi", "bagian", "unit", "jabatan", "posisi", "jenis_kelamin", "gender",
+                         "status", "pendidikan", "lokasi", "cabang")},
+    "operasional": {"ukuran": ("durasi", "terlambat", "delay", "waktu", "menit", "jam", "volume", "produksi",
+                               "stok", "cacat", "gagal", "batal", "jarak", "kapasitas", "jumlah"),
+                    "kategori": ("status", "lokasi", "gudang", "mesin", "lini", "rute", "bandara", "asal", "tujuan",
+                                 "maskapai", "armada", "shift", "cabang")},
 }
 MAKS_UKURAN = 4            # kotak angka di baris pertama
 MAKS_CALON = 8             # kolom teks yang diperiksa jumlah nilainya (hemat query)
@@ -36,9 +66,17 @@ def _uk(b: dict) -> dict:
     return {"field": b["field"], "peran": "ukuran", "agg": b.get("agg", "SUM"), "metrik": bool(b.get("metrik"))}
 
 
-def petakan(dataset_id: int, utama: str = "") -> dict:
+def skor_kata(nama: str, kata: tuple[str, ...]) -> int:
+    """Makin kecil makin cocok: indeks kata kunci pertama yang ada di nama kolom; tidak cocok = len(kata)."""
+    n = nama.lower()
+    return next((i for i, k in enumerate(kata) if k in n), len(kata))
+
+
+def petakan(dataset_id: int, utama: str = "", kata: dict | None = None) -> dict:
     """Peran kolom untuk template: {"waktu", "kategori": [...], "wilayah", "ukuran": [...]}.
-    utama = nama ukuran pilihan pengguna; ditaruh pertama (dipakai tren, peringkat, komposisi)."""
+    utama = nama ukuran pilihan pengguna; ditaruh pertama (dipakai tren, peringkat, komposisi).
+    kata  = KATA[bidang]: ukuran & kategori yang namanya cocok didahulukan (template per bidang)."""
+    kata = kata or {}
     t = alat._dataset(dataset_id)
     b = bidang.daftar(dataset_id)
     waktu = next((d["field"] for d in b["dimensi"] if d.get("dttm")), None) or \
@@ -51,10 +89,15 @@ def petakan(dataset_id: int, utama: str = "") -> dict:
         if 2 <= n <= 50:
             kategori.append((n, nama))
     semua = [u for u in b["ukuran"] if u["field"] != lembar.BARIS]
-    semua.sort(key=lambda u: (u["field"] != utama, bool(u.get("metrik")) and u["field"].lower() == "count"))
+    semua.sort(key=lambda u: (u["field"] != utama, skor_kata(u["field"], kata.get("ukuran", ())),
+                              bool(u.get("metrik")) and u["field"].lower() == "count"))
+    if kata.get("kategori"):     # kategori yang cocok dengan bidang di depan (kat[0]), lalu yang paling sedikit nilainya
+        kategori.sort(key=lambda x: (skor_kata(x[1], kata["kategori"]), x[0]))
+    else:
+        kategori.sort()
     ukuran = semua[:MAKS_UKURAN] or [u for u in b["ukuran"] if u["field"] == lembar.BARIS]
     return {"nama": b["nama"], "waktu": waktu, "wilayah": wilayah,
-            "kategori": [nama for _, nama in sorted(kategori)],          # paling sedikit nilainya dulu
+            "kategori": [nama for _, nama in kategori],
             "ukuran": [_uk(u) for u in ukuran]}
 
 
@@ -136,14 +179,123 @@ def _susun_perbandingan(p: dict) -> list[list[tuple[dict, int]]]:
     return baris
 
 
-SUSUN = {"ringkasan": _susun_ringkasan, "tren": _susun_tren, "perbandingan": _susun_perbandingan}
+# --- Template per bidang --------------------------------------------------------------------------------
+def _cari(p: dict, kata: tuple[str, ...]) -> dict | None:
+    """Ukuran pertama yang namanya memuat salah satu kata (None bila tidak ada)."""
+    return next((u for u in p["ukuran"] if skor_kata(u["field"], kata) < len(kata)), None)
+
+
+def _tabel(p: dict, judul: str, dim: dict) -> tuple[dict, int]:
+    """Tabel rincian semua ukuran berskala warna, selebar kanvas."""
+    return {"tanda": "tabel", "judul": judul, "baris": [dim], "kolom": p["ukuran"], "skala_warna": True,
+            "urut": "turun", "batas": 200}, 12
+
+
+def _susun_penjualan(p: dict) -> list[list[tuple[dict, int]]]:
+    u, kat = p["ukuran"][0], p["kategori"]
+    baris = [_angka(p)]
+    if p["waktu"]:
+        w = _dim(p["waktu"])
+        baris.append([({"tanda": "garis", "judul": f"Tren {_label(u)} + ramalan", "kolom": [w], "baris": [u],
+                        "analitik": {"ramalan": 6, "tren": True}}, 8),
+                      ({"tanda": "angka_tren", "judul": f"{_label(u)} terakhir", "kolom": [w], "baris": [u]}, 4)])
+        baris.append([({"tanda": "garis", "judul": f"{_label(u)}: % vs tahun lalu", "kolom": [w], "baris": [u],
+                        "kalkulasi": "yoy"}, 12)])
+    tengah = []
+    if kat:
+        tengah.append(({"tanda": "batang", "judul": f"10 {kat[0]} teratas", "baris": [_dim(kat[0])], "kolom": [u],
+                        "urut": "turun", "batas": 10, "label": True}, 6))
+    if p["wilayah"]:
+        tengah.append(({"tanda": "peta_wilayah", "judul": f"{_label(u)} per provinsi", "kolom": [_dim(p["wilayah"])],
+                        "baris": [u]}, 6))
+    elif len(kat) > 1:
+        tengah.append(({"tanda": "pie", "judul": f"Porsi per {kat[1]}", "kolom": [_dim(kat[1])], "baris": [u]}, 6))
+    baris.append(tengah)
+    if kat:
+        baris.append([_tabel(p, f"Rincian per {kat[0]}", _dim(kat[0]))])
+    return baris
+
+
+def _susun_keuangan(p: dict) -> list[list[tuple[dict, int]]]:
+    kat = p["kategori"]
+    masuk = _cari(p, ("pendapatan", "revenue", "omzet", "penjualan")) or p["ukuran"][0]
+    keluar = _cari(p, ("biaya", "beban", "cost", "pengeluaran"))
+    baris = [_angka(p)]
+    if p["waktu"]:
+        w = _dim(p["waktu"])
+        banding = [masuk] + ([keluar] if keluar and keluar != masuk else [])
+        baris.append([({"tanda": "batang", "judul": " vs ".join(_label(x) for x in banding) + " per periode",
+                        "kolom": [w], "baris": banding}, 8),
+                      ({"tanda": "area", "judul": f"{_label(masuk)} kumulatif", "kolom": [w], "baris": [masuk],
+                        "kalkulasi": "kumulatif"}, 4)])
+    if kat:
+        baris.append([({"tanda": "waterfall", "judul": f"{_label(masuk)} per {kat[0]}", "kolom": [_dim(kat[0])],
+                        "baris": [masuk]}, 6),
+                      ({"tanda": "batang", "judul": f"Porsi {kat[0]} (% dari total)", "kolom": [_dim(kat[0])],
+                        "baris": [masuk], "kalkulasi": "persen_total", "label": True}, 6)])
+        baris.append([_tabel(p, f"Rincian per {kat[0]}", _dim(kat[0]))])
+    elif p["waktu"]:
+        baris.append([_tabel(p, "Rincian per periode", _dim(p["waktu"]))])
+    return baris
+
+
+def _susun_sdm(p: dict) -> list[list[tuple[dict, int]]]:
+    kat = p["kategori"]
+    if not kat:
+        raise alat.InputSalah("Template SDM butuh kolom kategori, mis. departemen atau jabatan. Pilih template lain.")
+    u = p["ukuran"][0]
+    orang = {"field": lembar.BARIS, "peran": "ukuran", "agg": "COUNT", "metrik": False}
+    baris = [[({"tanda": "angka", "judul": "Jumlah karyawan (baris)", "baris": [orang]}, 4)] +
+             [({"tanda": "angka", "judul": _label(x), "baris": [x]}, 4) for x in p["ukuran"][:2]],
+             [({"tanda": "batang", "judul": f"Karyawan per {kat[0]}", "baris": [_dim(kat[0])], "kolom": [orang],
+                "urut": "turun", "label": True}, 6)]]
+    if len(kat) > 1:
+        baris[-1].append(({"tanda": "pie", "judul": f"Komposisi per {kat[1]}", "kolom": [_dim(kat[1])],
+                           "baris": [orang]}, 6))
+    bawah = [({"tanda": "batang", "judul": f"Rata-rata {_label(u)} per {kat[0]}", "baris": [_dim(kat[0])],
+               "kolom": [{**u, "agg": "AVG"} if not u.get("metrik") else u], "urut": "turun"}, 6)]
+    if p["waktu"]:
+        bawah.append(({"tanda": "garis", "judul": f"Tren {_label(u)}", "kolom": [_dim(p["waktu"])], "baris": [u]}, 6))
+    elif len(kat) > 1:
+        bawah.append(({"tanda": "peta_panas", "judul": f"{kat[0]} × {kat[1]}", "kolom": [_dim(kat[0])],
+                       "baris": [_dim(kat[1]), orang]}, 6))
+    baris.append(bawah)
+    baris.append([_tabel(p, f"Rincian per {kat[0]}", _dim(kat[0]))])
+    return baris
+
+
+def _susun_operasional(p: dict) -> list[list[tuple[dict, int]]]:
+    u, kat = p["ukuran"][0], p["kategori"]
+    baris = [_angka(p)]
+    if p["waktu"]:
+        baris.append([({"tanda": "garis", "judul": f"Tren {_label(u)} + anomali", "kolom": [_dim(p["waktu"])],
+                        "baris": [u], "analitik": {"anomali": True, "rata_bergerak": 7}}, 12)])
+    tengah = []
+    if kat:
+        tengah.append(({"tanda": "batang", "judul": f"{_label(u)} per {kat[0]} (tertinggi)", "baris": [_dim(kat[0])],
+                        "kolom": [u], "urut": "turun", "batas": 15, "label": True}, 6))
+    if len(kat) > 1:
+        tengah.append(({"tanda": "peta_panas", "judul": f"{kat[0]} × {kat[1]}", "kolom": [_dim(kat[0])],
+                        "baris": [_dim(kat[1]), u]}, 6))
+    elif p["wilayah"]:
+        tengah.append(({"tanda": "peta_wilayah", "judul": f"{_label(u)} per provinsi", "kolom": [_dim(p["wilayah"])],
+                        "baris": [u]}, 6))
+    baris.append(tengah)
+    if kat:
+        baris.append([_tabel(p, f"Rincian per {kat[0]}", _dim(kat[0]))])
+    return baris
+
+
+SUSUN = {"ringkasan": _susun_ringkasan, "tren": _susun_tren, "perbandingan": _susun_perbandingan,
+         "penjualan": _susun_penjualan, "keuangan": _susun_keuangan, "sdm": _susun_sdm,
+         "operasional": _susun_operasional}
 
 
 def rancang(dataset_id: int, kunci: str, utama: str = "") -> tuple[dict, list[list[tuple[dict, int]]]]:
     """(peta kolom, baris berisi (spesifikasi lembar, lebar)). Tidak menyimpan apa pun."""
     if kunci not in TEMPLAT:
         raise alat.InputSalah(f"Template '{kunci}' tidak dikenal.")
-    p = petakan(dataset_id, utama)
+    p = petakan(dataset_id, utama, KATA.get(kunci))
     if not p["ukuran"]:
         raise alat.InputSalah("Dataset ini belum punya kolom angka untuk dijadikan ukuran.")
     baris = [[({**spec, "dataset_id": dataset_id}, lebar) for spec, lebar in isi] for isi in SUSUN[kunci](p) if isi]

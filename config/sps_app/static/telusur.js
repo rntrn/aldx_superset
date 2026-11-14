@@ -1,4 +1,4 @@
-// ALDx App — Telusuri ke dashboard lain (drill-through, padanan Power BI).
+// ALDx App — Telusuri ke dashboard lain (drill-through).
 //
 //   Saat sebuah dashboard dibuka, tombol "Telusuri" di bilah atas membawa SEMUA filter yang sedang aktif
 //   (bilah filter + klik-filter pada chart, mis. klik irisan "Elektronik") ke dashboard lain yang punya filter

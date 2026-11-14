@@ -13,6 +13,7 @@ Urutan menyala, SOP, dan FAQ gangguan ada di [19-runbook-faq-admin.md](19-runboo
 | Uji otomatis | `powershell -ExecutionPolicy Bypass -File scripts\uji.ps1` |
 | Cadangkan | `powershell -ExecutionPolicy Bypass -File scripts\cadangkan.ps1 [-Engine]` |
 | Versi komponen | `powershell -ExecutionPolicy Bypass -File scripts\versi.ps1` |
+| Pratinjau catatan rilis satu versi (dipakai GitHub Actions untuk rilis `v<VERSI>`) | `pwsh -File scripts\catatan-rilis.ps1 -Versi 2026.11.14` |
 | Bersihkan storage Docker | `powershell -ExecutionPolicy Bypass -File scripts\cleanup.ps1` |
 
 Container memakai `restart: unless-stopped`: ikut menyala otomatis saat Docker Desktop menyala, kecuali Anda mematikannya dengan `stop.ps1`.

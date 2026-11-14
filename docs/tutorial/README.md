@@ -6,7 +6,7 @@ angka di dalam lingkaran emas pada gambar menunjukkan urutan bagian yang dibahas
 | Level | Untuk siapa | Bisa apa setelah selesai | Waktu belajar |
 |---|---|---|---|
 | [Level 1 · Pengguna](level-1-pengguna.md) | semua pengguna | login, membaca & menyaring dashboard, telusuri, tampilan tersimpan, PowerPoint, bertanya ke Asisten AI | 1 jam |
-| [Level 2 · Analis](level-2-analis.md) | pembuat laporan di unit kerja | chart & dashboard dengan seret-lepas, peta, ramalan, template, tab, Auto chart, laporan & peringatan email | 3 jam |
+| [Level 2 · Analis](level-2-analis.md) | pembuat laporan di unit kerja | chart & dashboard dengan seret-lepas, peta, ramalan, ambang, template per bidang, tab, Auto chart, laporan & peringatan email | 3 jam |
 | [Level 3 · Admin data](level-3-admin-data.md) | pengelola data di unit/divisi | sumber data, dataset, ekstrak, hak akses data, jejak data, pindai & gabung dataset lewat AI | 3 jam |
 | [Level 4 · Admin server](level-4-admin-server.md) | tim TI pengelola server | memasang, memantau, kapasitas, cadangan, upgrade, SSO, sematan, kesehatan kueri, pengaturan AI | 4 jam |
 

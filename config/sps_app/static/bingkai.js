@@ -75,7 +75,7 @@
   if (!induk || window.__spsBingkai) return;
   window.__spsBingkai = true;
 
-  // ---- Klik kanan chart di dashboard -> "Telusuri ke dashboard lain…" (drill-through ala Power BI) ----
+  // ---- Klik kanan chart di dashboard -> "Telusuri ke dashboard lain…" ----
   // Butir ditambahkan ke menu klik kanan bawaan chart. Saat dipilih: nilai yang diklik dijadikan klik-filter
   // (bila chart mendukung), lalu panel Telusuri di cangkang dibuka dengan filter itu (telusur.js).
   if (location.pathname.startsWith("/superset/dashboard/")) {

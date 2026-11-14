@@ -5,6 +5,7 @@
 
 **Dari data mentah ke dashboard, ramalan, dan jawaban AI, dalam satu aplikasi yang Anda miliki sendiri.**
 
+![Versi](https://img.shields.io/github/v/tag/rntrn/aldx_superset?filter=v*&label=versi&color=E11D74)
 ![Rilis terakhir](https://img.shields.io/github/release-date/rntrn/aldx_superset?label=rilis%20terakhir&color=E11D74)
 ![Apache Superset](https://img.shields.io/badge/Apache%20Superset-6.1-1F4E79)
 ![Docker](https://img.shields.io/badge/Docker-siap%20pakai-0F9488)
@@ -41,10 +42,11 @@ Apache Superset. Semua berjalan di komputer/server **Anda sendiri** dengan Docke
 |---|---|
 | **Tanpa internet** | `ALDx-Setup-Offline.exe` + semua `.bin` di satu folder ([Releases › ALDx offline](../../releases/tag/offline)) |
 | **Memperbarui** | jalankan installer baru **di atas** instalasi lama, Next-Next (data, dashboard, pengguna tetap) → [docs/29](docs/29-versi-pembaruan-hapus-total.md) |
+| **Versi tertentu** | tiap versi punya rilis tetap `v<VERSI>` (mis. [`v2026.11.14`](../../releases/tag/v2026.11.14)) berisi installer + `ALDx-SHA256.txt` untuk memeriksa unduhan → [docs/29](docs/29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github) |
 | **Menghapus** | Settings › Apps › ALDx › Uninstall; bersih tanpa sisa: `ALDx-HapusTotal.exe` |
 | **Tanpa Setup.exe** | Download ZIP › Extract All › klik dua kali `PASANG.cmd` (wizard yang sama) |
 
-Versi terpasang tampil di kaki halaman login dan bawah Beranda; yang baru di setiap versi: [docs/31](docs/31-catatan-versi.md).
+Versi terpasang tampil di kaki halaman login dan bawah Beranda (= nama tag rilis di GitHub); yang baru di setiap versi: [docs/31](docs/31-catatan-versi.md).
 
 ## Dari data ke keputusan: 5 langkah
 
@@ -76,14 +78,14 @@ Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33
 <td width="50%"><img src="docs/gambar/app/n2-tampilan-tersimpan.png" alt="Tampilan tersimpan di panel Telusuri"></td>
 </tr>
 <tr>
-<td><b>Dashboard dari template</b>: pilih dataset, ALDx menyusun angka utama, tren, peringkat, peta, dan filter.</td>
+<td><b>Dashboard dari template</b>: umum atau per bidang (Penjualan, Keuangan, SDM, Operasional); ALDx menyusun angka utama, tren, peringkat, peta, dan filter.</td>
 <td><b>Telusuri & tampilan tersimpan</b>: pindah ke dashboard lain dengan filter terbawa; simpan kombinasi filter dengan nama.</td>
 </tr>
 </table>
 
 | Area | Isi |
 |---|---|
-| **Analitik** | % dari total · kumulatif · YoY · rata bergerak · target · simulasi what-if · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
+| **Analitik** | % dari total · kumulatif · YoY · **ambang hijau/merah** · rata bergerak · target · simulasi what-if · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
 | **Dashboard** | tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
 | **Berbagi** | ekspor PNG/PDF/Excel/CSV · **PowerPoint** · berkas `.ald/.aldx` terenkripsi · Story · langganan laporan & peringatan data via email · sematkan ke web lain dengan RLS per penonton |
 | **Data** | 14+ jenis database + Access/Excel/CSV · jejak data (lineage) · persiapan data tanpa SQL · gabung otomatis · ekstrak ke ALDx Engine |
@@ -155,7 +157,7 @@ Untuk penyelenggara pelatihan: **[Alur pelatihan](docs/bahan-ajar/alur-pelatihan
 | mengelola data & hak akses | [docs/06](docs/06-sumber-data.md) · [docs/08](docs/08-hak-akses-data.md) · [docs/13](docs/13-sps-engine-ekstrak.md) |
 | mengelola server | [docs/11 · Pusat Kendali](docs/11-pusat-kendali-server.md) · [docs/19 · Runbook](docs/19-runbook-faq-admin.md) |
 | ingin tahu yang baru | [docs/31 · Catatan versi](docs/31-catatan-versi.md) |
-| membandingkan dengan Tableau, Power BI, Looker | [docs/32](docs/32-perbandingan-fitur-bi.md) |
+| melihat peta fitur & peta jalan | [docs/32](docs/32-peta-fitur.md) |
 
 Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar isi, mode gelap, tanpa internet).
 
@@ -182,7 +184,7 @@ Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar is
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
-| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus, seperti measure/column Power BI), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **dashboard dari template** (dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
+| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **ambang** (format bersyarat hijau/merah pada angka & tabel), **dashboard dari template** (umum & per bidang: Penjualan, Keuangan, SDM, Operasional; dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
 | Pusat Kendali | `/pusat-kendali/`: proses, cache, batas, identitas, hubungkan data, ekstrak (termasuk **impor banyak tabel sekaligus dengan cek kapasitas**), hak akses, multi-node |
 | Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
 | Ekspor | tombol **Ekspor** di setiap tabel & grafik halaman ALDx: gambar PNG, PDF, Excel, CSV, TXT, salin |
@@ -193,7 +195,7 @@ Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar is
 | Filter global & ulasan | satu filter (pilihan, rentang angka, rentang waktu) berlaku di **semua dashboard & Story**, tersimpan per akun; nilai dipilih dari daftar yang bisa dicari, **chip filter aktif** di bilah atas, *kecualikan dashboard ini*; **komentar & rating** dengan balasan, @sebut, pemberitahuan & moderasi Superadmin. Lihat [docs/25](docs/25-berkas-filter-global-ulasan.md) |
 | Sematkan ke web lain | dashboard tampil di web/aplikasi lain lewat `<iframe>` + token tamu: **RLS per penonton**, filter dari URL (`f.<kolom>=...`), hanya domain yang diizinkan (`.env`: `SPS_SEMATKAN_*`). Lihat [docs/30](docs/30-sematkan-dashboard.md) |
 | Dokumentasi | **Panduan di dalam aplikasi** (menu *Panduan*, `/panduan/`: pencarian, daftar isi, mode gelap, tanpa internet) dari Markdown di `docs\` + **PDF** di `docs\pdf\` |
-| Versi | versi terpasang di halaman login & bawah Beranda, dengan status *Versi terbaru / Pembaruan tersedia* ([docs/29](docs/29-versi-pembaruan-hapus-total.md)) |
+| Versi | versi terpasang di halaman login & bawah Beranda (tautan ke rilis tetap `v<VERSI>`), status *Versi terbaru / Pembaruan tersedia*; setiap rilis memuat `ALDx-SHA256.txt` ([docs/29](docs/29-versi-pembaruan-hapus-total.md)) |
 | Mutu | `scripts\uji.ps1` di server; daftar periksa audit keamanan [docs/27](docs/27-daftar-periksa-audit-keamanan.md) |
 
 </details>
@@ -273,6 +275,7 @@ D:\superset
 │   ├── uji.ps1             # Uji otomatis semua komponen
 │   ├── cadangkan.ps1       # Cadangan & pemulihan metadb (+ engine)
 │   ├── versi.ps1           # Versi tiap komponen
+│   ├── catatan-rilis.ps1   # Catatan rilis v<VERSI> dari docs/31 (GitHub Actions)
 │   ├── sinkron-laptop.ps1  # Ambil versi terbaru dari GitHub, terapkan, uji, (opsional) terbitkan installer
 │   ├── data-latihan.ps1    # Muat data latihan fiktif
 │   ├── data-penerbangan.ps1 # Buat Excel/CSV latihan penerbangan ukuran besar

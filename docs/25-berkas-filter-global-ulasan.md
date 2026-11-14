@@ -139,7 +139,7 @@ Kode: `config/sps_app/static/telusur.js`, `GET /filter-global/api/sasaran`, pemb
 ### 2c. Tampilan tersimpan (bookmark)
 
 Menyimpan **keadaan filter sebuah dashboard dengan nama**, supaya bisa dibuka lagi dengan satu klik
-(padanan *Bookmark* Power BI). Ada di panel yang sama dengan Telusuri.
+(*bookmark*). Ada di panel yang sama dengan Telusuri.
 
 1. Atur filter di dashboard (bilah filter dan/atau klik chart).
 2. Klik **Telusuri** → bagian **Tampilan tersimpan** → ketik nama (mis. *Elektronik Jawa*) → **Simpan tampilan ini**.

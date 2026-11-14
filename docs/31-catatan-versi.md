@@ -10,6 +10,50 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 
 ---
 
+## Riwayat versi & rilis di GitHub
+
+Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.14`) yang menunjuk commit build-nya, berisi
+`ALDx-Setup.exe`, `ALDx-HapusTotal.exe`, dan `ALDx-SHA256.txt`. Versi di kaki halaman login = nama tag. Cara memeriksa:
+[29 §1](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github).
+
+| Versi | Isi utama |
+|---|---|
+| 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
+| 2026.11.13.8 | AI: pekerjaan yang prosesnya mati dilaporkan |
+| 2026.11.13.7 | README baru, peta menu, alur pelatihan, tutorial & bahan ajar lengkap |
+| 2026.11.13.6 | AI: adaptasi model (think / tanpa tools / konteks kecil) + keamanan |
+| 2026.11.13.5 | AI andal semua model: coba ulang, model cadangan, pindai tabel |
+| 2026.11.13.4 | AI di latar: progres langsung + Batalkan |
+| 2026.11.13.3 | AI: gabung dataset, batas waktu rapi |
+| 2026.11.13.2 | tab dashboard, jelaskan perubahan, analitik per Warna, PowerPoint, Kesehatan kueri, SSO |
+| 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
+
+Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.14 · Ambang berwarna, template per bidang, rilis per versi
+
+### Baru
+
+| Area | Perubahan | Dokumen |
+|---|---|---|
+| Studio | **Ambang** (format bersyarat) untuk Angka, Angka + tren, dan Tabel: hijau ▲ bila nilai ≥ batas hijau, merah ▼ bila ≤ batas merah; ikut tersimpan ke chart & dashboard (warna mengikuti tema/mode gelap) | [12](12-studio-visual.md#ambang-format-bersyarat) |
+| Dashboard | **Template per bidang**: *Penjualan*, *Keuangan*, *SDM*, *Operasional*; kolom dipilih dari nama (mis. *omzet*, *biaya*, *departemen*, *durasi*), ukuran utama bisa *Otomatis* | [12 §2](12-studio-visual.md#2-susun-dashboard) |
+| Rilis | **Rilis tetap per versi** `v<VERSI>` di GitHub (tag = commit build) + **`ALDx-SHA256.txt`** (sidik SHA-256 semua berkas, termasuk offline) di rilis *terbaru*, *offline*, dan `v<VERSI>`; catatan rilis diambil dari dokumen ini | [29 §1](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github) |
+| Beranda | Nomor versi di bawah Beranda kini tautan ke rilis versi itu; *Unduh installer* membuka rilis versi terbaru | [29](29-versi-pembaruan-hapus-total.md) |
+| Dokumentasi | Bab 32 menjadi **Peta fitur & peta jalan** (tanpa perbandingan dengan produk lain); tutorial, bahan ajar, peta menu, alur pelatihan, README diperbarui | [32](32-peta-fitur.md) |
+
+### Perlu dilakukan setelah memperbarui
+
+| Cara memasang | Langkah |
+|---|---|
+| ALDx-Setup.exe / Offline | jalankan installer versi baru di atas instalasi lama (Next-Next), lalu `Ctrl + F5` di browser |
+| git | `git pull` lalu `docker compose restart superset superset-worker superset-beat`, `Ctrl + F5` |
+| Semua | opsional: periksa unduhan dengan `Get-FileHash` terhadap `ALDx-SHA256.txt` |
+
+---
+
 ## November 2026 · BI lanjutan
 
 ### Baru
@@ -23,10 +67,10 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Studio | **Objek desain dashboard**: Teks (10 huruf lokal, ukuran, warna, latar, rata), Gambar (unggah), Garis pemisah | [12](12-studio-visual.md#objek-desain-teks-gambar-garis) |
 | Filter global | Nilai dipilih dari **daftar yang bisa dicari** (RLS berlaku), **chip filter aktif** di bilah atas, *Kecualikan dashboard ini* | [25](25-berkas-filter-global-ulasan.md) |
 | Dashboard | Klik-filter antar-chart, **drill to detail**, **drill by** aktif bawaan | [12](12-studio-visual.md) |
-| Studio | **Hierarki seret-tumpuk**: seret satu dimensi ke atas dimensi lain → beri nama (seperti Tableau); seret ke atas hierarki = tambah level | [12](12-studio-visual.md#hierarki-dimensi-telusur-bertingkat) |
+| Studio | **Hierarki seret-tumpuk**: seret satu dimensi ke atas dimensi lain → beri nama; seret ke atas hierarki = tambah level | [12](12-studio-visual.md#hierarki-dimensi-telusur-bertingkat) |
 | Studio | **Tampilkan saya** tidak lagi mematikan jenis saat kolom berlebih: kolom ekstra tidak dipakai & ditandai pudar (±19 dari 23 jenis aktif dengan 3 dimensi) | [12](12-studio-visual.md#tampilkan-saya-dengan-banyak-kolom) |
 | Analitik | Opsi baru: **rata bergerak**, **garis rata-rata**, **median**, **target**, **tertinggi & terendah** (ikut tersimpan ke chart Superset); tombol **Siapkan agar analitik aktif** | [17 §4](17-katalog-chart-peta-prediksi.md#4-analitik-prediktif) |
-| Studio | **+ Ukuran / + Dimensi**: definisikan ukuran (rumus agregat) & dimensi (rumus per baris) seperti *measure / column* Power BI, dengan uji rumus | [12](12-studio-visual.md#ukuran--dimensi-terdefinisi-seperti-new-measure--new-column-power-bi) |
+| Studio | **+ Ukuran / + Dimensi**: definisikan ukuran (rumus agregat) & dimensi (rumus per baris), dengan uji rumus | [12](12-studio-visual.md#ukuran--dimensi-terdefinisi) |
 | Dashboard | **Telusuri ke dashboard lain** (drill-through): filter & klik-filter aktif dibawa ke dashboard lain | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Studio | **N teratas** (Top N) | [12](12-studio-visual.md#n-teratas-top-n) |
 | Studio | **Kalkulasi cepat**: *% dari total* & *Kumulatif* (pilihan **Hitung**), ikut tersimpan ke chart | [12](12-studio-visual.md#kalkulasi-cepat--dari-total-kumulatif--yoy) |
@@ -57,7 +101,7 @@ ketiga cara memasang ([29 §1](29-versi-pembaruan-hapus-total.md)).
 | Dashboard | **Klik kanan chart → Telusuri ke dashboard lain…** (drill-through satu gerakan) | [25 §2b](25-berkas-filter-global-ulasan.md) |
 | Rilis | `VERSI` wajib naik tiap pembaruan (dijaga GitHub Actions); tanggal & judul di halaman Releases selalu build terakhir; versi mendukung nomor urut harian (`2026.11.13.2`) | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Asisten AI | Tombol cepat di dashboard: **Ringkas dashboard ini dalam 5 poin** & *Apa yang janggal…* | [23](23-asisten-ai-peran-ahli.md) |
-| Peta jalan | Perbandingan fitur dengan Tableau, Power BI, Looker, Sigma | [32](32-perbandingan-fitur-bi.md) |
+| Peta jalan | Peta fitur & peta jalan | [32](32-peta-fitur.md) |
 | Installer | Installer online, offline & HapusTotal kini **dibangun dan diterbitkan otomatis** oleh GitHub Actions di setiap perubahan `main` | [29 §1](29-versi-pembaruan-hapus-total.md) |
 | Versi | Versi terpasang tampil di **halaman login** & **Beranda**, dengan status *Versi terbaru* / *Pembaruan tersedia* (dicek ke GitHub) | [29](29-versi-pembaruan-hapus-total.md) |
 | Ekstrak | **Impor banyak tabel sekaligus** dari satu koneksi, dengan **cek kapasitas** (perkiraan ukuran vs sisa kuota & disk engine: Cukup / Mendekati / Tidak cukup) sebelum impor | [13 §2.5](13-sps-engine-ekstrak.md) |

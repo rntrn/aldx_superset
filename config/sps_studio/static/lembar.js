@@ -15,6 +15,7 @@
              tanda: "otomatis", label: false, urut: "", chartId: null, hasil: null, nomorKueri: 0,
              analitik: {}};
   const TANDA_ANALITIK = ["garis", "area", "batang"];
+  const TANDA_AMBANG = ["angka", "angka_tren", "tabel"];            // = lembar.py TANDA_AMBANG
 
   /* ---------- Pil ---------- */
   // Kunci kolom hasil query (sama dengan Pil.label di lembar.py): untuk menandai pil yang diabaikan.
@@ -42,8 +43,8 @@
   const punyaGeo = (d, peran) => d.some(p => p.geo === peran);
   const sah = (t, nd, nu) => {
     const a = Studio.awal.aturan[t], d = dimensi();
-    // Hanya kebutuhan MINIMAL: kolom yang melebihi kapasitas jenis ini tidak dipakai (server: lembar.pangkas),
-    // seperti Tableau. Dulu batas maksimal membuat hampir semua jenis mati begitu ada kolom ketiga.
+    // Hanya kebutuhan MINIMAL: kolom yang melebihi kapasitas jenis ini tidak dipakai (server: lembar.pangkas).
+    // Dulu batas maksimal membuat hampir semua jenis mati begitu ada kolom ketiga.
     if (!(nd >= a.dim[0] && nu >= a.ukuran[0] && nd + nu > 0)) return false;
     if (a.geo === "titik" && !(punyaGeo(d, "lintang") && punyaGeo(d, "bujur"))) return false;
     if (a.waktu && !d.some(p => p.waktu)) return false;
@@ -141,7 +142,7 @@
       zonaTumpuk(el, d => tambahLevel(h, d.field));
     });
   }
-  /* ---------- Ukuran & dimensi terdefinisi (definisi.py), padanan New measure / New column Power BI ---------- */
+  /* ---------- Ukuran & dimensi terdefinisi (definisi.py) ---------- */
   const CONTOH_DEF = {
     ukuran: [["Rasio", "SUM(a) / SUM(b)"], ["Rata-rata", "AVG(a)"], ["Hitung unik", "COUNT(DISTINCT a)"],
              ["Jumlah bersyarat", "SUM(CASE WHEN a > 0 THEN b ELSE 0 END)"], ["Selisih", "SUM(a) - SUM(b)"]],
@@ -176,7 +177,7 @@
       } catch (e) { $("#dfHasil").innerHTML = `<span style="color:var(--merah)">${esc(e.message)}</span>`; }
     };
   }
-  // Kelompokkan nilai (Group di Tableau/Power BI): pilih nilai -> kelompok bernama, tanpa menulis rumus.
+  // Kelompokkan nilai: pilih nilai -> kelompok bernama, tanpa menulis rumus.
   // Hasilnya dimensi terdefinisi biasa (CASE WHEN ... END), jadi bisa diubah lewat "Ubah rumus…".
   async function dialogKelompok(b) {
     let nilai;
@@ -274,7 +275,7 @@
     } catch (e) { Studio.notif(esc(e.message), true); }
   }
 
-  // Seret dimensi dari panel ke atas dimensi lain = hierarki baru; ke atas hierarki = tambah level (seperti Tableau).
+  // Seret dimensi dari panel ke atas dimensi lain = hierarki baru; ke atas hierarki = tambah level.
   function zonaTumpuk(el, aksi) {
     el.ondragover = e => { e.preventDefault(); e.stopPropagation(); el.classList.add("tumpuk"); };
     el.ondragleave = () => el.classList.remove("tumpuk");
@@ -484,7 +485,7 @@
   const spec = () => ({dataset_id: L.ds, judul: $("#judulLembar").value.trim(), tanda: tandaEfektif(),
     kolom: L.kolom.map(keSpec), baris: L.baris.map(keSpec), warna: keSpec(L.warna), ukuran: keSpec(L.ukuran),
     label: L.label, filter: filterSpec(), urut: L.urut, batas: L.topN || BATAS_PRATINJAU, analitik: L.analitik,
-    kalkulasi: L.kalkulasi || "", skala_warna: !!L.skala});
+    kalkulasi: L.kalkulasi || "", skala_warna: !!L.skala, ambang: TANDA_AMBANG.includes(tandaEfektif()) ? L.ambang : {}});
   const horizontal = () => L.baris.some(p => p.peran === "dimensi") && !L.kolom.some(p => p.peran === "dimensi");
 
   const kueri = Studio.tunda(async () => {
@@ -504,6 +505,7 @@
       const sim = simulasiAktif();
       Studio.bisaJelaskan = TANDA_ANALITIK.includes(t) && hasil.dimensi.length === 1 && (hasil.waktu || []).length === 1 && !sim;
       const info = Studio.gambar($("#grafik"), denganSimulasi(L.hasil), t, {horizontal: horizontal(), label: L.label, skala: L.skala,
+        ambang: TANDA_AMBANG.includes(t) && Object.keys(L.ambang || {}).length ? L.ambang : null,
         klik: pilTelusur() ? nama => { const p = pilTelusur(); if (p && telusuri(p, 1, nama)) perbarui(); } : null,
         klikKanan: Studio.bisaJelaskan ? (i, nama, ev) => menuJelaskan(nama, ev) : null}) || {};
       if (sim) info.catatan = `Simulasi: ${sim.ukuran} ${sim.persen > 0 ? "+" : ""}${sim.persen}% (hanya pratinjau, tidak ikut tersimpan)` + (info.catatan ? ". " + info.catatan : "");
@@ -569,6 +571,7 @@
     $('#pilihKalkulasi option[value="yoy"]').disabled = !dimWaktu;
     if (L.kalkulasi === "yoy" && satu && !dimWaktu) { L.kalkulasi = ""; $("#pilihKalkulasi").value = ""; }
     $("#barisSkala").style.display = tandaEfektif() === "tabel" ? "" : "none";
+    $("#barisAmbang").style.display = TANDA_AMBANG.includes(tandaEfektif()) ? "" : "none";
     const r = Object.values(L.hasil?.analitik?.seri || {}).find(x => x.ramalan)?.ramalan;
     $("#anKet").innerHTML = !bisa ? "Untuk Garis, Area, atau Batang dengan satu dimensi berurutan (mis. bulan), boleh ditambah satu dimensi di Warna."
       : perWarna && !L.hasil?.analitik ? "Dihitung per nilai Warna (maks. 8 terbesar). Hanya tampil di Studio; chart tersimpan berisi data aslinya."
@@ -606,6 +609,7 @@
     L.topN = s.batas && s.batas < BATAS_PRATINJAU ? s.batas : 0; $("#topN").value = L.topN || "";
     L.kalkulasi = s.kalkulasi || ""; L.skala = !!s.skala_warna;
     $("#pilihKalkulasi").value = L.kalkulasi; $("#pakaiSkala").checked = L.skala;
+    L.ambang = s.ambang || {}; $("#ambangAtas").value = L.ambang.atas ?? ""; $("#ambangBawah").value = L.ambang.bawah ?? "";
     L.filter = [];
     const kelompok = {};
     (s.filter || []).forEach(f => {
@@ -660,7 +664,7 @@
   /* ---------- Tombol ---------- */
   function bersihkan(render = true) {
     Object.assign(L, {kolom: [], baris: [], warna: null, ukuran: null, filter: [], tanda: "otomatis", label: false, urut: "",
-                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false, simulasi: null});
+                      chartId: null, analitik: {}, topN: 0, kalkulasi: "", skala: false, ambang: {}, simulasi: null});
     $("#topN").value = ""; $("#pilihKalkulasi").value = ""; $("#pakaiSkala").checked = false;
     $("#judulLembar").value = ""; $("#pakaiLabel").checked = false; $("#pilihTanda").value = "otomatis";
     if (render) perbarui(); else { renderRak(); renderShowMe(); renderAnalitik(); tampilPesan("Seret <b>&nbsp;Dimensi&nbsp;</b> ke rak Kolom dan <b>&nbsp;Ukuran&nbsp;</b> ke rak Baris."); }
@@ -678,6 +682,15 @@
     $("#pakaiLabel").onchange = () => { L.label = $("#pakaiLabel").checked; perbarui(); };
     $("#pilihKalkulasi").onchange = () => { L.kalkulasi = $("#pilihKalkulasi").value; perbarui(); };
     $("#pakaiSkala").onchange = () => { L.skala = $("#pakaiSkala").checked; perbarui(); };
+    // Ambang (format bersyarat): kosong = tidak dipakai; hijau harus > merah (dicek juga di server).
+    const ubahAmbang = () => {
+      const a = {}, atas = $("#ambangAtas").value, bawah = $("#ambangBawah").value;
+      if (atas !== "") a.atas = +atas;
+      if (bawah !== "") a.bawah = +bawah;
+      if (a.atas != null && a.bawah != null && a.atas <= a.bawah) { Studio.notif("Ambang hijau harus lebih besar daripada ambang merah.", true); return; }
+      L.ambang = a; perbarui();
+    };
+    $("#ambangAtas").onchange = ubahAmbang; $("#ambangBawah").onchange = ubahAmbang;
     $("#simUkuran").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
     $("#simPersen").oninput = () => { $("#simNilai").textContent = `${$("#simPersen").value > 0 ? "+" : ""}${$("#simPersen").value}%`; };
     $("#simPersen").onchange = () => { L.simulasi = {ukuran: $("#simUkuran").value, persen: Number($("#simPersen").value)}; perbarui(); };
@@ -690,7 +703,7 @@
     ["tambahUkuran", "tambahDimensi"].forEach(id => { $("#" + id).disabled = !bolehDef; if (!bolehDef) $("#" + id).title = "Butuh izin mengubah dataset (role Alpha/Admin)"; });
     $("#tukar").onclick = () => { [L.kolom, L.baris] = [L.baris, L.kolom]; perbarui(); };
     $("#urut").onclick = () => { L.urut = {"": "turun", turun: "naik", naik: ""}[L.urut]; perbarui(); };
-    // N teratas (Top N seperti Tableau/Power BI): batas baris hasil; ikut tersimpan ke chart (row_limit).
+    // N teratas (Top N): batas baris hasil; ikut tersimpan ke chart (row_limit).
     $("#topN").onchange = () => { const n = Math.floor(+$("#topN").value); L.topN = n >= 1 ? Math.min(n, BATAS_PRATINJAU - 1) : 0; $("#topN").value = L.topN || ""; perbarui(); };
     $("#lihatData").onclick = () => {
       const t = $("#tabelData"); t.classList.toggle("tampil");

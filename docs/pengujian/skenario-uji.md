@@ -2,7 +2,7 @@
 
 Dihasilkan dari `skenario.py`. Isi hasilnya di **`lembar-uji.xlsx`**.
 
-Total **172 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
+Total **175 skenario**. Prioritas *Tinggi* wajib lulus sebelum dipakai pengguna.
 
 ## Uji asap (± 15 menit)
 
@@ -15,6 +15,7 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | A01 | 4 Admin server | Tinggi/asap | Instalasi baru dengan PASANG.cmd | Docker Desktop menyala, folder di D:\superset | Klik dua kali PASANG.cmd, isi password admin, lewati isian opsional, klik Pasang | Semua langkah selesai; halaman Selesai menampilkan alamat; browser membuka halaman login |
 | A02 | 4 Admin server | Tinggi/asap | Uji otomatis | A01 | Jalankan scripts\uji.ps1 | 55/55 LULUS, kode keluar 0 |
 | A02b | 4 Admin server | Sedang | Versi tampil & status pembaruan | A01; komputer dengan internet | Buka /login/ (lihat kaki halaman); login → gulir ke bawah Beranda | Login menulis vYYYY.MM.DD; Beranda menulis ALDx vYYYY.MM.DD (+ kode commit bila dipasang dengan git) dan '✓ Versi terbaru' atau 'Pembaruan tersedia' dengan tautan Unduh installer; tanpa internet tertulis 'Tidak bisa dicek' |
+| A02c | 4 Admin server | Sedang | Rilis tetap per versi & sidik SHA-256 | Komputer dengan internet | GitHub › Releases › rilis 'ALDx <VERSI>' (tag v<VERSI>) → unduh ALDx-Setup.exe & ALDx-SHA256.txt → (Get-FileHash .\ALDx-Setup.exe -Algorithm SHA256).Hash.ToLower(); setelah pasang klik nomor versi di Beranda | Sidik sama persis dengan baris ALDx-Setup.exe di ALDx-SHA256.txt; versi di login = nama tag; klik versi membuka rilis versi itu; catatan rilis memuat commit & isi bagian versi dari catatan versi |
 | A03 | 4 Admin server | Tinggi | Pemeriksaan prasyarat menolak kondisi tidak layak | Docker Desktop DIMATIKAN | Jalankan PASANG.cmd | Baris 'Docker Desktop menyala' GAGAL, tombol Lanjut nonaktif; setelah Docker dinyalakan & Periksa ulang: OK |
 | A04 | 4 Admin server | Tinggi | Pindah metadata lama ke PostgreSQL | Instalasi lama (MYSQL_HOST=host.docker.internal + XAMPP menyala, atau MariaDB) | Jalankan PASANG.cmd, centang Pindahkan data | Dashboard, chart, user, koneksi lama tampil di versi baru; .env METADB_JENIS=postgres; upload lama terbaca dari ALDx Engine |
 | A05 | 4 Admin server | Tinggi | Instalasi ulang tidak menghapus data | A01 + ada chart buatan sendiri | Jalankan PASANG.cmd lagi (password admin dikosongkan) | Selesai tanpa galat; chart tetap ada; password admin tidak berubah |
@@ -95,6 +96,8 @@ Setelah instalasi/upgrade, jalankan `scripts\uji.ps1` lalu skenario bertanda **a
 | D29 | 2 Analis | Sedang | Simulasi what-if | latihan_penjualan | Studio → nm_cabang × total, Batang → geser Simulasi ke +10% → Simpan baru → buka chart tersimpan | Batang naik 10% (total ±667 M → ±734 M); status menulis 'hanya pratinjau'; chart tersimpan tetap nilai asli; slider mati saat Hitung dipakai |
 | D30 | 2 Analis | Tinggi | Dashboard bertab & tinggi kotak | Studio, 3 lembar kerja | Susun dashboard → 2 lembar kerja di tab 1, tinggi kotak pertama 'Sangat tinggi' → + Tab → klik dua kali → 'Rincian' → lembar ke-3 → Simpan → buka dashboard → buka lagi di Studio | Dashboard punya tab Tab 1 & Rincian; kotak pertama lebih tinggi; lembar yang sama ditolak di tab lain; dibuka lagi di Studio dengan tab & tinggi yang sama |
 | D31 | 2 Analis | Sedang | Tooltip kaya & Jelaskan perubahan | latihan_penjualan | Garis periode × total → arahkan kursor ke Februari 2024 → klik kanan Maret 2024 → Jelaskan perubahan | Tooltip menulis porsi dari total & ▲ 9,1% vs sebelumnya; dialog: naik ±1,6 M (+10%), saluran paling menjelaskan, Online & Grosir penyumbang terbesar |
+| D32 | 2 Analis | Tinggi | Ambang (format bersyarat) Angka & Tabel | latihan_penjualan | Angka total → Ambang Hijau ≥ 600000000000 → Simpan baru; Tabel nm_cabang × total → Hijau ≥ 120000000000, Merah ≤ 60000000000 → Simpan baru → buka keduanya di Explore & dashboard; coba Hijau 5, Merah 9 | Angka hijau ▲ 667B; tabel: Jakarta/Surabaya/Bandung hijau ▲, Makassar merah ▼, Medan & Balikpapan biasa; chart tersimpan berwarna sama (tanpa batang sel); Hijau ≤ Merah ditolak dengan pesan; baris Ambang hanya tampil untuk Angka/Tabel |
+| D33 | 2 Analis | Tinggi | Template per bidang | latihan_penjualan | Susun dashboard → Dari template… → Per bidang: Penjualan, ukuran utama Otomatis → Buat → Simpan; ulangi Keuangan, SDM, Operasional | Penjualan: 9 lembar kerja (ukuran total, kategori pertama 'kategori', ada % vs tahun lalu & peta); tiap template membuat chart tanpa galat atau pesan jelas bila kolom yang dibutuhkan tidak ada; dashboard terbuka dan filter bekerja |
 
 ## E. Peta & analitik prediktif
 

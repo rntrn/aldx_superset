@@ -65,8 +65,8 @@ dan menu mana yang tercakup di sesi mana. Isi tiap sesi ada di modul per level (
 | Telusuri, tampilan tersimpan, kesegaran data, PowerPoint | ● (modul tambahan) | | | |
 | Asisten AI (panel ✦) | ● tanya | | ● pindai tabel, gabung | ● model, cadangan, batas |
 | Studio Visual, jenis chart, peta | | ● | | |
-| Ramalan, kalkulasi cepat, simulasi, jelaskan perubahan | | ● | | |
-| Susun dashboard (template, tab, tinggi) | | ● | | |
+| Ramalan, kalkulasi cepat, ambang, simulasi, jelaskan perubahan | | ● | | |
+| Susun dashboard (template umum & per bidang, tab, tinggi) | | ● | | |
 | Kueri Visual, Kueri tersimpan | | ● | | |
 | Auto chart & dashboard | | ● | | |
 | Daftar chart, Jejak data | | ● | ● | |
@@ -80,6 +80,7 @@ dan menu mana yang tercakup di sesi mana. Isi tiap sesi ada di modul per level (
 | Kesehatan kueri, Jejak audit, Moderasi ulasan | | | | ● |
 | Sematkan ke web lain | | | | ● |
 | Login SSO, keamanan, cadangan, upgrade | | | | ● |
+| Versi & rilis GitHub (`v<VERSI>`, `ALDx-SHA256.txt`) | | | | ● |
 
 ## 5. Penilaian
 

@@ -1,7 +1,7 @@
 /* =============================================================================
    Studio Visual — PENYUSUN DASHBOARD
      Seret lembar kerja ke kanvas; tiap baris maksimal 12 kolom (¼ ⅓ ½ ⅔ penuh).
-     Objek desain (padanan "Objects" Tableau/Power BI): Teks (huruf, ukuran, warna, latar, rata),
+     Objek desain: Teks (huruf, ukuran, warna, latar, rata),
      Gambar (unggah ke server) dan Garis pemisah. Validasi & render akhir di server: sps_studio/objek.py.
    ============================================================================= */
 "use strict";
@@ -374,10 +374,13 @@
     Studio.dialog({judul: "Dashboard dari template", ok: "Buat", isi: `
       <label>Dataset<select id="tpDs">${Studio.awal.dataset.map(d => `<option value="${d.id}">${esc(d.nama)}</option>`).join("")}</select></label>
       <label style="display:block;margin-top:8px">Ukuran utama<select id="tpUkuran"></select></label>
-      <div class="nilaiList" style="margin-top:10px;max-height:none">${Object.entries(T).map(([k, v], i) =>
+      <div class="nilaiList" style="margin-top:10px;max-height:46vh">${Object.entries(T).map(([k, v], i, a) =>
+        (i && v.kelompok && v.kelompok !== a[i - 1][1].kelompok ? `<div class="judulPanel" style="margin:6px 0 2px">${esc(v.kelompok)}</div>`
+          : !i ? '<div class="judulPanel" style="margin:0 0 2px">Umum</div>' : "") +
         `<label style="align-items:flex-start"><input type="radio" name="tpJenis" value="${k}" ${i ? "" : "checked"}>
           <span><b>${esc(v.label)}</b><br><span class="ket">${esc(v.ket)}</span></span></label>`).join("")}</div>
-      <p class="ket">ALDx memilih kolom tanggal, kategori, dan ukuran secara otomatis, lalu membuat lembar kerjanya.
+      <p class="ket">ALDx memilih kolom tanggal, kategori, dan ukuran secara otomatis (template per bidang mendahulukan kolom
+        yang namanya cocok, mis. <i>omzet</i>, <i>biaya</i>, <i>departemen</i>, <i>durasi</i>), lalu membuat lembar kerjanya.
         Hasil muncul di kanvas: ubah sesuka Anda, lalu klik <b>Simpan dashboard</b>.</p>
       <div class="hasilUji" id="tpHasil"></div>`,
       padaOk: () => {
@@ -399,7 +402,7 @@
       }});
     const isiUkuran = async () => {
       const b = await Studio.api(`/studio/api/bidang/${$("#tpDs").value}`).catch(() => ({ukuran: []}));
-      $("#tpUkuran").innerHTML = b.ukuran.filter(u => u.field !== "__baris__").map(u => `<option value="${esc(u.field)}">${esc(u.label)}</option>`).join("")
+      $("#tpUkuran").innerHTML = '<option value="">Otomatis (sesuai template)</option>' + b.ukuran.filter(u => u.field !== "__baris__").map(u => `<option value="${esc(u.field)}">${esc(u.label)}</option>`).join("")
         || '<option value="">Jumlah baris</option>';
     };
     $("#tpDs").onchange = isiUkuran; isiUkuran();

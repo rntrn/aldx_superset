@@ -174,7 +174,8 @@
           (admin ? ` <a href="${esc(tr.url)}" target="_blank" rel="noopener">${esc(t("Unduh installer"))}</a> · <a href="${esc(tr.catatan)}" target="_blank" rel="noopener">${esc(t("Apa yang baru"))}</a>` : "")
         : `<span class="status-versi ok">✓ ${esc(t("Versi terbaru"))}</span>`)
       : `<span class="status-versi">${esc(t(tr.pesan || ""))}</span>`;
-    el.innerHTML = `ALDx <b>v${esc(v.versi)}</b>${v.commit ? ` · <code title="${esc(t("Kode terpasang"))}${v.tanggal ? " " + esc(v.tanggal) : ""}">${esc(v.commit.slice(0, 7))}</code>` : ""} · ${status}`;
+    // Versi terpasang = tautan ke rilis tetapnya di GitHub (tag v<VERSI>: installer, sidik SHA-256, catatan versi).
+    el.innerHTML = `ALDx <a href="${esc(v.rilis)}" target="_blank" rel="noopener" title="${esc(t("Rilis versi ini di GitHub"))}"><b>v${esc(v.versi)}</b></a>${v.commit ? ` · <code title="${esc(t("Kode terpasang"))}${v.tanggal ? " " + esc(v.tanggal) : ""}">${esc(v.commit.slice(0, 7))}</code>` : ""} · ${status}`;
   }
   function pasangTautan(sel) {
     document.querySelectorAll(`${sel} [data-alamat]`).forEach(a => a.onclick = e => { e.preventDefault(); SPS.buka(a.dataset.alamat); });

@@ -181,6 +181,7 @@ Semua ada di Studio Visual, pada Garis/Area/Batang dengan satu dimensi (kecuali 
 | **Kumulatif** | **Hitung** › *Kumulatif (berjalan)* | garis selalu naik; titik terakhir = total seluruh periode (667B) |
 | **% vs tahun lalu (YoY)** | **Hitung** › *% vs tahun lalu (YoY)* | 12 bulan pertama kosong (belum ada tahun lalu); Jan 2024 = +15,8%. Hanya aktif bila dimensinya **tanggal** |
 | **Skala warna** | jenis **Tabel** › centang *Skala warna sel* | sel makin pekat untuk nilai makin besar |
+| **Ambang (target)** | jenis **Angka** / **Angka + tren** / **Tabel** › baris **Ambang**: isi *Hijau ≥* dan/atau *Merah ≤* | nilai yang mencapai target hijau ▲, yang di bawah batas merah ▼; **ikut tersimpan** ke chart & dashboard |
 | **Kelompokkan nilai** | klik kanan dimensi teks (mis. `nm_cabang`) › **Kelompokkan nilai…** | dimensi baru, mis. *Jawa* (Jakarta, Bandung, Surabaya) vs *Lainnya* |
 | **Simulasi what-if** | baris **Simulasi**: pilih ukuran, geser −50%…+100% | grafik menunjukkan bila ukuran itu naik/turun; **hanya pratinjau**, tidak ikut tersimpan |
 | **Tooltip kaya** | arahkan kursor ke titik/batang | nilai + porsi dari total + ▲/▼ dibanding titik sebelumnya (sumbu tanggal) |
@@ -222,6 +223,11 @@ Klik-filter antar-chart otomatis aktif.
 3. **Tab:** klik **+ Tab** di atas kanvas, seret lembar kerja ke tab baru. Klik dua kali nama tab untuk mengganti nama.
    Satu lembar kerja hanya boleh muncul di satu tab.
 4. **Tinggi kotak:** pilihan *Pendek … Sangat tinggi* di tiap kotak (otomatis = tinggi bawaan jenis chart).
+5. **Template per bidang** (bagian *Per bidang* di dialog yang sama): **Penjualan**, **Keuangan**, **SDM**, **Operasional**.
+   Biarkan **Ukuran utama** = *Otomatis (sesuai template)*: ALDx mendahulukan kolom yang namanya cocok dengan bidangnya
+   (mis. Penjualan: *total, qty, omzet* & *kategori, cabang*; SDM: *gaji* & *departemen*). Untuk `latihan_penjualan`,
+   template **Penjualan** membuat 9 lembar kerja: angka utama, tren + ramalan, angka + tren, % vs tahun lalu,
+   10 kategori teratas, peta provinsi, dan tabel rincian.
 
 ## 12. Menggabung tabel dengan Kueri Visual (tanpa SQL)
 
@@ -322,7 +328,11 @@ tercatat di log (mode uji). Data diambil **sebagai pemilik laporan**: jangan kir
     tab **Rincian** berisi satu lembar kerja lain.
 - **T7.** **Auto chart & dashboard** untuk `latihan_penjualan`: berapa saran yang tercentang bawaan? Buat dashboard dari pilihan.
 - **T8.** Buat **Peringatan data**: `SELECT SUM(total) FROM latihan_penjualan` (skema `sps_engine`), syarat `>` 600 miliar. Apakah syaratnya terpenuhi?
+- **T9.** Jenis **Angka** dengan **total**, **Ambang** *Hijau ≥* `600000000000`. Apa warnanya? Lalu **Tabel** `nm_cabang × total`
+    dengan *Hijau ≥* `120000000000` dan *Merah ≤* `60000000000`: cabang mana yang hijau dan mana yang merah? Simpan, lalu buka chart-nya.
+- **T10.** **Dari template…** › *Per bidang* › **Penjualan**, dataset `latihan_penjualan`, ukuran utama *Otomatis*. Berapa lembar kerja,
+    dan ukuran serta kategori apa yang dipilih?
 
-Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban); latihan **T1–T8**: [kunci tambahan](../bahan-ajar/level-2-analis.md#kunci-jawaban-tambahan).
+Kunci jawaban: [bahan ajar Level 2](../bahan-ajar/level-2-analis.md#kunci-jawaban); latihan **T1–T10**: [kunci tambahan](../bahan-ajar/level-2-analis.md#kunci-jawaban-tambahan).
 
 Lanjut ke [Level 3 · Admin data](level-3-admin-data.md).

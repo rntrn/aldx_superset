@@ -28,7 +28,33 @@ berbeda bisa menjalankan versi yang berbeda.
 
 **Unduhan resmi:** halaman **Releases** repo: *ALDx terbaru* (`ALDx-Setup.exe`, `ALDx-HapusTotal.exe`) dan *ALDx offline*
 (`ALDx-Setup-Offline.exe` + `ALDx-Setup-Offline-1.bin` + `ALDx-HapusTotal.exe`). Ukuran berkas di Releases dicocokkan dengan
-hasil build sebelum diumumkan.
+hasil build sebelum diumumkan. Setiap rilis menyertakan **`ALDx-SHA256.txt`**.
+
+### Versi yang bisa dicocokkan dengan rilis GitHub
+
+Mulai **2026.11.14**, setiap `VERSI` mendapat **rilis tetap** bertag `v<VERSI>` selain dua rilis bergulir:
+
+| Rilis | Isi | Berubah? |
+|---|---|---|
+| **ALDx terbaru** (tag `terbaru`) | installer online versi terakhir | ya, ditimpa tiap build |
+| **ALDx offline** (tag `offline`) | paket offline versi terakhir | ya, ditimpa tiap build |
+| **ALDx 2026.11.14** (tag `v2026.11.14`) | `ALDx-Setup.exe`, `ALDx-HapusTotal.exe`, `ALDx-SHA256.txt`, catatan versi | **tidak**: tag menunjuk commit build-nya |
+
+Rantai pencocokan: kaki halaman login `v2026.11.14` = tag git `v2026.11.14` = rilis *ALDx 2026.11.14* = commit di catatan
+rilisnya = bagian `## 2026.11.14` di [31 · Catatan versi](31-catatan-versi.md). Di Beranda, nomor versi bisa diklik
+untuk membuka rilis itu. Catatan rilis diambil otomatis dari bab 31 (`scripts/catatan-rilis.ps1`); build ditolak bila
+bagian versi itu belum ditulis.
+
+**Memeriksa unduhan utuh & asli** (PowerShell, di folder unduhan):
+
+```powershell
+(Get-FileHash .\ALDx-Setup.exe -Algorithm SHA256).Hash.ToLower()
+Get-Content .\ALDx-SHA256.txt        # baris ALDx-Setup.exe harus sama persis
+```
+
+Paket offline (±1,7 GB) hanya disimpan di rilis *offline* (versi terakhir); sidiknya tetap tercatat di `ALDx-SHA256.txt`
+rilis versinya. Butuh paket offline versi lama: bangun dari tag-nya (`git checkout v2026.11.14`, lalu
+`installer\setup\buat-installer.ps1 -Offline`).
 
 **Membangun installer terbaru sendiri** (tanpa GitHub Actions), di folder repo:
 

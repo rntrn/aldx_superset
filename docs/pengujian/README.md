@@ -6,7 +6,7 @@ Tiga lapis pengujian, dari yang otomatis sampai uji oleh pengguna.
 |---|---|---|---|---|
 | 1. **Uji otomatis** | 84 pemeriksaan: container, koneksi, backgrounder, 23 chart, ramalan (termasuk tipe angka ClickHouse), engine, halaman & menu, keamanan & Superadmin, batas data, ekspor, peran AI, hierarki dimensi, objek dashboard, Tampilkan saya & analitik lengkap, preset tema, kolom ID, data latihan harian, impor banyak tabel, versi aplikasi, ukuran & dimensi terdefinisi, kalkulasi cepat, template dashboard, data pendukung latihan, berkas .ald/.aldx, filter global & ulasan, driver Hubungkan data, HTTPS gateway, penguncian akun & audit, hak minimum, ketahanan (ekspor latar & cadangan) | admin server | setiap instalasi, upgrade, perubahan pengaturan | `scripts\uji.ps1` → `config/sps_uji.py` |
 | 2. **Uji asap** | 12 skenario manual inti (± 20 menit) | admin server | setelah lapis 1 | skenario bertanda *asap* |
-| 3. **UAT** | 172 skenario per level & area | perwakilan pengguna tiap level | sebelum dipakai pengguna, dan setelah upgrade mayor | [skenario-uji.md](skenario-uji.md), [lembar-uji.xlsx](lembar-uji.xlsx) |
+| 3. **UAT** | 175 skenario per level & area | perwakilan pengguna tiap level | sebelum dipakai pengguna, dan setelah upgrade mayor | [skenario-uji.md](skenario-uji.md), [lembar-uji.xlsx](lembar-uji.xlsx) |
 
 
 ## 1. Uji otomatis
@@ -26,7 +26,7 @@ Contoh hasil:
 [Studio]
   LULUS  chart Batang                               24 baris -> echarts_timeseries_bar
   ...
-84/84 lulus
+86/86 lulus
 ```
 
 Uji ini **tidak mengubah data pengguna** (tabel sementara `uji__otomatis` dibuat lalu dihapus) dan

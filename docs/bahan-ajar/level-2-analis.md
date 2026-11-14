@@ -124,7 +124,7 @@
 |---|---|---|
 | 0–20 | kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi | [§10c](../tutorial/level-2-analis.md) |
 | 20–30 | jelaskan perubahan, tooltip kaya, analitik per Warna | [§10c](../tutorial/level-2-analis.md) |
-| 30–40 | dashboard dari template, tab, tinggi kotak | [§11a](../tutorial/level-2-analis.md) |
+| 30–40 | ambang (target berwarna); dashboard dari template (umum & per bidang), tab, tinggi kotak | [§10c, §11a](../tutorial/level-2-analis.md) |
 | 40–50 | Auto chart & dashboard; Asisten AI membuat dashboard | [§12c](../tutorial/level-2-analis.md) |
 | 50–60 | Langganan laporan & Peringatan data; Daftar chart & Jejak data | [§12d–e](../tutorial/level-2-analis.md) |
 
@@ -138,6 +138,8 @@
 - **T6.** Template *Ringkasan eksekutif* untuk `latihan_penjualan`: berapa lembar kerja? Tambah tab **Rincian**.
 - **T7.** Auto chart `latihan_penjualan`: berapa saran tercentang bawaan?
 - **T8.** Peringatan data `SUM(total)` `latihan_penjualan` `>` 600 miliar: terpenuhi?
+- **T9.** **Ambang**: Angka total dengan *Hijau ≥* 600 miliar; Tabel `nm_cabang × total` dengan *Hijau ≥* 120 miliar & *Merah ≤* 60 miliar.
+- **T10.** Template **Penjualan** (per bidang), ukuran utama *Otomatis*: berapa lembar kerja, ukuran & kategori apa yang dipilih?
 
 ### Kunci jawaban tambahan
 
@@ -151,6 +153,8 @@
 | T6 | **7 lembar kerja** + judul; filter Saluran, Kategori, Cabang, Rentang waktu; tab Rincian: satu lembar hanya di satu tab |
 | T7 | **4** saran teratas |
 | T8 | **ya** (667,4 miliar > 600 miliar) |
+| T9 | Angka **hijau ▲ 667B**. Tabel: **hijau** Jakarta (234,2 M), Surabaya (137,1 M), Bandung (121,2 M); **merah** Makassar (45,5 M); Medan & Balikpapan biasa. Chart tersimpan menampilkan warna yang sama |
+| T10 | **9 lembar kerja** + judul; ukuran utama **total**, kategori pertama **kategori**; ada % vs tahun lalu dan peta provinsi |
 
 ### Kuis tambahan
 
@@ -160,7 +164,10 @@
 15. Simulasi what-if… a) mengubah data sumber **b) hanya pratinjau, tidak tersimpan** c) menghapus chart
 16. Peringatan data berbeda dari Langganan laporan karena… **a) email hanya dikirim bila syarat angka terpenuhi** b) selalu tiap jam c) tanpa email
 
-**Kunci:** 12b · 13a · 14a · 15b · 16a
+17. Ambang *Hijau ≥ 100* dan *Merah ≤ 50*; nilai 75 tampil… a) hijau b) merah **c) warna biasa**
+18. Template per bidang memilih kolom berdasarkan… a) urutan abjad **b) kecocokan nama kolom dengan bidangnya** c) acak
+
+**Kunci:** 12b · 13a · 14a · 15b · 16a · 17c · 18b
 
 ## Daftar periksa kompetensi
 
@@ -175,7 +182,8 @@
 - [ ] Mengekspor hasil ke Excel/CSV/gambar dan memakai `/data-engineer` untuk SQL
 - [ ] Memakai kalkulasi cepat (% total, kumulatif, YoY), skala warna, kelompokkan nilai, simulasi
 - [ ] Memakai *Jelaskan perubahan* dan membaca tooltip kaya
-- [ ] Membuat dashboard dari template, menambah tab, mengatur tinggi kotak
+- [ ] Memberi **ambang** (hijau/merah) pada Angka atau Tabel dan menjelaskan artinya
+- [ ] Membuat dashboard dari template (umum & per bidang), menambah tab, mengatur tinggi kotak
 - [ ] Memakai Auto chart & dashboard
 - [ ] Membuat Langganan laporan dan Peringatan data
 - [ ] Memeriksa dampak lewat Jejak data sebelum mengubah dataset

@@ -72,7 +72,8 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") { Studio.tut
 
 /* ---------- Tabel data sederhana ---------- */
 // skala = daftar kolom ukuran yang selnya diberi latar makin pekat untuk nilai makin besar (skala warna tabel).
-Studio.tabelHtml = (kolom, baris, maks = 500, skala = null) => {
+// ambang = {kolom, atas, bawah}: sel kolom itu hijau ▲ (>= atas) / merah ▼ (<= bawah); menang atas skala warna.
+Studio.tabelHtml = (kolom, baris, maks = 500, skala = null, ambang = null) => {
   const tampil = baris.slice(0, maks), rentang = {};
   (skala || []).forEach(k => {
     const v = tampil.map(b => b[k]).filter(angka);
@@ -85,8 +86,12 @@ Studio.tabelHtml = (kolom, baris, maks = 500, skala = null) => {
     return ` style="background:rgba(225,29,116,${a.toFixed(3)})"`;
   };
   return `<table class="data"><tr>${kolom.map(k => `<th>${esc(k)}</th>`).join("")}</tr>` +
-    tampil.map(b => "<tr>" + kolom.map(k => angka(b[k])
-      ? `<td class="n"${latar(k, b[k])}>${fmtPenuh.format(b[k])}</td>` : `<td>${esc(b[k])}</td>`).join("") + "</tr>").join("") + "</table>";
+    tampil.map(b => "<tr>" + kolom.map(k => {
+      if (!angka(b[k])) return `<td>${esc(b[k])}</td>`;
+      const kA = ambang && k === ambang.kolom ? Studio.kelasAmbang(b[k], ambang) : "";
+      return kA ? `<td class="n ambang-${kA}">${kA === "naik" ? "▲" : "▼"} ${fmtPenuh.format(b[k])}</td>`
+        : `<td class="n"${latar(k, b[k])}>${fmtPenuh.format(b[k])}</td>`;
+    }).join("") + "</tr>").join("") + "</table>";
 };
 
 /* ---------- Tab ---------- */

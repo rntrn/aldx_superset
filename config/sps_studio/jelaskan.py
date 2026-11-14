@@ -1,6 +1,6 @@
 """Jelaskan perubahan: kenapa sebuah titik naik/turun dibanding titik sebelumnya?
 
-Padanan "Explain the increase/decrease" Power BI & "Explain Data" Tableau, versi sederhana yang bisa ditelusuri:
+Jelaskan kenaikan/penurunan, versi sederhana yang bisa ditelusuri:
     1. ambil nilai ukuran pada dua titik (mis. Maret vs Februari) per nilai tiap dimensi lain di dataset
     2. hitung selisih tiap nilai (mis. Cabang Jakarta +1,2 M, Cabang Medan -0,3 M)
     3. urutkan menurut sumbangan terbesar terhadap perubahan total
