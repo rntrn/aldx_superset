@@ -181,6 +181,8 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Versi semua komponen | `scripts\versi.ps1` |
 | Ringkasan AI di dashboard terlalu sering memakai model berbayar | `config\ai.yaml`: `ringkasan_dashboard: klik` (atau `mati`), naikkan `ringkasan_menit` |
 | Antivirus kantor menghapus `ALDx-Setup.exe` / `ALDx-HapusTotal.exe` | pasang/perbarui/hapus lewat git & skrip ([README](../README.md#pasang--perbarui-dengan-git-tanpa-exe)); TI mengizinkan hash dari `ALDx-SHA256.txt` ([18](18-installer.md#peringatan-windows--antivirus)) |
+| `powershell` *is not recognized* saat menjalankan `powershell -ExecutionPolicy Bypass -File scripts\…` | jalankan langsung di jendela PowerShell: `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\atur-password.ps1` (berlaku untuk skrip mana pun) |
+| Lupa password Superadmin | `.\scripts\atur-password.ps1` (email = `ADMIN_USERNAME` di `.env`); skrip diblokir: `docker compose exec superset superset fab reset-password --username <email> --password <baru>` lalu ganti lagi dari profil |
 | Memastikan installer asli & utuh | `Get-FileHash ALDx-Setup.exe` = baris di `ALDx-SHA256.txt` rilis `v<VERSI>` ([29](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github)) |
 | Masuk ke dalam container | `docker compose exec superset bash` (keluar: `exit`) |
 | Query metadb langsung | `docker compose exec metadb psql -U superset -d sps_superset` (keluar: `\q`) |
@@ -216,7 +218,10 @@ Tidak. Yang menghapus data hanya `docker volume rm ...` (lihat [04 § Mulai ulan
 `.env` dibaca saat container dibuat. Jalankan `scripts\start.ps1` (bukan hanya `restart`).
 
 **6. Lupa password admin.**
-`docker compose exec superset superset fab reset-password --username admin --password PASSWORD_BARU`
+Login Superadmin = email di `.env` (`Select-String -Path .env -Pattern '^ADMIN_USERNAME='`). Di jendela PowerShell:
+`Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\atur-password.ps1` (password tidak tampil & tidak tercatat; kunci akun ikut dibuka).
+Skrip diblokir: `docker compose exec superset superset fab reset-password --username <email> --password <baru>`, lalu
+ganti lagi dari menu profil (password ini tercatat di riwayat PowerShell).
 
 **7. Web hanya bisa dibuka dari server, tidak dari komputer lain.**
 Buka port `SUPERSET_PORT` (bawaan 8088) di Windows Firewall:

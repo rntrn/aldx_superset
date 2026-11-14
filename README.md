@@ -239,6 +239,7 @@ memakai data lama: pasang ALDx, lalu `scripts\cadangkan.ps1 -Pulihkan <berkas .d
 | `git clone` gagal: *Could not resolve host* / *timed out* | wajib lewat proxy | `git config --global http.proxy http://proxy.kantor:8080` (alamat dari TI) |
 | `git pull` menolak: *local changes would be overwritten* | ada berkas yang diubah di folder | `git status` untuk melihatnya; simpan sementara `git stash`, pull, lalu `git stash pop` (atau buang: `git checkout -- <berkas>`) |
 | *You are in 'detached HEAD' state* | wajar setelah `git checkout v…` | kembali ke terbaru: `git checkout main` |
+| `powershell` *is not recognized* | sudah di dalam PowerShell 7, atau `powershell.exe` dibatasi kantor | jalankan skrip langsung: `Set-ExecutionPolicy -Scope Process Bypass -Force; .\scripts\<nama>.ps1` (mis. `.\scripts\uji.ps1`) |
 | *running scripts is disabled on this system* | kebijakan PowerShell | pakai `PASANG.cmd` (sudah menanganinya) atau awali dengan `Set-ExecutionPolicy -Scope Process Bypass -Force` |
 | Skrip tetap diblokir (AppLocker / CrowdStrike) | kebijakan keamanan kantor | jangan diakali: minta TI mengizinkan folder `D:\ALDx` ([docs/18](docs/18-installer.md#peringatan-windows--antivirus)) |
 | `docker` *not recognized* / *cannot connect* | Docker Desktop mati / akun bukan `docker-users` | nyalakan Docker Desktop, tunggu ikon diam; minta TI menambahkan akun |
