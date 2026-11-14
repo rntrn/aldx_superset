@@ -6,6 +6,9 @@ Jalankan **`ALDx-Setup.exe`** (Releases › ALDx terbaru), atau klik dua kali **
 Yang wajib hanya **email & password Superadmin**. Panduan untuk pengguna awam: [CARA-PASANG.md](../CARA-PASANG.md);
 rinci & gambar: [18-installer.md](18-installer.md).
 
+**Tanpa .exe** (mis. antivirus kantor menghapus Setup): `git clone` + `PASANG.cmd`, langkah lengkap di
+[README › Pasang & perbarui dengan git](../README.md#pasang--perbarui-dengan-git-tanpa-exe).
+
 ## Prasyarat
 
 | Kebutuhan | Cara cek |

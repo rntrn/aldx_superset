@@ -180,6 +180,7 @@ Selalu mulai dari **lapis bawah**. Laporan lengkap sekali jalan:
 | Diagnosa lengkap | `scripts\diagnose.ps1` → `diagnosa.txt` |
 | Versi semua komponen | `scripts\versi.ps1` |
 | Ringkasan AI di dashboard terlalu sering memakai model berbayar | `config\ai.yaml`: `ringkasan_dashboard: klik` (atau `mati`), naikkan `ringkasan_menit` |
+| Antivirus kantor menghapus `ALDx-Setup.exe` / `ALDx-HapusTotal.exe` | pasang/perbarui/hapus lewat git & skrip ([README](../README.md#pasang--perbarui-dengan-git-tanpa-exe)); TI mengizinkan hash dari `ALDx-SHA256.txt` ([18](18-installer.md#peringatan-windows--antivirus)) |
 | Memastikan installer asli & utuh | `Get-FileHash ALDx-Setup.exe` = baris di `ALDx-SHA256.txt` rilis `v<VERSI>` ([29](29-versi-pembaruan-hapus-total.md#versi-yang-bisa-dicocokkan-dengan-rilis-github)) |
 | Masuk ke dalam container | `docker compose exec superset bash` (keluar: `exit`) |
 | Query metadb langsung | `docker compose exec metadb psql -U superset -d sps_superset` (keluar: `\q`) |

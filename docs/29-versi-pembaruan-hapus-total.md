@@ -110,7 +110,7 @@ memakai `ALDx-HapusTotal.exe` untuk memperbarui: itu menghapus semua data.
    (folder hasil Setup.exe: tambah `-JadikanGit` sekali untuk menjadikannya folder git; `.env` & data tidak disentuh). Skrip ini mengambil versi terbaru,
    menerapkannya ke Docker, memperbarui menu & izin, lalu menjalankan uji. Data & pengaturan dipertahankan.
    Tambah `-KomitInstaller -Terbitkan` untuk sekalian menerbitkan installer baru ke Releases (pengembang).
-   Cara manual: `git pull`, lalu klik dua kali `PASANG.cmd`.
+   Cara manual langkah demi langkah (termasuk memilih/kembali ke versi tertentu): [README › Pasang & perbarui dengan git](../README.md#pasang--perbarui-dengan-git-tanpa-exe).
 2. **Dengan Setup.exe:** pastikan exe di Releases dibangun **setelah** perubahan terakhir, lalu jalankan di atas
    instalasi lama (folder sama, data dipertahankan).
 3. **Tanpa internet:** pakai installer offline (lihat tabel di atas), atau salin folder instalasi dari komputer yang
