@@ -203,6 +203,75 @@
       `<div class="langkah-ai"><span>${esc(p.saran.length + " " + t("saran chart ditemukan (Asisten AI › Auto Chart)"))}</span></div>` +
       (p.wawasan || []).map(w => `<div class="wawasan-ai">${esc(w)}</div>`).join(""));
     if (p.tipe === "usulan") kartuUsulan(p);
+    if (p.tipe === "rencana") kartuRencana(p);
+    if (p.tipe === "pilihan" && (p.pilihan || []).length) {          // pertanyaan balik: satu klik = perintah lengkap
+      const baris = document.createElement("div");
+      baris.className = "contoh-ai lanjutan-ai";
+      p.pilihan.forEach(x => { const b = document.createElement("button"); b.type = "button"; b.textContent = x; b.onclick = () => kirim(x); baris.appendChild(b); });
+      wadah.appendChild(baris);
+    }
+  }
+
+  // ---------------- Rencana perubahan (sps_ai/rencana.py) ----------------
+  // Belum ada yang berubah sampai "Simpan perubahan"; sesudahnya bisa "Urungkan".
+  const sebaris = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<code>$1</code>");
+  function segarkanHalaman(alamat) {
+    try {
+      const l = $("#bingkai").contentWindow.location, kini = l.pathname + l.search;
+      if (alamat && kini.startsWith(alamat)) l.reload();
+    } catch (e) { /* halaman lain origin */ }
+  }
+  function kartuRencana(p) {
+    const d = gelembung("usulan rencana-ai", `<b>${esc(t("Rencana perubahan"))}</b>
+      <ul>${p.baris.map(b => `<li>${sebaris(b)}</li>`).join("")}</ul>
+      ${(p.peringatan || []).map(w => `<div class="lencana-ai blok">${sebaris(w)}</div>`).join("")}
+      <div class="aksi-usulan"></div>`);
+    const aksi = d.querySelector(".aksi-usulan");
+    const tombolBuka = () => p.buka ? `<button type="button" class="tombol" data-buka>${esc(t("Buka"))}</button>` : "";
+    const kirimAksi = async (nama, tombol) => {
+      tombol.disabled = true;
+      try {
+        const r = await kirimJson(`/asisten/api/rencana/${encodeURIComponent(p.id)}/${nama}`, "{}"), j = await bacaJson(r);
+        if (!r.ok) throw new Error(j.error || r.status);
+        return j;
+      } catch (err) {
+        tombol.disabled = false;
+        aksi.querySelector(".galat-ai")?.remove();
+        aksi.insertAdjacentHTML("beforeend", `<div class="galat-ai">${esc(err.message)}</div>`);
+        return null;
+      }
+    };
+    const pasangBuka = () => { const b = aksi.querySelector("[data-buka]"); if (b) b.onclick = () => SPS.buka(p.buka); };
+    const tahapUsulan = () => {
+      aksi.innerHTML = `<button type="button" class="tombol utama" data-simpan>${ik("centang", 16)}${esc(t("Simpan perubahan"))}</button>
+        <button type="button" class="tombol" data-batal>${esc(t("Batal"))}</button>`;
+      aksi.querySelector("[data-simpan]").onclick = async e => {
+        const j = await kirimAksi("simpan", e.currentTarget);
+        if (!j) return;
+        riwayat.push({role: "user", content: "(Pengguna menekan Simpan; perubahan sudah tersimpan.)"});
+        segarkanHalaman(j.buka || p.buka);
+        tahapTersimpan();
+      };
+      aksi.querySelector("[data-batal]").onclick = async e => {
+        if (!await kirimAksi("batal", e.currentTarget)) return;
+        d.classList.add("selesai"); aksi.innerHTML = `<small>${esc(t("Dibatalkan, tidak ada yang berubah."))}</small>`;
+      };
+    };
+    const tahapTersimpan = () => {
+      d.classList.add("selesai");
+      aksi.innerHTML = `<span class="sukses-ai">${ik("centang", 16)} ${esc(t("Tersimpan di aplikasi."))}</span>
+        ${tombolBuka()}<button type="button" class="tombol" data-urungkan>${esc(t("Urungkan"))}</button>`;
+      pasangBuka();
+      aksi.querySelector("[data-urungkan]").onclick = async e => {
+        const j = await kirimAksi("urungkan", e.currentTarget);
+        if (!j) return;
+        riwayat.push({role: "user", content: "(Pengguna mengurungkan perubahan tadi.)"});
+        segarkanHalaman(j.buka || p.buka);
+        aksi.innerHTML = `<small>${esc(t("Diurungkan, kembali seperti semula."))}</small>${tombolBuka()}`;
+        pasangBuka();
+      };
+    };
+    tahapUsulan();
   }
 
   // ---------------- Sambungkan AI ----------------

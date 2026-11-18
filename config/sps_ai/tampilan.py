@@ -271,6 +271,17 @@ def api_story(story_id: int):
     return jsonify(story.ambil(story_id))
 
 
+@bp.route("/api/rencana/<rid>/<aksi>", methods=["POST"])
+@_butuh_akses()
+def api_rencana(rid: str, aksi: str):
+    """Rencana perubahan dari Asisten AI (sps_ai/rencana.py): simpan | urungkan | batal."""
+    from sps_ai import rencana
+    fungsi = {"simpan": rencana.simpan, "urungkan": rencana.urungkan, "batal": rencana.batal}.get(aksi)
+    if fungsi is None:
+        return jsonify(error="Aksi tidak dikenal."), 404
+    return jsonify(fungsi(rid, g.user.username))
+
+
 @bp.route("/api/story/narasi", methods=["POST"])
 @_butuh_akses()
 def api_story_narasi():

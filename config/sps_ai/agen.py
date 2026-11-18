@@ -24,7 +24,7 @@ from typing import Any, Callable
 
 from sqlalchemy import Column, DateTime, Integer, MetaData, String, Table, Text
 
-from sps_ai import alat, auto, llm, peran as P, wawasan
+from sps_ai import alat, auto, llm, niat, peran as P, rencana, wawasan
 from sps_ai.pengaturan import ModelAI, Pengaturan
 
 log = logging.getLogger(__name__)
@@ -144,6 +144,16 @@ ALAT = [
             {"chart_id": {"type": "integer"}}, ["chart_id"]),
     _fungsi("data_chart", "Ambil angka yang ditampilkan sebuah chart (query chart dijalankan ulang dengan hak akses pengguna).",
             {"chart_id": {"type": "integer"}, "batas": {"type": "integer"}}, ["chart_id"]),
+    _fungsi("rencanakan", "UBAH dashboard/chart yang SUDAH ADA (filter dashboard, judul, jenis chart, tambah/keluarkan chart "
+            "di dashboard). Tulis nama apa adanya, server yang mencocokkan. Pengguna melihat pratinjau lalu menekan Simpan.",
+            {"operasi": {"type": "array", "items": {"type": "object", "properties": {
+                "op": {"type": "string", "enum": list(rencana.OPERASI)},
+                "dashboard": {"type": "string", "description": "judul dashboard, atau 'ini' untuk halaman yang dibuka"},
+                "chart": {"type": "string", "description": "judul chart, atau 'ini'"},
+                "kolom": {"type": "string", "description": "kolom filter; kosongkan bila pengguna tidak menyebut"},
+                "jenis": {"type": "string", "description": "jenis chart baru, atau jenis filter: pilihan|rentang|waktu"},
+                "judul": {"type": "string", "description": "judul baru"}}, "required": ["op"]}}},
+            ["operasi"]),
 ]
 
 LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca struktur dataset",
@@ -152,6 +162,7 @@ LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca strukt
               "cari_tabel": "Memindai tabel database", "daftarkan_tabel": "Mendaftarkan tabel sebagai dataset",
               "cari_dashboard": "Mencari dashboard", "cari_panduan": "Membaca panduan",
               "info_dashboard": "Membaca isi dashboard", "info_chart": "Membaca chart", "data_chart": "Mengambil angka chart",
+              "rencanakan": "Menyusun rencana perubahan",
               "daftar_koneksi": "Membaca daftar koneksi", "daftar_ekstrak": "Membaca daftar ekstrak",
               "batas_data": "Membaca batas data", "lihat_tema": "Membaca tema", "cek_kontras": "Menghitung kontras warna",
               "usul_tema": "Menyusun usulan tema", "status_server": "Membaca status server",
@@ -184,9 +195,19 @@ def _catat(username: str, model_id: str, pertanyaan: str, dipakai: list[str], st
 
 # --- Menjalankan alat ------------------------------------------------------------------
 def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: Callable[[dict], None],
-                  bahasa: str = "id") -> Any:
+                  bahasa: str = "id", username: str = "", konteks: dict | None = None) -> Any:
     if nama in P.ALAT_AHLI:
         return P.jalankan(nama, arg, ev, bahasa)
+    if nama == "rencanakan":
+        try:
+            h = rencana.susun(arg.get("operasi") or [], username, konteks)
+        except rencana.Butuh as e:
+            ev({"tipe": "pilihan", "pilihan": e.pilihan})
+            return {"perlu_ditanyakan": str(e), "pilihan": e.pilihan,
+                    "catatan": "Belum ada perubahan. Tanyakan ini ke pengguna; tombol pilihan sudah tampil."}
+        ev(h)
+        return {"rencana_dibuat": True, "isi": h["baris"], "peringatan": h["peringatan"],
+                "catatan": "BELUM tersimpan. Minta pengguna memeriksa pratinjau lalu menekan 'Simpan perubahan'."}
     if nama == "cari_dataset":
         return alat.daftar_dataset(arg.get("kata_kunci", ""))
     if nama == "info_dataset":
@@ -377,6 +398,13 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
     jawaban, status, dicoba, catatan_model, dibuat, diringkas = "", "ok", [model.id], "", 0, False
+    if "rencanakan" in peran.alat:              # perintah ubah yang polanya jelas: tanpa model AI (niat.py)
+        langsung = _jawab_niat(pertanyaan, username, konteks, peristiwa)
+        if langsung is not None:
+            _catat(username, "tanpa-model", f"[{peran.perintah}] {pertanyaan}", ["rencanakan"], langsung, mulai)
+            return {"jawaban": jawaban_niat(langsung, list(peristiwa)),
+                    "peristiwa": [p for p in peristiwa if p.get("tipe") != "teks"],
+                    "status": "ok", "peran": peran.id, "model": model.id, "lanjutan": []}
     tenggat = mulai + (batas or batas_total())  # bawaan: selesai SEBELUM server web memutus permintaan
     try:
         putaran = 0                                 # jawaban model yang berhasil; pengalihan model tidak dihitung
@@ -427,7 +455,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
                         if dibuat > MAKS_BUAT:
                             raise alat.InputSalah(f"Batas {MAKS_BUAT} objek baru per pertanyaan tercapai. "
                                                   "Ringkas hasilnya untuk pengguna; minta konfirmasi bila perlu lebih.")
-                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa)
+                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa, username, konteks)
                 except (alat.IzinDitolak, alat.InputSalah, SupersetSecurityException, KeyError, ValueError,
                         LookupError) as exc:
                     db.session.rollback()
@@ -447,6 +475,36 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     jawaban = samarkan_rahasia(jawaban, atur)
     return {"jawaban": jawaban, "peristiwa": list(peristiwa), "status": status, "peran": peran.id,
             "model": model.id, "lanjutan": lanjutan(dipakai, list(peristiwa), status)}
+
+
+def _jawab_niat(pertanyaan: str, username: str, konteks: dict | None, peristiwa: list) -> str | None:
+    """Perintah ubah dikenali penerjemah niat -> rencana langsung. Kembali status ('rencana'|'tanya'|'ditolak'),
+    atau None bila bukan perintah ubah (diteruskan ke model AI)."""
+    from superset import db
+    operasi = niat.baca(pertanyaan)
+    if not operasi:
+        return None
+    peristiwa.append({"tipe": "langkah", "teks": "Memahami perintah perubahan"})
+    try:
+        peristiwa.append(rencana.susun(operasi, username, konteks))
+        return "rencana"
+    except rencana.Butuh as e:
+        db.session.rollback()
+        peristiwa.append({"tipe": "teks", "teks": str(e)})
+        peristiwa.append({"tipe": "pilihan", "pilihan": e.pilihan})
+        return "tanya"
+    except (alat.IzinDitolak, alat.InputSalah, LookupError) as e:
+        db.session.rollback()
+        peristiwa.append({"tipe": "teks", "teks": str(e)})
+        return "ditolak"
+
+
+def jawaban_niat(status: str, peristiwa: list[dict]) -> str:
+    teks = next((p["teks"] for p in reversed(peristiwa) if p.get("tipe") == "teks"), "")
+    if status == "rencana":
+        return ("Ini perubahan yang akan disimpan. Periksa dulu, lalu tekan **Simpan perubahan**. "
+                "Setelah disimpan masih bisa diurungkan.")
+    return teks
 
 
 def ringkas_pesan(pesan: list[dict], sistem: str) -> list[dict]:

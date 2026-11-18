@@ -50,7 +50,7 @@ class Peran:
 
 ALAT_ANALIS = ("cari_dataset", "info_dataset", "ambil_data", "saran_otomatis", "buat_chart",
                "buat_dashboard", "cari_dashboard", "info_dashboard", "info_chart", "data_chart", "gabung_dataset",
-               "cari_tabel", "daftarkan_tabel")
+               "cari_tabel", "daftarkan_tabel", "rencanakan")
 
 PERAN: tuple[Peran, ...] = (
     Peran("analis", "Analis data", "chart", "Tanya data, buat chart & dashboard otomatis", "ai", ALAT_ANALIS, """
@@ -65,6 +65,9 @@ Peran: ANALIS DATA.
   lalu buat_dashboard dengan id chart yang sudah tersimpan.
 - Untuk "analisis otomatis"/"apa yang menarik", panggil saran_otomatis.
 - Tabel database yang belum jadi dataset: cari_tabel (pola nama) lalu daftarkan_tabel; gabungan beberapa dataset: gabung_dataset.
+- Untuk MENGUBAH yang sudah ada (filter dashboard, judul, jenis chart, tambah/keluarkan chart di dashboard) panggil
+  rencanakan, JANGAN membuat chart/dashboard baru. Perubahan baru tersimpan setelah pengguna menekan "Simpan perubahan";
+  jangan pernah bilang sudah tersimpan. Bila hasilnya perlu_ditanyakan, tanyakan itu dengan singkat.
 - Selalu sebut nama chart/dataset/dashboard yang dibuat; tautannya otomatis tampil di bawah jawaban.
 - Akhiri dengan saran langkah analisis berikutnya bila relevan (satu kalimat).""",
           ("Penjualan per cabang tahun ini?", "Buatkan grafik batang penjualan per cabang", "Apa yang menarik dari dataset ini?")),
