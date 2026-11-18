@@ -173,7 +173,8 @@ def _catat(username: str, model_id: str, pertanyaan: str, dipakai: list[str], st
     try:
         AI_LOG.create(bind=db.engine, checkfirst=True)
         db.session.execute(AI_LOG.insert().values(
-            waktu=datetime.now(), username=username, model=model_id, pertanyaan=pertanyaan[:4000],
+            # model_id model lokal terdeteksi otomatis bisa > 64 huruf ("lokal:LM Studio:<nama panjang>")
+            waktu=datetime.now(), username=username[:64], model=model_id[:64], pertanyaan=pertanyaan[:4000],
             alat=json.dumps(dipakai), status=status, durasi_ms=int((time.time() - mulai) * 1000)))
         db.session.commit()
     except Exception:  # noqa: BLE001 - audit gagal tidak boleh menggagalkan jawaban
@@ -475,7 +476,9 @@ def cadangan(atur: Pengaturan, model: ModelAI, dicoba: list[str]) -> ModelAI | N
     Privasi: bila model sekarang boleh menerima data (riwayat bisa berisi angka), cadangannya juga harus boleh
     (kirim_data), atau model lokal. Urutan: jenis yang sama dulu (cloud -> cloud, lokal -> lokal)."""
     calon = [m for m in atur.model if m.id not in dicoba and (not model.kirim_data or m.kirim_data or not m.api_key)]
-    calon.sort(key=lambda m: bool(m.api_key) != bool(model.api_key))
+    # Model lain di server lokal yang SAMA (LM Studio/Ollama) ditaruh paling akhir: memintanya membuat server
+    # membongkar model aktif, dan permintaan lain yang sedang berjalan ikut diputus ({"error":"terminated"}).
+    calon.sort(key=lambda m: (bool(m.api_key) != bool(model.api_key), m.base_url == model.base_url))
     return calon[0] if calon else None
 
 

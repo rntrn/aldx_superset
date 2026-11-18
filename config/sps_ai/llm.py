@@ -46,7 +46,9 @@ POLA_BLOK = re.compile(r"```(?:json|tool_call)?\s*(\{.*?\})\s*```", re.S)
 POLA_PIKIR = re.compile(r"<(think|thinking|reasoning)>.*?</\1>\s*", re.S | re.I)
 POLA_TOLAK_ALAT = re.compile(r"tool|function.?call", re.I)
 POLA_KONTEKS = re.compile(r"context.{0,20}(length|window|limit)|maximum.{0,20}tokens|too many tokens|prompt is too long", re.I)
-_TANPA_ALAT: set[str] = set()            # model yang terbukti tidak mendukung tools -> langsung mode teks
+POLA_DIPUTUS = re.compile(r'"error"\s*:\s*"terminated"', re.I)
+POLA_GAGAL_MUAT = re.compile(r"failed to load model", re.I)
+_TANPA_ALAT: set[str] = set()           # model yang terbukti tidak mendukung tools -> langsung mode teks
 
 
 def bersihkan_jawaban(isi: str) -> str:
@@ -171,6 +173,13 @@ def _chat_sekali(model: ModelAI, pesan: list[dict], alat: list[dict], batas_deti
         log.warning("ALDx AI: model %s error %s: %s", model.base_url, r.status_code, r.text[:500])
         if r.status_code in (400, 422) and POLA_KONTEKS.search(r.text):
             raise GagalModel(f"Pertanyaan & riwayat terlalu panjang untuk model '{model.nama}'.", konteks_penuh=True)
+        if r.status_code == 400 and POLA_DIPUTUS.search(r.text):
+            # LM Studio memutus permintaan saat model dibongkar/diganti atau ada permintaan lain bersamaan.
+            raise GagalModel(f"Model '{model.nama}' memutus permintaan (sedang ganti model atau melayani permintaan "
+                             "lain). Coba lagi sebentar lagi.", sementara=True)
+        if r.status_code == 400 and POLA_GAGAL_MUAT.search(r.text):
+            raise GagalModel(f"Server lokal gagal memuat model '{model.model}' (RAM/VRAM kurang atau berkas model "
+                             "rusak). Pilih model lain atau muat model itu dulu di LM Studio.", sementara=True)
         if alat and r.status_code in (400, 404, 422) and POLA_TOLAK_ALAT.search(r.text):
             raise TanpaAlat(f"Model '{model.nama}' tidak mendukung pemanggilan alat.")
         raise GagalModel(_pesan_status(model, r.status_code, r.text), sementara=r.status_code in STATUS_SEMENTARA)
