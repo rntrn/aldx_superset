@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.18 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Explore tidak terpotong di layar sempit, AI lokal LM Studio lebih stabil |
 | 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
 | 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
 | 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
@@ -31,6 +32,32 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.18 · Asisten AI mengubah dashboard & chart, Explore di layar sempit
+
+### Baru
+
+| Area | Perubahan | Dokumen |
+|---|---|---|
+| Asisten AI | **ALDx Rencana**: `/analis` bisa menambah/menghapus filter dashboard (otomatis berlaku di semua chart yang punya kolomnya), mengganti judul dashboard/chart, mengubah jenis chart, serta menambah/mengeluarkan chart di dashboard. Selalu lewat kartu **Rencana perubahan** → **Simpan perubahan** → **Urungkan**. Perintah umum dipahami **tanpa model AI**; bila informasi kurang, Asisten bertanya dengan tombol pilihan | [23 §2b](23-asisten-ai-peran-ahli.md#2b-mengubah-dashboard--chart-lewat-asisten-aldx-rencana) |
+
+### Diperbaiki
+
+| Masalah | Penyebab & perbaikan |
+|---|---|
+| Editor chart (Explore) terpotong di kanan, chart tidak terlihat, pada layar sempit atau saat panel AI terbuka | Explore butuh lebar minimal ±1130 px. Kini: bingkai 900–1180 px → panel kiri dipersempit; < 900 px → chart di atas, sumber data & kontrol bertumpuk di bawahnya |
+| Asisten AI: *Model '…' mengembalikan error (400)* dengan LM Studio | LM Studio memutus permintaan (`terminated`) saat model diganti/dibongkar. Kini dikenali sebagai galat sementara (dicoba ulang/dialihkan), dan model cadangan tidak lagi dipilih dari server lokal yang sama. *Failed to load model* diberi pesan jelas |
+| Jejak audit Asisten AI (`sps_ai_log`) tidak tercatat untuk model lokal yang ditemukan otomatis | id model lebih dari 64 huruf; kini dipotong |
+
+### Perlu dilakukan setelah memperbarui
+
+| Cara memasang | Langkah |
+|---|---|
+| ALDx-Setup.exe / Offline | jalankan installer versi baru di atas instalasi lama (Next-Next), lalu `Ctrl + F5` |
+| git | `git pull`, `docker compose restart superset superset-worker superset-beat`, `Ctrl + F5` |
+| Memakai LM Studio | Server Settings: matikan *Only Keep Last JIT Loaded Model* (atau muat satu model lewat *Load Model*) agar permintaan tidak diputus saat model berganti |
 
 ---
 

@@ -128,6 +128,21 @@
     html.sps-tata-ponsel .grid-content{display:flex!important;flex-direction:column}
     html.sps-tata-ponsel .grid-content .dragdroppable-row,html.sps-tata-ponsel .grid-content .dragdroppable-row > .with-popover-menu,
     html.sps-tata-ponsel .grid-content .grid-row{display:contents!important}
+    /* Explore (editor chart) punya lebar minimum 300 + 320 + 512 px: di bingkai yang lebih sempit (layar kecil, panel AI
+       terbuka) chart terdorong keluar & terpotong di kanan. Sedang: panel kiri dipersempit. Sempit: chart di atas, lalu
+       sumber data & kontrol bertumpuk di bawahnya (digulir). */
+    @media (min-width:901px) and (max-width:1180px){
+      html.sps-bingkai .explore-column.data-source-selection{min-width:220px!important;width:220px!important;flex:0 0 220px!important}
+      html.sps-bingkai .explore-column.controls-column{min-width:280px!important;width:280px!important;flex:0 0 280px!important}
+      html.sps-bingkai .main-explore-content{min-width:0!important}
+    }
+    @media (max-width:900px){
+      html.sps-bingkai div:has(> .main-explore-content){flex-direction:column!important;overflow-y:auto!important;overflow-x:hidden!important}
+      html.sps-bingkai div:has(> .main-explore-content) > *{width:100%!important;min-width:0!important;max-width:100%!important;flex:none!important}
+      html.sps-bingkai .main-explore-content{order:-1;height:62vh;min-height:340px}
+      html.sps-bingkai .explore-column.controls-column{height:auto!important;min-height:70vh}
+      html.sps-bingkai .explore-column.data-source-selection{height:50vh!important}
+    }
     @media (max-width:760px){                      /* ponsel: kotak dashboard bertumpuk satu kolom */
       html.sps-bingkai .sps-versi,html.sps-bingkai .sps-ponsel-atur{display:none!important}
       html.sps-bingkai .dashboard .grid-row{flex-direction:column!important;flex-wrap:nowrap!important}
