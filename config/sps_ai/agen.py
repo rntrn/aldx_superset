@@ -520,7 +520,7 @@ def ringkas_pesan(pesan: list[dict], sistem: str) -> list[dict]:
 def samarkan_rahasia(teks: str, atur: Pengaturan) -> str:
     """Lapisan terakhir: API key model & secret key aplikasi tidak pernah tampil di jawaban, apa pun kata modelnya."""
     import os
-    rahasia = {m.api_key for m in atur.model if len(m.api_key or "") >= 12}
+    rahasia = {k for m in atur.model for k in (m.api_key, m.token) if len(k or "") >= 12}
     rahasia |= {v for k, v in os.environ.items() if len(v or "") >= 12 and
                 any(t in k.upper() for t in ("SECRET", "PASSWORD", "API_KEY", "TOKEN"))}
     for r in sorted(rahasia, key=len, reverse=True):

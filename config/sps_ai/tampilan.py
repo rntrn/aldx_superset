@@ -351,7 +351,8 @@ def api_sambungan():
         status.lupakan()
     data = pengaturan.baca_yaml()
     atur = pengaturan.muat()
-    lokal = [{**s, "port": s["base_url"].rsplit(":", 1)[-1].split("/")[0], **LANGKAH_LOKAL.get(s["nama"], {})}
+    lokal = [{**{k: v for k, v in s.items() if k != "token"}, "token_terisi": bool(s.get("token")),
+              "port": s["base_url"].rsplit(":", 1)[-1].split("/")[0], **LANGKAH_LOKAL.get(s["nama"], {})}
              for s in status.temukan(pengaturan.sumber_lokal(data))]
     boleh = _boleh_atur()
     cloud = _daftar_cloud(data)
@@ -405,6 +406,8 @@ def api_sambungan_simpan():
     env, key = str(d.get("env") or "").strip(), str(d.get("key") or "").strip()
     data = pengaturan.baca_yaml()
     model = [m for m in data.get("model") or [] if env and (m.get("api_key_env") or "").strip() == env]
+    # token server lokal (LM Studio "Require Authentication", dsb.): diuji ke server lokal itu
+    model += [{"base_url": x["base_url"]} for x in pengaturan.sumber_lokal(data, {}) if env and x["env"] == env]
     if not model:
         raise ValueError("Layanan AI tidak dikenal.")
     if key:

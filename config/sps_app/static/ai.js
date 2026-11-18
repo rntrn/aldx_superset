@@ -293,15 +293,23 @@
     const kartuLokal = d.lokal.map(x => {
       const p = x.langkah ? x : null;
       const siapPakai = x.aktif && x.model.length;
-      const status = !x.aktif ? `<span class="lencana">${esc(t("belum menyala"))}</span>`
+      const status = x.butuh_token ? `<span class="lencana peringatan">${esc(t(x.token_terisi ? "token ditolak" : "butuh token"))}</span>`
+        : !x.aktif ? `<span class="lencana">${esc(t("belum menyala"))}</span>`
         : x.model.length ? `<span class="lencana ok">${esc(t("siap"))} · ${x.model.length} model</span>`
         : `<span class="lencana peringatan">${esc(t("menyala, belum ada model"))}</span>`;
-      const isi = siapPakai
-        ? `<div class="model-temuan">${x.model.map(m => `<code>${esc(m)}</code>`).join("")}</div>`
+      const formToken = d.boleh_atur ? `<form class="isi-key" data-env="${esc(x.env)}">
+          <input type="password" autocomplete="off" spellcheck="false" placeholder="${esc(t(x.token_terisi ? "Ganti token…" : "Tempel token server lokal"))}" aria-label="Token ${esc(x.nama)}">
+          <button class="tombol utama" type="submit">${esc(t("Simpan"))}</button>
+          ${x.token_terisi ? `<button class="tombol" type="button" data-hapus="${esc(x.env)}">${esc(t("Hapus"))}</button>` : ""}
+        </form>` : "";
+      const isi = x.butuh_token
+        ? `<p class="redup">${esc(t("Server ini meminta token (mis. LM Studio › Server Settings › Require Authentication). Buat token di Manage Tokens lalu tempel di sini, atau matikan Require Authentication."))}</p>${formToken}`
+        : siapPakai
+        ? `<div class="model-temuan">${x.model.map(m => `<code>${esc(m)}${(x.dimuat || []).includes(m) ? ` · ${esc(t("dimuat"))}` : ""}</code>`).join("")}</div>${x.token_terisi ? formToken : ""}`
         : p ? `<ol>${p.langkah.map(l => Array.isArray(l)
             ? `<li>${esc(t(l[0]))}<span class="perintah"><code>${esc(l[1])}</code><button type="button" data-salin="${esc(l[1])}">${esc(t("Salin"))}</button></span></li>`
             : `<li>${esc(t(l))}</li>`).join("")}</ol>` : "";
-      const buka = (!hidup.length && x.nama === "Ollama") || (x.aktif && !x.model.length) || siapPakai;
+      const buka = (!hidup.length && x.nama === "Ollama") || (x.aktif && !x.model.length) || siapPakai || x.butuh_token;
       return `<details class="kartu-sambung" ${buka ? "open" : ""}>
         <summary><b>${esc(x.nama)}</b><small>port ${esc(x.port)}</small>${status}</summary>${isi}
         ${p && !siapPakai ? `<a class="tautan" href="${p.unduh}" target="_blank" rel="noopener">${esc(t("Unduh"))} ${esc(x.nama)} ↗</a>` : ""}</details>`;

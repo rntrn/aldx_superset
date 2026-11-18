@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,6 +20,12 @@ class ModelAI:
     model: str
     api_key: str           # kosong untuk model lokal
     kirim_data: bool
+    token: str = ""        # token server LOKAL (mis. LM Studio "Require Authentication"); model tetap dianggap lokal
+
+    @property
+    def kunci(self) -> str:
+        """Nilai header Authorization: key cloud, atau token server lokal."""
+        return self.api_key or self.token
 
     @property
     def publik(self) -> dict:
@@ -58,11 +65,31 @@ def baca_yaml() -> dict:
         return yaml.safe_load(f) or {}
 
 
-def sumber_lokal(data: dict | None = None) -> list[dict]:
-    """Server model lokal yang diperiksa otomatis (ai.yaml: temukan_lokal)."""
+def env_token_lokal(nama: str) -> str:
+    """Nama variabel token bawaan untuk server lokal, mis. 'LM Studio' -> AI_LOKAL_LM_STUDIO_TOKEN."""
+    return "AI_LOKAL_" + re.sub(r"[^A-Z0-9]+", "_", nama.upper()).strip("_") + "_TOKEN"
+
+
+def sumber_lokal(data: dict | None = None, tersimpan: dict | None = None) -> list[dict]:
+    """Server model lokal yang diperiksa otomatis (ai.yaml: temukan_lokal).
+
+    Token (bila server mewajibkan, mis. LM Studio "Require Authentication"): variabel `api_key_env` di ai.yaml
+    (bawaan AI_LOKAL_<NAMA>_TOKEN), diisi lewat .env atau panel Sambungkan AI (tersimpan terenkripsi)."""
     data = baca_yaml() if data is None else data
-    return [{"nama": str(s["nama"]), "base_url": str(s["base_url"]).rstrip("/")}
-            for s in data.get("temukan_lokal") or [] if s.get("base_url")]
+    if tersimpan is None:
+        try:
+            from sps_ai import kunci_api
+            tersimpan = kunci_api.semua()
+        except Exception:  # noqa: BLE001 - di luar aplikasi (uji unit) / database belum siap
+            tersimpan = {}
+    hasil = []
+    for s in data.get("temukan_lokal") or []:
+        if not s.get("base_url"):
+            continue
+        env = str(s.get("api_key_env") or env_token_lokal(str(s["nama"])))
+        hasil.append({"nama": str(s["nama"]), "base_url": str(s["base_url"]).rstrip("/"), "env": env,
+                      "token": os.environ.get(env, "").strip() or tersimpan.get(env, "")})
+    return hasil
 
 
 def muat(hanya_aktif: bool = True) -> Pengaturan:
@@ -88,18 +115,24 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
             base_url=str(m["base_url"]).rstrip("/"), model=str(m["model"]),
             api_key=api_key, kirim_data=bool(m.get("kirim_data", False)),
         ))
+    sumber = sumber_lokal(data, tersimpan)
+    token_url = {x["base_url"]: x["token"] for x in sumber if x["token"]}
+    aktif = [ModelAI(**{**m.__dict__, "token": token_url.get(m.base_url, "")}) if not m.api_key else m for m in aktif]
     if hanya_aktif:
         from sps_ai import status
         aktif = status.aktif(aktif) if aktif else []
         # Model lokal yang ditemukan otomatis (semua model chat yang sudah diunduh di Ollama, LM Studio, ...).
         sudah = {(m.base_url, m.model.lower()) for m in aktif}
         temuan = []
-        for srv in status.temukan(sumber_lokal(data)):
-            for nama in srv["model"]:
+        for srv in status.temukan(sumber):
+            # model yang sudah DIMUAT di server lebih dulu: memakainya tidak memaksa server memuat/membongkar model
+            for nama in sorted(srv["model"], key=lambda n: n not in srv.get("dimuat", [])):
                 if (srv["base_url"], nama.lower()) in sudah:
                     continue
-                temuan.append(ModelAI(id=f"lokal:{srv['nama']}:{nama}", nama=f"{nama} — lokal ({srv['nama']})",
-                                      base_url=srv["base_url"], model=nama, api_key="", kirim_data=True))
+                tanda = " · dimuat" if nama in srv.get("dimuat", []) else ""
+                temuan.append(ModelAI(id=f"lokal:{srv['nama']}:{nama}", nama=f"{nama} — lokal ({srv['nama']}){tanda}",
+                                      base_url=srv["base_url"], model=nama, api_key="", kirim_data=True,
+                                      token=srv.get("token", "")))
         lokal = [m for m in aktif if not m.api_key]
         aktif = lokal + temuan + [m for m in aktif if m.api_key]
     return Pengaturan(
