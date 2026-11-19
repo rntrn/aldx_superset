@@ -177,6 +177,11 @@ function Tambah-Cek([string]$nama, [string]$hasil, [string]$ket) {
     [System.Windows.Forms.Application]::DoEvents()
 }
 
+function Port-Aldx {
+    <# Port host yang sudah dipakai layanan ALDx sendiri (docker-compose.yml), selain port web. #>
+    return @([int](Nilai "NODE_WEB_PORT" "8089"), [int](Nilai "METADB_PORT_HOST" "5433"), [int](Nilai "ENGINE_PORT_HOST" "8124"), 6379)
+}
+
 function Port-Bebas([int]$port) {
     <# Port dipakai program lain (bukan Docker milik instalasi ini)? #>
     $c = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -217,16 +222,23 @@ function Jalankan-Pemeriksaan {
     elseif ($bebasGb -lt 40) { Tambah-Cek "Ruang disk $($drive.Name):" "Peringatan" "$bebasGb GB bebas. Disarankan 40 GB+ (ekstrak & cadangan)." }
     else { Tambah-Cek "Ruang disk $($drive.Name):" "OK" "$bebasGb GB bebas" }
     # Port (dibaca dari .env, sama dengan docker-compose.yml)
-    # Port web dipakai program lain pada pemasangan baru: pilih otomatis port bebas berikutnya (8089, 8090, ...).
+    # Port web dipakai program lain pada pemasangan baru: pilih otomatis port bebas berikutnya yang bukan port ALDx lain (8090, ...).
     $portWeb = [int]$aPort[1].Text
+    $portAldx = Port-Aldx                                    # port lain milik ALDx: tidak boleh dipilih sebagai port web
+    if ($portWeb -in $portAldx) {                           # pemasangan lama (s.d. 2026.11.14.3) bisa memilih 8089 = bentrok
+        $pengganti = @(($portWeb + 1)..($portWeb + 20) | Where-Object { $_ -notin $portAldx -and -not (Port-Bebas $_) })[0]
+        Tambah-Cek "Port $portWeb (Web)" "Peringatan" "Bentrok dengan layanan ALDx lain. Otomatis memakai port $pengganti."
+        $aPort[1].Text = "$pengganti"; $portWeb = $pengganti
+    }
     if (-not $sudahTerpasang -and (Port-Bebas $portWeb)) {
-        $pengganti = @(($portWeb + 1)..($portWeb + 20) | Where-Object { -not (Port-Bebas $_) })[0]
+        $pengganti = @(($portWeb + 1)..($portWeb + 20) | Where-Object { $_ -notin $portAldx -and -not (Port-Bebas $_) })[0]
         if ($pengganti) {
             Tambah-Cek "Port $portWeb (Web)" "Peringatan" "Dipakai program '$(Port-Bebas $portWeb)'. Otomatis memakai port $pengganti."
             $aPort[1].Text = "$pengganti"; $portWeb = 0
         }
     }
-    $daftarPort = @(@([int](Nilai "METADB_PORT_HOST" "5433"), "Katalog"), @([int](Nilai "ENGINE_PORT_HOST" "8124"), "Engine"), @(6379, "Cache"))
+    $daftarPort = @(@([int](Nilai "METADB_PORT_HOST" "5433"), "Katalog"), @([int](Nilai "ENGINE_PORT_HOST" "8124"), "Engine"), @(6379, "Cache"),
+                    @([int](Nilai "NODE_WEB_PORT" "8089"), "Diagnosa web"))
     if ($portWeb) { $daftarPort = @(, @($portWeb, "Web")) + $daftarPort }
     foreach ($p in $daftarPort) {
         $pemakai = Port-Bebas $p[0]
@@ -304,6 +316,7 @@ $HALAMAN += @{ Judul = "Identitas & alamat"; Sub = "Nama aplikasi, perusahaan, w
     }
     $port = 0
     if (-not [int]::TryParse($aPort[1].Text.Trim(), [ref]$port) -or $port -lt 1 -or $port -gt 65535) { return "Port web harus angka 1-65535, mis. 8088." }
+    if ($port -in (Port-Aldx)) { return "Port $port sudah dipakai layanan ALDx lain (diagnosa web, katalog, engine, atau cache). Pilih mis. 8090." }
     if ($aNamaServer[1].Text -match '[^A-Za-z0-9.,:\-\s]') { return "Nama/IP server hanya huruf, angka, titik, minus; pisah koma." }
 } }
 
