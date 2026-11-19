@@ -18,7 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
-| 2026.11.20 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Studio Visual satu-satunya tempat membangun chart, Explore tidak terpotong di layar sempit, AI lokal: token, model dimuat, antrean |
+| 2026.11.20 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Studio Visual satu-satunya tempat membangun chart, Susun dashboard tanpa kehilangan isi editor Superset, Explore tidak terpotong, AI lokal: token, model dimuat, antrean |
 | 2026.11.14.4 | perbaikan pemasang: port web otomatis tidak lagi memilih 8089 (bentrok dengan port diagnosa ALDx) |
 | 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
 | 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
@@ -43,6 +43,7 @@ Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya
 | Area | Perubahan | Dokumen |
 |---|---|---|
 | Studio | **Studio Visual = satu-satunya tempat membangun & mengedit chart.** Menu *Daftar chart* dihapus; panel *Chart tersimpan* memuat semua chart (dengan cari), tombol **Mode lanjutan** membuka Explore bila perlu. *Tambah chart*, daftar chart, Explore dari dataset, tombol *Edit chart*, cari `Ctrl + K` dan tautan Asisten diarahkan ke Studio | [12](12-studio-visual.md#satu-tempat-untuk-membangun--mengedit-chart) |
+| Studio | **Susun dashboard membuka semua dashboard yang boleh Anda ubah** (editor Superset, Asisten AI, impor) dan menyimpannya **tanpa kehilangan isi**: kolom, markdown, tab bertingkat jadi kotak 🔒 terkunci yang disalin utuh; lebar/tinggi bebas, judul pengganti, baris di luar tab, filter editor, skema warna & klik-filter dipertahankan; cakupan semua filter dihitung ulang sehingga chart baru ikut terfilter | [12 §2](12-studio-visual.md#membuka--menyimpan-dashboard-dari-mana-pun-tanpa-kehilangan-isi) |
 | Asisten AI | **Model lokal**: token server lokal (LM Studio *Require Authentication*) diisi di Sambungkan AI; status jujur (*butuh token*, *token ditolak*); model yang sedang dimuat ditandai *· dimuat* & didahulukan; **antrean** satu permintaan sekaligus per server lokal (chat, ringkasan, uji tidak berebut) | [28 §2.3](28-sambungkan-asisten-ai.md#23-lm-studio-ada-tampilan-mudah-dipantau) |
 | Asisten AI | **ALDx Rencana**: `/analis` bisa menambah/menghapus filter dashboard (otomatis berlaku di semua chart yang punya kolomnya), mengganti judul dashboard/chart, mengubah jenis chart, serta menambah/mengeluarkan chart di dashboard. Selalu lewat kartu **Rencana perubahan** → **Simpan perubahan** → **Urungkan**. Perintah umum dipahami **tanpa model AI**; bila informasi kurang, Asisten bertanya dengan tombol pilihan | [23 §2b](23-asisten-ai-peran-ahli.md#2b-mengubah-dashboard--chart-lewat-asisten-aldx-rencana) |
 

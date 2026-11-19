@@ -1,7 +1,7 @@
 # 34 · Analisis: editor ganda (buat vs edit) & Asisten AI yang lemah mengubah aplikasi
 
 > Status (2026-11-20): §1, Fase 0 (AI lokal), Fase 1 (ALDx Rencana) dan bagian navigasi Fase 3 (Studio satu pintu chart,
-> C3) sudah diterapkan di versi 2026.11.20. Belum: Fase 2 (round-trip dashboard D1–D4), C1/C2/C4/C5, Fase 4.
+> C3) dan Fase 2 (round-trip dashboard D1–D4) sudah diterapkan di versi 2026.11.20. Belum: D5, C1/C2/C4/C5, Fase 4.
 
 ---
 

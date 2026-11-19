@@ -1180,6 +1180,112 @@ def jalankan_semua() -> None:
                 db.session.delete(d)
                 db.session.commit()
 
+    @uji("Studio", "Dashboard editor Superset dibuka & disimpan di Studio tanpa kehilangan isi (kolom, markdown, ukuran, filter, warna, luar tab)")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from sps_studio import dasbor
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if latihan is None or len(latihan.slices) < 5:
+            raise RuntimeError("dashboard latihan belum ada (scripts\\data-latihan.ps1)")
+        c = list(latihan.slices)[:5]
+        kol = next((k.column_name for k in c[0].datasource.columns if k.column_name in ("kategori", "saluran", "nm_cabang")), None)
+        ch = lambda cid, chart, w, h, induk: {"type": "CHART", "id": cid, "children": [], "parents": induk,  # noqa: E731
+                                              "meta": {"chartId": chart.id, "width": w, "height": h, "sliceName": chart.slice_name,
+                                                       "uuid": str(chart.uuid), "sliceNameOverride": "Judul dari editor"}}
+        isi = ["ROOT_ID", "GRID_ID"]
+        pos = {"DASHBOARD_VERSION_KEY": "v2", "ROOT_ID": {"type": "ROOT", "id": "ROOT_ID", "children": ["GRID_ID"]},
+               "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-a", "ROW-b"], "parents": ["ROOT_ID"]},
+               "HEADER_ID": {"type": "HEADER", "id": "HEADER_ID", "meta": {"text": "uji__ronde"}},
+               "ROW-a": {"type": "ROW", "id": "ROW-a", "children": ["CHART-x", "COLUMN-k"], "parents": isi, "meta": {}},
+               "CHART-x": ch("CHART-x", c[0], 5, 63, [*isi, "ROW-a"]),
+               "COLUMN-k": {"type": "COLUMN", "id": "COLUMN-k", "children": ["CHART-y", "CHART-z"], "parents": [*isi, "ROW-a"],
+                            "meta": {"width": 7, "background": "BACKGROUND_TRANSPARENT"}},
+               "CHART-y": ch("CHART-y", c[1], 7, 30, [*isi, "ROW-a", "COLUMN-k"]),
+               "CHART-z": ch("CHART-z", c[2], 7, 30, [*isi, "ROW-a", "COLUMN-k"]),
+               "ROW-b": {"type": "ROW", "id": "ROW-b", "children": ["MARKDOWN-m"], "parents": isi, "meta": {}},
+               "MARKDOWN-m": {"type": "MARKDOWN", "id": "MARKDOWN-m", "children": [], "parents": [*isi, "ROW-b"],
+                              "meta": {"width": 12, "height": 20, "code": "## Catatan editor"}}}
+        f_editor = {"id": "NATIVE_FILTER-editor1", "name": "Filter editor", "filterType": "filter_select",
+                    "targets": [{"datasetId": c[0].datasource_id, "column": {"name": kol}}], "chartsInScope": [c[0].id],
+                    "scope": {"rootPath": ["ROOT_ID"], "excluded": []}, "controlValues": {"multiSelect": True},
+                    "defaultDataMask": {"filterState": {"value": None}}, "cascadeParentIds": [], "type": "NATIVE_FILTER"}
+        meta0 = {"color_scheme": "supersetColors", "cross_filters_enabled": False, "native_filter_configuration": [f_editor]}
+
+        def ke_payload(b: dict) -> dict:                  # sama dengan simpan() di dasbor.js
+            peta = lambda baris: [[k if k.get("jenis") else {kk: k.get(kk) for kk in ("chart_id", "lebar", "tinggi", "ref")}  # noqa: E731
+                                   for k in row] for row in baris]
+            return {"judul": b["judul"], "keterangan": b["keterangan"], "filter": b["filter"],
+                    "tab": [{"judul": t["judul"], "baris": peta(t["baris"])} for t in b["tab"]] or [{"judul": "", "baris": peta(b["baris"])}]}
+
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            d = Dashboard(dashboard_title="uji__ronde", owners=[admin], slices=c[:3], position_json=_json.dumps(pos),
+                          json_metadata=_json.dumps(meta0))
+            db.session.add(d)
+            db.session.commit()
+            try:
+                if d.id not in {x["id"] for x in dasbor.daftar()}:
+                    raise RuntimeError("dashboard non-Studio tidak muncul di daftar Studio")
+                b = dasbor.buka(d.id)
+                kotak = [k for row in b["baris"] for k in row]
+                kunci = [k for k in kotak if k.get("jenis") == "terkunci"]
+                if len(kunci) != 2 or b["filter_lain"] != ["Filter editor"]:
+                    raise RuntimeError(f"kotak terkunci/filter editor tidak terbaca: {kotak}, {b['filter_lain']}")
+                payload = ke_payload(b)
+                payload["tab"][0]["baris"].append([{"chart_id": c[3].id, "lebar": 6}])       # chart baru ditambahkan di Studio
+                dasbor.simpan(payload, d.id)
+                db.session.expire_all()
+                p2, m2 = _json.loads(d.position_json), _json.loads(d.json_metadata)
+                cx = next(v for v in p2.values() if isinstance(v, dict) and v.get("type") == "CHART" and v["meta"]["chartId"] == c[0].id)
+                salah = []
+                if p2.get("COLUMN-k", {}).get("children") != ["CHART-y", "CHART-z"] or p2["COLUMN-k"]["meta"]["width"] != 7:
+                    salah.append("kolom berisi 2 chart")
+                if p2.get("MARKDOWN-m", {}).get("meta", {}).get("code") != "## Catatan editor":
+                    salah.append("markdown editor")
+                if (cx["meta"]["width"], cx["meta"]["height"], cx["meta"].get("sliceNameOverride")) != (5, 63, "Judul dari editor"):
+                    salah.append(f"ukuran/judul pengganti chart {cx['meta']}")
+                if (m2.get("color_scheme"), m2.get("cross_filters_enabled")) != ("supersetColors", False):
+                    salah.append("skema warna / klik-filter ditimpa")
+                fe = next((f for f in m2["native_filter_configuration"] if f["id"] == "NATIVE_FILTER-editor1"), None)
+                if fe is None or fe.get("controlValues") != {"multiSelect": True}:
+                    salah.append("filter editor hilang/berubah")
+                elif kol and c[3].id not in fe["chartsInScope"] and kol in {k.column_name for k in c[3].datasource.columns}:
+                    salah.append("chart baru tidak ikut filter editor")
+                if sorted(s.id for s in d.slices) != sorted(x.id for x in c[:4]):
+                    salah.append(f"daftar chart dashboard {[s.id for s in d.slices]}")
+                if salah:
+                    raise RuntimeError("hilang/berubah: " + "; ".join(salah))
+
+                # Bertab: baris di luar tab dipertahankan walau tidak tampil di Studio
+                pos_t = {"DASHBOARD_VERSION_KEY": "v2", "ROOT_ID": pos["ROOT_ID"],
+                         "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-luar", "TABS-t"], "parents": ["ROOT_ID"]},
+                         "ROW-luar": {"type": "ROW", "id": "ROW-luar", "children": ["MARKDOWN-l"], "parents": isi, "meta": {}},
+                         "MARKDOWN-l": {"type": "MARKDOWN", "id": "MARKDOWN-l", "children": [], "parents": [*isi, "ROW-luar"],
+                                        "meta": {"width": 12, "height": 10, "code": "di luar tab"}},
+                         "TABS-t": {"type": "TABS", "id": "TABS-t", "children": ["TAB-1", "TAB-2"], "parents": isi, "meta": {}},
+                         "TAB-1": {"type": "TAB", "id": "TAB-1", "children": ["ROW-t1"], "parents": [*isi, "TABS-t"], "meta": {"text": "Satu"}},
+                         "TAB-2": {"type": "TAB", "id": "TAB-2", "children": ["ROW-t2"], "parents": [*isi, "TABS-t"], "meta": {"text": "Dua"}},
+                         "ROW-t1": {"type": "ROW", "id": "ROW-t1", "children": ["CHART-t1"], "parents": [*isi, "TABS-t", "TAB-1"], "meta": {}},
+                         "CHART-t1": ch("CHART-t1", c[0], 6, 50, [*isi, "TABS-t", "TAB-1", "ROW-t1"]),
+                         "ROW-t2": {"type": "ROW", "id": "ROW-t2", "children": ["CHART-t2"], "parents": [*isi, "TABS-t", "TAB-2"], "meta": {}},
+                         "CHART-t2": ch("CHART-t2", c[1], 6, 50, [*isi, "TABS-t", "TAB-2", "ROW-t2"])}
+                d.position_json, d.slices = _json.dumps(pos_t), c[:2]
+                db.session.commit()
+                b = dasbor.buka(d.id)
+                if len(b["tab"]) != 2 or not b["catatan"]:
+                    raise RuntimeError(f"tab/catatan luar tab salah: {len(b['tab'])} tab, {b['catatan']}")
+                dasbor.simpan(ke_payload(b), d.id)
+                db.session.expire_all()
+                p3 = _json.loads(d.position_json)
+                if p3["GRID_ID"]["children"][0] != "ROW-luar" or p3.get("MARKDOWN-l", {}).get("meta", {}).get("code") != "di luar tab":
+                    raise RuntimeError(f"baris di luar tab hilang: {p3['GRID_ID']}")
+                return "kolom, markdown, lebar 5/tinggi 63, judul pengganti, filter & warna editor utuh; chart baru ikut filter; luar tab tetap"
+            finally:
+                db.session.delete(d)
+                db.session.commit()
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t

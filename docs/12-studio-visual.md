@@ -240,6 +240,22 @@ Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = 
 
 ## 2. Susun dashboard
 
+### Membuka & menyimpan dashboard dari mana pun (tanpa kehilangan isi)
+
+**Buka dashboard…** berisi semua dashboard yang boleh Anda ubah (pemilik / Admin): buatan Studio, editor dashboard
+Superset, Asisten AI, maupun impor .ald/.aldx. Menyimpan dari Studio **tidak menghapus** apa pun yang dibuat di editor lain:
+
+| Di dashboard | Di Studio | Saat disimpan |
+|---|---|---|
+| Chart biasa | kotak chart | lebar & tinggi bebas dari editor (mis. 5/12, tinggi 63) dipertahankan (pilihan *Tinggi: dari editor*); judul pengganti chart ikut |
+| Kolom berisi beberapa chart, markdown biasa, tab bertingkat | kotak **🔒 terkunci** (garis putus-putus) | disalin **utuh** beserta isinya; bisa dipindah, diubah lebarnya, atau dihapus di Studio, isinya diubah di editor dashboard Superset |
+| Baris di luar tab (dashboard bertab) | tidak tampil (ada pemberitahuan saat dibuka) | tetap di tempatnya, sebelum/sesudah tab |
+| Filter buatan editor | chip **🔒** di bilah Filter | tetap utuh (nilai bawaan, kaskade, dll.) |
+| Skema warna & klik-filter dari editor | – | tidak ditimpa (hanya diisi untuk dashboard baru) |
+
+Setiap simpan menghitung ulang **cakupan semua filter**: chart yang baru ditambahkan langsung ikut terfilter, chart yang
+datasetnya tidak punya kolom filter dikecualikan otomatis.
+
 0. **Mulai cepat: Dari template…** → pilih dataset, **ukuran utama**, dan template; ALDx memilih kolom tanggal,
    kategori (teks dengan 2–50 nilai), dan provinsi secara otomatis, membuat lembar kerjanya, lalu mengisi kanvas
    beserta filter. Periksa/ubah, lalu **Simpan dashboard**.
