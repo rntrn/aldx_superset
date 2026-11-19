@@ -144,15 +144,20 @@ ALAT = [
             {"chart_id": {"type": "integer"}}, ["chart_id"]),
     _fungsi("data_chart", "Ambil angka yang ditampilkan sebuah chart (query chart dijalankan ulang dengan hak akses pengguna).",
             {"chart_id": {"type": "integer"}, "batas": {"type": "integer"}}, ["chart_id"]),
-    _fungsi("rencanakan", "UBAH dashboard/chart yang SUDAH ADA (filter dashboard, judul, jenis chart, tambah/keluarkan chart "
-            "di dashboard). Tulis nama apa adanya, server yang mencocokkan. Pengguna melihat pratinjau lalu menekan Simpan.",
+    _fungsi("rencanakan", "UBAH atau HAPUS yang SUDAH ADA: filter dashboard, judul, jenis chart, tambah/keluarkan chart di "
+            "dashboard, ukuran/dimensi/label kolom dataset, story, hapus chart/dashboard/story. Tulis nama apa adanya, server "
+            "yang mencocokkan. Pengguna melihat pratinjau lalu menekan Simpan (bisa diurungkan).",
             {"operasi": {"type": "array", "items": {"type": "object", "properties": {
                 "op": {"type": "string", "enum": list(rencana.OPERASI)},
-                "dashboard": {"type": "string", "description": "judul dashboard, atau 'ini' untuk halaman yang dibuka"},
+                "dashboard": {"type": "string", "description": "judul dashboard ('ini' = halaman yang dibuka); buat_story: beberapa, dipisah koma"},
                 "chart": {"type": "string", "description": "judul chart, atau 'ini'"},
-                "kolom": {"type": "string", "description": "kolom filter; kosongkan bila pengguna tidak menyebut"},
+                "dataset": {"type": "string", "description": "nama dataset, atau 'ini'"},
+                "story": {"type": "string", "description": "judul story"},
+                "kolom": {"type": "string", "description": "kolom filter/kolom dataset; kosongkan bila pengguna tidak menyebut"},
                 "jenis": {"type": "string", "description": "jenis chart baru, atau jenis filter: pilihan|rentang|waktu"},
-                "judul": {"type": "string", "description": "judul baru"}}, "required": ["op"]}}},
+                "nama": {"type": "string", "description": "nama ukuran/dimensi baru (huruf, angka, _)"},
+                "rumus": {"type": "string", "description": "rumus SQL ukuran (agregat) / dimensi (per baris)"},
+                "judul": {"type": "string", "description": "judul/label baru, atau judul story baru"}}, "required": ["op"]}}},
             ["operasi"]),
 ]
 

@@ -43,6 +43,16 @@ P_TAMBAH_CHART =re.compile(r"\b(?:tambah|masukkan|masukan|taruh|letakkan|pasang)
 P_BUANG_CHART = re.compile(r"\b(?:keluarkan|buang|hapus|copot|singkirkan|lepas)\w*\s+(?:chart|grafik|diagram)\s+(.+?)\s+"
                            r"dari\s+(?:dalam\s+)?dash(?:board|bor)\s*(.*)$", re.I)
 
+# --- Fase 4: dataset, story, hapus objek -----------------------------------------------------------
+P_DEFINISI = re.compile(r"\b(?:tambah|buat|bikin)\w*\s+(ukuran|metrik|measure|dimensi|kolom hitung)\s+(?:baru\s+)?"
+                        r"([A-Za-z_]\w*)\s*(?:=|:|dengan rumus|rumus(?:nya)?)\s*(.+?)\s+(?:di|pada|ke|untuk)\s+dataset\s+(.+)$", re.I)
+P_LABEL = re.compile(r"\b(?:ganti|ubah|rubah)\w*\s+(?:label|nama tampilan)\s+kolom\s+(.+?)\s+(?:jadi|menjadi|ke)\s+(.+?)"
+                     r"\s+(?:di|pada|dari)\s+dataset\s+(.+)$", re.I)
+P_STORY_BARU = re.compile(r"\b(?:buat|bikin|susun)\w*\s+story\s+(?:baru\s+)?(?:bernama\s+|berjudul\s+)?(.+?)\s+"
+                          r"(?:dari|berisi|dengan)\s+(?:dash(?:board|bor)\s+)?(.+)$", re.I)
+P_KE_STORY = re.compile(r"\b(?:tambah|masukkan|masukan|sisipkan)\w*\s+dash(?:board|bor)\s+(.+?)\s+ke\s+(?:dalam\s+)?story\s+(.+)$", re.I)
+P_HAPUS_OBJEK = re.compile(r"\b(?:hapus|buang|delete|hilangkan|musnahkan)\w*\s+(chart|grafik|diagram|dash(?:board|bor)|story)\s+(.+)$", re.I)
+
 _TANPA_KOLOM = re.compile(r"^(?:yang|untuk|di|pada|agar|supaya|biar|ini|itu|baru|global|umum|semua|"
                           r"bisa|berlaku|dashboard|nya|ya|dong|sekalian)\b", re.I)
 _KATA_WAKTU = re.compile(r"\b(?:waktu|tanggal|periode|rentang waktu|range waktu)\b", re.I)
@@ -73,8 +83,23 @@ def baca(teks: str) -> list[dict] | None:
     """Kalimat pengguna -> daftar operasi rencana, atau None bila bukan perintah ubah yang dikenali."""
     t = re.sub(r"^/[\w-]+\s*", "", str(teks or "")).strip()
     t = re.sub(r"^(?:tolong|mohon|coba|bisa|bisakah|minta)\s+", "", t, flags=re.I)
-    if not t or len(t) > 300 or "?" in t[:-1]:
+    if not t or len(t) > 600 or "?" in t[:-1]:
         return None
+
+    m = P_DEFINISI.search(t)
+    if m:
+        jenis = "dimensi" if m.group(1).lower() in ("dimensi", "kolom hitung") else "ukuran"
+        return [{"op": f"tambah_{jenis}", "nama": m.group(2), "rumus": m.group(3).strip(), "dataset": _bersih(m.group(4))}]
+    m = P_LABEL.search(t)
+    if m:
+        return [{"op": "ganti_label_kolom", "kolom": _bersih(m.group(1)), "judul": _bersih(m.group(2)),
+                 "dataset": _bersih(m.group(3))}]
+    m = P_STORY_BARU.search(t)
+    if m:
+        return [{"op": "buat_story", "judul": _bersih(m.group(1)), "dashboard": _bersih(m.group(2))}]
+    m = P_KE_STORY.search(t)
+    if m:
+        return [{"op": "tambah_ke_story", "dashboard": _bersih(m.group(1)), "story": _bersih(m.group(2))}]
 
     m = P_JUDUL.search(t)
     if m:
@@ -97,6 +122,11 @@ def baca(teks: str) -> list[dict] | None:
     m = P_HAPUS_FILTER.search(t)
     if m:
         return [{"op": "hapus_filter", "kolom": _bersih(m.group(1)), "dashboard": _nama_dashboard(t)}]
+    m = P_HAPUS_OBJEK.search(t)                      # setelah "keluarkan chart X dari dashboard" & "hapus filter"
+    if m:
+        objek, nama = m.group(1).lower(), _bersih(m.group(2))
+        kunci = "dashboard" if objek.startswith("dash") else "story" if objek == "story" else "chart"
+        return [{"op": f"hapus_{kunci}", kunci: nama}]
 
     if P_TAMBAH_FILTER.search(t):
         kolom = _kolom_filter(t)

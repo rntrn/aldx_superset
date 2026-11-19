@@ -159,12 +159,21 @@ sebelum Anda menekan **Simpan perubahan**.
 | `ganti judul dashboard X menjadi Y` · `ganti nama chart ini jadi Y` | judul baru |
 | `ubah chart X jadi batang` · `jadikan chart ini pie` | jenis chart diganti; chart Studio dibangun ulang dengan pembangun Studio (semua jenis Studio), chart dari editor lanjutan: angka, tabel, pie, batang, garis |
 | `tambahkan chart X ke dashboard Y` · `keluarkan chart X dari dashboard Y` | chart masuk sebagai baris baru di bawah / dikeluarkan (chart-nya tidak dihapus) |
+| `tambah ukuran margin = SUM(laba) / SUM(penjualan) di dataset D` | ukuran terdefinisi baru (rumus diperiksa & diuji ke database dulu; sama dengan **+ Ukuran** di Studio) |
+| `tambah dimensi kelompok = CASE WHEN total >= 1000000 THEN 'Besar' ELSE 'Kecil' END di dataset D` | dimensi (kolom hitung) baru |
+| `ganti label kolom nm_cabang jadi Nama Cabang di dataset D` | label tampilan kolom |
+| `buat story Ringkasan dari dashboard A, B` · `tambahkan dashboard C ke story Ringkasan` · `hapus story Ringkasan` | story baru / langkah baru di akhir / story dihapus (dashboard-nya tidak ikut) |
+| `hapus chart X` · `hapus dashboard Y` | **dihapus**, dengan snapshot `.ald` sebelumnya; **Urungkan** mengimpornya kembali dan memasang chart lagi di dashboard tempatnya semula |
 
 - **Tanpa model AI.** Perintah dengan pola di atas dipahami langsung oleh penerjemah niat (`sps_ai/niat.py`): cepat dan
   tetap jalan walau model lokal lambat/sibuk. Kalimat bebas lainnya dikerjakan model lewat alat `rencanakan`.
 - **Nama tidak harus persis**: `tes1` cocok dengan *tes 1*. Bila ada beberapa yang cocok, Asisten bertanya dengan tombol
   (nama kembar dibedakan dengan `#id`).
 - **Hanya pemilik** dashboard/chart (atau Admin) yang bisa menyimpan perubahan.
+- **Unduh .ald (sebelum)** (muncul setelah Simpan): berkas `.ald` berisi kondisi dashboard/chart **sebelum** perubahan,
+  terkunci dengan kunci server, bisa diimpor lagi lewat menu **Berkas .ald / .aldx**. Snapshot di server dihapus otomatis
+  setelah 7 hari, jadi tidak menumpuk.
+- Peran `/data-engineer` juga bisa memakai perintah-perintah ini (terutama ukuran, dimensi, dan label kolom dataset).
 - **Urungkan** mengembalikan objek persis seperti sebelum disimpan. Ditolak bila objek itu sudah diubah lagi di tempat
   lain sesudahnya (agar tidak menimpa pekerjaan orang). Snapshot disimpan 7 hari (tabel `sps_ai_rencana`); pratinjau
   yang tidak disimpan kedaluwarsa setelah 24 jam.

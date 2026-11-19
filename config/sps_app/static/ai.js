@@ -250,17 +250,21 @@
         if (!j) return;
         riwayat.push({role: "user", content: "(Pengguna menekan Simpan; perubahan sudah tersimpan.)"});
         segarkanHalaman(j.buka || p.buka);
-        tahapTersimpan();
+        tahapTersimpan(j);
       };
       aksi.querySelector("[data-batal]").onclick = async e => {
         if (!await kirimAksi("batal", e.currentTarget)) return;
         d.classList.add("selesai"); aksi.innerHTML = `<small>${esc(t("Dibatalkan, tidak ada yang berubah."))}</small>`;
       };
     };
-    const tahapTersimpan = () => {
+    // Snapshot .ald SEBELUM perubahan (dihapus otomatis setelah 7 hari): bisa diunduh & diimpor lewat menu Berkas.
+    const tombolUnduh = j => Array.from({length: Math.min(Number(j?.unduh) || 0, 3)}, (_, i) =>
+      `<a class="tombol" href="/asisten/api/rencana/${encodeURIComponent(p.id)}/unduh?i=${i}" download
+          title="${esc(t("Berkas .ald berisi kondisi sebelum perubahan (dihapus otomatis setelah 7 hari)"))}">${ik("simpan", 16)}${esc(t("Unduh .ald (sebelum)"))}</a>`).join("");
+    const tahapTersimpan = j => {
       d.classList.add("selesai");
       aksi.innerHTML = `<span class="sukses-ai">${ik("centang", 16)} ${esc(t("Tersimpan di aplikasi."))}</span>
-        ${tombolBuka()}<button type="button" class="tombol" data-urungkan>${esc(t("Urungkan"))}</button>`;
+        ${tombolBuka()}<button type="button" class="tombol" data-urungkan>${esc(t("Urungkan"))}</button>${tombolUnduh(j)}`;
       pasangBuka();
       aksi.querySelector("[data-urungkan]").onclick = async e => {
         const j = await kirimAksi("urungkan", e.currentTarget);

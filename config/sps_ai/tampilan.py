@@ -271,6 +271,18 @@ def api_story(story_id: int):
     return jsonify(story.ambil(story_id))
 
 
+@bp.route("/api/rencana/<rid>/unduh")
+@_butuh_akses()
+def api_rencana_unduh(rid: str):
+    """Snapshot .ald SEBELUM perubahan (kunci server; buka/impor lewat menu Berkas .ald/.aldx)."""
+    from flask import Response
+    from urllib.parse import quote
+    from sps_ai import rencana
+    nama, isi = rencana.unduh(rid, g.user.username, int(request.args.get("i") or 0))
+    return Response(isi, mimetype="application/octet-stream",
+                    headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(nama)}"})
+
+
 @bp.route("/api/rencana/<rid>/<aksi>", methods=["POST"])
 @_butuh_akses()
 def api_rencana(rid: str, aksi: str):

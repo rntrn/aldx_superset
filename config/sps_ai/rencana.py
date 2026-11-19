@@ -657,8 +657,26 @@ def _catat_audit(aksi: str, r: dict, username: str) -> None:
         log.warning("ALDx Rencana: audit tidak tercatat", exc_info=True)
 
 
+def _ald_sebelum(cap: dict) -> list[dict]:
+    """Berkas .ald objek yang akan diubah, diambil SEBELUM perubahan (bisa diunduh dari kartu rencana).
+    Gagal membuatnya (mis. tanpa izin ekspor) tidak menghalangi penyimpanan; hanya unduhan yang tidak tersedia."""
+    from sps_ai import rencana_lanjut
+    hasil = []
+    for jenis in ("dashboard", "chart"):
+        ids = [int(k.split(":")[1]) for k in cap if k.startswith(jenis + ":")]
+        if not ids:
+            continue
+        try:
+            nama, b64 = rencana_lanjut.ekspor_ald(jenis, ids)
+            hasil.append({"nama": nama, "b64": b64})
+        except Exception:  # noqa: BLE001
+            log.info("ALDx Rencana: snapshot .ald %s %s tidak dibuat", jenis, ids, exc_info=True)
+    return hasil
+
+
 def simpan(rid: str, username: str) -> dict:
     from superset import db
+    from sps_ai import rencana_lanjut
     r = _baca(rid, username)
     if r["status"] != "usulan":
         raise alat.InputSalah(f"Rencana ini sudah {r['status']}.")
@@ -666,30 +684,50 @@ def simpan(rid: str, username: str) -> dict:
         raise alat.InputSalah("Rencana ini sudah kedaluwarsa. Minta ulang perubahannya.")
     operasi, cap = json.loads(r["operasi"]), json.loads(r["cap"] or "{}")
     _periksa_cap(cap, "pratinjau dibuat")
-    sebelum = {k: _snapshot(k) for k in cap}
+    objek = {k: _snapshot(k) for k in cap}
+    ald = _ald_sebelum(cap)
+    urung: list[dict] = []
     try:
         for o in operasi:
-            TERAPKAN[o["op"]](o)
+            u = TERAPKAN[o["op"]](o)
+            if u:
+                urung.append(u)
         db.session.commit()
     except Exception:
         db.session.rollback()
+        # Sebagian operasi (definisi, story, hapus) menyimpan sendiri: kembalikan yang sudah terjadi.
+        for u in reversed(urung):
+            try:
+                rencana_lanjut.urungkan(u)
+                db.session.commit()
+            except Exception:  # noqa: BLE001
+                db.session.rollback()
+                log.exception("ALDx Rencana: gagal mengembalikan %s setelah simpan gagal", u.get("jenis"))
         raise
+    ald += [{"nama": u["nama"], "b64": u["ald"]} for u in urung if u.get("jenis") == "impor"]
     sesudah = {k: _cap(_objek(k)) for k in cap}
-    _tulis(rid, status="disimpan", sebelum=json.dumps(sebelum, default=str), cap=json.dumps(sesudah))
+    _tulis(rid, status="disimpan", cap=json.dumps(sesudah),
+           sebelum=json.dumps({"objek": objek, "urung": urung, "ald": ald}, default=str))
     _catat_audit("Simpan perubahan Asisten AI", r, username)
     from sps_ai import wawasan
     wawasan.lupakan()
-    return {"ok": True, "status": "disimpan", "buka": operasi[-1].get("buka")}
+    return {"ok": True, "status": "disimpan", "buka": operasi[-1].get("buka"), "unduh": len(ald)}
 
 
 def urungkan(rid: str, username: str) -> dict:
     from superset import db
+    from sps_ai import rencana_lanjut
     r = _baca(rid, username)
     if r["status"] != "disimpan":
         raise alat.InputSalah("Hanya perubahan yang sudah disimpan yang bisa diurungkan.")
     _periksa_cap(json.loads(r["cap"] or "{}"), "perubahan disimpan")
+    data = json.loads(r["sebelum"] or "{}")
+    if "objek" not in data:                         # format awal: {kunci: snapshot}
+        data = {"objek": data, "urung": []}
     try:
-        for k, snap in json.loads(r["sebelum"] or "{}").items():
+        for u in reversed(data.get("urung") or []):   # hapus / definisi / story: catatan khusus, urutan terbalik
+            rencana_lanjut.urungkan(u)
+        for k, snap in data["objek"].items():
             _pulihkan(k, snap)
         db.session.commit()
     except Exception:
@@ -702,8 +740,29 @@ def urungkan(rid: str, username: str) -> dict:
     return {"ok": True, "status": "diurungkan", "buka": json.loads(r["operasi"])[-1].get("buka")}
 
 
+def unduh(rid: str, username: str, i: int = 0) -> tuple[str, bytes]:
+    """Berkas .ald 'sebelum perubahan' milik rencana yang sudah disimpan (dihapus otomatis setelah 7 hari)."""
+    import base64
+    r = _baca(rid, username)
+    try:
+        daftar = json.loads(r["sebelum"] or "{}").get("ald") or []
+    except (ValueError, AttributeError):
+        daftar = []
+    if not 0 <= i < len(daftar):
+        raise LookupError("Snapshot .ald untuk perubahan ini tidak tersedia.")
+    return daftar[i]["nama"], base64.b64decode(daftar[i]["b64"])
+
+
 def batal(rid: str, username: str) -> dict:
     r = _baca(rid, username)
     if r["status"] == "usulan":
         _tulis(rid, status="batal")
     return {"ok": True, "status": "batal"}
+
+
+# Operasi fase 4 (dataset, story, hapus chart/dashboard): sps_ai/rencana_lanjut.py
+from sps_ai import rencana_lanjut as _lanjut  # noqa: E402  (impor di akhir: modul itu memakai fungsi di atas)
+
+OPERASI.update(_lanjut.OPERASI)
+RENCANA.update(_lanjut.RENCANA)
+TERAPKAN.update(_lanjut.TERAPKAN)

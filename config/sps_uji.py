@@ -1360,6 +1360,107 @@ def jalankan_semua() -> None:
                         db.session.delete(x)
                 db.session.commit()
 
+    @uji("Asisten AI", "Rencana fase 4: ukuran, label kolom, story, hapus chart & dashboard (snapshot .ald) lalu Urungkan")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from superset.models.slice import Slice
+        from sps_ai import alat as A, niat, rencana, story
+        t = db.session.query(SqlaTable).filter_by(table_name="latihan_penjualan").first()
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if t is None or latihan is None:
+            raise RuntimeError("data latihan belum ada")
+        u = admin.username
+        jalan = lambda teks: rencana.susun(niat.baca(teks), u)  # noqa: E731
+        sisa = {"chart": [], "dash": [], "story": []}
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            try:
+                # Ukuran terdefinisi + label kolom
+                h = jalan("tambah ukuran uji__rata = SUM(total) / SUM(jumlah_transaksi) di dataset latihan_penjualan")
+                label_lama = next(c.verbose_name for c in t.columns if c.column_name == "kategori")
+                h2 = jalan("ganti label kolom kategori jadi Kategori Uji di dataset latihan_penjualan")
+                rencana.simpan(h["id"], u)
+                rencana.simpan(h2["id"], u)
+                db.session.expire_all()
+                if "uji__rata" not in {m.metric_name for m in t.metrics} or \
+                        next(c.verbose_name for c in t.columns if c.column_name == "kategori") != "Kategori Uji":
+                    raise RuntimeError("ukuran/label tidak tersimpan")
+                rencana.urungkan(h2["id"], u)
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                if "uji__rata" in {m.metric_name for m in t.metrics} or \
+                        next(c.verbose_name for c in t.columns if c.column_name == "kategori") != label_lama:
+                    raise RuntimeError("ukuran/label tidak diurungkan")
+                # Story
+                h = jalan(f"buat story uji__story dari dashboard {latihan.dashboard_title}")
+                rencana.simpan(h["id"], u)
+                st = next((s for s in story.daftar() if s["judul"] == "uji__story"), None)
+                if st is None:
+                    raise RuntimeError("story tidak dibuat")
+                sisa["story"].append(st["id"])
+                rencana.urungkan(h["id"], u)
+                if any(s["judul"] == "uji__story" for s in story.daftar()):
+                    raise RuntimeError("story tidak diurungkan")
+                sisa["story"].clear()
+                # Hapus chart (dipakai dashboard) -> snapshot .ald -> Urungkan memasang kembali
+                c = A.buat_chart(t.id, "batang", "uji__hapus_chart", ["SUM(total)"], ["kategori"])
+                sisa["chart"].append(c["id"])
+                ch = db.session.query(Slice).get(c["id"])
+                d = Dashboard(dashboard_title="uji__hapus_dash", owners=[admin], slices=[ch], json_metadata="{}",
+                              position_json=_json.dumps({"ROOT_ID": {"type": "ROOT", "id": "ROOT_ID", "children": ["GRID_ID"]},
+                                                         "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-u"], "parents": ["ROOT_ID"]},
+                                                         "ROW-u": {"type": "ROW", "id": "ROW-u", "children": ["CHART-u"], "parents": ["ROOT_ID", "GRID_ID"]},
+                                                         "CHART-u": {"type": "CHART", "id": "CHART-u", "children": [], "parents": ["ROOT_ID", "GRID_ID", "ROW-u"],
+                                                                     "meta": {"chartId": ch.id, "width": 6, "height": 50}}}))
+                db.session.add(d)
+                db.session.commit()
+                sisa["dash"].append(d.id)
+                uuid_chart, did = str(ch.uuid), d.id
+                h = jalan("hapus chart uji__hapus_chart")
+                j = rencana.simpan(h["id"], u)
+                db.session.expire_all()
+                if db.session.query(Slice).filter(Slice.uuid == uuid_chart).first() is not None or not j.get("unduh"):
+                    raise RuntimeError("chart tidak terhapus / snapshot .ald tidak ada")
+                nama, isi = rencana.unduh(h["id"], u)
+                if not isi.startswith(b"ALDX") or not nama.endswith(".ald"):
+                    raise RuntimeError(f"unduhan bukan berkas .ald: {nama}")
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                baru = db.session.query(Slice).filter(Slice.uuid == uuid_chart).first()
+                d = db.session.query(Dashboard).get(did)
+                if baru is None or baru.id not in [s.id for s in d.slices] or f'"chartId": {baru.id}' not in d.position_json:
+                    raise RuntimeError("chart tidak kembali ke dashboard-nya")
+                sisa["chart"] = [baru.id]
+                # Hapus dashboard -> Urungkan dari .ald
+                uuid_dash = str(d.uuid)
+                h = jalan("hapus dashboard uji__hapus_dash")
+                rencana.simpan(h["id"], u)
+                db.session.expire_all()
+                if db.session.query(Dashboard).filter(Dashboard.uuid == uuid_dash).first() is not None:
+                    raise RuntimeError("dashboard tidak terhapus")
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                d = db.session.query(Dashboard).filter(Dashboard.uuid == uuid_dash).first()
+                if d is None:
+                    raise RuntimeError("dashboard tidak kembali dari snapshot .ald")
+                sisa["dash"] = [d.id]
+                return "ukuran & label (simpan/urungkan), story, hapus chart (kembali ke dashboard) & hapus dashboard dari .ald"
+            finally:
+                db.session.rollback()
+                for i in sisa["story"]:
+                    story.hapus(i)
+                for i in sisa["dash"]:
+                    x = db.session.query(Dashboard).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                for i in sisa["chart"]:
+                    x = db.session.query(Slice).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                db.session.commit()
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t
