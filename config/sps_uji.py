@@ -1089,7 +1089,8 @@ def jalankan_semua() -> None:
         if mati:
             raise RuntimeError(f"{len(mati)} tautan mati: " + "; ".join(mati[:4]))
         peta = (P.DOCS / "33-peta-menu-per-level.md").read_text(encoding="utf-8")
-        tanpa = [n for n in ("Hubungkan data", "Jejak data", "Studio Visual", "Daftar chart", "Langganan laporan", "Peringatan data",
+        # "Daftar chart" sudah bukan menu (2026.11.20): mencari/mengedit chart ada di Studio Visual
+        tanpa = [n for n in ("Hubungkan data", "Jejak data", "Studio Visual", "Langganan laporan", "Peringatan data",
                              "Sematkan ke web lain", "Auto chart & dashboard", "Kesehatan kueri", "Jejak audit", "Moderasi ulasan")
                  if f"**{n}**" not in peta]
         if tanpa:
