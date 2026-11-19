@@ -1115,6 +1115,90 @@ def jalankan_semua() -> None:
             raise RuntimeError("mode/menit ai.yaml salah dibaca")
         return f"{len(p)} poin; model terpilih: lokal; kirim_data: false ditolak; mode {ringkasan.mode()}"
 
+    @uji("Asisten AI", "Rencana: perintah ubah dipahami tanpa model AI")
+    def _():
+        from sps_ai import niat
+        kasus = {
+            "dari dashboard tes1 buatkan filtrasi yang bisa berlaku di semua chart": ("tambah_filter", "dashboard", "tes1"),
+            "tambah filter cabang di dashboard Penjualan": ("tambah_filter", "kolom", "cabang"),
+            "pasang filter tanggal di dashboard ini": ("tambah_filter", "jenis", "waktu"),
+            "hapus filter cabang dari dashboard tes1": ("hapus_filter", "kolom", "cabang"),
+            "ganti judul dashboard tes1 menjadi Ringkasan": ("ganti_judul_dashboard", "judul", "Ringkasan"),
+            "jadikan chart ini pie": ("ubah_jenis_chart", "jenis", "pie"),
+            "keluarkan chart Total dari dashboard tes1": ("buang_chart", "chart", "Total"),
+        }
+        for teks, (op, kunci, nilai) in kasus.items():
+            h = niat.baca(teks)
+            if not h or h[0]["op"] != op or h[0].get(kunci) != nilai:
+                raise RuntimeError(f"'{teks}' -> {h}")
+        for teks in ("berapa penjualan bulan ini?", "buatkan dashboard penjualan per cabang"):
+            if niat.baca(teks) is not None:
+                raise RuntimeError(f"'{teks}' salah dianggap perintah ubah")
+        return f"{len(kasus)} perintah dikenali, 2 pertanyaan biasa diteruskan ke model"
+
+    @uji("Asisten AI", "Rencana: pratinjau, Simpan, Urungkan kembali persis (dashboard uji sementara)")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from sps_ai import rencana
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if latihan is None or not latihan.slices:
+            raise RuntimeError("dashboard latihan belum ada (scripts\\data-latihan.ps1)")
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            d = Dashboard(dashboard_title="uji__rencana", owners=[admin], slices=list(latihan.slices)[:3],
+                          position_json="{}", json_metadata="{}")
+            db.session.add(d)
+            db.session.commit()
+            try:
+                sidik = lambda: (d.dashboard_title, d.json_metadata, d.position_json, sorted(s.id for s in d.slices))  # noqa: E731
+                awal = sidik()
+                tanya = None
+                try:
+                    rencana.susun([{"op": "tambah_filter", "dashboard": "uji__rencana", "kolom": ""}], admin.username)
+                except rencana.Butuh as e:
+                    tanya = e
+                if tanya is None or not tanya.pilihan:
+                    raise RuntimeError("kolom kosong tidak ditanyakan / tanpa pilihan")
+                kolom = rencana.saran_kolom(d)[0]
+                h = rencana.susun([{"op": "tambah_filter", "dashboard": "uji_rencana", "kolom": kolom},
+                                   {"op": "ganti_judul_dashboard", "dashboard": "uji__rencana", "judul": "uji__rencana2"}],
+                                  admin.username)
+                rencana.simpan(h["id"], admin.username)
+                db.session.expire_all()
+                f = _json.loads(d.json_metadata).get("native_filter_configuration") or []
+                if d.dashboard_title != "uji__rencana2" or not f or not f[0].get("chartsInScope"):
+                    raise RuntimeError("perubahan tidak tersimpan")
+                rencana.urungkan(h["id"], admin.username)
+                db.session.expire_all()
+                if sidik() != awal:
+                    raise RuntimeError("Urungkan tidak mengembalikan persis")
+                return f"filter '{kolom}' + ganti judul tersimpan, lalu diurungkan persis"
+            finally:
+                db.session.delete(d)
+                db.session.commit()
+
+    @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
+    def _():
+        import time as _t
+        from sps_ai import llm, pengaturan
+        from sps_ai.pengaturan import ModelAI
+        if pengaturan.env_token_lokal("LM Studio") != "AI_LOKAL_LM_STUDIO_TOKEN":
+            raise RuntimeError("nama variabel token lokal salah")
+        m = ModelAI("x", "x", "http://uji-antre:1/v1", "m", "", True, token="t" * 20)
+        if m.kunci != "t" * 20 or m.api_key:
+            raise RuntimeError("token lokal tidak dipakai / model dianggap cloud")
+        with llm.antre(m, _t.monotonic() + 30):
+            try:
+                with llm.antre(m, _t.monotonic() + 11.5):        # menunggu ±1,5 dtk lalu menyerah
+                    raise RuntimeError("antrean tidak mengunci server yang sama")
+            except llm.AntreanPenuh:
+                pass
+        with llm.antre(m, _t.monotonic() + 30):                 # kunci sudah dilepas
+            pass
+        return "token terpisah dari key cloud; permintaan kedua ke server yang sama menunggu giliran"
+
     @uji("Dokumentasi", "Catatan versi untuk VERSI ini ada (dipakai rilis v<VERSI>); tanpa perbandingan merek produk lain")
     def _():
         import re as _re

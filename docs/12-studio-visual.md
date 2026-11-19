@@ -15,8 +15,22 @@ dashboard Superset, dipakai Asisten AI & Story. Chart buatan Studio bisa dibuka 
 Pilihan dataset berisi dataset **fisik dan virtual** yang boleh Anda akses. Dataset yang baru dibuat (mis. dari
 Kueri Visual atau SQL Lab) muncul otomatis saat Anda kembali ke Studio, tanpa memuat ulang halaman.
 
-Tautan langsung: `/studio/?dataset=<id>` membuka lembar kerja dengan dataset itu; `/studio/?tab=prep&dataset=<id>`
-membuka Persiapan data (dipakai tombol lanjutan Kueri Visual dan menu **Data → Persiapan data**).
+Tautan langsung: `/studio/?dataset=<id>` membuka lembar kerja dengan dataset itu; `/studio/?chart=<id>` membuka chart itu;
+`/studio/?tab=prep&dataset=<id>` membuka Persiapan data (dipakai tombol lanjutan Kueri Visual dan menu **Data → Persiapan data**).
+
+### Satu tempat untuk membangun & mengedit chart
+
+Mulai versi 2026.11.20 menu **Daftar chart** dihapus: semua chart dibuat, dicari, dan diedit di **Studio Visual**.
+
+- Panel kanan **Chart tersimpan** berisi **semua** chart yang boleh Anda buka (dengan kotak cari). Chart buatan Studio
+  dibuka sebagai lembar kerja; chart dari editor lanjutan / impor ditandai **lanjutan** dan dibuka di Mode lanjutan.
+- Tombol **Mode lanjutan** (di bilah lembar kerja, setelah chart disimpan) membuka chart yang sama di editor Superset
+  (Explore) untuk pengaturan rinci yang tidak ada di Studio.
+- Pengalihan otomatis: *Tambah chart* Superset (`/chart/add`), daftar chart (`/chart/list`), dan Explore yang dibuka dari
+  dataset (chart baru) → Studio. Tombol **Edit chart** di dashboard, hasil cari `Ctrl + K`, dan tautan Asisten AI
+  membuka chart buatan Studio di Studio; chart lain tetap di Explore. Pintasan `g → c` membuka Studio.
+- Mode lanjutan diingat per chart selama sesi browser, jadi memuat ulang Explore tidak melempar Anda kembali ke Studio.
+- Explore pada layar sempit (atau saat panel AI terbuka) tidak lagi terpotong: chart tampil di atas, kontrol di bawahnya.
 
 ---
 

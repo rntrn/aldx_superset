@@ -18,7 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
-| 2026.11.18 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Explore tidak terpotong di layar sempit, AI lokal LM Studio lebih stabil |
+| 2026.11.20 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Studio Visual satu-satunya tempat membangun chart, Explore tidak terpotong di layar sempit, AI lokal: token, model dimuat, antrean |
 | 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
 | 2026.11.14.2 | ringkasan AI otomatis di dashboard, skenario what-if tersimpan, mini-chart di tooltip, uji tampilan otomatis di CI |
 | 2026.11.14 | ambang berwarna (format bersyarat), template per bidang, rilis tetap per versi + SHA-256, peta fitur tanpa perbandingan merek |
@@ -35,12 +35,14 @@ Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya
 
 ---
 
-## 2026.11.18 · Asisten AI mengubah dashboard & chart, Explore di layar sempit
+## 2026.11.20 · Asisten AI mengubah dashboard & chart, Studio Visual satu pintu chart, AI lokal stabil
 
 ### Baru
 
 | Area | Perubahan | Dokumen |
 |---|---|---|
+| Studio | **Studio Visual = satu-satunya tempat membangun & mengedit chart.** Menu *Daftar chart* dihapus; panel *Chart tersimpan* memuat semua chart (dengan cari), tombol **Mode lanjutan** membuka Explore bila perlu. *Tambah chart*, daftar chart, Explore dari dataset, tombol *Edit chart*, cari `Ctrl + K` dan tautan Asisten diarahkan ke Studio | [12](12-studio-visual.md#satu-tempat-untuk-membangun--mengedit-chart) |
+| Asisten AI | **Model lokal**: token server lokal (LM Studio *Require Authentication*) diisi di Sambungkan AI; status jujur (*butuh token*, *token ditolak*); model yang sedang dimuat ditandai *· dimuat* & didahulukan; **antrean** satu permintaan sekaligus per server lokal (chat, ringkasan, uji tidak berebut) | [28 §2.3](28-sambungkan-asisten-ai.md#23-lm-studio-ada-tampilan-mudah-dipantau) |
 | Asisten AI | **ALDx Rencana**: `/analis` bisa menambah/menghapus filter dashboard (otomatis berlaku di semua chart yang punya kolomnya), mengganti judul dashboard/chart, mengubah jenis chart, serta menambah/mengeluarkan chart di dashboard. Selalu lewat kartu **Rencana perubahan** → **Simpan perubahan** → **Urungkan**. Perintah umum dipahami **tanpa model AI**; bila informasi kurang, Asisten bertanya dengan tombol pilihan | [23 §2b](23-asisten-ai-peran-ahli.md#2b-mengubah-dashboard--chart-lewat-asisten-aldx-rencana) |
 
 ### Diperbaiki

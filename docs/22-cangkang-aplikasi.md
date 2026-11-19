@@ -78,7 +78,7 @@ khusus halaman itu (mis. SQL Lab: `Ctrl + Enter` jalankan, `Ctrl + Shift + F` ra
 | `?` | Cara pakai halaman ini |
 | `Ctrl + \` | Ringkas / lebarkan sidebar |
 | `Esc` | Tutup panel |
-| `g` lalu `h` / `t` / `k` / `q` / `s` / `c` / `d` / `y` | Ke Beranda / Dataset / Kueri Visual / SQL Lab / Studio / Daftar chart / Daftar dashboard / Story |
+| `g` lalu `h` / `t` / `k` / `q` / `s` / `c` / `d` / `y` | Ke Beranda / Dataset / Kueri Visual / SQL Lab / Studio / Studio (chart) / Daftar dashboard / Story |
 
 Pintasan tetap berfungsi saat kursor berada di dalam halaman, kecuali saat sedang mengetik di kotak isian.
 

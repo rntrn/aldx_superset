@@ -55,8 +55,8 @@
     const dipakai = new Set(semuaKotak().map(k => k.chart_id));
     $("#daftarLembarD").innerHTML = Studio.awal.lembar.filter(l => !cari || l.judul.toLowerCase().includes(cari)).map(l =>
       `<div class="bidang dimensi" draggable="true" data-id="${l.id}" style="color:var(--teks);${dipakai.has(l.id) ? "opacity:.45" : ""}">
-        <span class="tag">${esc((Studio.awal.aturan[l.tanda]?.label || "").slice(0, 4))}</span>${esc(l.judul)}</div>`).join("")
-      || '<div class="ket">Belum ada lembar kerja tersimpan. Buat di tab Lembar kerja.</div>';
+        <span class="tag">${esc((Studio.awal.aturan[l.tanda]?.label || l.jenis || "").slice(0, 4))}</span>${esc(l.judul)}</div>`).join("")
+      || '<div class="ket">Belum ada chart tersimpan. Buat di tab Lembar kerja.</div>';
     $$("#daftarLembarD [data-id]").forEach(el => {
       el.ondragstart = e => e.dataTransfer.setData("text/plain", JSON.stringify({baru: Number(el.dataset.id)}));
     });

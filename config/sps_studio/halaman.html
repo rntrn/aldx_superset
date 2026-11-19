@@ -95,6 +95,7 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
 .daftarKecil div{padding:6px 4px;border-bottom:1px solid var(--garis2);cursor:pointer}
 .daftarKecil div:hover{background:var(--bg)}
 .daftarKecil b{font-weight:600;display:block}
+.daftarKecil .lanjutan{font-size:10.5px;font-weight:500;border:1px solid var(--garis);border-radius:999px;padding:0 6px;margin-left:4px}
 #saranData{max-height:340px;overflow:auto}
 .judulAksi{display:flex;align-items:center;justify-content:space-between}
 .bidang.hierarki .tag{background:var(--sps-aksen-muda,#FDE8F1);color:var(--sps-utama,#18181B)}
@@ -269,6 +270,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
       <label class="topN" title="Tampilkan hanya N baris teratas menurut urutan (kosong = semua). Dengan Urutkan naik = N terbawah.">N teratas <input type="number" id="topN" min="1" max="1999" placeholder="semua"></label>
       <button class="teks" id="lihatData">Lihat data</button>
       <button class="teks" id="bersihkan">Bersihkan</button>
+      <button class="teks" id="hapusChart" hidden title="Hapus chart ini (hanya pemilik/Admin)">Hapus chart</button>
+      <button class="teks" id="modeLanjutan" hidden title="Buka chart ini di editor lanjutan (Explore): pengaturan rinci yang tidak ada di Studio">Mode lanjutan</button>
       <button class="kedua" id="simpanBaru" title="Simpan sebagai chart baru">Simpan baru</button>
       <button class="utama" id="simpanLembar">Simpan</button>
     </div>
@@ -282,7 +285,8 @@ table.data td{padding:5px 8px;border-bottom:1px solid #F0F2F5}table.data td.n{te
     <div class="butuh" id="butuh"></div>
     <div class="judulPanel">Saran dari data</div>
     <div class="daftarKecil" id="saranData"><div class="ket">Pilih sumber data.</div></div>
-    <div class="judulPanel">Lembar kerja tersimpan</div>
+    <div class="judulPanel">Chart tersimpan</div>
+    <input type="text" id="cariLembar" placeholder="Cari chart…" style="width:100%;margin-bottom:4px">
     <div class="daftarKecil" id="daftarLembar"></div>
   </div>
 </section>

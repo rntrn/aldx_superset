@@ -106,6 +106,36 @@
   const halamanSps = !document.getElementById("app");
   document.documentElement.classList.add("sps-bingkai");
 
+  // ---- Studio Visual = satu-satunya tempat membangun & mengedit chart ----
+  //   /chart/add, /chart/list            -> Studio (chart baru / daftar chart ada di Studio)
+  //   /explore/ dari dataset (chart baru) -> Studio dengan dataset itu
+  //   /explore/?slice_id=N               -> Studio bila chart N buatan Studio; chart lain tetap di Explore
+  //   ...&lanjutan=1                     -> Mode lanjutan: tetap di Explore (diingat per chart selama sesi)
+  (function arahkanKeStudio() {
+    if (halamanSps) return;
+    const p = location.pathname, q = new URLSearchParams(location.search);
+    const kunciLanjutan = id => "sps_lanjutan_" + id;
+    if (/^\/chart\/(add|list)/.test(p)) {
+      const ds = q.get("dataset") || q.get("datasource_id");
+      location.replace("/studio/" + (/^\d+$/.test(ds || "") ? "?dataset=" + ds : ""));
+      return;
+    }
+    if (!/^\/explore\/?$/.test(p)) return;
+    const slice = q.get("slice_id");
+    if (q.get("lanjutan") === "1") {
+      if (slice) try { sessionStorage.setItem(kunciLanjutan(slice), "1"); } catch (e) { /* mode privat */ }
+      return;
+    }
+    if (/^\d+$/.test(slice || "")) {
+      try { if (sessionStorage.getItem(kunciLanjutan(slice))) return; } catch (e) { /* mode privat */ }
+      fetch(`/studio/api/lembar/${slice}`, {credentials: "same-origin"})
+        .then(r => { if (r.ok) location.replace(`/studio/?chart=${slice}`); }).catch(() => {});
+      return;
+    }
+    const ds = q.get("datasource_id") || (q.get("datasource") || "").split("__")[0];
+    if (!q.get("form_data_key") && !q.get("form_data") && /^\d+$/.test(ds)) location.replace(`/studio/?dataset=${ds}`);
+  })();
+
   const gaya = document.createElement("style");
   gaya.textContent = `
     html.sps-bingkai #main-menu, html.sps-bingkai header.sps-hiasan, html.sps-bingkai .spsNav,

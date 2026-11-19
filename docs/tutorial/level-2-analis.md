@@ -300,9 +300,9 @@ Detail: [docs/23](../23-asisten-ai-peran-ahli.md).
 Butuh **email (SMTP)** yang diisi admin server ([docs/26 §1](../26-langganan-versi-ponsel-lihat-sebagai.md)); tanpa SMTP, pengiriman hanya
 tercatat di log (mode uji). Data diambil **sebagai pemilik laporan**: jangan kirim ke orang yang tidak berhak atas datanya.
 
-## 12e. Daftar chart & Jejak data
+## 12e. Mencari chart (Studio Visual) & Jejak data
 
-- **Visual › Daftar chart**: cari chart lewat nama/dataset/pembuat, buka, ubah, atau hapus milik sendiri.
+- **Visual › Studio Visual › Chart tersimpan** (panel kanan): cari chart lewat nama, klik untuk membuka & mengubah, **Hapus chart** untuk menghapus milik sendiri. Chart bertanda *lanjutan* dibuka di Mode lanjutan (Explore).
 - **Data › Jejak data**: pilih dataset di kiri → empat kolom **Sumber → Dataset → Chart → Dashboard**. Arahkan kursor ke sebuah chart
   untuk menyorot dashboard pemakainya. **Pakai sebelum mengubah atau menghapus** sesuatu: halaman menulis
   *"Mengubah atau menghapus … berdampak pada N chart dan M dashboard"*. Chart milik orang lain yang tidak boleh Anda lihat

@@ -705,18 +705,27 @@ def buka(chart_id: int) -> dict:
 
 
 def daftar() -> list[dict]:
-    """Lembar kerja Studio yang boleh dibuka user (terbaru dulu)."""
+    """SEMUA chart yang boleh dibuka user (terbaru dulu): Studio Visual = satu tempat membangun & mencari chart.
+
+    studio=True  -> dibuka sebagai lembar kerja (spesifikasi di params.sps_studio)
+    studio=False -> chart dari editor lanjutan / impor / AI jenis dasar: dibuka di Mode lanjutan (Explore)
+    """
     from superset import db, security_manager
     from superset.models.slice import Slice
+    from sps_ai.wawasan import JENIS
 
-    rows = (db.session.query(Slice).filter(Slice.params.like('%"sps_studio"%'))
-            .order_by(Slice.changed_on.desc()).limit(200).all())
+    rows = db.session.query(Slice).order_by(Slice.changed_on.desc()).limit(400).all()
     hasil = []
     for c in rows:
         if not security_manager.can_access_chart(c):
             continue
-        spec = json.loads(c.params or "{}").get("sps_studio", {})
-        hasil.append({"id": c.id, "judul": c.slice_name, "tanda": spec.get("tanda"),
-                      "dataset_id": spec.get("dataset_id") or c.datasource_id, "spec": spec,
-                      "diubah": c.changed_on.isoformat(sep=" ", timespec="minutes") if c.changed_on else ""})
+        try:
+            spec = json.loads(c.params or "{}").get("sps_studio") or {}
+        except ValueError:
+            spec = {}
+        hasil.append({"id": c.id, "judul": c.slice_name, "tanda": spec.get("tanda"), "studio": bool(spec),
+                      "jenis": JENIS.get(c.viz_type, c.viz_type), "dataset_id": spec.get("dataset_id") or c.datasource_id,
+                      "spec": spec, "diubah": c.changed_on.isoformat(sep=" ", timespec="minutes") if c.changed_on else ""})
+        if len(hasil) >= 300:
+            break
     return hasil
