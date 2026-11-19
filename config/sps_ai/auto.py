@@ -357,11 +357,26 @@ def buat_dari_saran(dataset_id: int, pilihan: list[dict], judul_dashboard: str =
 def buat_satu(dataset_id: int, p: dict) -> dict:
     from sps_studio import lembar as L
     jenis, spec = str(p.get("jenis") or ""), p.get("spec")
-    if not spec and jenis in alat.JENIS_CHART:
-        return alat.buat_chart(dataset_id, jenis, p.get("judul", ""), p["metrik"], p.get("kelompok"))
     if not spec:
-        ukuran = [_uk(m[1], m[0]) for m in (re.match(r"^(\w+)\((.+)\)$", x).groups() for x in p.get("metrik") or [])]
+        t0 = alat._dataset(int(dataset_id))
+        tersimpan = {m.metric_name for m in t0.metrics}
+
+        def ukuran_dari(x: str) -> dict:
+            """'SUM(total)' / 'COUNT(*)' / nama metrik tersimpan -> pil ukuran Studio."""
+            x = str(x).strip()
+            cocok = re.match(r"^(\w+)\s*\(\s*(.+?)\s*\)$", x)
+            if cocok and cocok.group(2) == "*":
+                return {"field": L.BARIS, "peran": "ukuran"}
+            if cocok:
+                return _uk(cocok.group(2), cocok.group(1).upper())
+            if x in tersimpan:
+                return {"field": x, "peran": "ukuran", "metrik": True}
+            raise alat.InputSalah(f"Metrik '{x}' tidak dikenal: pakai AGREGAT(kolom) atau nama metrik tersimpan.")
+        ukuran = [ukuran_dari(x) for x in p.get("metrik") or []]
         spec = spec_dari(jenis, ukuran, list(p.get("kelompok") or []))
+        if p.get("filter"):                         # filter AI {kolom, op, nilai} -> filter lembar kerja
+            spec["filter"] = [{"field": f.get("kolom"), "op": "IN", "nilai": [f.get("nilai")]} if f.get("op") == "=="
+                              else {"field": f.get("kolom"), "op": f.get("op"), "nilai": f.get("nilai")} for f in p["filter"]]
     t, lb = L.dari_dict({"dataset_id": dataset_id, "tanda": jenis, "judul": p.get("judul", ""), **spec})
     h = L.simpan(t, lb)
     return {**h, "judul": h.get("judul") or p.get("judul", ""), "jenis": jenis}

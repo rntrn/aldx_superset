@@ -262,11 +262,15 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
         return {"saran": [{k: s[k] for k in ("judul", "jenis", "metrik", "kelompok")} for s in h["saran"]],
                 "profil": h.get("profil"), "data_tidak_dikirim": True}
     if nama == "buat_chart":
-        if arg["jenis"] in alat.JENIS_CHART or arg.get("filter"):
+        # Semua jenis lewat pembangun Studio Visual: chart AI bisa dibuka & diedit di Studio, tampilannya seragam.
+        # Pembangun lama (alat.buat_chart) hanya cadangan untuk 5 jenis dasar bila rak Studio menolak spesifikasinya.
+        try:
+            h = auto.buat_satu(arg["dataset_id"], arg)
+        except alat.InputSalah:
+            if arg["jenis"] not in alat.JENIS_CHART:
+                raise
             h = alat.buat_chart(arg["dataset_id"], arg["jenis"], arg.get("judul", ""), arg["metrik"],
                                 arg.get("kelompok"), arg.get("filter"))
-        else:                       # jenis lain (treemap, sankey, peta, ...): pembangun Studio Visual
-            h = auto.buat_satu(arg["dataset_id"], arg)
         ev({"tipe": "chart", **h})
         return h
     if nama == "buat_dashboard":

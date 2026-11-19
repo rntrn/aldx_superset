@@ -1286,6 +1286,80 @@ def jalankan_semua() -> None:
                 db.session.delete(d)
                 db.session.commit()
 
+    @uji("Studio", "Satu editor chart: chart editor lanjutan dibuka sebagai lembar kerja, perubahan di Mode lanjutan terdeteksi, chart AI lewat Studio")
+    def _():
+        import json as _json
+        from superset.models.slice import Slice
+        from sps_ai import alat as A, auto
+        from sps_studio import konversi
+        t = db.session.query(SqlaTable).filter_by(table_name="latihan_penjualan").first()
+        if t is None:
+            raise RuntimeError("dataset latihan_penjualan belum ada")
+        kol = {c.column_name for c in t.columns}
+        if not {"total", "kategori"} <= kol:
+            raise RuntimeError(f"kolom latihan_penjualan berubah: {sorted(kol)}")
+        angka, teks = "total", "kategori"
+        dibuat = []
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            try:
+                # C1: chart pembangun lama (editor lanjutan) -> lembar kerja
+                h = A.buat_chart(t.id, "batang", "uji__lanjutan", [f"SUM({angka})"], [teks],
+                                 [{"kolom": teks, "op": "IN", "nilai": ["x", "y"]}])
+                dibuat.append(h["id"])
+                s = lembar.buka(h["id"])
+                if s.get("tanda") != "batang" or not s.get("dikonversi") or s["kolom"][0]["field"] != teks \
+                        or s["baris"][0] != {"field": angka, "peran": "ukuran", "agg": "SUM"} or s["filter"][0]["op"] != "IN":
+                    raise RuntimeError(f"konversi salah: {s}")
+                if not next(x for x in lembar.daftar() if x["id"] == h["id"])["studio"]:
+                    raise RuntimeError("chart yang bisa dikonversi masih bertanda lanjutan")
+                tt, lb = lembar.dari_dict(s)
+                lembar.simpan(tt, lb, h["id"])                        # disimpan dari Studio = jadi chart Studio
+                db.session.expire_all()
+                c = db.session.query(Slice).get(h["id"])
+                p = _json.loads(c.params)
+                if not p.get("sps_studio") or lembar.buka(c.id).get("catatan"):
+                    raise RuntimeError("setelah disimpan Studio masih dianggap dikonversi/berubah")
+                # C2: diubah di Mode lanjutan -> terdeteksi & dibangun ulang; tidak terwakili -> peringatan basi
+                p["row_limit"] = 77
+                c.params = _json.dumps(p)
+                db.session.commit()
+                s2 = lembar.buka(c.id)
+                if s2.get("batas") != 77 or s2.get("catatan") != lembar.PESAN_BERUBAH:
+                    raise RuntimeError(f"perubahan Mode lanjutan tidak terdeteksi: {s2.get('batas')}, {s2.get('catatan')}")
+                p["metrics"] = [{"expressionType": "SQL", "sqlExpression": f"SUM({angka}) / 2", "label": "x"}]
+                c.params = _json.dumps(p)
+                db.session.commit()
+                if not lembar.buka(c.id).get("basi"):
+                    raise RuntimeError("perubahan yang tidak terwakili tidak diberi peringatan")
+                # Tidak terwakili sama sekali -> tetap di Mode lanjutan
+                p.pop("sps_studio"), p.pop("sps_studio_sidik", None)
+                c.params = _json.dumps(p)
+                db.session.commit()
+                try:
+                    lembar.buka(c.id)
+                    raise RuntimeError("chart dengan metrik SQL bebas dibuka sebagai lembar kerja")
+                except A.InputSalah as e:
+                    if "tidak dibuat di Studio" not in str(e):
+                        raise
+                if konversi.bisa_cepat(c.viz_type, p):
+                    raise RuntimeError("bisa_cepat menerima metrik SQL bebas")
+                # C4: chart jenis dasar dari Asisten AI dibangun dengan pembangun Studio (bisa dibuka di Studio)
+                h2 = auto.buat_satu(t.id, {"jenis": "pie", "judul": "uji__ai", "metrik": [f"SUM({angka})"], "kelompok": [teks],
+                                           "filter": [{"kolom": teks, "op": "==", "nilai": "x"}]})
+                dibuat.append(h2["id"])
+                p2 = _json.loads(db.session.query(Slice).get(h2["id"]).params)
+                if not p2.get("sps_studio") or p2["sps_studio"]["filter"][0]["op"] != "IN":
+                    raise RuntimeError("chart AI tidak lewat pembangun Studio")
+                return f"batang lama -> lembar kerja ({teks} × SUM({angka})); ubahan Mode lanjutan terdeteksi; SQL bebas tetap lanjutan; pie AI = chart Studio"
+            finally:
+                for i in dibuat:
+                    x = db.session.query(Slice).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                db.session.commit()
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t

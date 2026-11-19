@@ -649,7 +649,11 @@
   async function bukaChart(id) {
     const l = Studio.awal.lembar.find(x => x.id === Number(id));
     if (l && !l.studio) { location.href = alamatLanjutan(id); return; }
-    try { const s = await Studio.api(`/studio/api/lembar/${id}`); await gantiDataset(s.dataset_id, s); }
+    try {
+      const s = await Studio.api(`/studio/api/lembar/${id}`);
+      await gantiDataset(s.dataset_id, s);
+      if (s.catatan) Studio.notif(esc(s.catatan), !!s.basi);   // dikonversi / diubah di Mode lanjutan
+    }
     catch (e) {
       if (/tidak dibuat di Studio/.test(e.message)) location.href = alamatLanjutan(id);
       else Studio.notif(esc(e.message), true);

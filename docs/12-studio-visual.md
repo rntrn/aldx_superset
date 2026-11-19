@@ -23,7 +23,17 @@ Tautan langsung: `/studio/?dataset=<id>` membuka lembar kerja dengan dataset itu
 Mulai versi 2026.11.20 menu **Daftar chart** dihapus: semua chart dibuat, dicari, dan diedit di **Studio Visual**.
 
 - Panel kanan **Chart tersimpan** berisi **semua** chart yang boleh Anda buka (dengan kotak cari). Chart buatan Studio
-  dibuka sebagai lembar kerja; chart dari editor lanjutan / impor ditandai **lanjutan** dan dibuka di Mode lanjutan.
+  dibuka sebagai lembar kerja. Chart dari editor lanjutan / impor / Asisten AI versi lama **juga dibuka sebagai lembar
+  kerja** bila pengaturannya bisa diwakili rak Studio: jenis angka, tabel, tabel pivot, pie, batang, garis, area, treemap,
+  corong, awan kata; metrik `AGREGAT(kolom)`, metrik tersimpan, atau jumlah baris; dimensi kolom biasa; filter sederhana
+  (`IN`, `=`, `≥`, `≤`). Studio memberi tahu bahwa chart itu dikonversi: **Simpan** membangun ulang chart dengan
+  pengaturan Studio (format rinci dari Explore bisa berubah), **Simpan baru** membuat chart terpisah. Yang tidak terwakili
+  (metrik/kolom SQL bebas, tabel baris mentah, jenis khusus) ditandai **lanjutan** dan dibuka di Mode lanjutan.
+- **Diubah di Mode lanjutan?** Studio menyimpan sidik chart. Bila chart Studio diubah di Explore, saat dibuka lagi lembar
+  kerja dibangun ulang dari versi terbaru (ada pemberitahuan). Bila perubahannya tidak bisa ditampilkan Studio, versi
+  Studio terakhir yang tampil disertai peringatan merah: **Simpan** akan menimpa perubahan itu, pakai **Simpan baru**.
+- Chart buatan **Asisten AI** (semua jenis, termasuk angka, tabel, pie, batang, garis) dibangun dengan pembangun Studio,
+  jadi langsung bisa dibuka & diedit di Studio dan tampilannya sama dengan chart Studio.
 - Tombol **Mode lanjutan** (di bilah lembar kerja, setelah chart disimpan) membuka chart yang sama di editor Superset
   (Explore) untuk pengaturan rinci yang tidak ada di Studio.
 - Pengalihan otomatis: *Tambah chart* Superset (`/chart/add`), daftar chart (`/chart/list`), dan Explore yang dibuka dari
