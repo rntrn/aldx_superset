@@ -93,7 +93,8 @@ Nama model di penyedia bisa berganti; pilih versi *instruct* terbaru dari keluar
    LM Studio membongkar model aktif dan memutus permintaan yang sedang berjalan.
 
 > **Antrean:** ALDx mengirim **satu permintaan sekaligus** ke setiap server lokal (chat, ringkasan dashboard, uji model
-> bergiliran), karena server lokal di laptop praktis hanya melayani satu. Permintaan yang menunggu terlalu lama dijawab
+> bergiliran), karena server lokal di laptop praktis hanya melayani satu. **Chat didahulukan**: ringkasan AI otomatis di
+> dashboard tidak dijalankan bila server sedang dipakai atau ada chat menunggu (tekan *Perbarui* nanti). Permintaan yang menunggu terlalu lama dijawab
 > *masih sibuk melayani permintaan lain*. Model "berpikir" (mis. qwen3.5 di CPU) bisa butuh beberapa menit per jawaban;
 > untuk laptop tanpa GPU pilih model instruksi kecil tanpa mode berpikir.
 
@@ -182,7 +183,7 @@ gratisnya kurang.
 | *Penyedia tidak bisa dihubungi dari server* | tidak ada internet / proxy kantor / SSL inspection | taruh sertifikat CA kantor di `certs\`, isi `AI_CA_BUNDLE` di `.env` ([certs/README](../certs/README.md)); atau pakai jalur lokal |
 | Key yang diisi lewat aplikasi tidak terbaca setelah pindah server | `SUPERSET_SECRET_KEY` berbeda | isi ulang key di layar Sambungkan AI |
 | Jawaban lambat / ngawur | model terlalu kecil untuk pertanyaannya | pakai model lebih besar (§2.1) atau layanan cloud |
-| *"terlalu lama menjawab"* | model lokal di CPU melewati batas waktu satu langkah | naikkan `batas_detik_lokal` (bawaan 240 dtk) di `config\ai.yaml`; cloud memakai `batas_detik_model` (120 dtk) |
+| *"terlalu lama menjawab"* | model lokal di CPU melewati batas waktu satu langkah | naikkan `batas_detik_lokal` (bawaan 420 dtk) di `config\ai.yaml`; cloud memakai `batas_detik_model` (120 dtk) |
 | *"Server '…' sedang sibuk atau bermasalah (HTTP 503…)"* | penyedia (mis. Gemini gratis) kelebihan beban | ALDx sudah mencoba ulang 2×. Tambahkan model kedua (key gratis lain atau model lokal) agar ALDx otomatis beralih; atau coba lagi beberapa menit kemudian |
 | *"Batas … pertanyaan per jam untuk akun Anda tercapai"* | pembatas pemakaian ALDx (melindungi biaya) | tunggu jam berikutnya, atau Admin menaikkan `batas_pertanyaan_per_jam` di `config\ai.yaml` |
 | Kartu **Ringkasan AI**: *"butuh model yang boleh membaca angka"* | hanya model cloud `kirim_data: false` yang aktif | pasang model lokal, atau (dengan izin resmi) `kirim_data: true` pada model cloud; atau `ringkasan_dashboard: mati` |

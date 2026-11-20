@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.20.2 | AI lokal lebih tangguh untuk model kecil/lambat: kolom filter ditebak dari kalimat, jawaban langsung setelah rencana, chat didahulukan dari ringkasan otomatis, batas waktu lokal 420 dtk |
 | 2026.11.20 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Studio Visual satu-satunya tempat membangun chart, Susun dashboard tanpa kehilangan isi editor Superset, Explore tidak terpotong, AI lokal: token, model dimuat, antrean |
 | 2026.11.14.4 | perbaikan pemasang: port web otomatis tidak lagi memilih 8089 (bentrok dengan port diagnosa ALDx) |
 | 2026.11.14.3 | perbaikan pemasang: gagal *Membuat akun admin* bila nama Superadmin berisi spasi (atau password berkarakter khusus) |
@@ -33,6 +34,29 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.20.2 · AI lokal tangguh untuk model kecil
+
+Ditemukan saat menguji Asisten AI dengan model lokal Gemma-4-e4b di laptop tanpa GPU (±2–4 menit per langkah).
+
+### Diperbaiki
+
+| Masalah | Penyebab & perbaikan |
+|---|---|
+| *"…pengguna bisa memilih saluran penjualan untuk semua grafik"*: AI bertanya "kolom apa?" padahal kolomnya disebut | model kecil memanggil `rencanakan` tanpa mengisi kolom. Kini kolom **ditebak dari kalimat pengguna** (hanya kolom milik chart di dashboard itu, frasa terpanjang; kembar → tetap bertanya). Kartu rencana menyebut *kolom ditebak dari kalimat Anda* |
+| Setelah rencana dibuat, model butuh satu langkah lagi (menit di CPU) dan kadang menjawab dalam bahasa Inggris | setelah `rencanakan` menghasilkan pratinjau atau pertanyaan balik, **jawaban disusun ALDx langsung** (tanpa putaran model berikutnya) |
+| Chat tertahan beberapa menit di belakang **ringkasan AI otomatis** dashboard, lalu pindah ke model lain yang gagal dimuat | ringkasan otomatis kini **prioritas rendah**: tidak dijalankan bila server lokal sedang dipakai atau ada chat menunggu (*klik Perbarui nanti*). Saat server lokal sibuk/terlalu lama, model cadangan tidak lagi dipilih dari server yang sama (antreannya sama dan memaksa ganti model) |
+| *"terlalu lama menjawab"* untuk model lokal di CPU | `batas_detik_lokal` bawaan 240 → **420 dtk** per langkah |
+
+### Perlu dilakukan setelah memperbarui
+
+| Cara memasang | Langkah |
+|---|---|
+| ALDx-Setup.exe / Offline | jalankan installer versi baru di atas instalasi lama, lalu `Ctrl + F5` |
+| git | `git pull`, `docker compose restart superset superset-worker superset-beat`, `Ctrl + F5` |
+| `config\ai.yaml` sudah diubah sendiri | naikkan `batas_detik_lokal` ke 420 bila masih 240 |
 
 ---
 

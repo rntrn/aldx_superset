@@ -42,7 +42,7 @@ class Pengaturan:
     baris_maks: int
     baris_ke_model: int
     batas_detik_model: int
-    batas_detik_lokal: int = 240
+    batas_detik_lokal: int = 420
     batas_latar: int = 900          # detik total satu pertanyaan di latar belakang (tidak terikat timeout web)
     cadangan_otomatis: bool = True  # model sibuk/kuota habis -> lanjut dengan model aktif lain (sps_ai/agen.cadangan)
     batas_per_jam: int = 60         # pertanyaan per pengguna per jam (0 = tanpa batas); Admin tidak dibatasi
@@ -144,7 +144,7 @@ def muat(hanya_aktif: bool = True) -> Pengaturan:
         baris_maks=int(data.get("baris_maks", 500)),
         baris_ke_model=int(data.get("baris_ke_model", 50)),
         batas_detik_model=int(data.get("batas_detik_model", 120)),
-        batas_detik_lokal=int(data.get("batas_detik_lokal", 240)),
+        batas_detik_lokal=int(data.get("batas_detik_lokal", 420)),
         batas_latar=max(60, min(int(data.get("batas_latar_detik", 900)), 3600)),
         cadangan_otomatis=bool(data.get("cadangan_otomatis", True)),
         batas_per_jam=max(0, int(data.get("batas_pertanyaan_per_jam", 60))),

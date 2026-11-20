@@ -105,7 +105,7 @@ gratis, maupun berbayar; yang perlu Anda atur:
 | Pengaturan (`config\ai.yaml`) | Bawaan | Fungsi |
 |---|---|---|
 | `bawaan` | model pertama | model yang terpilih pertama kali |
-| `batas_detik_model` / `batas_detik_lokal` | 120 / 240 | waktu tunggu **satu langkah** model cloud / lokal |
+| `batas_detik_model` / `batas_detik_lokal` | 120 / 420 | waktu tunggu **satu langkah** model cloud / lokal |
 | `batas_latar_detik` | 900 | batas total **satu pertanyaan** (berjalan di latar, tidak terikat timeout web) |
 | `cadangan_otomatis` | `true` | model sibuk/kuota habis (429/5xx, mis. Gemini 503) → coba ulang 2×, lalu beralih ke model aktif lain |
 | `batas_pertanyaan_per_jam` | 60 | per pengguna (Admin bebas); melindungi biaya model berbayar |

@@ -167,7 +167,7 @@ langkah_maks: 6          # maksimal pemanggilan alat
 baris_maks: 500          # maksimal baris hasil query yang ditampilkan
 baris_ke_model: 50       # maksimal baris yang dikirim ke model (bila kirim_data: true)
 batas_detik_model: 120   # waktu tunggu jawaban model cloud (per langkah)
-batas_detik_lokal: 240   # waktu tunggu model LOKAL (CPU tanpa GPU bisa 1-3 menit per langkah)
+batas_detik_lokal: 420   # waktu tunggu model LOKAL per langkah (CPU tanpa GPU: instruksi panjang bisa 2-6 menit)
 batas_latar_detik: 900   # batas total SATU pertanyaan (semua langkah). Berjalan di latar: tidak terikat timeout web
 cadangan_otomatis: true  # model sibuk/kuota habis (429/5xx) -> coba ulang 2x, lalu lanjut dengan model aktif lain
 batas_pertanyaan_per_jam: 60  # per pengguna (Admin tidak dibatasi); 0 = tanpa batas. Melindungi biaya model berbayar
