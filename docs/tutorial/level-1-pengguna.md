@@ -113,11 +113,15 @@ akses Anda. Simpan file unduhan sesuai ketentuan kerahasiaan data perusahaan.
 1. Klik **✦** di bilah atas, atau tekan `Ctrl + I`. Panel muncul di kanan, di halaman mana pun.
    (Tombol ini muncul bila admin mengizinkan role Anda. Bila panel menampilkan **Sambungkan Asisten AI**,
    artinya AI belum disambungkan: minta admin mengikuti [28-sambungkan-asisten-ai.md](../28-sambungkan-asisten-ai.md).)
-2. Peran awal **Analis data**. Klik salah satu contoh, atau ketik pertanyaan sehari-hari, misalnya:
-   *"Berapa total penjualan tiap cabang tahun 2025?"*
+2. Panel dibuka dalam mode **Otomatis**: Anda cukup bertanya, ALDx memilih peran ahli yang tepat (analis, panduan,
+   data engineer, ...) dan menuliskannya di atas jawaban, mis. *Dijawab /analis · menyebut 'penjualan'*.
+   Klik salah satu contoh, atau ketik pertanyaan sehari-hari, misalnya: *"Berapa total penjualan tiap cabang tahun 2025?"*
 3. Asisten mencari dataset, menjalankan query **dengan hak akses Anda**, lalu menjawab beserta tabel.
    Tabel jawaban punya tombol **Ekspor** (Excel, CSV, gambar, ...).
-4. Bingung cara memakai menu? Ketik `/panduan` lalu pertanyaannya, mis. *"/panduan cara membuat dashboard"*.
+4. Bingung cara memakai menu? Tanyakan saja, mis. *"bagaimana cara membuat dashboard?"*: otomatis dijawab `/panduan`.
+   Ingin memaksa satu peran? Klik chip perannya atau ketik `/panduan`, `/analis`, ... di depan pertanyaan.
+5. Pemilik dashboard bisa meminta perubahan, mis. *"tambah filter cabang di dashboard ini"*: muncul kartu **Rencana
+   perubahan** → **Simpan perubahan** → bisa **Urungkan**. Belum ada yang berubah sebelum Anda menekan Simpan.
 
 Tips bertanya:
 - Asisten sudah tahu dataset, chart, dan dashboard yang boleh Anda buka, serta halaman yang sedang terbuka.

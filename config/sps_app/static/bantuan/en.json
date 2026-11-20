@@ -45,7 +45,7 @@
       ],
       [
         "g → c",
-        "Go to Charts"
+        "Go to Visual Studio (all charts)"
       ],
       [
         "g → d",
@@ -63,7 +63,7 @@
     "langkah": [
       "Pick a menu item on the left, or press Ctrl + K and type a page name.",
       "Press ? at any time to open the guide for the current page.",
-      "Click ✦ in the top bar (Ctrl + I) for the AI Assistant. Pick a role: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
+      "Click ✦ in the top bar (Ctrl + I) for the AI Assistant. Auto mode picks the expert role itself; type / to force a role: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
       "Hover over a table or chart on an ALDx page and click Export (top right): Image, PDF, Excel, CSV, Text, or Copy table."
     ]
   },
@@ -224,7 +224,9 @@
       "Pick a type under Show me; a gold frame = recommended. Extra fields are not used (dimmed, struck-through pills).",
       "Hierarchy: drag one dimension onto another and name it; click a bar to drill down.",
       "Add Color, Filters, Analytics (forecast, moving average, average, median, target) if needed, then Save. Analytics greyed out? Click the prepare button.",
-      "Build a dashboard tab: drag worksheets onto the canvas, add filters, polish with Text (fonts & colors), Image and Line objects, then Save."
+      "Build a dashboard tab: drag worksheets onto the canvas, add filters, polish with Text (fonts & colors), Image and Line objects, then Save.",
+      "Saved charts (right panel) lists every chart you may open, with a search box. Advanced mode opens the built-in editor for detailed settings; Delete chart removes your own chart.",
+      "Build dashboard › Open dashboard… lists every dashboard you may edit; parts made in other editors show as 🔒 locked boxes and are kept intact when you save."
     ],
     "pintasan": [
       [
@@ -242,17 +244,17 @@
     ]
   },
   "chart": {
-    "judul": "Charts",
-    "ringkas": "Every chart you are allowed to see. Click a name to open & edit it.",
+    "judul": "Charts (in Visual Studio)",
+    "ringkas": "The chart list now lives in Visual Studio › Saved charts: one place to create, find, and edit charts.",
     "langkah": [
-      "Filter by name, type, owner, or dataset.",
-      "Click the star to mark a favourite.",
-      "Click a chart name to open the editor (Explore)."
+      "Open Visual Studio (g → c).",
+      "Find the chart in the Saved charts panel and click it to edit.",
+      "Charts marked advanced open in Advanced mode (the built-in editor)."
     ]
   },
   "explore": {
-    "judul": "Editing a chart",
-    "ringkas": "The built-in chart editor: choose a type, metrics, dimensions, filters, then save.",
+    "judul": "Advanced mode (built-in editor)",
+    "ringkas": "Detailed chart settings. Everyday chart creation and editing happens in Visual Studio.",
     "langkah": [
       "Change the chart type at the top left.",
       "Set Metrics, Dimensions, Filters, then click Update chart.",
@@ -265,6 +267,7 @@
       ]
     ],
     "tips": [
+      "Charts built in Visual Studio open there automatically; the Advanced mode button in Visual Studio brings you here.",
       "The ⋯ menu at the top right: download CSV/Excel/image, copy a link, view the query."
     ]
   },
@@ -286,7 +289,8 @@
       "Hover over a chart and click ⋯ for full screen, view data, or download."
     ],
     "tips": [
-      "The ⋯ button at the top right of the dashboard: download PDF/image, share a link, schedule an email."
+      "The ⋯ button at the top right of the dashboard: download PDF/image, share a link, schedule an email.",
+      "Owners/Admins: the Add filter button in the dashboard header adds a filter for every chart that has the column (can be undone)."
     ]
   },
   "story": {
@@ -310,8 +314,10 @@
   },
   "asisten": {
     "judul": "AI Assistant",
-    "ringkas": "Ask about your data in plain language, or create charts & dashboards automatically.",
+    "ringkas": "Ask about your data, create charts & dashboards, or change existing ones, from the ✦ panel (Ctrl + I).",
     "langkah": [
+      "Auto mode: the expert role is chosen for every question and shown above the answer (Answered by /role · reason). Click a role chip to force one role.",
+      "Ask for a change, e.g. add a branch filter to this dashboard: check the Planned change card, press Save changes; you can Undo and Download .ald (before).",
       "Ask AI: type a question, e.g. What are sales by branch this year?",
       "Auto Chart: choose a dataset, click Analyse dataset, tick suggestions, then Create."
     ],

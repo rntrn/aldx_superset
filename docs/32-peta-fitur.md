@@ -20,13 +20,17 @@ Status: ✅ ada · 🆕 baru diadopsi (November 2026) · ⏳ kandidat berikutnya
 | Lapisan semantik: metrik didefinisikan sekali, dipakai semua | ✅/🆕 | definisi tersimpan di **dataset**: dipakai semua chart, Explore & pengguna |
 | Rumus gaya spreadsheet langsung di atas data gudang | 🆕 (sebagian) | dialog rumus: klik kolom, contoh rumus, **Uji rumus** |
 | Tanya data dengan bahasa sehari-hari | ✅ | Asisten AI ([23](23-asisten-ai-peran-ahli.md)) |
+| **Orchestrator**: satu kotak tanya, peran ahli dipilih otomatis per pertanyaan | 🆕 | panel AI › **Otomatis** ([23 §2](23-asisten-ai-peran-ahli.md#2-peran-ahli)) |
+| **Ubah aplikasi lewat percakapan** (filter, judul, jenis chart, isi dashboard, ukuran dataset, story, hapus) dengan pratinjau & urungkan | 🆕 | ALDx Rencana ([23 §2b](23-asisten-ai-peran-ahli.md#2b-mengubah-dashboard--chart-lewat-asisten-aldx-rencana)) |
+| **Satu editor chart** (buat & ubah chart di satu tempat) | 🆕 | Studio Visual; editor bawaan jadi *Mode lanjutan* ([12](12-studio-visual.md#satu-tempat-untuk-membangun--mengedit-chart)) |
+| Tambah filter langsung dari dashboard | 🆕 | tombol **Tambah filter** di kepala dashboard ([25 §2a](25-berkas-filter-global-ulasan.md#2a-tambah-filter-langsung-di-dashboard)) |
 | Sematkan dengan RLS per penonton | ✅ | [30](30-sematkan-dashboard.md) |
 | Langganan laporan, riwayat versi, tata letak ponsel | ✅ | [26](26-langganan-versi-ponsel-lihat-sebagai.md) |
 | Presentasi berurutan | ✅ | Story |
 | Parameter *what-if* (geser angka, chart ikut berubah) | 🆕 (sebagian) | Studio › **Simulasi** (pratinjau, tidak tersimpan) |
 | Jelaskan kenaikan/penurunan | 🆕 | Studio: klik kanan periode → **Jelaskan perubahan** |
 | Tooltip kaya | 🆕 | Studio: porsi & perubahan di tooltip |
-| Tab & ukuran kotak di dashboard | 🆕 | Studio › Susun dashboard (grid 12 kolom; posisi bebas piksel sengaja tidak) |
+| Tab & ukuran kotak di dashboard | 🆕 | Studio › Susun dashboard (grid 12 kolom; posisi bebas piksel sengaja tidak); membuka dashboard dari editor lain tanpa kehilangan isi |
 | Ekspor PowerPoint | 🆕 | tombol PowerPoint di dashboard |
 | SSO (OpenID Connect / Azure AD) | 🆕 | [05](05-login-ldap.md#masuk-dengan-sso-openid-connect) |
 | Pemantauan kinerja kueri | 🆕 | Kelola › **Kesehatan kueri** |

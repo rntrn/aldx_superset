@@ -63,14 +63,14 @@ dan menu mana yang tercakup di sesi mana. Isi tiap sesi ada di modul per level (
 | Daftar dashboard, filter, klik-filter, unduh | ● | | | |
 | Filter global, komentar & rating, ekspor tabel | ● | | | |
 | Telusuri, tampilan tersimpan, kesegaran data, PowerPoint | ● (modul tambahan) | | | |
-| Asisten AI (panel ✦) | ● tanya | | ● pindai tabel, gabung | ● model, cadangan, batas |
+| Asisten AI (panel ✦) | ● tanya (Otomatis) | ● ubah lewat Rencana | ● pindai tabel, gabung, ukuran dataset | ● model, cadangan, batas |
 | Ringkasan AI di dashboard | ● baca & cocokkan angka | | | ● mode otomatis/klik/mati |
 | Studio Visual, jenis chart, peta | | ● | | |
 | Ramalan, kalkulasi cepat, ambang, simulasi (skenario tersimpan), mini-chart tooltip, jelaskan perubahan | | ● | | |
 | Susun dashboard (template umum & per bidang, tab, tinggi) | | ● | | |
 | Kueri Visual, Kueri tersimpan | | ● | | |
 | Auto chart & dashboard | | ● | | |
-| Daftar chart, Jejak data | | ● | ● | |
+| Mencari chart (Studio), Jejak data | | ● | ● | |
 | Langganan laporan, Peringatan data | | ● | | ● (siapkan email) |
 | Berkas .ald / .aldx | | ● | | |
 | Hubungkan data, Dataset, SQL Lab | | | ● | |

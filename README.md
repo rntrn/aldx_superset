@@ -254,8 +254,8 @@ Sidebar ALDx disusun mengikuti alur kerja; angka 1–5 menunjukkan urutan membua
 |---|---|---|
 | **1 · Hubungkan** | Hubungkan data · Dataset | sambung database/data warehouse/Excel/CSV/Access; impor banyak tabel sekaligus |
 | **2 · Siapkan** | Persiapan data · Kueri Visual · Ekstrak | bersihkan, gabung tabel tanpa SQL, salin ke mesin cepat |
-| **3 · Visualkan** | Studio Visual | seret kolom → chart; peta; ramalan; kalkulasi cepat |
-| **4 · Susun** | Susun dashboard · Auto chart | dashboard dengan tab, filter, objek desain; atau dari template |
+| **3 · Visualkan** | Studio Visual | seret kolom → chart; peta; ramalan; kalkulasi cepat. **Satu-satunya tempat membuat & mengedit chart** |
+| **4 · Susun** | Susun dashboard · Auto chart | dashboard dengan tab, filter, objek desain; atau dari template; buka & sunting dashboard dari mana pun tanpa kehilangan isi |
 | **5 · Bagikan** | Story · Langganan · PowerPoint · Sematkan | presentasi, email terjadwal, slide, tampil di web lain |
 
 Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33-peta-menu-per-level.md)**.
@@ -284,7 +284,7 @@ Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33
 | Area | Isi |
 |---|---|
 | **Analitik** | % dari total · kumulatif · YoY · **ambang hijau/merah** · rata bergerak · target · simulasi what-if (bisa disimpan sebagai skenario) · mini-chart tren di tooltip · kelompokkan nilai · ukuran & dimensi buatan sendiri (rumus) · hierarki telusur bertingkat |
-| **Dashboard** | **ringkasan AI otomatis** · tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
+| **Dashboard** | **ringkasan AI otomatis** · **tambah filter langsung di dashboard** (berlaku di semua chart yang punya kolomnya, bisa diurungkan) · tab · tinggi kotak · objek desain (teks, gambar) · klik-filter antar-chart · telusuri antar-dashboard · label kesegaran data · riwayat versi · tata letak ponsel |
 | **Berbagi** | ekspor PNG/PDF/Excel/CSV · **PowerPoint** · berkas `.ald/.aldx` terenkripsi · Story · langganan laporan & peringatan data via email · sematkan ke web lain dengan RLS per penonton |
 | **Data** | 14+ jenis database + Access/Excel/CSV · jejak data (lineage) · persiapan data tanpa SQL · gabung otomatis · ekstrak ke ALDx Engine |
 | **Admin** | Pusat Kendali (pengaturan, batas, topologi) · kesehatan kueri · jejak audit · cadangan & pulihkan · multi-node · HTTPS |
@@ -295,6 +295,8 @@ Semua menu dan siapa yang memakainya: **[docs/33 · Peta menu per level](docs/33
 <img src="docs/gambar/app/a10-panel-ai.png" width="720" alt="Panel Asisten AI">
 
 Tekan **`Ctrl + I`** di halaman mana pun. Asisten paham isi aplikasi (dataset, chart, dashboard) dan halaman yang sedang dibuka.
+Mode **Otomatis** (bawaan): **Orchestrator** memilih peran ahli yang tepat untuk setiap pertanyaan (analis, panduan, data engineer,
+UI/UX, HW engineer) dan menuliskan *Dijawab /peran · alasan*; pilih chip peran atau ketik `/peran` untuk memaksa satu peran.
 
 | Anda minta | Asisten melakukan |
 |---|---|
@@ -303,6 +305,8 @@ Tekan **`Ctrl + I`** di halaman mana pun. Asisten paham isi aplikasi (dataset, c
 | *"scan tabel berawalan data_ di sps_engine"* | memindai tabel database, jumlah baris, status dataset |
 | *"gabungkan dataset A, B, C jadi dataset detail"* | menggabung otomatis; menolak gabungan yang membuat angka berlipat; RLS ikut |
 | *"ringkas dashboard ini dalam 5 poin"* | membaca dashboard yang terbuka lalu meringkas |
+| *"tambah filter cabang di dashboard Penjualan"* · *"ubah chart ini jadi batang"* · *"hapus chart X"* | **mengubah** yang sudah ada: kartu *Rencana perubahan* → **Simpan** → **Urungkan**; snapshot `.ald` sebelum perubahan bisa diunduh. Perintah umum dipahami **tanpa model AI** |
+| *"tambah ukuran margin = SUM(laba)/SUM(penjualan) di dataset X"* · *"buat story dari dashboard A, B"* | ukuran/dimensi/label dataset, story |
 | (tanpa bertanya) | **Ringkasan AI otomatis** di bilah atas setiap dashboard: 3–5 poin berangka + *Perlu perhatian*, sesuai hak akses Anda |
 
 **Bekerja dengan model apa pun**
@@ -313,7 +317,10 @@ Tekan **`Ctrl + I`** di halaman mana pun. Asisten paham isi aplikasi (dataset, c
 | **Gratis** | Gemini, Groq, OpenRouter, Cerebras, Mistral, GitHub Models | penyedia sibuk/kuota habis → coba ulang, lalu **beralih ke model cadangan** |
 | **Berbayar** | OpenAI, Azure, Anthropic, DeepSeek, dan API setara OpenAI | batas pertanyaan per pengguna per jam melindungi biaya |
 
-**Terintegrasi:** progres langkah tampil langsung dan bisa **dibatalkan**; hasil berupa tautan ke Studio Visual; tombol saran langkah berikutnya.
+**Terintegrasi:** progres langkah tampil langsung dan bisa **dibatalkan**; hasil berupa tautan ke Studio Visual; tombol saran langkah berikutnya
+(hanya yang bisa dikerjakan peran aktif).
+**Jujur & tangguh untuk model kecil:** jawaban yang mengaku sudah membuat sesuatu tanpa menjalankan alatnya diganti pesan jujur;
+kolom yang lupa diisi model ditebak dari kalimat Anda; permintaan ke model lokal diantre (chat didahulukan dari ringkasan otomatis).
 **Aman:** semua alat berjalan sebagai **pengguna yang bertanya** (RLS berlaku), isi data diperlakukan sebagai data (bukan perintah), API key disamarkan,
 maksimal 12 objek baru per pertanyaan, angka hanya dikirim ke model yang diizinkan (`kirim_data`).
 Panduan: [docs/28 · Sambungkan Asisten AI](docs/28-sambungkan-asisten-ai.md) · [docs/23 · Peran ahli, keamanan](docs/23-asisten-ai-peran-ahli.md).
@@ -357,6 +364,7 @@ Untuk penyelenggara pelatihan: **[Alur pelatihan](docs/bahan-ajar/alur-pelatihan
 | mengelola server | [docs/11 · Pusat Kendali](docs/11-pusat-kendali-server.md) · [docs/19 · Runbook](docs/19-runbook-faq-admin.md) |
 | ingin tahu yang baru | [docs/31 · Catatan versi](docs/31-catatan-versi.md) |
 | melihat peta fitur & peta jalan | [docs/32](docs/32-peta-fitur.md) |
+| memahami rancangan Asisten AI (Orchestrator, ALDx Rencana) & satu editor chart | [docs/23](docs/23-asisten-ai-peran-ahli.md) · [docs/34](docs/34-analisis-editor-dan-asisten-ai.md) |
 
 Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar isi, mode gelap, tanpa internet).
 
@@ -383,9 +391,9 @@ Dokumentasi juga ada **di dalam aplikasi** (menu *Panduan*: pencarian, daftar is
 | Menu | sidebar mengikuti alur BI: **Data › Kueri › Visual › Dashboard & Story › Asisten › Kelola**, angka 1–5 = urutan membuat laporan |
 | Cangkang aplikasi | `/app/`: Beranda (**Siapkan ALDx** untuk admin, cari, 5 langkah bangun laporan, lanjutkan), sidebar urut alur kerja, `Ctrl + K`, tombol `?` cara pakai, bahasa ID/EN/日本語, tampilan ponsel. Lihat [docs/22](docs/22-cangkang-aplikasi.md) |
 | Kueri Visual | `/kueri/`: klik dua kali tabel = kueri jadi, tabel kedua digabung otomatis, simpan jadi dataset |
-| Studio Visual | `/studio/`: seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **ambang** (format bersyarat hijau/merah pada angka & tabel), **dashboard dari template** (umum & per bidang: Penjualan, Keuangan, SDM, Operasional; dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya** (dengan mini-chart tren per kategori), **skenario what-if tersimpan**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
+| Studio Visual | `/studio/`: **satu-satunya editor chart** (panel *Chart tersimpan* memuat semua chart, chart editor lanjutan dibuka sebagai lembar kerja bila bisa, sisanya lewat **Mode lanjutan**/Explore; tombol **Hapus chart**), seret-lepas, 23 jenis chart, peta, **analitik** (ramalan Holt-Winters + pita keyakinan, tren, anomali, rata bergerak, garis rata-rata/median/target, tertinggi & terendah), **ukuran & dimensi terdefinisi** (rumus), **N teratas**, **kalkulasi cepat** (% dari total, kumulatif, YoY), **kelompokkan nilai**, **skala warna tabel**, **ambang** (format bersyarat hijau/merah pada angka & tabel), **dashboard dari template** (umum & per bidang: Penjualan, Keuangan, SDM, Operasional; dengan tab & tinggi kotak), **jelaskan perubahan**, **tooltip kaya** (dengan mini-chart tren per kategori), **skenario what-if tersimpan**, **ekspor PowerPoint**, **hierarki dimensi** (seret dimensi ke atas dimensi lain, lalu klik untuk menelusuri), "Tampilkan saya" yang tetap aktif dengan banyak kolom, **saran chart dari data** (hampir semua jenis), susun dashboard dengan **objek desain** (teks dengan 10 huruf lokal, gambar, garis) yang membuka **semua dashboard** dan menyimpan tanpa menghapus isi buatan editor Superset (kotak 🔒 terkunci), persiapan data. Lihat [docs/12](docs/12-studio-visual.md) |
 | Pusat Kendali | `/pusat-kendali/`: proses, cache, batas, identitas, hubungkan data, ekstrak (termasuk **impor banyak tabel sekaligus dengan cek kapasitas**), hak akses, multi-node |
-| Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
+| Asisten AI | **panel di setiap halaman** (`Ctrl + I`) dengan mode **Otomatis** (Orchestrator memilih peran) dan peran ahli `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; **ALDx Rencana**: mengubah/menghapus filter, judul, jenis chart, isi dashboard, ukuran/dimensi dataset, story lewat pratinjau → Simpan → Urungkan (snapshot `.ald`); usulan perubahan baru berlaku setelah ditekan **Terapkan**. AI **paham isi aplikasi & halaman yang dibuka** (dataset, chart, dashboard beserta angkanya). **Sambungkan AI** di panel: model lokal (Ollama, LM Studio, Jan, llama.cpp) terdeteksi otomatis, key cloud gratis/berbayar diisi Admin tanpa restart ([docs/28](docs/28-sambungkan-asisten-ai.md)). Halaman `/asisten/`: auto chart/dashboard, story. Lihat [docs/23](docs/23-asisten-ai-peran-ahli.md) |
 | Ekspor | tombol **Ekspor** di setiap tabel & grafik halaman ALDx: gambar PNG, PDF, Excel, CSV, TXT, salin |
 | Keamanan & audit | akun terkunci otomatis setelah salah password berulang; **jejak audit** (login, unduh data, ekspor/impor, hak akses) di Pusat Kendali › Riwayat + CSV; role bawaan berhak minimum; peringatan akun non-Admin yang melihat semua data |
 | Superadmin & batas data | role **Superadmin** di atas Admin untuk pengaturan vital; **Batas data** (ukuran/baris upload, impor, ekstrak, kuota engine) dengan rekomendasi otomatis atau tanpa batas. Lihat [docs/24](docs/24-superadmin-dan-batas-data.md) |
@@ -454,7 +462,7 @@ D:\superset
 │   ├── sps_latihan_sumber.py # Database SUMBER contoh (PostgreSQL hanya-baca) + role RLS contoh untuk latihan
 │   ├── sps_latihan_wilayah.py # DATA LATIHAN harian ±2,3 juta baris + hierarki Wilayah/Kalender/Produk (dimuat installer)
 │   ├── sps_uji.py          # UJI OTOMATIS (scripts\uji.ps1)
-│   ├── ai.yaml + sps_ai/   # Asisten AI
+│   ├── ai.yaml + sps_ai/   # Asisten AI (orkestrator.py: pilih peran; niat.py + rencana*.py: ubah lewat pratinjau/urungkan)
 │   ├── sps_server/         # Pusat Kendali Server: pengaturan, auto-tuning, monitor, multi-node, HTTPS (tls.py)
 │   ├── sps_engine/         # ALDx Engine: ekstrak, upload, tugas terjadwal
 │   ├── sps_studio/         # Studio Visual: lembar kerja, 23 chart, peta, ramalan, hierarki, dashboard + objek desain, persiapan data

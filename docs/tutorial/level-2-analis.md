@@ -104,7 +104,9 @@ Galeri seluruh 23 jenis: [17-katalog-chart-peta-prediksi.md](../17-katalog-chart
 
 1. **(1)** Ketik judul yang jelas, mis. *Penjualan per Cabang 2025*.
 2. **(2) Simpan** memperbarui chart yang sedang dibuka, **(3) Simpan baru** membuat salinan.
-3. Chart tersimpan muncul di **Lembar kerja tersimpan** (panel kanan) dan di menu **Charts** Superset.
+3. Chart tersimpan muncul di **Chart tersimpan** (panel kanan; berisi semua chart yang boleh Anda buka, dengan kotak cari).
+4. **Mode lanjutan** membuka chart yang sama di editor bawaan (Explore) untuk pengaturan rinci; **Hapus chart** menghapusnya.
+   Studio Visual adalah satu-satunya tempat membuat & mengedit chart: menu Daftar chart tidak ada lagi.
 
 ---
 
@@ -284,8 +286,10 @@ Detail: [docs/26](../26-langganan-versi-ponsel-lihat-sebagai.md).
 2. **Analisis dataset** → daftar saran dengan skor dan alasan (4 teratas sudah tercentang; judul bisa diubah).
 3. **Buat chart terpilih**, atau isi *Judul dashboard* lalu **Buat dashboard dari pilihan**. Buka hasilnya di Studio Visual.
 
-**Lewat Asisten AI** (`Ctrl + I`, peran `/analis`): *"buat dashboard dari dataset latihan_penjualan"* atau *"gabungkan dataset A dan
-B"*. Progres langkah tampil langsung, tombol **Batalkan** tersedia, dan tautan hasilnya muncul di bawah jawaban.
+**Lewat Asisten AI** (`Ctrl + I`, mode Otomatis atau peran `/analis`): *"buat dashboard dari dataset latihan_penjualan"* atau
+*"gabungkan dataset A dan B"*. Progres langkah tampil langsung, tombol **Batalkan** tersedia, dan tautan hasilnya muncul di bawah jawaban.
+Mengubah yang sudah ada juga bisa: *"ubah chart ini jadi batang"*, *"keluarkan chart X dari dashboard Y"*, *"tambah ukuran margin =
+SUM(laba) / SUM(penjualan) di dataset Z"* → kartu **Rencana perubahan** → **Simpan** → **Urungkan** bila perlu.
 Detail: [docs/23](../23-asisten-ai-peran-ahli.md).
 
 ## 12d. Langganan laporan & Peringatan data

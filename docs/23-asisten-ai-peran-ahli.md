@@ -64,6 +64,26 @@ pakai **Tanya lanjut**. Kode: `config/sps_ai/ringkasan.py`, `config/sps_app/stat
 
 ## 2. Peran ahli
 
+### Otomatis (Orchestrator)
+
+Panel AI dibuka dalam mode **Otomatis**: setiap pertanyaan diarahkan ke peran yang paling tepat oleh Orchestrator
+(`sps_ai/orkestrator.py`), tanpa memanggil model AI sehingga tidak menambah waktu tunggu. Di atas jawaban tampil
+**Dijawab /peran · alasan**, misalnya *Dijawab /data-engineer · menyebut 'query', 'join'*.
+
+| Petunjuk di pertanyaan | Peran |
+|---|---|
+| perintah ubah (*tambah filter…*, *ganti judul…*, *hapus chart…*) | /analis (ukuran/dimensi/label kolom dataset → /data-engineer) |
+| *bagaimana cara…*, *di mana menu…*, *apa bedanya…*, pintasan | /panduan, walau menyebut chart/dashboard |
+| chart, grafik, dashboard, berapa, total, tren, bandingkan, analisis | /analis |
+| dataset, tabel, kolom, join, SQL, koneksi, ekstrak, duplikat, kualitas data | /data-engineer |
+| warna, tema, huruf, kontras, logo, tampilan, aksesibilitas | /ahli-ui-ux |
+| CPU, RAM, memori, server, worker, cache, timeout, lambat | /hw-engineer |
+| *ya*, *lanjut*, *ok*, jawaban 1–2 kata | peran jawaban sebelumnya |
+
+Halaman yang sedang dibuka ikut jadi petunjuk ringan (mis. Pusat Kendali › Identitas → /ahli-ui-ux). Hanya peran yang boleh
+dipakai akun Anda yang bisa terpilih; bila bidang yang cocok tidak tersedia, alasannya menyebut hal itu. Pilih chip peran
+atau ketik `/analis` (dst.) untuk memaksa peran tertentu sampai percakapan baru; `/otomatis` untuk kembali.
+
 Pilih dengan **chip** di atas obrolan, atau ketik **`/`** lalu nama peran (panah ↑ ↓, `Enter`).
 
 ![Pilih peran dengan /](gambar/app/a11-perintah-peran.png)

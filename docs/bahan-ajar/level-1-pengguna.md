@@ -32,7 +32,7 @@ Setelah sesi, peserta mampu:
 | 45–60 | Filter & klik-filter | peserta praktik | ![](../gambar/tutorial/l1-03c-filter-dibuka.png) |
 | 60–70 | Menu chart: unduh, layar penuh, lihat tabel | peserta praktik | ![](../gambar/tutorial/l1-04-menu-chart.png) |
 | 70–75 | Hak akses data: "angka saya beda dengan teman" | diskusi | – |
-| 75–80 | Panel Asisten AI (`Ctrl + I`), `/panduan`, tombol Ekspor | demo | ![](../gambar/app/a10-panel-ai.png) |
+| 75–80 | Panel Asisten AI (`Ctrl + I`) mode Otomatis (peran dipilih sendiri), `/panduan`, tombol Ekspor | demo | ![](../gambar/app/a10-panel-ai.png) |
 | 80–90 | Latihan & kuis | individu | – |
 
 ## Poin penyampaian

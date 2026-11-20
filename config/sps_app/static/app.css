@@ -439,6 +439,8 @@ body.ai-buka .panel-ai { transform: none; visibility: visible; transition: trans
 .kontras { font-size: 12px; padding: 4px 8px; border-radius: 8px; }
 .kontras.lulus { background: #ECFDF3; color: var(--sukses); } .kontras.sedang { background: #FFFAEB; color: #B54708; } .kontras.gagal { background: #FEF3F2; color: var(--bahaya); }
 .lencana-ai { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #FFFAEB; color: #B54708; white-space: nowrap; }
+.peran-otomatis { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--teks-3); margin-bottom: 4px; }
+.peran-otomatis b { color: var(--teks-2); font-weight: 600; }
 .aksi-usulan { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .pesan-ai.rencana-ai ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 .pesan-ai.rencana-ai code { font-size: 12px; background: var(--aksen-muda); border-radius: 4px; padding: 0 4px; }

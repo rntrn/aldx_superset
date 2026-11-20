@@ -13,7 +13,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | Belajar membaca dashboard | [tutorial/level-1-pengguna.md](tutorial/level-1-pengguna.md) |
 | Membuat chart & dashboard sendiri | [tutorial/level-2-analis.md](tutorial/level-2-analis.md) |
 | Melihat semua jenis chart, peta, ramalan | [17-katalog-chart-peta-prediksi.md](17-katalog-chart-peta-prediksi.md) |
-| **Asisten AI di setiap halaman** (`Ctrl + I`, peran `/analis`, `/panduan`, ...) | [23-asisten-ai-peran-ahli.md](23-asisten-ai-peran-ahli.md) |
+| **Asisten AI di setiap halaman** (`Ctrl + I`, mode Otomatis/Orchestrator, peran `/analis`, `/panduan`, ...; mengubah dashboard & chart lewat pratinjau/Urungkan) | [23-asisten-ai-peran-ahli.md](23-asisten-ai-peran-ahli.md) |
 | **Menyambungkan Asisten AI** (lokal Ollama/LM Studio, cloud gratis & berbayar) | [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md) |
 | **Ekspor** tabel/grafik ke gambar, PDF, Excel, CSV, TXT | [22-cangkang-aplikasi.md § 7](22-cangkang-aplikasi.md) |
 | Halaman Asisten AI (Auto Chart, Story) | [10-asisten-ai.md](10-asisten-ai.md) |
@@ -45,6 +45,7 @@ Semua dokumen juga tersedia sebagai **PDF** di folder [`pdf/`](pdf/).
 | **Beda versi antar komputer** (Setup.exe vs offline vs git), **hapus total** ALDx | [29-versi-pembaruan-hapus-total.md](29-versi-pembaruan-hapus-total.md) |
 | **Apa yang baru** & langkah setelah memperbarui | [31-catatan-versi.md](31-catatan-versi.md) |
 | Peta fitur & peta jalan | [32-peta-fitur.md](32-peta-fitur.md) |
+| Analisis & rancangan: satu editor chart, ALDx Rencana, Orchestrator (untuk pengembang) | [34-analisis-editor-dan-asisten-ai.md](34-analisis-editor-dan-asisten-ai.md) |
 | **Menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) | [28-sambungkan-asisten-ai.md](28-sambungkan-asisten-ai.md) |
 | Rincian model AI lokal (RAM, jaringan kantor, masalah) | [20-model-ai-lokal.md](20-model-ai-lokal.md) |
 | Pusat Kendali, auto-tuning, multi-node | [11-pusat-kendali-server.md](11-pusat-kendali-server.md) |

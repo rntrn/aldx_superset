@@ -32,7 +32,7 @@
 | 35–50 | Warna bertumpuk, label, urutkan, tukar | ![](../gambar/tutorial/l2-03-warna.png) |
 | 50–65 | Filter & agregasi | ![](../gambar/tutorial/l2-04-filter.png) |
 | 65–85 | Tampilkan saya: 23 jenis, kapan pakai apa ([tabel pilihan](../tutorial/level-2-analis.md#7-memilih-jenis-grafik-lain)) | galeri katalog |
-| 85–100 | Menyimpan chart, membuka lagi, membuka di Explore | ![](../gambar/tutorial/l2-06-simpan.png) |
+| 85–100 | Menyimpan chart, mencari & membuka lagi di *Chart tersimpan*, Mode lanjutan, Hapus chart | ![](../gambar/tutorial/l2-06-simpan.png) |
 | 100–120 | Latihan 1–2 | – |
 
 **Sesi 2 (120 menit): peta, ramalan, dashboard**
@@ -126,7 +126,7 @@
 | 20–30 | jelaskan perubahan, tooltip kaya, analitik per Warna | [§10c](../tutorial/level-2-analis.md) |
 | 30–40 | ambang (target berwarna); dashboard dari template (umum & per bidang), tab, tinggi kotak | [§10c, §11a](../tutorial/level-2-analis.md) |
 | 40–50 | Auto chart & dashboard; Asisten AI membuat dashboard | [§12c](../tutorial/level-2-analis.md) |
-| 50–60 | Langganan laporan & Peringatan data; Daftar chart & Jejak data | [§12d–e](../tutorial/level-2-analis.md) |
+| 50–60 | Langganan laporan & Peringatan data; mencari chart (Studio) & Jejak data | [§12d–e](../tutorial/level-2-analis.md) |
 
 ### Latihan tambahan
 
