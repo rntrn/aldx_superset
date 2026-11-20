@@ -28,7 +28,11 @@
     if (siap) return siap;
     siap = fetch("/asisten/api/peran", {credentials: "same-origin"}).then(r => (r.ok ? r.json() : null)).then(j => {
       if (!j) return false;
-      daftarPeran = j.peran; model = j.model;
+      // Otomatis (bawaan): Orchestrator di server memilih peran untuk setiap pertanyaan (sps_ai/orkestrator.py).
+      const contohOtomatis = j.peran.map(p => (p.contoh || [])[0]).filter(Boolean).slice(0, 4);
+      daftarPeran = [{id: "otomatis", perintah: "/otomatis", nama: "Otomatis", ikon: "ai", contoh: contohOtomatis,
+                      ringkas: "Orchestrator memilih peran ahli yang paling tepat untuk setiap pertanyaan"}, ...j.peran];
+      model = j.model;
       $("#modelAi").innerHTML = model.map(m => `<option value="${esc(m.id)}" ${m.id === j.bawaan ? "selected" : ""}>${esc(m.nama)}</option>`).join("");
       $("#modelAi").hidden = model.length < 2;
       infoModel();
@@ -44,6 +48,7 @@
   const peran = id => daftarPeran.find(p => p.id === id);
 
   function peranUntukHalaman() {
+    if (peran("otomatis")) return "otomatis";      // halaman yang dibuka ikut dipertimbangkan Orchestrator
     const h = SPS.halaman ? SPS.halaman().alamat : "";
     for (const [pola, calon] of PERAN_HALAMAN) {
       if (pola.test(h)) { const p = calon.find(peran); if (p) return p; }
@@ -464,10 +469,18 @@
       <div class="langkah-ai langsung"></div><button type="button" class="batal-ai" hidden>${esc(t("Batalkan"))}</button>`);
     sibuk = true; $("#kirimAi").disabled = true;
     try {
-      const isi = JSON.stringify({riwayat, model: $("#modelAi").value, peran: peranAktif, konteks: konteksHalaman()});
+      const isi = JSON.stringify({riwayat, model: $("#modelAi").value, peran: peranAktif, konteks: konteksHalaman(),
+                                  peran_terakhir: riwayat.peranDipakai || ""});
       const j = await tanyaLatar(isi, tunggu) || await tanyaLangsung(isi);
       tunggu.remove();
       const wadah = gelembung("ai", "");
+      riwayat.peranDipakai = j.peran || riwayat.peranDipakai;
+      if (j.otomatis) {                                         // Orchestrator: agent mana yang menjawab & kenapa
+        const dipakai = peran(j.peran);
+        wadah.insertAdjacentHTML("beforeend", `<div class="peran-otomatis" title="${esc(t("Pilih chip peran atau ketik / untuk memaksa peran tertentu"))}">` +
+          `${ik(dipakai?.ikon || "ai", 13)}<span>${esc(t("Dijawab"))} <b>${esc(dipakai?.perintah || "/" + j.peran)}</b>` +
+          `${j.peran_alasan ? ` · ${esc(t(j.peran_alasan))}` : ""}</span></div>`);
+      }
       (j.peristiwa || []).filter(x => x.tipe === "langkah").forEach(x => tampilPeristiwa(x, wadah));
       wadah.insertAdjacentHTML("beforeend", `<div class="teks-ai">${md(j.jawaban)}</div>`);
       (j.peristiwa || []).filter(x => x.tipe !== "langkah").forEach(x => tampilPeristiwa(x, wadah));

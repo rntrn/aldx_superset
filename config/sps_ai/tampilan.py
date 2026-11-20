@@ -152,6 +152,27 @@ PESAN_KUOTA = ("Batas {n} pertanyaan per jam untuk akun Anda tercapai (melindung
                "Coba lagi nanti, atau minta Admin menaikkan batas_pertanyaan_per_jam.")
 
 
+def _peran_untuk(d: dict, konteks: dict | None) -> tuple:
+    """(Peran, alasan | None). Mode Otomatis (peran kosong / "otomatis") -> Orchestrator memilih dari pertanyaan
+    terakhir (sps_ai/orkestrator.py); peran yang dipilih pengguna (chip atau /peran) selalu dihormati."""
+    pid = str(d.get("peran") or "otomatis").lstrip("/")
+    if pid != "otomatis":
+        return peran.ambil(pid), None
+    from sps_ai import orkestrator
+    riwayat = d.get("riwayat") or []
+    tanya = next((m.get("content") for m in reversed(riwayat)
+                  if isinstance(m, dict) and m.get("role") == "user" and isinstance(m.get("content"), str)), "")
+    terakhir = str(d.get("peran_terakhir") or "").lstrip("/") or None
+    pid, alasan = orkestrator.pilih(tanya, [x.id for x in peran.tersedia()], konteks, terakhir)
+    return peran.ambil(pid), alasan
+
+
+def _tandai(h: dict, alasan: str | None) -> dict:
+    if alasan is not None:
+        h.update(otomatis=True, peran_alasan=alasan)
+    return h
+
+
 @bp.route("/api/chat", methods=["POST"])
 @_butuh_akses()
 def api_chat():
@@ -166,8 +187,9 @@ def api_chat():
     konteks = d.get("konteks") if isinstance(d.get("konteks"), dict) else None
     if konteks:
         konteks = {k: str(konteks.get(k) or "")[:lim] for k, lim in (("alamat", 400), ("judul", 120), ("teks", 4000))}
-    return jsonify(agen.jawab(d.get("riwayat") or [], model, atur, g.user.username,
-                              peran.ambil(d.get("peran")), konteks, bahasa_aktif()))
+    p, alasan = _peran_untuk(d, konteks)
+    return jsonify(_tandai(agen.jawab(d.get("riwayat") or [], model, atur, g.user.username, p, konteks, bahasa_aktif()),
+                           alasan))
 
 
 @bp.route("/api/chat/mulai", methods=["POST"])
@@ -188,11 +210,14 @@ def api_chat_mulai():
     konteks = d.get("konteks") if isinstance(d.get("konteks"), dict) else None
     if konteks:
         konteks = {k: str(konteks.get(k) or "")[:lim] for k, lim in (("alamat", 400), ("judul", 120), ("teks", 4000))}
-    riwayat, p, bahasa, username = d.get("riwayat") or [], peran.ambil(d.get("peran")), bahasa_aktif(), g.user.username
+    (p, alasan), riwayat = _peran_untuk(d, konteks), d.get("riwayat") or []
+    bahasa, username = bahasa_aktif(), g.user.username
 
     def kerja(kemajuan, dibatalkan):
-        return agen.jawab(riwayat, model, atur, username, p, konteks, bahasa,
-                          kemajuan=kemajuan, dibatalkan=dibatalkan, batas=atur.batas_latar)
+        if alasan is not None:              # langsung tampil di progres: agent mana yang bekerja
+            kemajuan({"tipe": "langkah", "teks": f"Orchestrator: {p.perintah} ({alasan})"})
+        return _tandai(agen.jawab(riwayat, model, atur, username, p, konteks, bahasa,
+                                  kemajuan=kemajuan, dibatalkan=dibatalkan, batas=atur.batas_latar), alasan)
     try:
         return jsonify(id=latar.mulai(current_app._get_current_object(), g.user.id, username, kerja))
     except ValueError as e:

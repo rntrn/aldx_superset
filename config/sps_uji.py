@@ -1599,6 +1599,36 @@ def jalankan_semua() -> None:
             raise RuntimeError(f"klaim palsu tidak diganti: {h['jawaban'][:100]}")
         return "saran 'Buat chart' hanya di peran yang bisa; klaim tanpa alat diganti pesan jujur + arahan /analis"
 
+    @uji("Asisten AI", "Orchestrator: setiap pertanyaan diarahkan ke peran (agent) yang tepat")
+    def _():
+        from flask import current_app, g
+        from sps_ai import orkestrator as O, tampilan as T
+        semua = ["analis", "panduan", "data-engineer", "ahli-ui-ux", "hw-engineer"]
+        kasus = [("Buatkan grafik batang penjualan per cabang", None, "analis"),
+                 ("bagaimana cara membuat dashboard dari nol?", None, "panduan"),
+                 ("di mana menu ekspor PowerPoint?", None, "panduan"),
+                 ("kenapa query join ke tabel cabang lambat?", None, "data-engineer"),
+                 ("cek kualitas data dataset latihan_penjualan, ada duplikat?", None, "data-engineer"),
+                 ("tambah filter kategori di dashboard tes1", None, "analis"),
+                 ("tambah ukuran margin = SUM(total) / SUM(jumlah_transaksi) di dataset latihan_penjualan", None, "data-engineer"),
+                 ("warna tema terlalu pucat, kontrasnya kurang", None, "ahli-ui-ux"),
+                 ("RAM server penuh terus, worker sering restart", None, "hw-engineer"),
+                 ("yes", "data-engineer", "data-engineer"),                     # lanjutan percakapan
+                 ("Buat chart dari data tadi", "data-engineer", "analis")]       # kejadian nyata: pindah ke agent yang bisa
+        salah = [f"{t!r} -> {O.pilih(t, semua, None, a)[0]} (harap {h})" for t, a, h in kasus if O.pilih(t, semua, None, a)[0] != h]
+        if salah:
+            raise RuntimeError("; ".join(salah[:3]))
+        pid, alasan = O.pilih("RAM server penuh terus", ["analis", "panduan"])
+        if pid not in ("analis", "panduan") or "tidak tersedia" not in alasan:
+            raise RuntimeError(f"peran terlarang tidak dijelaskan: {pid}, {alasan}")
+        with override_user(admin), current_app.test_request_context():
+            g.user = admin
+            p1, a1 = T._peran_untuk({"riwayat": [{"role": "user", "content": "di mana menu Story?"}]}, None)
+            p2, a2 = T._peran_untuk({"peran": "data-engineer", "riwayat": [{"role": "user", "content": "buat chart"}]}, None)
+        if (p1.id, a1 is None, p2.id, a2) != ("panduan", False, "data-engineer", None):
+            raise RuntimeError(f"API: otomatis -> {p1.id} ({a1}); manual -> {p2.id} ({a2})")
+        return f"{len(kasus)} pertanyaan tepat agent; lanjutan percakapan; peran terlarang dijelaskan; pilihan manual dihormati"
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t
