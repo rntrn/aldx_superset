@@ -1565,6 +1565,40 @@ def jalankan_semua() -> None:
             raise RuntimeError("cadangan saat sibuk memilih model di server yang sama")
         return "kolom ditebak (saluran, nm_cabang); 1 panggilan model lalu jawaban ALDx; ringkasan tidak menunggu; cadangan beda server"
 
+    @uji("Asisten AI", "Jujur: tidak mengaku membuat tanpa alat, saran sesuai peran, batas peran & bahasa di instruksi")
+    def _():
+        from sps_ai import agen, peran as P
+        from sps_ai.pengaturan import ModelAI, Pengaturan
+        de, an = P.PETA_PERAN["data-engineer"], P.PETA_PERAN["analis"]
+        ev = [{"tipe": "tabel"}]
+        if "Buat chart dari data tadi" in agen.lanjutan(["ambil_data"], ev, "ok", de.alat) or \
+                "Buat chart dari data tadi" not in agen.lanjutan(["ambil_data"], ev, "ok", an.alat):
+            raise RuntimeError("saran 'Buat chart' tidak mengikuti alat peran")
+        if not agen.mengaku_tanpa_alat("A Line Chart ... has been created.", [], "yes") or \
+                agen.mengaku_tanpa_alat("Chart sudah dibuat.", ["buat_chart"], "buat chart") or \
+                agen.mengaku_tanpa_alat("Dashboard ini sudah dibuat sejak 2024.", [], "kapan dashboard ini dibuat?"):
+            raise RuntimeError("deteksi klaim tanpa alat salah")
+        s = agen._sistem(de, None, "id", None, False)
+        if "TIDAK bisa membuat chart" not in s or not s.rstrip().endswith("apa pun bahasa hasil alat."):
+            raise RuntimeError("batas peran / bahasa tidak ada di akhir instruksi")
+        # Kejadian nyata: /data-engineer, pengguna menjawab "yes", model kecil mengaku sudah membuat chart tanpa alat
+        asli = agen.llm.chat
+        agen.llm.chat = lambda *a, **k: {"content": "A Line Chart visualizing Total Sales has been created.", "tool_calls": []}
+        m = ModelAI("uji-lokal", "uji lokal", "http://uji-lokal:1/v1", "m", "", True)
+        try:
+            with override_user(admin):
+                from flask import g
+                g.user = admin
+                h = agen.jawab([{"role": "user", "content": "Buat chart dari data tadi"},
+                                {"role": "assistant", "content": "Would you like me to create this chart?"},
+                                {"role": "user", "content": "yes"}], m, Pengaturan([m], "uji-lokal", [], 6, 500, 50, 120),
+                               admin.username, de)
+        finally:
+            agen.llm.chat = asli
+        if "Belum ada yang dibuat" not in h["jawaban"] or "/analis" not in h["jawaban"]:
+            raise RuntimeError(f"klaim palsu tidak diganti: {h['jawaban'][:100]}")
+        return "saran 'Buat chart' hanya di peran yang bisa; klaim tanpa alat diganti pesan jujur + arahan /analis"
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t
