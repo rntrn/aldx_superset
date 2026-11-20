@@ -267,21 +267,29 @@ _AWALAN_NAMA = re.compile(r"^(?:nm|nama)\s+")
 
 def kolom_dari_teks(dash, teks: Any) -> str:
     """Tebak kolom filter dari KALIMAT PENGGUNA bila model AI tidak mengisinya ('pengguna bisa memilih saluran
-    penjualan' -> saluran). Hanya kolom milik chart di dashboard itu; frasa terpanjang menang; kembar -> '' (tanya)."""
+    penjualan' -> saluran). Hanya kolom milik chart di dashboard itu. Urutan pilihan:
+      1. kolom teks/tanggal dulu (kolom angka seperti 'penjualan' jarang jadi filter pilihan);
+      2. yang disebut LEBIH DULU (bahasa Indonesia: kata inti di depan, 'saluran penjualan' = saluran);
+      3. frasa lebih panjang. Masih kembar -> '' (ditanyakan ke pengguna)."""
     t = f" {norm(teks)} "
     judul = norm(dash.dashboard_title)
     if judul:
         t = t.replace(f" {judul} ", " ").replace(f" {judul.replace(' ', '')} ", " ")
-    terbaik: dict[int, set] = {}
+    temuan: dict[str, tuple] = {}                     # kolom -> kunci urut (makin kecil makin baik)
     for h in kolom_dashboard(dash).values():
         frasa = {norm(h["kolom"]), norm(h["label"]), _AWALAN_NAMA.sub("", norm(h["kolom"]))} - {""}
         for f in frasa:
-            if len(f) >= 3 and f" {f} " in t:
-                terbaik.setdefault(len(f), set()).add(h["kolom"])
-    if not terbaik:
+            pos = t.find(f" {f} ")
+            if len(f) >= 3 and pos >= 0:
+                kunci = (0 if (h["teks"] or h["dttm"]) else 1, pos, -len(f))
+                if h["kolom"] not in temuan or kunci < temuan[h["kolom"]]:
+                    temuan[h["kolom"]] = kunci
+    if not temuan:
         return ""
-    calon = terbaik[max(terbaik)]
-    return next(iter(calon)) if len(calon) == 1 else ""
+    urut = sorted(temuan.items(), key=lambda x: x[1])
+    if len(urut) > 1 and urut[0][1] == urut[1][1]:
+        return ""
+    return urut[0][0]
 
 
 def jenis_chart(teks: Any) -> str:

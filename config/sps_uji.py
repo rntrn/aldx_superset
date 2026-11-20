@@ -1510,7 +1510,9 @@ def jalankan_semua() -> None:
             raise RuntimeError("dashboard latihan belum ada")
         # 1. Tebak kolom dari kalimat
         cek = {"saya ingin pengguna bisa memilih saluran penjualan untuk semua grafik": "saluran",
-               "biar bisa dipilih per cabang": "nm_cabang", "untuk semua grafik": ""}
+               "biar bisa dipilih per cabang": "nm_cabang", "untuk semua grafik": "",
+               "pilih total per saluran": "saluran",              # kolom teks didahulukan dari kolom angka
+               "bisa memilih kategori dan saluran": "kategori"}   # yang disebut lebih dulu
         with override_user(admin):                      # hak akses chart dibaca sebagai pengguna
             from flask import g
             g.user = admin
