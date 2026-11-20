@@ -18,6 +18,7 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 
 | Versi | Isi utama |
 |---|---|
+| 2026.11.20.3 | Asisten AI tidak lagi mengaku sudah membuat chart tanpa benar-benar membuatnya; saran & instruksi mengikuti kemampuan peran; bahasa jawaban ditegaskan |
 | 2026.11.20.2 | AI lokal lebih tangguh untuk model kecil/lambat: kolom filter ditebak dari kalimat, jawaban langsung setelah rencana, chat didahulukan dari ringkasan otomatis, batas waktu lokal 420 dtk |
 | 2026.11.20 | Asisten AI bisa mengubah dashboard & chart (pratinjau, Simpan, Urungkan), Studio Visual satu-satunya tempat membangun chart, Susun dashboard tanpa kehilangan isi editor Superset, Explore tidak terpotong, AI lokal: token, model dimuat, antrean |
 | 2026.11.14.4 | perbaikan pemasang: port web otomatis tidak lagi memilih 8089 (bentrok dengan port diagnosa ALDx) |
@@ -34,6 +35,24 @@ Setiap versi punya **rilis tetap** di GitHub bertag `v<VERSI>` (mis. `v2026.11.1
 | 2026.11.13 | telusuri lewat klik kanan; versi wajib naik tiap pembaruan |
 
 Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya tercatat di tabel ini.
+
+---
+
+## 2026.11.20.3 · Asisten AI jujur soal yang dibuat
+
+### Diperbaiki
+
+| Masalah | Penyebab & perbaikan |
+|---|---|
+| Di `/data-engineer`, tombol saran *Buat chart dari data tadi* → *yes* → AI menjawab "chart has been created", padahal tidak ada chart | peran itu tidak punya alat pembuat chart, tetapi sarannya tetap ditawarkan, dan model kecil mengarang hasilnya. Kini: (1) saran lanjutan hanya yang alatnya dimiliki peran aktif; (2) jawaban yang mengaku membuat/mengubah/menyimpan **tanpa memanggil alat** (saat pengguna meminta tindakan atau menjawab *ya/yes*) diganti pesan jujur *Belum ada yang dibuat* + arahan **/analis**; (3) instruksi peran tanpa alat chart menyatakan batasnya |
+| Model lokal kecil menjawab dalam bahasa Inggris | instruksi diakhiri penegasan bahasa jawaban (bagian paling diingat model kecil) |
+
+### Perlu dilakukan setelah memperbarui
+
+| Cara memasang | Langkah |
+|---|---|
+| ALDx-Setup.exe / Offline | jalankan installer versi baru di atas instalasi lama, lalu `Ctrl + F5` |
+| git | `git pull`, `docker compose restart superset superset-worker superset-beat`, `Ctrl + F5` |
 
 ---
 

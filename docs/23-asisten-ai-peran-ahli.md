@@ -167,6 +167,8 @@ sebelum Anda menekan **Simpan perubahan**.
 
 - **Tanpa model AI.** Perintah dengan pola di atas dipahami langsung oleh penerjemah niat (`sps_ai/niat.py`): cepat dan
   tetap jalan walau model lokal lambat/sibuk. Kalimat bebas lainnya dikerjakan model lewat alat `rencanakan`.
+- **Membuat chart/dashboard hanya di `/analis`.** Peran lain tidak ditawari saran *Buat chart*, dan bila model mengaku sudah membuat
+  sesuatu tanpa menjalankan alatnya, jawabannya diganti *Belum ada yang dibuat* beserta arahan pindah ke `/analis`.
 - **Model kecil lupa menyebut kolom?** Kolom filter ditebak dari kalimat Anda sendiri (*"…memilih saluran penjualan…"* → `saluran`),
   lalu tetap tampil di pratinjau dengan catatan *ditebak*. Setelah rencana/pertanyaan balik dibuat, jawaban langsung disusun
   ALDx tanpa menunggu langkah model berikutnya.
