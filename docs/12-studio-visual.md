@@ -8,9 +8,9 @@ Pembuatan chart, dashboard, dan persiapan data dengan **drag & drop**, di dalam 
 | **Susun dashboard** | Seret lembar kerja ke kanvas, atur lebar ¼ ⅓ ½ ⅔ penuh & tinggi kotak, **tab**, filter dashboard, klik-filter antar-chart |
 | **Persiapan data** | Alur langkah termasuk **gabung (join)**, profil kolom, aksi cepat, simpan sebagai dataset baru |
 
-Hasilnya **chart, dashboard, dan dataset Superset biasa**: bisa dibuka di Explore, diedit di editor
-dashboard Superset, dipakai Asisten AI & Story. Chart buatan Studio bisa dibuka lagi di Studio
-(spesifikasinya disimpan di `params.sps_studio`).
+Hasilnya **chart, dashboard, dan dataset Superset biasa**: dipakai Asisten AI, Story, filter global, dan bisa dibuka di
+editor bawaan (**Mode lanjutan**) bila perlu pengaturan rinci. Chart buatan Studio dibuka lagi di Studio (spesifikasinya
+di `params.sps_studio`); chart dari editor lain dibuka sebagai lembar kerja bila bisa (lihat di bawah).
 
 Pilihan dataset berisi dataset **fisik dan virtual** yang boleh Anda akses. Dataset yang baru dibuat (mis. dari
 Kueri Visual atau SQL Lab) muncul otomatis saat Anda kembali ke Studio, tanpa memuat ulang halaman.
@@ -295,7 +295,7 @@ datasetnya tidak punya kolom filter dikecualikan otomatis.
 4. **Tab** (opsional, untuk dashboard panjang): **+ Tab** di atas kanvas → isi tab baru. Klik nama tab untuk pindah,
    klik dua kali untuk mengganti nama, **×** menghapus tab beserta isinya. Maksimal 8 tab; satu lembar kerja hanya boleh
    muncul sekali di seluruh dashboard. Satu tab saja = dashboard biasa tanpa tab.
-5. Isi judul & keterangan → **Simpan dashboard**. Buka lagi lewat pilihan "Buka dashboard Studio".
+5. Isi judul & keterangan → **Simpan dashboard**. Buka lagi lewat pilihan **Buka dashboard…** (berisi semua dashboard yang boleh Anda ubah).
 
 Batas tata letak: kotak mengikuti grid 12 kolom Superset (bukan posisi bebas piksel), agar dashboard tetap rapi di
 layar lebar, laptop, dan ponsel. Kombinasi lebar + tinggi + tab + objek desain menggantikan kebutuhan tata letak bebas.

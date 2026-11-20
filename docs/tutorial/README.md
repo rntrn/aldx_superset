@@ -50,7 +50,7 @@ bisa dicocokkan dengan kunci jawaban.
 
 ### Membaca singkatan angka
 
-| Di halaman Superset (dashboard, Explore) | Di Studio Visual | Arti |
+| Di halaman Superset (dashboard, Mode lanjutan/Explore) | Di Studio Visual | Arti |
 |---|---|---|
 | `k` | `rb` | ribu |
 | `M` | `jt` | juta |

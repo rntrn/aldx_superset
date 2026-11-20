@@ -38,7 +38,7 @@ izin itu (Analis ke atas biasanya); **Admin** / **Superadmin** = khusus peran te
 
 | Menu | Fungsi | Level | Akses | Bagian tutorial |
 |---|---|---|---|---|
-| **Studio Visual** | seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, ambang, simulasi & skenario tersimpan, mini-chart tooltip, susun dashboard (tab, template umum & per bidang) | L2 | semua yang boleh membuat chart | L2 §1–11a |
+| **Studio Visual** | **satu-satunya tempat membuat, mencari, mengubah & menghapus chart** (panel *Chart tersimpan*, *Mode lanjutan*); seret-lepas, 23 jenis chart, peta, ramalan, kalkulasi cepat, ambang, simulasi & skenario tersimpan, mini-chart tooltip, susun dashboard (tab, template umum & per bidang, membuka semua dashboard yang boleh diubah) | L2 | semua yang boleh membuat chart | L2 §1–11a |
 | ~~Daftar chart~~ | dihapus (2026.11.20): mencari, membuka, mengubah, menghapus chart kini di **Studio Visual** › *Chart tersimpan* | L2 | izin | L2 §12e |
 
 ## Dashboard & Story
@@ -81,7 +81,7 @@ Bukan menu sidebar, tetapi dipakai semua level:
 | Alat | Cara | Level | Bagian tutorial |
 |---|---|---|---|
 | **Cari / perintah** | `Ctrl + K` | L1 | L1 §1 |
-| **Asisten AI** (panel ✦) | `Ctrl + I`; peran `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer` | L1 (pakai) · L3–L4 (data/server) | L1 §6, L3 §6b, L4 §4c |
+| **Asisten AI** (panel ✦) | `Ctrl + I`; mode **Otomatis** (Orchestrator memilih peran) atau peran `/analis` `/panduan` `/data-engineer` `/ahli-ui-ux` `/hw-engineer`; mengubah dashboard/chart/dataset/story lewat pratinjau → Simpan → Urungkan | L1 (pakai) · L3–L4 (data/server) | L1 §6, L3 §6b, L4 §4c |
 | **Ringkasan AI** (bilah atas dashboard) | chip ✦ Ringkasan AI: 3–5 poin berangka + *Perlu perhatian*; Perbarui, Tanya lanjut | L1 (baca) · L4 (mode `otomatis`/`klik`/`mati`) | L1 §6, L4 §4c |
 | **Cara pakai halaman** | tombol `?` | L1 | L1 §1 |
 | **Ekspor** tabel & grafik | tombol Ekspor di pojok: PNG, PDF, Excel, CSV, TXT, salin | L1 | L1 §6a |
@@ -104,7 +104,7 @@ Bukan menu sidebar, tetapi dipakai semua level:
 | 5 | Story, Langganan laporan, Ekspor PowerPoint, Sematkan | dibagikan ke pembaca |
 
 Jalan pintas: minta **Asisten AI** (`Ctrl + I`) — *"gabungkan dataset A, B, C"*, *"scan tabel berawalan data_"*,
-*"buat dashboard dari dataset ini"* — lalu lanjutkan hasilnya di Studio Visual.
+*"buat dashboard dari dataset ini"*, *"tambah filter cabang di dashboard ini"* — lalu lanjutkan hasilnya di Studio Visual.
 
 ## Jalur belajar menurut peran pekerjaan
 

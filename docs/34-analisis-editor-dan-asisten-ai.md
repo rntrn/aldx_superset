@@ -2,6 +2,8 @@
 
 > Status (2026-11-20): §1, Fase 0 (AI lokal), Fase 1 (ALDx Rencana) dan bagian navigasi Fase 3 (Studio satu pintu chart,
 > C1–C5) dan Fase 2 (round-trip dashboard D1–D4) sudah diterapkan di versi 2026.11.20. Fase 4 (hapus dataset sengaja tidak disediakan) dan D5 (tombol Tambah filter di dashboard) juga sudah: semua temuan tertangani.
+> Lanjutan: 2026.11.20.2 (AI lokal tangguh untuk model kecil), 2026.11.20.3 (AI tidak mengaku membuat tanpa alat),
+> 2026.11.20.4 (**Orchestrator**: mode Otomatis memilih peran untuk setiap pertanyaan, `sps_ai/orkestrator.py`).
 
 ---
 

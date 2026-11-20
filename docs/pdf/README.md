@@ -2,7 +2,7 @@
 
 | Berkas | Isi |
 |---|---|
-| `manual-lengkap.pdf` | README + CARA-PASANG + dokumen teknis 00–33 dalam satu berkas (sampul, daftar isi, bookmark) |
+| `manual-lengkap.pdf` | README + CARA-PASANG + dokumen teknis 00–34 dalam satu berkas (sampul, daftar isi, bookmark) |
 | `dokumen/33-peta-menu-per-level.pdf` | **peta semua menu**: untuk siapa, fungsinya, belajarnya di mana (cocok dicetak) |
 | `dokumen/NN-*.pdf` | setiap dokumen teknis terpisah |
 | `dokumen/28-sambungkan-asisten-ai.pdf` | **menyambungkan Asisten AI**: lokal, cloud gratis, cloud berbayar (satu pintu) |

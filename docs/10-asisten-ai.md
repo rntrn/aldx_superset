@@ -1,7 +1,8 @@
 # 10 · Asisten AI, Auto Chart/Dashboard & Story
 
-> Baru: Asisten AI juga tersedia sebagai **panel di setiap halaman** (`Ctrl + I`) dengan peran ahli
-> `/analis`, `/panduan`, `/data-engineer`, `/ahli-ui-ux`, `/hw-engineer`. Lihat [23-asisten-ai-peran-ahli.md](23-asisten-ai-peran-ahli.md).
+> Asisten AI tersedia sebagai **panel di setiap halaman** (`Ctrl + I`). Mode **Otomatis** (bawaan): Orchestrator memilih peran ahli
+> `/analis`, `/panduan`, `/data-engineer`, `/ahli-ui-ux`, `/hw-engineer` untuk setiap pertanyaan; Asisten juga bisa **mengubah**
+> dashboard, chart, dataset & story lewat pratinjau → Simpan → Urungkan (ALDx Rencana). Lihat [23-asisten-ai-peran-ahli.md](23-asisten-ai-peran-ahli.md).
 
 Asisten analitik yang dipasang **di dalam**
 Superset pada alamat **http://localhost:8088/asisten/** (menu navbar **Asisten AI**).
@@ -48,7 +49,10 @@ config/
     ├── llm.py              # klien HTTP OpenAI-compatible
     ├── alat.py             # alat: query data, buat chart, buat dashboard
     ├── auto.py             # Auto chart: profil data + skor "machine learning ringan"
-    ├── agen.py             # prompt sistem, definisi alat, putaran agent, audit
+    ├── agen.py             # prompt sistem, definisi alat, putaran agent, audit, penjaga klaim tanpa alat
+    ├── orkestrator.py      # mode Otomatis: memilih peran (agent) untuk setiap pertanyaan, tanpa model AI
+    ├── niat.py             # perintah ubah umum dikenali tanpa model AI
+    ├── rencana.py, rencana_lanjut.py  # ALDx Rencana: pratinjau, Simpan, Urungkan, snapshot .ald
     ├── story.py            # simpan/ambil story
     ├── tampilan.py         # halaman & API (/asisten/...), menu navbar, izin
     ├── halaman.html        # UI 3 tab

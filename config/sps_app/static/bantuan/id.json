@@ -45,7 +45,7 @@
       ],
       [
         "g → c",
-        "Ke Daftar chart"
+        "Ke Studio Visual (semua chart)"
       ],
       [
         "g → d",
@@ -63,7 +63,7 @@
     "langkah": [
       "Pilih menu di kiri, atau tekan Ctrl + K lalu ketik nama halaman.",
       "Tekan ? kapan saja untuk membuka panduan halaman yang sedang dibuka.",
-      "Klik ✦ di bilah atas (Ctrl + I) untuk Asisten AI. Pilih peran: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
+      "Klik ✦ di bilah atas (Ctrl + I) untuk Asisten AI. Mode Otomatis memilih peran ahli sendiri; ketik / untuk memaksa peran: /analis, /panduan, /data-engineer, /ahli-ui-ux, /hw-engineer.",
       "Arahkan kursor ke tabel atau grafik di halaman ALDx, klik Ekspor (pojok kanan atas): Gambar, PDF, Excel, CSV, Teks, atau Salin tabel."
     ]
   },
@@ -224,7 +224,9 @@
       "Pilih jenis di Tampilkan saya; bingkai emas = rekomendasi. Kolom berlebih tidak dipakai (pil pudar dicoret).",
       "Hierarki: seret satu dimensi ke atas dimensi lain, beri nama; klik batang untuk menelusuri.",
       "Tambah Warna, Filter, Analitik (ramalan, rata bergerak, rata-rata, median, target) bila perlu, lalu Simpan. Panel Analitik pudar? Klik Siapkan agar analitik aktif.",
-      "Tab Susun dashboard: seret lembar kerja ke kanvas, tambah filter, percantik dengan objek Teks (huruf & warna), Gambar, Garis, lalu Simpan."
+      "Tab Susun dashboard: seret lembar kerja ke kanvas, tambah filter, percantik dengan objek Teks (huruf & warna), Gambar, Garis, lalu Simpan.",
+      "Chart tersimpan (panel kanan) berisi semua chart yang boleh Anda buka, dengan kotak cari. Mode lanjutan membuka editor bawaan untuk pengaturan rinci; Hapus chart menghapus milik sendiri.",
+      "Susun dashboard › Buka dashboard… memuat semua dashboard yang boleh Anda ubah; bagian buatan editor lain tampil sebagai kotak 🔒 dan tetap utuh saat disimpan."
     ],
     "pintasan": [
       [
@@ -242,17 +244,17 @@
     ]
   },
   "chart": {
-    "judul": "Daftar chart",
-    "ringkas": "Semua chart yang boleh Anda lihat. Klik nama untuk membuka & mengubahnya.",
+    "judul": "Chart (di Studio Visual)",
+    "ringkas": "Daftar chart kini ada di Studio Visual › Chart tersimpan: satu tempat membuat, mencari, dan mengubah chart.",
     "langkah": [
-      "Saring dengan nama, jenis, pemilik, atau dataset.",
-      "Klik bintang untuk menandai favorit.",
-      "Klik nama chart untuk membuka editor (Explore)."
+      "Buka Studio Visual (g → c).",
+      "Cari chart di panel Chart tersimpan, klik untuk mengubah.",
+      "Chart bertanda lanjutan dibuka di Mode lanjutan (editor bawaan)."
     ]
   },
   "explore": {
-    "judul": "Mengubah chart",
-    "ringkas": "Editor chart bawaan: pilih jenis, metrik, dimensi, filter, lalu simpan.",
+    "judul": "Mode lanjutan (editor bawaan)",
+    "ringkas": "Pengaturan chart yang rinci. Membuat & mengubah chart sehari-hari cukup di Studio Visual.",
     "langkah": [
       "Ganti jenis chart di kiri atas.",
       "Atur Metrics, Dimensions, Filters, lalu klik Update chart.",
@@ -265,6 +267,7 @@
       ]
     ],
     "tips": [
+      "Chart buatan Studio otomatis dibuka di Studio; tombol Mode lanjutan di Studio membawa ke halaman ini.",
       "Menu ⋯ kanan atas: unduh CSV/Excel/gambar, salin tautan, lihat kueri."
     ]
   },
@@ -286,7 +289,8 @@
       "Arahkan kursor ke chart, klik ⋯ untuk layar penuh, lihat data, atau unduh."
     ],
     "tips": [
-      "Tombol ⋯ di kanan atas dashboard: unduh PDF/gambar, bagikan tautan, kirim terjadwal."
+      "Tombol ⋯ di kanan atas dashboard: unduh PDF/gambar, bagikan tautan, kirim terjadwal.",
+      "Pemilik/Admin: tombol Tambah filter di kepala dashboard menambah filter untuk semua chart yang punya kolomnya (bisa diurungkan)."
     ]
   },
   "story": {
@@ -310,8 +314,10 @@
   },
   "asisten": {
     "judul": "Asisten AI",
-    "ringkas": "Bertanya tentang data dengan kalimat biasa, atau membuat chart & dashboard otomatis.",
+    "ringkas": "Bertanya tentang data, membuat chart & dashboard, atau mengubah yang sudah ada, dari panel ✦ (Ctrl + I).",
     "langkah": [
+      "Mode Otomatis: peran ahli dipilih sendiri untuk setiap pertanyaan dan tertulis di atas jawaban (Dijawab /peran · alasan). Klik chip peran untuk memaksa satu peran.",
+      "Minta perubahan, mis. tambah filter cabang di dashboard ini: periksa kartu Rencana perubahan, tekan Simpan perubahan; bisa Urungkan dan Unduh .ald (sebelum).",
       "Tanya AI: ketik pertanyaan, mis. Berapa penjualan per cabang tahun ini?",
       "Auto Chart: pilih dataset, klik Analisis dataset, centang saran, lalu Buat."
     ],

@@ -46,6 +46,7 @@ Rilis tetap `v<VERSI>` dibuat mulai versi **2026.11.14**; versi sebelumnya hanya
 | Area | Perubahan | Dokumen |
 |---|---|---|
 | Asisten AI | **Orchestrator** (`sps_ai/orkestrator.py`): chip baru **Otomatis** (bawaan) memilih peran ahli untuk SETIAP pertanyaan tanpa memanggil model AI. Dasarnya: perintah ubah yang dikenali, kata kunci tiap bidang (*bagaimana cara…* → /panduan, chart/angka → /analis, dataset/SQL/koneksi → /data-engineer, warna/tema → /ahli-ui-ux, CPU/RAM/server → /hw-engineer), halaman yang dibuka, dan kelanjutan percakapan (*ya*, *lanjut*). Hanya peran yang boleh dipakai akun itu. Setiap jawaban menampilkan *Dijawab /peran · alasan*. Chip peran atau `/peran` tetap memaksa peran tertentu | [23 §2](23-asisten-ai-peran-ahli.md#2-peran-ahli) |
+| Dokumentasi | README, manual (00, 10, 12, 32, 33, 34), tutorial & bahan ajar, **bantuan di aplikasi** (tombol `?`, Indonesia/English/日本語) dan semua PDF disesuaikan dengan Studio sebagai satu editor chart, ALDx Rencana, tombol Tambah filter, dan Orchestrator | [00](00-mulai-di-sini.md) |
 
 ### Perlu dilakukan setelah memperbarui
 
