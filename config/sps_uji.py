@@ -1461,6 +1461,44 @@ def jalankan_semua() -> None:
                         db.session.delete(x)
                 db.session.commit()
 
+    @uji("Halaman", "Tambah filter langsung di dashboard: kolom per dashboard, pratinjau, Simpan, Urungkan persis")
+    def _():
+        from flask import current_app, g
+        from superset.models.dashboard import Dashboard
+        import sps_filter_global as F
+        d = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if d is None:
+            raise RuntimeError("dashboard latihan belum ada")
+
+        def panggil(fungsi, *arg, **req):
+            with current_app.test_request_context(**req):
+                g.user = admin
+                r = fungsi(*arg)
+            r, kode = (r if isinstance(r, tuple) else (r, 200))
+            if kode != 200:
+                raise RuntimeError(f"{fungsi.__name__} -> {kode}: {r.get_json()}")
+            return r.get_json()
+
+        with override_user(admin):
+            awal = (d.json_metadata, d.position_json)
+            k = panggil(F.api_kolom_dashboard, path=f"/filter-global/api/kolom-dashboard?dashboard={d.id}")
+            pilih = next((x for x in k["kolom"] if not x["sudah"] and not x["waktu"]), None)
+            if pilih is None or not pilih["chart"]:
+                raise RuntimeError(f"tidak ada kolom yang bisa difilter: {k['kolom'][:3]}")
+            r = panggil(F.api_tambah_filter, path="/filter-global/api/tambah", method="POST",
+                        json={"dashboard": d.id, "kolom": pilih["kolom"]})
+            panggil(F.api_rencana_filter, r["id"], "simpan", path="/x", method="POST")
+            db.session.expire_all()
+            if f'"column": {{"name": "{pilih["kolom"]}"}}' not in d.json_metadata:
+                raise RuntimeError("filter tidak tersimpan di dashboard")
+            if not next(x for x in panggil(F.api_kolom_dashboard, path=f"/x?dashboard={d.id}")["kolom"] if x["kolom"] == pilih["kolom"])["sudah"]:
+                raise RuntimeError("kolom yang baru difilter tidak ditandai 'sudah ada'")
+            panggil(F.api_rencana_filter, r["id"], "urungkan", path="/x", method="POST")
+            db.session.expire_all()
+            if (d.json_metadata, d.position_json) != awal:
+                raise RuntimeError("Urungkan tidak mengembalikan dashboard persis")
+        return f"filter '{pilih['kolom']}' ({pilih['chart']} dari {pilih['total']} chart) tersimpan lalu diurungkan persis"
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t
