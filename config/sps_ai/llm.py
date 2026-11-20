@@ -29,10 +29,11 @@ class GagalModel(RuntimeError):
 
     sementara=True: sibuk / kuota / jaringan / waktu habis -> layak dicoba ulang atau dialihkan ke model cadangan.
     """
-    def __init__(self, pesan: str, sementara: bool = False, konteks_penuh: bool = False):
+    def __init__(self, pesan: str, sementara: bool = False, konteks_penuh: bool = False, sibuk: bool = False):
         super().__init__(pesan)
         self.sementara = sementara
         self.konteks_penuh = konteks_penuh     # instruksi + riwayat melebihi jendela konteks model
+        self.sibuk = sibuk                     # server lokal sibuk / terlalu lama: model lain di server SAMA tidak membantu
 
 
 class TanpaAlat(GagalModel):
@@ -77,17 +78,34 @@ def _klien_redis():
 
 
 @contextlib.contextmanager
-def antre(model: ModelAI, tenggat: float):
-    """Tunggu giliran ke server lokal model ini (model cloud: langsung). Melempar AntreanPenuh bila tenggat lewat."""
+def antre(model: ModelAI, tenggat: float, prioritas: str = "normal"):
+    """Tunggu giliran ke server lokal model ini (model cloud: langsung). Melempar AntreanPenuh bila tenggat lewat.
+
+    prioritas "rendah" (ringkasan dashboard otomatis): TIDAK menunggu. Bila server sedang dipakai, atau ada pertanyaan
+    chat yang sedang menunggu giliran, langsung AntreanPenuh, sehingga chat pengguna tidak tertahan di belakangnya."""
     if model.api_key:
         yield
         return
+    rendah = prioritas == "rendah"
     tunggu = max(1.0, tenggat - time.monotonic() - 10)
     klien = _klien_redis()
     if klien is not None:
+        antri = ANTRE_AWALAN + "tunggu:" + model.base_url
+        if rendah and int(klien.get(antri) or 0) > 0:
+            raise AntreanPenuh()
         kunci = klien.lock(ANTRE_AWALAN + model.base_url, timeout=int(tenggat - time.monotonic()) + 30,
-                           blocking_timeout=tunggu)
-        if not kunci.acquire():
+                           blocking_timeout=0.01 if rendah else tunggu)
+        if not rendah:                               # tandai "ada chat menunggu" selama menunggu giliran
+            klien.incr(antri)
+            klien.expire(antri, int(tunggu) + 60)
+        try:
+            dapat = kunci.acquire()
+        finally:
+            if not rendah:
+                with contextlib.suppress(Exception):
+                    if int(klien.decr(antri)) <= 0:
+                        klien.delete(antri)
+        if not dapat:
             raise AntreanPenuh()
         try:
             yield
@@ -97,7 +115,7 @@ def antre(model: ModelAI, tenggat: float):
         return
     with _kunci_daftar:
         kunci_t = _kunci_thread.setdefault(model.base_url, threading.Lock())
-    if not kunci_t.acquire(timeout=tunggu):
+    if not (kunci_t.acquire(blocking=False) if rendah else kunci_t.acquire(timeout=tunggu)):
         raise AntreanPenuh()
     try:
         yield
@@ -176,7 +194,7 @@ def _pesan_status(model: ModelAI, kode: int, teks: str) -> str:
     return f"Model '{model.nama}' mengembalikan error ({kode}){': ' + pesan if pesan else ''}. Detail ada di log."
 
 
-def chat(model: ModelAI, pesan: list[dict], alat: list[dict], batas_detik: int) -> dict[str, Any]:
+def chat(model: ModelAI, pesan: list[dict], alat: list[dict], batas_detik: int, prioritas: str = "normal") -> dict[str, Any]:
     """Kirim percakapan + daftar alat, kembalikan `message` dari model.
 
     Galat sementara (sibuk, kuota, jaringan) dicoba ulang hingga 2 kali dengan jeda, selama masih dalam batas_detik.
@@ -185,11 +203,11 @@ def chat(model: ModelAI, pesan: list[dict], alat: list[dict], batas_detik: int) 
 
     def kirim(isi: list[dict], tawaran: list[dict], teks: list[dict] | None = None) -> dict[str, Any]:
         try:
-            with antre(model, tenggat):
+            with antre(model, tenggat, prioritas):
                 return _chat_sekali(model, isi, tawaran, max(5, int(tenggat - time.monotonic())), teks)
         except AntreanPenuh:
-            raise GagalModel(f"Model lokal '{model.nama}' masih sibuk melayani permintaan lain (mis. ringkasan "
-                             "dashboard). Coba lagi sebentar lagi.", sementara=True) from None
+            raise GagalModel(f"Model lokal '{model.nama}' masih sibuk melayani permintaan lain. Coba lagi sebentar lagi.",
+                             sementara=True, sibuk=True) from None
 
     for percobaan, jeda in enumerate((*COBA_ULANG, None)):
         try:
@@ -201,7 +219,8 @@ def chat(model: ModelAI, pesan: list[dict], alat: list[dict], batas_detik: int) 
             _TANPA_ALAT.add(model.id)
             return kirim(_mode_teks(pesan, alat), [], alat)
         except GagalModel as exc:
-            if not exc.sementara or jeda is None or time.monotonic() + jeda + 10 > tenggat:
+            if not exc.sementara or jeda is None or time.monotonic() + jeda + 10 > tenggat \
+                    or (prioritas == "rendah" and exc.sibuk):          # ringkasan: server sibuk = lewati, jangan menunggu
                 raise
             log.info("ALDx AI: %s galat sementara (%s), coba lagi dalam %s dtk", model.id, exc, jeda)
             time.sleep(jeda)
@@ -227,7 +246,7 @@ def _chat_sekali(model: ModelAI, pesan: list[dict], alat: list[dict], batas_deti
                          "Admin: isi AI_CA_BUNDLE (lihat certs/README.md).") from exc
     except requests.Timeout as exc:
         raise GagalModel(f"Model '{model.nama}' terlalu lama menjawab. Coba pertanyaan lebih singkat "
-                         "atau pilih model lain.", sementara=True) from exc
+                         "atau pilih model lain.", sementara=True, sibuk=not model.api_key) from exc
     except requests.RequestException as exc:
         log.warning("ALDx AI: model %s tidak terhubung: %s", model.base_url, exc)  # detail teknis ke log
         raise GagalModel(f"Model '{model.nama}' sedang tidak aktif atau tidak bisa dihubungi. "

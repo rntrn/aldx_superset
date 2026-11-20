@@ -83,7 +83,7 @@ def poin(teks: str) -> list[str]:
     return hasil
 
 
-def buat(dashboard_id: int, username: str, bahasa: str = "id") -> dict:
+def buat(dashboard_id: int, username: str, bahasa: str = "id", prioritas: str = "rendah") -> dict:
     """Panggil model (sinkron). Dipakai thread latar & uji. Hak akses = pengguna yang sedang aktif (g.user)."""
     from sps_ai import agen, llm, pengaturan, wawasan
     atur = pengaturan.muat()
@@ -100,12 +100,16 @@ def buat(dashboard_id: int, username: str, bahasa: str = "id") -> dict:
     while True:
         dicoba.append(model.id)
         try:
-            jawaban = llm.chat(model, pesan, [], atur.batas_untuk(model))
+            # Prioritas rendah: server AI lokal yang sedang dipakai (atau ada chat menunggu) tidak ditunggu.
+            jawaban = llm.chat(model, pesan, [], atur.batas_untuk(model), prioritas)
             break
         except llm.GagalModel as exc:
-            lain = agen.cadangan(atur, model, dicoba) if atur.cadangan_otomatis and exc.sementara else None
+            lain = agen.cadangan(atur, model, dicoba, exc.sibuk) if atur.cadangan_otomatis and exc.sementara else None
             if lain is None or not lain.kirim_data:
                 agen._catat(username, model.id, "[ringkasan dashboard]", [], "gagal_model", mulai)
+                if exc.sibuk:
+                    raise llm.GagalModel("Server AI lokal sedang menjawab pertanyaan lain, jadi ringkasan dilewati agar "
+                                         "chat tidak tertahan. Klik Perbarui sebentar lagi.", sementara=True, sibuk=True) from None
                 raise
             log.info("ALDx AI ringkasan: %s gagal (%s), pakai %s", model.id, exc, lain.id)
             model = lain
@@ -150,7 +154,7 @@ def minta(app, dashboard_id: int, user, bahasa: str, auto: bool, segar: bool) ->
             g.user = u
             try:
                 with override_user(u):
-                    hasil = {"status": "selesai", **buat(info["id"], username, bahasa)}
+                    hasil = {"status": "selesai", **buat(info["id"], username, bahasa, "rendah" if auto else "normal")}
                 _cache().set(kunci, hasil, timeout=simpan)
             except Exception as exc:  # noqa: BLE001 - galat apa pun tampil di kartu, bukan menghilang
                 log.warning("ALDx AI ringkasan dashboard %s gagal: %s", info["id"], exc)

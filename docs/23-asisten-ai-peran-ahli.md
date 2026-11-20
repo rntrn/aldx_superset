@@ -37,7 +37,7 @@ lalu angkanya ditampilkan langsung ke Anda tanpa lewat model.
 
 **Kecepatan.** Model lokal kecil (4B) tanpa GPU butuh ±1–3 menit untuk pertanyaan yang memakai beberapa alat. Di halaman
 dashboard, angka sudah disertakan sehingga biasanya cukup satu langkah. Untuk jawaban cepat, pakai model 8B+ dengan GPU atau
-layanan cloud ([28](28-sambungkan-asisten-ai.md)). Bila sering melewati batas waktu, naikkan `batas_detik_lokal` (model lokal, bawaan 240 dtk)
+layanan cloud ([28](28-sambungkan-asisten-ai.md)). Bila sering melewati batas waktu, naikkan `batas_detik_lokal` (model lokal, bawaan 420 dtk)
 atau `batas_detik_model` (cloud, 120 dtk) di `config\ai.yaml`.
 
 ## 1c. Ringkasan AI otomatis di dashboard
@@ -167,6 +167,9 @@ sebelum Anda menekan **Simpan perubahan**.
 
 - **Tanpa model AI.** Perintah dengan pola di atas dipahami langsung oleh penerjemah niat (`sps_ai/niat.py`): cepat dan
   tetap jalan walau model lokal lambat/sibuk. Kalimat bebas lainnya dikerjakan model lewat alat `rencanakan`.
+- **Model kecil lupa menyebut kolom?** Kolom filter ditebak dari kalimat Anda sendiri (*"…memilih saluran penjualan…"* → `saluran`),
+  lalu tetap tampil di pratinjau dengan catatan *ditebak*. Setelah rencana/pertanyaan balik dibuat, jawaban langsung disusun
+  ALDx tanpa menunggu langkah model berikutnya.
 - **Nama tidak harus persis**: `tes1` cocok dengan *tes 1*. Bila ada beberapa yang cocok, Asisten bertanya dengan tombol
   (nama kembar dibedakan dengan `#id`).
 - **Hanya pemilik** dashboard/chart (atau Admin) yang bisa menyimpan perubahan.

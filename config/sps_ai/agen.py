@@ -406,9 +406,11 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     peta = any(n in peran.alat for n in ("cari_dataset", "cari_dashboard", "info_dashboard"))
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
+    # Kalimat pengguna ikut ke alat: penyusun rencana menebak kolom dari kalimat bila model kecil lupa mengisinya.
+    konteks_alat = {**(konteks or {}), "pertanyaan": pertanyaan}
     jawaban, status, dicoba, catatan_model, dibuat, diringkas = "", "ok", [model.id], "", 0, False
     if "rencanakan" in peran.alat:              # perintah ubah yang polanya jelas: tanpa model AI (niat.py)
-        langsung = _jawab_niat(pertanyaan, username, konteks, peristiwa)
+        langsung = _jawab_niat(pertanyaan, username, konteks_alat, peristiwa)
         if langsung is not None:
             _catat(username, "tanpa-model", f"[{peran.perintah}] {pertanyaan}", ["rencanakan"], langsung, mulai)
             return {"jawaban": jawaban_niat(langsung, list(peristiwa)),
@@ -429,7 +431,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
             try:
                 msg = llm.chat(model, pesan, daftar_alat if boleh_alat else [], min(atur.batas_untuk(model), sisa))
             except llm.GagalModel as exc:
-                lain = cadangan(atur, model, dicoba) if exc.sementara and atur.cadangan_otomatis else None
+                lain = cadangan(atur, model, dicoba, exc.sibuk) if exc.sementara and atur.cadangan_otomatis else None
                 if lain is not None:                # penyedia sibuk/kuota habis: lanjutkan dengan model cadangan
                     dicoba.append(lain.id)
                     peristiwa.append({"tipe": "langkah", "teks": f"{model.nama} tidak tersedia, beralih ke {lain.nama}"})
@@ -452,6 +454,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
                 jawaban = msg.get("content") or ""
                 break
             pesan.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": panggilan})
+            hasil_rencana = None                    # rencanakan sudah menghasilkan pratinjau / pertanyaan balik
             for p in panggilan:
                 nama = p.get("function", {}).get("name", "")
                 dipakai.append(nama)
@@ -464,7 +467,10 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
                         if dibuat > MAKS_BUAT:
                             raise alat.InputSalah(f"Batas {MAKS_BUAT} objek baru per pertanyaan tercapai. "
                                                   "Ringkas hasilnya untuk pengguna; minta konfirmasi bila perlu lebih.")
-                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa, username, konteks)
+                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa, username, konteks_alat)
+                    if nama == "rencanakan" and isinstance(hasil, dict) and \
+                            (hasil.get("rencana_dibuat") or hasil.get("perlu_ditanyakan")):
+                        hasil_rencana = hasil
                 except (alat.IzinDitolak, alat.InputSalah, SupersetSecurityException, KeyError, ValueError,
                         LookupError) as exc:
                     db.session.rollback()
@@ -475,6 +481,12 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
                     hasil = {"error": f"Alat gagal: {exc}"}
                 pesan.append({"role": "tool", "tool_call_id": p.get("id") or nama, "name": nama,
                               "content": json.dumps(hasil, ensure_ascii=False, default=str)[:12000]})
+            if hasil_rencana is not None:
+                # Jawaban disusun ALDx, bukan putaran model berikutnya: model lokal hemat 1 langkah (menit di CPU),
+                # bahasanya pasti benar, dan tidak ada yang mengaku "sudah tersimpan".
+                jawaban = jawaban_niat("rencana" if hasil_rencana.get("rencana_dibuat") else "tanya",
+                                       [{"tipe": "teks", "teks": str(hasil_rencana.get("perlu_ditanyakan") or "")}])
+                break
     except llm.GagalModel as exc:
         status, jawaban = "gagal_model", str(exc)
     _catat(username, model.id, f"[{peran.perintah}] {pertanyaan}", dipakai, status, mulai)
@@ -537,12 +549,16 @@ def samarkan_rahasia(teks: str, atur: Pengaturan) -> str:
     return teks
 
 
-def cadangan(atur: Pengaturan, model: ModelAI, dicoba: list[str]) -> ModelAI | None:
+def cadangan(atur: Pengaturan, model: ModelAI, dicoba: list[str], sibuk: bool = False) -> ModelAI | None:
     """Model aktif berikutnya untuk dialihkan saat model sekarang sibuk / kuota habis / tidak terjangkau.
 
     Privasi: bila model sekarang boleh menerima data (riwayat bisa berisi angka), cadangannya juga harus boleh
     (kirim_data), atau model lokal. Urutan: jenis yang sama dulu (cloud -> cloud, lokal -> lokal)."""
     calon = [m for m in atur.model if m.id not in dicoba and (not model.kirim_data or m.kirim_data or not m.api_key)]
+    if sibuk:
+        # Server lokal sibuk (antrean penuh) / terlalu lama: model lain di server yang SAMA memakai antrean yang sama
+        # dan memaksa server berganti model. Hanya server/layanan lain yang layak dicoba.
+        calon = [m for m in calon if m.base_url != model.base_url]
     # Model lain di server lokal yang SAMA (LM Studio/Ollama) ditaruh paling akhir: memintanya membuat server
     # membongkar model aktif, dan permintaan lain yang sedang berjalan ikut diputus ({"error":"terminated"}).
     calon.sort(key=lambda m: (bool(m.api_key) != bool(model.api_key), m.base_url == model.base_url))

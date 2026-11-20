@@ -262,6 +262,36 @@ def cari_kolom(teks: Any, dash, perintah: str = "") -> dict:
         raise Butuh(str(e) + " Kolom yang tersedia:", [perintah.format(k) for k in saran_kolom(dash)]) from None
 
 
+_AWALAN_NAMA = re.compile(r"^(?:nm|nama)\s+")
+
+
+def kolom_dari_teks(dash, teks: Any) -> str:
+    """Tebak kolom filter dari KALIMAT PENGGUNA bila model AI tidak mengisinya ('pengguna bisa memilih saluran
+    penjualan' -> saluran). Hanya kolom milik chart di dashboard itu. Urutan pilihan:
+      1. kolom teks/tanggal dulu (kolom angka seperti 'penjualan' jarang jadi filter pilihan);
+      2. yang disebut LEBIH DULU (bahasa Indonesia: kata inti di depan, 'saluran penjualan' = saluran);
+      3. frasa lebih panjang. Masih kembar -> '' (ditanyakan ke pengguna)."""
+    t = f" {norm(teks)} "
+    judul = norm(dash.dashboard_title)
+    if judul:
+        t = t.replace(f" {judul} ", " ").replace(f" {judul.replace(' ', '')} ", " ")
+    temuan: dict[str, tuple] = {}                     # kolom -> kunci urut (makin kecil makin baik)
+    for h in kolom_dashboard(dash).values():
+        frasa = {norm(h["kolom"]), norm(h["label"]), _AWALAN_NAMA.sub("", norm(h["kolom"]))} - {""}
+        for f in frasa:
+            pos = t.find(f" {f} ")
+            if len(f) >= 3 and pos >= 0:
+                kunci = (0 if (h["teks"] or h["dttm"]) else 1, pos, -len(f))
+                if h["kolom"] not in temuan or kunci < temuan[h["kolom"]]:
+                    temuan[h["kolom"]] = kunci
+    if not temuan:
+        return ""
+    urut = sorted(temuan.items(), key=lambda x: x[1])
+    if len(urut) > 1 and urut[0][1] == urut[1][1]:
+        return ""
+    return urut[0][0]
+
+
 def jenis_chart(teks: Any) -> str:
     from sps_studio.aturan import ATURAN_TANDA
     t = norm(teks).replace("grafik ", "").replace("chart ", "").replace("diagram ", "").strip()
@@ -310,6 +340,7 @@ def _rencana_tambah_filter(o: dict, konteks) -> dict:
     dash = cari_dashboard(o.get("dashboard"), konteks, f"tambah filter {o.get('kolom') or ''} di dashboard {{}}".replace("  ", " "))
     _milik(dash, "dashboard")
     jenis = str(o.get("jenis") or "").strip().lower()
+    tebakan = ""
     if jenis == "waktu" or norm(o.get("kolom")) in ("waktu", "tanggal", "periode", "rentang waktu"):
         kandidat = [c for c in dash.slices if _punya_waktu(c)]
         if not kandidat:
@@ -320,7 +351,9 @@ def _rencana_tambah_filter(o: dict, konteks) -> dict:
         h = {"kolom": kol, "dataset_ids": [ds.id], "dttm": True}
         jenis = "waktu"
     else:
-        h = cari_kolom(o.get("kolom"), dash, f"tambah filter {{}} di dashboard {dash.dashboard_title}")
+        diminta = str(o.get("kolom") or "").strip()
+        tebakan = "" if diminta else kolom_dari_teks(dash, (konteks or {}).get("pertanyaan"))
+        h = cari_kolom(diminta or tebakan, dash, f"tambah filter {{}} di dashboard {dash.dashboard_title}")
         masuk = [c.id for c in dash.slices if _punya_kolom(c, h["kolom"])]
         jenis = jenis if jenis in JENIS_FILTER else ("waktu" if h["dttm"] else "pilihan")
     from sps_studio import dasbor
@@ -337,8 +370,9 @@ def _rencana_tambah_filter(o: dict, konteks) -> dict:
            f"berlaku di **{len(masuk)} dari {len(dash.slices)}** chart"
     return {"op": "tambah_filter", "dashboard_id": dash.id, "dataset_id": h["dataset_ids"][0], "kolom": h["kolom"],
             "jenis": jenis, "nama": nama, "kunci": [f"dashboard:{dash.id}"], "teks": teks,
-            "peringatan": [f"Tidak berlaku untuk: {', '.join(luar[:6])}{'…' if len(luar) > 6 else ''} "
-                           f"(datasetnya tidak punya kolom `{h['kolom']}`)."] if luar else [],
+            "peringatan": ([f"Kolom `{h['kolom']}` ditebak dari kalimat Anda; tekan Batal bila keliru."] if tebakan else []) +
+                          ([f"Tidak berlaku untuk: {', '.join(luar[:6])}{'…' if len(luar) > 6 else ''} "
+                            f"(datasetnya tidak punya kolom `{h['kolom']}`)."] if luar else []),
             "buka": f"/superset/dashboard/{dash.id}/"}
 
 

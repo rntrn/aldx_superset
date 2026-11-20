@@ -1499,6 +1499,72 @@ def jalankan_semua() -> None:
                 raise RuntimeError("Urungkan tidak mengembalikan dashboard persis")
         return f"filter '{pilih['kolom']}' ({pilih['chart']} dari {pilih['total']} chart) tersimpan lalu diurungkan persis"
 
+    @uji("Asisten AI", "Model kecil: kolom ditebak dari kalimat, jawaban langsung setelah rencanakan, chat didahulukan dari ringkasan")
+    def _():
+        import time as _t
+        from superset.models.dashboard import Dashboard
+        from sps_ai import agen, llm, rencana
+        from sps_ai.pengaturan import ModelAI, Pengaturan
+        d = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if d is None:
+            raise RuntimeError("dashboard latihan belum ada")
+        # 1. Tebak kolom dari kalimat
+        cek = {"saya ingin pengguna bisa memilih saluran penjualan untuk semua grafik": "saluran",
+               "biar bisa dipilih per cabang": "nm_cabang", "untuk semua grafik": "",
+               "pilih total per saluran": "saluran",              # kolom teks didahulukan dari kolom angka
+               "bisa memilih kategori dan saluran": "kategori"}   # yang disebut lebih dulu
+        with override_user(admin):                      # hak akses chart dibaca sebagai pengguna
+            from flask import g
+            g.user = admin
+            for teks, harap in cek.items():
+                if rencana.kolom_dari_teks(d, teks) != harap:
+                    raise RuntimeError(f"tebakan kolom '{teks}' -> {rencana.kolom_dari_teks(d, teks)!r}, harap {harap!r}")
+        # 2. Agen dengan model palsu yang meniru model kecil: memanggil rencanakan TANPA kolom
+        panggilan = []
+
+        def palsu(model, pesan, alat_, batas, prioritas="normal"):
+            panggilan.append(1)
+            return {"content": "", "tool_calls": [{"id": "x", "type": "function", "function": {
+                "name": "rencanakan", "arguments": _json_dumps({"operasi": [{"op": "tambah_filter", "dashboard": d.dashboard_title}]})}}]}
+        import json as _j
+        _json_dumps = _j.dumps
+        asli = agen.llm.chat
+        m = ModelAI("uji-lokal", "uji lokal", "http://uji-lokal:1/v1", "m", "", True)
+        atur = Pengaturan([m], "uji-lokal", [], 6, 500, 50, 120)
+        agen.llm.chat = palsu
+        try:
+            with override_user(admin):
+                from flask import g
+                g.user = admin
+                h1 = agen.jawab([{"role": "user", "content": f"di dashboard {d.dashboard_title} pengguna bisa memilih provinsi"}],
+                                m, atur, admin.username)
+                h2 = agen.jawab([{"role": "user", "content": f"di dashboard {d.dashboard_title} pengguna bisa memilih"}],
+                                m, atur, admin.username)
+        finally:
+            agen.llm.chat = asli
+        r1 = next((p for p in h1["peristiwa"] if p.get("tipe") == "rencana"), None)
+        if len(panggilan) != 2 or r1 is None or "`provinsi`" not in r1["baris"][0] or "Simpan perubahan" not in h1["jawaban"]:
+            raise RuntimeError(f"jawaban langsung/tebakan gagal: {len(panggilan)} panggilan, {h1['jawaban'][:80]}")
+        rencana.batal(r1["id"], admin.username)
+        if not any(p.get("tipe") == "pilihan" and p["pilihan"] for p in h2["peristiwa"]) or "kolom apa" not in h2["jawaban"]:
+            raise RuntimeError(f"pertanyaan balik tidak langsung: {h2['jawaban'][:80]}")
+        # 3. Prioritas rendah (ringkasan) tidak menunggu; cadangan saat sibuk tidak memilih server yang sama
+        mulai = _t.monotonic()
+        with llm.antre(m, _t.monotonic() + 30):
+            try:
+                with llm.antre(m, _t.monotonic() + 30, "rendah"):
+                    raise RuntimeError("ringkasan masuk padahal server sedang dipakai")
+            except llm.AntreanPenuh:
+                pass
+        if _t.monotonic() - mulai > 2:
+            raise RuntimeError("prioritas rendah masih menunggu")
+        lain = ModelAI("uji-lain", "uji lain", "http://uji-lokal:1/v1", "m2", "", True)
+        jauh = ModelAI("uji-jauh", "uji jauh", "http://uji-jauh:1/v1", "m3", "", True)
+        a2 = Pengaturan([m, lain, jauh], "uji-lokal", [], 6, 500, 50, 120)
+        if agen.cadangan(a2, m, [m.id], sibuk=True).id != "uji-jauh" or agen.cadangan(a2, m, [m.id, "uji-jauh"], sibuk=True) is not None:
+            raise RuntimeError("cadangan saat sibuk memilih model di server yang sama")
+        return "kolom ditebak (saluran, nm_cabang); 1 panggilan model lalu jawaban ALDx; ringkasan tidak menunggu; cadangan beda server"
+
     @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
     def _():
         import time as _t
