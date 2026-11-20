@@ -10,7 +10,10 @@
   const LEBAR = {3: "¼", 4: "⅓", 6: "½", 8: "⅔", 12: "Penuh"};
   // baris: [[{chart_id, lebar, judul, tinggi?} | objek]] atau [{jenis: "garis"}] = isi TAB YANG SEDANG TAMPIL.
   // tab: [{judul, baris}] seluruh dashboard; D.baris selalu menunjuk D.tab[D.aktif].baris (lihat simpanTab()).
-  const D = {id: null, baris: [], filter: [], tab: [{judul: "Tab 1", baris: []}], aktif: 0};
+  // filterLain: nama filter yang dibuat di editor Superset (dipertahankan, tidak diedit di Studio).
+  // Kotak {jenis: "terkunci", ref, lebar, judul}: bagian editor lanjutan (kolom, markdown, tab bertingkat) yang disalin
+  // utuh oleh server saat disimpan (sps_studio/dasbor.py); bisa dipindah, diubah lebarnya, atau dihapus.
+  const D = {id: null, baris: [], filter: [], filterLain: [], tab: [{judul: "Tab 1", baris: []}], aktif: 0};
   const TINGGI_CHART = {"": "Tinggi: otomatis", 26: "Pendek", 38: "Sedang", 52: "Standar", 70: "Tinggi", 90: "Sangat tinggi"};
   const simpanTab = () => { D.tab[D.aktif].baris = D.baris; };          // D.baris sering diganti (filter/splice): catat kembali
   const semuaKotak = () => { simpanTab(); return D.tab.flatMap(t => t.baris).flat(); };
@@ -55,8 +58,8 @@
     const dipakai = new Set(semuaKotak().map(k => k.chart_id));
     $("#daftarLembarD").innerHTML = Studio.awal.lembar.filter(l => !cari || l.judul.toLowerCase().includes(cari)).map(l =>
       `<div class="bidang dimensi" draggable="true" data-id="${l.id}" style="color:var(--teks);${dipakai.has(l.id) ? "opacity:.45" : ""}">
-        <span class="tag">${esc((Studio.awal.aturan[l.tanda]?.label || "").slice(0, 4))}</span>${esc(l.judul)}</div>`).join("")
-      || '<div class="ket">Belum ada lembar kerja tersimpan. Buat di tab Lembar kerja.</div>';
+        <span class="tag">${esc((Studio.awal.aturan[l.tanda]?.label || l.jenis || "").slice(0, 4))}</span>${esc(l.judul)}</div>`).join("")
+      || '<div class="ket">Belum ada chart tersimpan. Buat di tab Lembar kerja.</div>';
     $$("#daftarLembarD [data-id]").forEach(el => {
       el.ondragstart = e => e.dataTransfer.setData("text/plain", JSON.stringify({baru: Number(el.dataset.id)}));
     });
@@ -119,19 +122,25 @@
   }
 
   function elKotak(kotak, r, i) {
-    const el = document.createElement("div"), objek = !!kotak.jenis;
-    el.className = "dtile" + (objek ? " objek" : ""); el.draggable = true;
+    const el = document.createElement("div"), kunci = kotak.jenis === "terkunci", objek = !!kotak.jenis && !kunci;
+    el.className = "dtile" + (objek ? " objek" : "") + (kunci ? " terkunci" : ""); el.draggable = true;
     el.style.flex = `0 0 calc(${kotak.lebar / 12 * 100}% - ${10 * (1 - kotak.lebar / 12)}px)`;
-    const judul = objek ? (kotak.jenis === "teks" ? "Teks" : "Gambar") : kotak.judul;
-    el.innerHTML = `<div class="kepala"><span title="${esc(judul)}">${esc(judul)}</span>
-      <select title="Lebar">${Object.entries(LEBAR).map(([v, t]) => `<option value="${v}" ${Number(v) === kotak.lebar ? "selected" : ""}>${t}</option>`).join("")}</select>
-      ${objek ? "" : `<select data-tinggi title="Tinggi kotak di dashboard">${Object.entries(TINGGI_CHART).map(([v, t]) => `<option value="${v}" ${String(kotak.tinggi || "") === v ? "selected" : ""}>${t}</option>`).join("")}</select>`}
+    const judul = kunci ? kotak.judul : objek ? (kotak.jenis === "teks" ? "Teks" : "Gambar") : kotak.judul;
+    // lebar/tinggi dari editor Superset yang bukan pilihan Studio tetap tampil & dipertahankan
+    const pilihanLebar = {...LEBAR, ...(LEBAR[kotak.lebar] ? {} : {[kotak.lebar]: `${kotak.lebar}/12`})};
+    const pilihanTinggi = {...TINGGI_CHART, ...(kotak.tinggi && !TINGGI_CHART[kotak.tinggi] ? {[kotak.tinggi]: `Tinggi: dari editor (${kotak.tinggi})`} : {})};
+    el.innerHTML = `<div class="kepala"><span title="${esc(judul)}">${kunci ? "🔒 " : ""}${esc(judul)}</span>
+      <select title="Lebar">${Object.entries(pilihanLebar).map(([v, t]) => `<option value="${v}" ${Number(v) === kotak.lebar ? "selected" : ""}>${t}</option>`).join("")}</select>
+      ${objek || kunci ? "" : `<select data-tinggi title="Tinggi kotak di dashboard">${Object.entries(pilihanTinggi).map(([v, t]) => `<option value="${v}" ${String(kotak.tinggi || "") === v ? "selected" : ""}>${t}</option>`).join("")}</select>`}
       ${objek ? '<button class="kecil" data-atur>Atur</button>' : ""}<button class="kecil" data-hapus>Hapus</button></div><div class="mini"></div>`;
     el.ondragstart = e => { e.stopPropagation(); e.dataTransfer.setData("text/plain", JSON.stringify({r, i})); };
     $("select", el).onchange = e => { kotak.lebar = Number(e.target.value); renderKanvas(); };
-    if (!objek) $("[data-tinggi]", el).onchange = e => { if (e.target.value) kotak.tinggi = Number(e.target.value); else delete kotak.tinggi; };
+    if (!objek && !kunci) $("[data-tinggi]", el).onchange = e => { if (e.target.value) kotak.tinggi = Number(e.target.value); else delete kotak.tinggi; };
     $("[data-hapus]", el).onclick = () => { D.baris[r].splice(i, 1); D.baris = D.baris.filter(b => b.length); renderKanvas(); };
-    if (objek) {
+    if (kunci) {
+      $(".mini", el).innerHTML = `<div class="kosongBesar ket">Dibuat di editor lanjutan. Isinya disimpan utuh; ubah isinya di
+        editor dashboard Superset. Di sini bisa dipindah, diubah lebarnya, atau dihapus.</div>`;
+    } else if (objek) {
       $("[data-atur]", el).onclick = () => aturObjek(kotak);
       const mini = $(".mini", el);
       mini.style.height = `${Math.min(kotak.tinggi * 8, 420)}px`;
@@ -217,6 +226,8 @@
       `<div class="fchip ${(f.nilai?.length || f.min != null || f.max != null) ? "aktif" : ""}"><b>${esc(f.nama)}</b>
         <span class="nilai" title="${esc(ringkasFilter(f))}">${esc(ringkasFilter(f))}</span>
         <button class="kecil" data-atur="${i}">Pilih</button><button class="kecil" data-hapus="${i}">Hapus</button></div>`).join("") +
+      D.filterLain.map(n => `<div class="fchip" title="Dibuat di editor dashboard Superset: tetap ada & ikut semua chart yang cocok"><b>🔒 ${esc(n)}</b>
+        <span class="nilai">dari editor</span></div>`).join("") +
       `<button class="kedua" id="tambahFilter">Tambah filter</button>
        <span class="ket">Klik chart di dashboard juga menyaring chart lain (cross filter).</span>`;
     $("#tambahFilter").onclick = dialogTambahFilter;
@@ -342,7 +353,7 @@
   async function simpan() {
     try {
       const j = await Studio.api("/studio/api/dashboard", {id: D.id, judul: $("#judulDasbor").value, keterangan: $("#ketDasbor").value,
-                                                         tab: (simpanTab(), D.tab.map(t => ({judul: t.judul, baris: t.baris.map(row => row.map(k => (k.jenis ? k : {chart_id: k.chart_id, lebar: k.lebar, tinggi: k.tinggi})))}))),
+                                                         tab: (simpanTab(), D.tab.map(t => ({judul: t.judul, baris: t.baris.map(row => row.map(k => (k.jenis ? k : {chart_id: k.chart_id, lebar: k.lebar, tinggi: k.tinggi, ref: k.ref})))}))),
                                                          filter: D.filter.map(f => ({nama: f.nama, dataset_id: f.dataset_id, kolom: f.kolom, jenis: f.jenis}))});
       D.id = j.id;
       $("#tautanDasbor").innerHTML = `<a href="${esc(j.url)}" target="_blank">Buka dashboard</a>`;
@@ -355,15 +366,16 @@
     if (!id) return baru();
     try {
       const d = await Studio.api(`/studio/api/dashboard/${id}`);
-      Object.assign(D, {id: d.id, filter: d.filter || []}); aturTab(d.tab, d.baris);
+      Object.assign(D, {id: d.id, filter: d.filter || [], filterLain: d.filter_lain || []}); aturTab(d.tab, d.baris);
       cacheHasil.clear(); renderFilter();
       $("#judulDasbor").value = d.judul; $("#ketDasbor").value = d.keterangan || "";
       $("#tautanDasbor").innerHTML = `<a href="/superset/dashboard/${d.id}/" target="_blank">Buka dashboard</a>`;
       renderKanvas();
+      if ((d.catatan || []).length) Studio.notif(esc(d.catatan.join(" ")));
     } catch (e) { Studio.notif(esc(e.message), true); }
   }
   function baru() {
-    Object.assign(D, {id: null, filter: []}); aturTab(null, []);
+    Object.assign(D, {id: null, filter: [], filterLain: []}); aturTab(null, []);
     cacheHasil.clear(); renderFilter();
     $("#judulDasbor").value = ""; $("#ketDasbor").value = ""; $("#tautanDasbor").innerHTML = ""; $("#bukaDasbor").value = "";
     renderKanvas();
@@ -389,7 +401,7 @@
         Studio.api("/studio/api/templat", {dataset_id: Number($("#tpDs").value), templat: $('input[name="tpJenis"]:checked').value, ukuran: $("#tpUkuran").value})
           .then(async h => {
             await Studio.muatAwal();
-            Object.assign(D, {id: null, filter: h.filter || []}); aturTab(null, h.baris);
+            Object.assign(D, {id: null, filter: h.filter || [], filterLain: []}); aturTab(null, h.baris);
             cacheHasil.clear(); renderFilter();
             $("#judulDasbor").value = h.judul; $("#ketDasbor").value = ""; $("#tautanDasbor").innerHTML = ""; isiPilihan();
             renderKanvas(); Studio.tutupDialog();
@@ -408,7 +420,7 @@
     $("#tpDs").onchange = isiUkuran; isiUkuran();
   }
   function isiPilihan() {
-    $("#bukaDasbor").innerHTML = '<option value="">Buka dashboard Studio…</option>' +
+    $("#bukaDasbor").innerHTML = '<option value="">Buka dashboard…</option>' +
       Studio.awal.dashboard.map(d => `<option value="${d.id}" ${d.id === D.id ? "selected" : ""}>${esc(d.judul)}</option>`).join("");
   }
 

@@ -24,7 +24,7 @@ from typing import Any, Callable
 
 from sqlalchemy import Column, DateTime, Integer, MetaData, String, Table, Text
 
-from sps_ai import alat, auto, llm, peran as P, wawasan
+from sps_ai import alat, auto, llm, niat, peran as P, rencana, wawasan
 from sps_ai.pengaturan import ModelAI, Pengaturan
 
 log = logging.getLogger(__name__)
@@ -144,6 +144,21 @@ ALAT = [
             {"chart_id": {"type": "integer"}}, ["chart_id"]),
     _fungsi("data_chart", "Ambil angka yang ditampilkan sebuah chart (query chart dijalankan ulang dengan hak akses pengguna).",
             {"chart_id": {"type": "integer"}, "batas": {"type": "integer"}}, ["chart_id"]),
+    _fungsi("rencanakan", "UBAH atau HAPUS yang SUDAH ADA: filter dashboard, judul, jenis chart, tambah/keluarkan chart di "
+            "dashboard, ukuran/dimensi/label kolom dataset, story, hapus chart/dashboard/story. Tulis nama apa adanya, server "
+            "yang mencocokkan. Pengguna melihat pratinjau lalu menekan Simpan (bisa diurungkan).",
+            {"operasi": {"type": "array", "items": {"type": "object", "properties": {
+                "op": {"type": "string", "enum": list(rencana.OPERASI)},
+                "dashboard": {"type": "string", "description": "judul dashboard ('ini' = halaman yang dibuka); buat_story: beberapa, dipisah koma"},
+                "chart": {"type": "string", "description": "judul chart, atau 'ini'"},
+                "dataset": {"type": "string", "description": "nama dataset, atau 'ini'"},
+                "story": {"type": "string", "description": "judul story"},
+                "kolom": {"type": "string", "description": "kolom filter/kolom dataset; kosongkan bila pengguna tidak menyebut"},
+                "jenis": {"type": "string", "description": "jenis chart baru, atau jenis filter: pilihan|rentang|waktu"},
+                "nama": {"type": "string", "description": "nama ukuran/dimensi baru (huruf, angka, _)"},
+                "rumus": {"type": "string", "description": "rumus SQL ukuran (agregat) / dimensi (per baris)"},
+                "judul": {"type": "string", "description": "judul/label baru, atau judul story baru"}}, "required": ["op"]}}},
+            ["operasi"]),
 ]
 
 LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca struktur dataset",
@@ -152,6 +167,7 @@ LABEL_ALAT = {"cari_dataset": "Mencari dataset", "info_dataset": "Membaca strukt
               "cari_tabel": "Memindai tabel database", "daftarkan_tabel": "Mendaftarkan tabel sebagai dataset",
               "cari_dashboard": "Mencari dashboard", "cari_panduan": "Membaca panduan",
               "info_dashboard": "Membaca isi dashboard", "info_chart": "Membaca chart", "data_chart": "Mengambil angka chart",
+              "rencanakan": "Menyusun rencana perubahan",
               "daftar_koneksi": "Membaca daftar koneksi", "daftar_ekstrak": "Membaca daftar ekstrak",
               "batas_data": "Membaca batas data", "lihat_tema": "Membaca tema", "cek_kontras": "Menghitung kontras warna",
               "usul_tema": "Menyusun usulan tema", "status_server": "Membaca status server",
@@ -173,7 +189,8 @@ def _catat(username: str, model_id: str, pertanyaan: str, dipakai: list[str], st
     try:
         AI_LOG.create(bind=db.engine, checkfirst=True)
         db.session.execute(AI_LOG.insert().values(
-            waktu=datetime.now(), username=username, model=model_id, pertanyaan=pertanyaan[:4000],
+            # model_id model lokal terdeteksi otomatis bisa > 64 huruf ("lokal:LM Studio:<nama panjang>")
+            waktu=datetime.now(), username=username[:64], model=model_id[:64], pertanyaan=pertanyaan[:4000],
             alat=json.dumps(dipakai), status=status, durasi_ms=int((time.time() - mulai) * 1000)))
         db.session.commit()
     except Exception:  # noqa: BLE001 - audit gagal tidak boleh menggagalkan jawaban
@@ -183,9 +200,19 @@ def _catat(username: str, model_id: str, pertanyaan: str, dipakai: list[str], st
 
 # --- Menjalankan alat ------------------------------------------------------------------
 def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: Callable[[dict], None],
-                  bahasa: str = "id") -> Any:
+                  bahasa: str = "id", username: str = "", konteks: dict | None = None) -> Any:
     if nama in P.ALAT_AHLI:
         return P.jalankan(nama, arg, ev, bahasa)
+    if nama == "rencanakan":
+        try:
+            h = rencana.susun(arg.get("operasi") or [], username, konteks)
+        except rencana.Butuh as e:
+            ev({"tipe": "pilihan", "pilihan": e.pilihan})
+            return {"perlu_ditanyakan": str(e), "pilihan": e.pilihan,
+                    "catatan": "Belum ada perubahan. Tanyakan ini ke pengguna; tombol pilihan sudah tampil."}
+        ev(h)
+        return {"rencana_dibuat": True, "isi": h["baris"], "peringatan": h["peringatan"],
+                "catatan": "BELUM tersimpan. Minta pengguna memeriksa pratinjau lalu menekan 'Simpan perubahan'."}
     if nama == "cari_dataset":
         return alat.daftar_dataset(arg.get("kata_kunci", ""))
     if nama == "info_dataset":
@@ -240,11 +267,15 @@ def _jalankan_alat(nama: str, arg: dict, model: ModelAI, atur: Pengaturan, ev: C
         return {"saran": [{k: s[k] for k in ("judul", "jenis", "metrik", "kelompok")} for s in h["saran"]],
                 "profil": h.get("profil"), "data_tidak_dikirim": True}
     if nama == "buat_chart":
-        if arg["jenis"] in alat.JENIS_CHART or arg.get("filter"):
+        # Semua jenis lewat pembangun Studio Visual: chart AI bisa dibuka & diedit di Studio, tampilannya seragam.
+        # Pembangun lama (alat.buat_chart) hanya cadangan untuk 5 jenis dasar bila rak Studio menolak spesifikasinya.
+        try:
+            h = auto.buat_satu(arg["dataset_id"], arg)
+        except alat.InputSalah:
+            if arg["jenis"] not in alat.JENIS_CHART:
+                raise
             h = alat.buat_chart(arg["dataset_id"], arg["jenis"], arg.get("judul", ""), arg["metrik"],
                                 arg.get("kelompok"), arg.get("filter"))
-        else:                       # jenis lain (treemap, sankey, peta, ...): pembangun Studio Visual
-            h = auto.buat_satu(arg["dataset_id"], arg)
         ev({"tipe": "chart", **h})
         return h
     if nama == "buat_dashboard":
@@ -376,6 +407,13 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
     pesan = [{"role": "system", "content": _sistem(peran, konteks, bahasa, model, peta)}] + _riwayat_bersih(riwayat)
     pertanyaan = next((p["content"] for p in reversed(pesan) if p["role"] == "user"), "")
     jawaban, status, dicoba, catatan_model, dibuat, diringkas = "", "ok", [model.id], "", 0, False
+    if "rencanakan" in peran.alat:              # perintah ubah yang polanya jelas: tanpa model AI (niat.py)
+        langsung = _jawab_niat(pertanyaan, username, konteks, peristiwa)
+        if langsung is not None:
+            _catat(username, "tanpa-model", f"[{peran.perintah}] {pertanyaan}", ["rencanakan"], langsung, mulai)
+            return {"jawaban": jawaban_niat(langsung, list(peristiwa)),
+                    "peristiwa": [p for p in peristiwa if p.get("tipe") != "teks"],
+                    "status": "ok", "peran": peran.id, "model": model.id, "lanjutan": []}
     tenggat = mulai + (batas or batas_total())  # bawaan: selesai SEBELUM server web memutus permintaan
     try:
         putaran = 0                                 # jawaban model yang berhasil; pengalihan model tidak dihitung
@@ -426,7 +464,7 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
                         if dibuat > MAKS_BUAT:
                             raise alat.InputSalah(f"Batas {MAKS_BUAT} objek baru per pertanyaan tercapai. "
                                                   "Ringkas hasilnya untuk pengguna; minta konfirmasi bila perlu lebih.")
-                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa)
+                    hasil = _jalankan_alat(nama, _argumen(p), model, atur, peristiwa.append, bahasa, username, konteks)
                 except (alat.IzinDitolak, alat.InputSalah, SupersetSecurityException, KeyError, ValueError,
                         LookupError) as exc:
                     db.session.rollback()
@@ -448,6 +486,36 @@ def jawab(riwayat: list[dict], model: ModelAI, atur: Pengaturan, username: str, 
             "model": model.id, "lanjutan": lanjutan(dipakai, list(peristiwa), status)}
 
 
+def _jawab_niat(pertanyaan: str, username: str, konteks: dict | None, peristiwa: list) -> str | None:
+    """Perintah ubah dikenali penerjemah niat -> rencana langsung. Kembali status ('rencana'|'tanya'|'ditolak'),
+    atau None bila bukan perintah ubah (diteruskan ke model AI)."""
+    from superset import db
+    operasi = niat.baca(pertanyaan)
+    if not operasi:
+        return None
+    peristiwa.append({"tipe": "langkah", "teks": "Memahami perintah perubahan"})
+    try:
+        peristiwa.append(rencana.susun(operasi, username, konteks))
+        return "rencana"
+    except rencana.Butuh as e:
+        db.session.rollback()
+        peristiwa.append({"tipe": "teks", "teks": str(e)})
+        peristiwa.append({"tipe": "pilihan", "pilihan": e.pilihan})
+        return "tanya"
+    except (alat.IzinDitolak, alat.InputSalah, LookupError) as e:
+        db.session.rollback()
+        peristiwa.append({"tipe": "teks", "teks": str(e)})
+        return "ditolak"
+
+
+def jawaban_niat(status: str, peristiwa: list[dict]) -> str:
+    teks = next((p["teks"] for p in reversed(peristiwa) if p.get("tipe") == "teks"), "")
+    if status == "rencana":
+        return ("Ini perubahan yang akan disimpan. Periksa dulu, lalu tekan **Simpan perubahan**. "
+                "Setelah disimpan masih bisa diurungkan.")
+    return teks
+
+
 def ringkas_pesan(pesan: list[dict], sistem: str) -> list[dict]:
     """Versi ringkas percakapan untuk model berkonteks kecil: instruksi tanpa katalog isi aplikasi,
     hanya 6 pesan terakhir, dan hasil alat dipotong 3.000 huruf. Pasangan pemanggilan-hasil alat tidak dipisah."""
@@ -461,7 +529,7 @@ def ringkas_pesan(pesan: list[dict], sistem: str) -> list[dict]:
 def samarkan_rahasia(teks: str, atur: Pengaturan) -> str:
     """Lapisan terakhir: API key model & secret key aplikasi tidak pernah tampil di jawaban, apa pun kata modelnya."""
     import os
-    rahasia = {m.api_key for m in atur.model if len(m.api_key or "") >= 12}
+    rahasia = {k for m in atur.model for k in (m.api_key, m.token) if len(k or "") >= 12}
     rahasia |= {v for k, v in os.environ.items() if len(v or "") >= 12 and
                 any(t in k.upper() for t in ("SECRET", "PASSWORD", "API_KEY", "TOKEN"))}
     for r in sorted(rahasia, key=len, reverse=True):
@@ -475,7 +543,9 @@ def cadangan(atur: Pengaturan, model: ModelAI, dicoba: list[str]) -> ModelAI | N
     Privasi: bila model sekarang boleh menerima data (riwayat bisa berisi angka), cadangannya juga harus boleh
     (kirim_data), atau model lokal. Urutan: jenis yang sama dulu (cloud -> cloud, lokal -> lokal)."""
     calon = [m for m in atur.model if m.id not in dicoba and (not model.kirim_data or m.kirim_data or not m.api_key)]
-    calon.sort(key=lambda m: bool(m.api_key) != bool(model.api_key))
+    # Model lain di server lokal yang SAMA (LM Studio/Ollama) ditaruh paling akhir: memintanya membuat server
+    # membongkar model aktif, dan permintaan lain yang sedang berjalan ikut diputus ({"error":"terminated"}).
+    calon.sort(key=lambda m: (bool(m.api_key) != bool(model.api_key), m.base_url == model.base_url))
     return calon[0] if calon else None
 
 

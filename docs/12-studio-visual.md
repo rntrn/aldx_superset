@@ -15,8 +15,32 @@ dashboard Superset, dipakai Asisten AI & Story. Chart buatan Studio bisa dibuka 
 Pilihan dataset berisi dataset **fisik dan virtual** yang boleh Anda akses. Dataset yang baru dibuat (mis. dari
 Kueri Visual atau SQL Lab) muncul otomatis saat Anda kembali ke Studio, tanpa memuat ulang halaman.
 
-Tautan langsung: `/studio/?dataset=<id>` membuka lembar kerja dengan dataset itu; `/studio/?tab=prep&dataset=<id>`
-membuka Persiapan data (dipakai tombol lanjutan Kueri Visual dan menu **Data → Persiapan data**).
+Tautan langsung: `/studio/?dataset=<id>` membuka lembar kerja dengan dataset itu; `/studio/?chart=<id>` membuka chart itu;
+`/studio/?tab=prep&dataset=<id>` membuka Persiapan data (dipakai tombol lanjutan Kueri Visual dan menu **Data → Persiapan data**).
+
+### Satu tempat untuk membangun & mengedit chart
+
+Mulai versi 2026.11.20 menu **Daftar chart** dihapus: semua chart dibuat, dicari, dan diedit di **Studio Visual**.
+
+- Panel kanan **Chart tersimpan** berisi **semua** chart yang boleh Anda buka (dengan kotak cari). Chart buatan Studio
+  dibuka sebagai lembar kerja. Chart dari editor lanjutan / impor / Asisten AI versi lama **juga dibuka sebagai lembar
+  kerja** bila pengaturannya bisa diwakili rak Studio: jenis angka, tabel, tabel pivot, pie, batang, garis, area, treemap,
+  corong, awan kata; metrik `AGREGAT(kolom)`, metrik tersimpan, atau jumlah baris; dimensi kolom biasa; filter sederhana
+  (`IN`, `=`, `≥`, `≤`). Studio memberi tahu bahwa chart itu dikonversi: **Simpan** membangun ulang chart dengan
+  pengaturan Studio (format rinci dari Explore bisa berubah), **Simpan baru** membuat chart terpisah. Yang tidak terwakili
+  (metrik/kolom SQL bebas, tabel baris mentah, jenis khusus) ditandai **lanjutan** dan dibuka di Mode lanjutan.
+- **Diubah di Mode lanjutan?** Studio menyimpan sidik chart. Bila chart Studio diubah di Explore, saat dibuka lagi lembar
+  kerja dibangun ulang dari versi terbaru (ada pemberitahuan). Bila perubahannya tidak bisa ditampilkan Studio, versi
+  Studio terakhir yang tampil disertai peringatan merah: **Simpan** akan menimpa perubahan itu, pakai **Simpan baru**.
+- Chart buatan **Asisten AI** (semua jenis, termasuk angka, tabel, pie, batang, garis) dibangun dengan pembangun Studio,
+  jadi langsung bisa dibuka & diedit di Studio dan tampilannya sama dengan chart Studio.
+- Tombol **Mode lanjutan** (di bilah lembar kerja, setelah chart disimpan) membuka chart yang sama di editor Superset
+  (Explore) untuk pengaturan rinci yang tidak ada di Studio.
+- Pengalihan otomatis: *Tambah chart* Superset (`/chart/add`), daftar chart (`/chart/list`), dan Explore yang dibuka dari
+  dataset (chart baru) → Studio. Tombol **Edit chart** di dashboard, hasil cari `Ctrl + K`, dan tautan Asisten AI
+  membuka chart buatan Studio di Studio; chart lain tetap di Explore. Pintasan `g → c` membuka Studio.
+- Mode lanjutan diingat per chart selama sesi browser, jadi memuat ulang Explore tidak melempar Anda kembali ke Studio.
+- Explore pada layar sempit (atau saat panel AI terbuka) tidak lagi terpotong: chart tampil di atas, kontrol di bawahnya.
 
 ---
 
@@ -225,6 +249,22 @@ ke palet baru saat `build-dashboards` / tugas malam (`sps_warna.py`); warna pili
 Warna dibagi menurut urutan kemunculan, sama seperti Superset, jadi pratinjau = hasil di dashboard.
 
 ## 2. Susun dashboard
+
+### Membuka & menyimpan dashboard dari mana pun (tanpa kehilangan isi)
+
+**Buka dashboard…** berisi semua dashboard yang boleh Anda ubah (pemilik / Admin): buatan Studio, editor dashboard
+Superset, Asisten AI, maupun impor .ald/.aldx. Menyimpan dari Studio **tidak menghapus** apa pun yang dibuat di editor lain:
+
+| Di dashboard | Di Studio | Saat disimpan |
+|---|---|---|
+| Chart biasa | kotak chart | lebar & tinggi bebas dari editor (mis. 5/12, tinggi 63) dipertahankan (pilihan *Tinggi: dari editor*); judul pengganti chart ikut |
+| Kolom berisi beberapa chart, markdown biasa, tab bertingkat | kotak **🔒 terkunci** (garis putus-putus) | disalin **utuh** beserta isinya; bisa dipindah, diubah lebarnya, atau dihapus di Studio, isinya diubah di editor dashboard Superset |
+| Baris di luar tab (dashboard bertab) | tidak tampil (ada pemberitahuan saat dibuka) | tetap di tempatnya, sebelum/sesudah tab |
+| Filter buatan editor | chip **🔒** di bilah Filter | tetap utuh (nilai bawaan, kaskade, dll.) |
+| Skema warna & klik-filter dari editor | – | tidak ditimpa (hanya diisi untuk dashboard baru) |
+
+Setiap simpan menghitung ulang **cakupan semua filter**: chart yang baru ditambahkan langsung ikut terfilter, chart yang
+datasetnya tidak punya kolom filter dikecualikan otomatis.
 
 0. **Mulai cepat: Dari template…** → pilih dataset, **ukuran utama**, dan template; ALDx memilih kolom tanggal,
    kategori (teks dengan 2–50 nilai), dan provinsi secara otomatis, membuat lembar kerjanya, lalu mengisi kanvas

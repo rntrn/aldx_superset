@@ -83,6 +83,19 @@ Nama model di penyedia bisa berganti; pilih versi *instruct* terbaru dari keluar
 3. Tab **Developer** › pilih model › nyalakan **Start server** (port 1234) dan aktifkan **Serve on Local Network**.
 4. Di ALDx: **Periksa lagi**. Bila statusnya *menyala, belum ada model*, muat modelnya di tab Developer.
 5. Agar menyala sendiri: Settings › *Start LM Studio on login* + *Start server automatically*.
+6. **Require Authentication** (Server Settings) menyala → status di ALDx *butuh token*. Pilih salah satu: matikan
+   pengaturan itu, atau buat token di **Manage Tokens** lalu tempel di kartu LM Studio (panel AI › Sambungkan AI, atau
+   Pusat Kendali › Asisten AI; Admin). Token tersimpan terenkripsi sebagai `AI_LOKAL_LM_STUDIO_TOKEN` (bisa juga di `.env`;
+   nama lain: `api_key_env` di `temukan_lokal` pada `ai.yaml`). Token ditolak → status *token ditolak*.
+7. Model yang sedang **dimuat** di LM Studio ditandai *· dimuat* dan diletakkan paling atas di pilihan model: memakainya
+   tidak memaksa LM Studio memuat/membongkar model.
+8. Disarankan: Server Settings › matikan **Only Keep Last JIT Loaded Model**. Bila menyala, meminta model lain membuat
+   LM Studio membongkar model aktif dan memutus permintaan yang sedang berjalan.
+
+> **Antrean:** ALDx mengirim **satu permintaan sekaligus** ke setiap server lokal (chat, ringkasan dashboard, uji model
+> bergiliran), karena server lokal di laptop praktis hanya melayani satu. Permintaan yang menunggu terlalu lama dijawab
+> *masih sibuk melayani permintaan lain*. Model "berpikir" (mis. qwen3.5 di CPU) bisa butuh beberapa menit per jawaban;
+> untuk laptop tanpa GPU pilih model instruksi kecil tanpa mode berpikir.
 
 ### 2.4 Jan
 

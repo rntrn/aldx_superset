@@ -28,8 +28,10 @@
     {id: "kueri", grup: "Kueri", label: "Kueri Visual", ikon: "kueri", alamat: "/kueri/", izin: "Kueri Visual", cocok: /^\/kueri/},
     {id: "sqllab", grup: "Kueri", label: "SQL Lab", ikon: "sql", alamat: "/sqllab/", izin: "SQL Editor", cocok: /^\/sqllab\/?$|^\/sqllab\/\?/},
     {id: "tersimpan", grup: "Kueri", label: "Kueri tersimpan", ikon: "simpan", alamat: "/savedqueryview/list/", izin: "Saved Queries", cocok: /^\/savedqueryview/},
-    {id: "studio", grup: "Visual", label: "Studio Visual", ikon: "studio", alamat: "/studio/", izin: "Studio Visual", langkah: 3},
-    {id: "chart", grup: "Visual", label: "Daftar chart", ikon: "chart", alamat: "/chart/list/", izin: "Charts", cocok: /^\/(chart|explore)/},
+    // Studio Visual = satu-satunya menu membangun & mengedit chart (daftar chart ada di dalamnya). Halaman chart/Explore
+    // Superset termasuk menu ini; Explore hanya dipakai sebagai "Mode lanjutan" (bingkai.js mengarahkan ke Studio).
+    {id: "studio", grup: "Visual", label: "Studio Visual", ikon: "studio", alamat: "/studio/", izin: "Studio Visual", langkah: 3,
+     cocok: /^\/(studio\/?(\?(?!tab=prep).*)?$|chart\/|explore)/},
     {id: "dashboard", grup: "Dashboard & Story", label: "Daftar dashboard", ikon: "dashboard", alamat: "/dashboard/list/", izin: "Dashboards",
      langkah: 4, cocok: /^\/(dashboard\/list|superset\/dashboard)/},
     {id: "story", grup: "Dashboard & Story", label: "Story", ikon: "story", alamat: "/asisten/?tab=story", izin: "Story", langkah: 5},
@@ -305,7 +307,7 @@
       .sort((a, b) => !!b.certified_by - !!a.certified_by).forEach(x =>
         pilihan.push({kelompok, ikon, label: label(x), ket: x.certified_by ? t("Resmi") : "", jalan: () => buka(alamat(x))}));
     tambah(d, t("Dashboard"), "dashboard", x => x.dashboard_title, x => x.url || `/superset/dashboard/${x.id}/`);
-    tambah(c, t("Chart"), "chart", x => x.slice_name, x => `/explore/?slice_id=${x.id}`);
+    tambah(c, t("Chart"), "chart", x => x.slice_name, x => `/studio/?chart=${x.id}`);
     if (s && s.result) s.result = s.result.filter(x => !/^ramalan__/.test(x.table_name));   // dataset sistem (U17)
     tambah(s, t("Dataset"), "tabel", x => x.table_name, x => `/explore/?datasource_type=table&datasource_id=${x.id}`);
     gambarPalet();
@@ -344,7 +346,7 @@
   }
   function topikHalaman() {
     if (!ruteAktif) return /\/superset\/dashboard\//.test(alamatBingkai) ? "lihat-dashboard" : "beranda";
-    if (ruteAktif.id === "chart" && /^\/explore/.test(alamatBingkai)) return "explore";
+    if (ruteAktif.id === "studio" && /^\/explore/.test(alamatBingkai)) return "explore";
     if (ruteAktif.id === "dashboard" && /\/superset\/dashboard\//.test(alamatBingkai)) return "lihat-dashboard";
     return ruteAktif.id;
   }
@@ -369,7 +371,7 @@
   }
 
   // ---------------- Pintasan keyboard ----------------
-  const LOMPAT = {h: "beranda", d: "dashboard", c: "chart", s: "studio", k: "kueri", q: "sqllab", t: "dataset", y: "story"};
+  const LOMPAT = {h: "beranda", d: "dashboard", c: "studio", s: "studio", k: "kueri", q: "sqllab", t: "dataset", y: "story"};
   let tungguG = 0;
   const sedangMengetik = el => el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
   function tanganiTombol(e) {

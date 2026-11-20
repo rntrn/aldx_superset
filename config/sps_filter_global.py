@@ -395,5 +395,62 @@ def api_hapus_tampilan():
     return jsonify(ok=True)
 
 
+# --- Tambah filter dashboard langsung dari halaman dashboard (tombol "Tambah filter", bingkai.js) ----------
+# Memakai ALDx Rencana (sps_ai/rencana.py): pratinjau "berlaku di N dari M chart" -> Simpan -> Urungkan, hanya
+# pemilik/Admin. Tidak butuh akses Asisten AI. Filter baru langsung dipakai filter global (kolom yang sama).
+def _galat_rencana(fungsi):
+    from sps_ai import alat, rencana
+    from superset.exceptions import SupersetSecurityException
+    try:
+        return jsonify(fungsi())
+    except rencana.Butuh as e:
+        return jsonify(error=str(e), pilihan=e.pilihan), 400
+    except (alat.IzinDitolak, SupersetSecurityException) as e:
+        return jsonify(error=str(e)), 403
+    except (alat.InputSalah, LookupError, ValueError) as e:
+        return jsonify(error=str(e)), 400
+
+
+@bp.route("/api/kolom-dashboard")
+def api_kolom_dashboard():
+    """Kolom yang bisa jadi filter untuk SATU dashboard, paling cocok dulu: {kolom: [{kolom, label, chart, total, waktu}]}."""
+    from sps_ai import rencana
+    d = _dashboard(request.args.get("dashboard", ""))
+    if d is None:
+        return jsonify(error="Dashboard tidak ditemukan."), 404
+    semua = rencana.kolom_dashboard(d)
+    urut = rencana.saran_kolom(d, n=len(semua))
+    ada = {((f.get("targets") or [{}])[0].get("column") or {}).get("name") for f in _filter_native(d)}
+    total = len(d.slices)
+    return jsonify(dashboard=d.id, total=total, kolom=[
+        {"kolom": k, "label": semua[k]["label"] or k, "chart": len(semua[k]["charts"]), "total": total,
+         "waktu": semua[k]["dttm"], "sudah": k in ada} for k in urut])
+
+
+@bp.route("/api/tambah", methods=["POST"])
+def api_tambah_filter():
+    """{dashboard, kolom, jenis?} -> pratinjau rencana {id, baris, peringatan} (belum disimpan)."""
+    from flask import g
+    from sps_ai import rencana
+    d = request.get_json(silent=True) or {}
+    dash = _dashboard(d.get("dashboard", ""))
+    if dash is None:
+        return jsonify(error="Dashboard tidak ditemukan."), 404
+    op = {"op": "tambah_filter", "dashboard": str(dash.id), "kolom": str(d.get("kolom") or "")}
+    if d.get("jenis") in ("pilihan", "rentang", "waktu"):
+        op["jenis"] = d["jenis"]
+    return _galat_rencana(lambda: rencana.susun([op], g.user.username))
+
+
+@bp.route("/api/rencana/<rid>/<aksi>", methods=["POST"])
+def api_rencana_filter(rid: str, aksi: str):
+    from flask import g
+    from sps_ai import rencana
+    fungsi = {"simpan": rencana.simpan, "urungkan": rencana.urungkan, "batal": rencana.batal}.get(aksi)
+    if fungsi is None:
+        return jsonify(error="Aksi tidak dikenal."), 404
+    return _galat_rencana(lambda: fungsi(rid, g.user.username))
+
+
 def daftarkan(app) -> None:
     app.register_blueprint(bp)

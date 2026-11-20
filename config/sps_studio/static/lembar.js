@@ -596,8 +596,8 @@
       const j = await Studio.api("/studio/api/lembar", {spec: spec(), chart_id: baru ? null : L.chartId});
       if (j.disimpan) {
         L.chartId = j.id;
-        Studio.notif(`Tersimpan sebagai chart Superset. ${j.catatan ? esc(j.catatan) + " " : ""}<a href="${esc(j.url)}" target="_blank">Buka di Explore</a>`);
-        await Studio.muatAwal(); renderDaftar(); window.dispatchEvent(new Event("lembar-berubah"));
+        Studio.notif(`Tersimpan. ${j.catatan ? esc(j.catatan) : ""}`);
+        await Studio.muatAwal(); renderDaftar(); tombolLanjutan(); window.dispatchEvent(new Event("lembar-berubah"));
       } else Studio.notif(`${esc(j.catatan)} <a href="${esc(j.url)}" target="_blank">Buka</a>`);
     } catch (e) { Studio.notif(esc(e.message), true); }
   }
@@ -624,19 +624,49 @@
              if (f.op === ">=") k.min = f.nilai; else k.max = f.nilai; }
     });
     L.filter.push(...Object.values(kelompok));
-    L.tanda = s.tanda || "otomatis"; L.chartId = s.chart_id || null; L.analitik = s.analitik || {};
+    L.tanda = s.tanda || "otomatis"; L.chartId = s.chart_id || null; L.analitik = s.analitik || {}; tombolLanjutan();
     $("#judulLembar").value = s.judul || ""; $("#pakaiLabel").checked = L.label; $("#pilihTanda").value = L.tanda;
     perbarui();
   }
 
+  // Semua chart yang boleh dibuka. Chart Studio -> lembar kerja; chart dari editor lanjutan -> Mode lanjutan (Explore).
+  const alamatLanjutan = id => `/explore/?slice_id=${id}&lanjutan=1`;
+  function tombolLanjutan() {
+    const b = $("#modeLanjutan"), h = $("#hapusChart");
+    b.hidden = h.hidden = !L.chartId;
+    b.onclick = () => { if (L.chartId) location.href = alamatLanjutan(L.chartId); };
+    h.onclick = async () => {
+      const id = L.chartId, judul = $("#judulLembar").value || "chart ini";
+      if (!id || !confirm(`Hapus "${judul}"? Chart juga hilang dari dashboard yang memakainya. Tidak bisa dibatalkan.`)) return;
+      try {
+        await Studio.api(`/studio/api/lembar/${id}/hapus`, {});
+        L.chartId = null; tombolLanjutan();
+        await Studio.muatAwal(); renderDaftar(); window.dispatchEvent(new Event("lembar-berubah"));
+        Studio.notif(`Chart <b>${esc(judul)}</b> dihapus. Lembar kerja tetap terbuka; Simpan untuk membuatnya lagi.`);
+      } catch (e) { Studio.notif(esc(e.message), true); }
+    };
+  }
+  async function bukaChart(id) {
+    const l = Studio.awal.lembar.find(x => x.id === Number(id));
+    if (l && !l.studio) { location.href = alamatLanjutan(id); return; }
+    try {
+      const s = await Studio.api(`/studio/api/lembar/${id}`);
+      await gantiDataset(s.dataset_id, s);
+      if (s.catatan) Studio.notif(esc(s.catatan), !!s.basi);   // dikonversi / diubah di Mode lanjutan
+    }
+    catch (e) {
+      if (/tidak dibuat di Studio/.test(e.message)) location.href = alamatLanjutan(id);
+      else Studio.notif(esc(e.message), true);
+    }
+  }
   function renderDaftar() {
-    const daftar = Studio.awal.lembar;
-    $("#daftarLembar").innerHTML = daftar.map(l => `<div data-id="${l.id}"><b>${esc(l.judul)}</b><span class="ket">${esc(Studio.awal.aturan[l.tanda]?.label || "")} · ${esc(l.diubah)}</span></div>`).join("")
-      || '<div class="ket">Belum ada. Simpan lembar kerja pertama Anda.</div>';
-    $$("#daftarLembar [data-id]").forEach(el => el.onclick = async () => {
-      try { const s = await Studio.api(`/studio/api/lembar/${el.dataset.id}`); await gantiDataset(s.dataset_id, s); }
-      catch (e) { Studio.notif(esc(e.message), true); }
-    });
+    const cari = ($("#cariLembar").value || "").trim().toLowerCase();
+    const daftar = Studio.awal.lembar.filter(l => !cari || l.judul.toLowerCase().includes(cari)).slice(0, 120);
+    $("#daftarLembar").innerHTML = daftar.map(l => `<div data-id="${l.id}" title="${l.studio ? "Buka di lembar kerja" : "Dibuat di editor lanjutan: dibuka di Mode lanjutan"}">
+        <b>${esc(l.judul)}${l.studio ? "" : '<span class="lanjutan">lanjutan</span>'}</b>
+        <span class="ket">${esc(Studio.awal.aturan[l.tanda]?.label || l.jenis || "")} · ${esc(l.diubah)}</span></div>`).join("")
+      || `<div class="ket">${cari ? "Tidak ada chart yang cocok." : "Belum ada. Simpan lembar kerja pertama Anda."}</div>`;
+    $$("#daftarLembar [data-id]").forEach(el => el.onclick = () => bukaChart(el.dataset.id));
   }
 
   /* ---------- Saran dari data (auto chart ML ringan) ---------- */
@@ -720,9 +750,13 @@
     $("#bersihkan").onclick = () => bersihkan();
     $("#simpanLembar").onclick = () => simpan(false);
     $("#simpanBaru").onclick = () => simpan(true);
-    pasangSeret(); renderDaftar();
-    // ?dataset=ID (mis. dari Kueri Visual) memilih dataset itu; selain itu dataset pertama.
-    const minta = Number(new URLSearchParams(location.search).get("dataset"));
+    pasangSeret(); renderDaftar(); tombolLanjutan();
+    $("#cariLembar").oninput = renderDaftar;
+    // ?chart=ID membuka chart itu (tombol Edit di mana pun diarahkan ke sini); ?dataset=ID memilih dataset itu
+    // (mis. dari Kueri Visual); selain itu dataset pertama.
+    const q = new URLSearchParams(location.search);
+    if (Number(q.get("chart"))) { bukaChart(Number(q.get("chart"))); return; }
+    const minta = Number(q.get("dataset"));
     const awalDs = ds.find(d => d.id === minta) || ds[0];
     if (awalDs) gantiDataset(awalDs.id); else tampilPesan("Belum ada dataset yang boleh Anda akses.");
   });

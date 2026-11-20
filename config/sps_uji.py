@@ -1089,7 +1089,8 @@ def jalankan_semua() -> None:
         if mati:
             raise RuntimeError(f"{len(mati)} tautan mati: " + "; ".join(mati[:4]))
         peta = (P.DOCS / "33-peta-menu-per-level.md").read_text(encoding="utf-8")
-        tanpa = [n for n in ("Hubungkan data", "Jejak data", "Studio Visual", "Daftar chart", "Langganan laporan", "Peringatan data",
+        # "Daftar chart" sudah bukan menu (2026.11.20): mencari/mengedit chart ada di Studio Visual
+        tanpa = [n for n in ("Hubungkan data", "Jejak data", "Studio Visual", "Langganan laporan", "Peringatan data",
                              "Sematkan ke web lain", "Auto chart & dashboard", "Kesehatan kueri", "Jejak audit", "Moderasi ulasan")
                  if f"**{n}**" not in peta]
         if tanpa:
@@ -1114,6 +1115,409 @@ def jalankan_semua() -> None:
                 ("klik", "otomatis", "otomatis") or ringkasan.menit({"ringkasan_menit": 1}) != 5:
             raise RuntimeError("mode/menit ai.yaml salah dibaca")
         return f"{len(p)} poin; model terpilih: lokal; kirim_data: false ditolak; mode {ringkasan.mode()}"
+
+    @uji("Asisten AI", "Rencana: perintah ubah dipahami tanpa model AI")
+    def _():
+        from sps_ai import niat
+        kasus = {
+            "dari dashboard tes1 buatkan filtrasi yang bisa berlaku di semua chart": ("tambah_filter", "dashboard", "tes1"),
+            "tambah filter cabang di dashboard Penjualan": ("tambah_filter", "kolom", "cabang"),
+            "pasang filter tanggal di dashboard ini": ("tambah_filter", "jenis", "waktu"),
+            "hapus filter cabang dari dashboard tes1": ("hapus_filter", "kolom", "cabang"),
+            "ganti judul dashboard tes1 menjadi Ringkasan": ("ganti_judul_dashboard", "judul", "Ringkasan"),
+            "jadikan chart ini pie": ("ubah_jenis_chart", "jenis", "pie"),
+            "keluarkan chart Total dari dashboard tes1": ("buang_chart", "chart", "Total"),
+        }
+        for teks, (op, kunci, nilai) in kasus.items():
+            h = niat.baca(teks)
+            if not h or h[0]["op"] != op or h[0].get(kunci) != nilai:
+                raise RuntimeError(f"'{teks}' -> {h}")
+        for teks in ("berapa penjualan bulan ini?", "buatkan dashboard penjualan per cabang"):
+            if niat.baca(teks) is not None:
+                raise RuntimeError(f"'{teks}' salah dianggap perintah ubah")
+        return f"{len(kasus)} perintah dikenali, 2 pertanyaan biasa diteruskan ke model"
+
+    @uji("Asisten AI", "Rencana: pratinjau, Simpan, Urungkan kembali persis (dashboard uji sementara)")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from sps_ai import rencana
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if latihan is None or not latihan.slices:
+            raise RuntimeError("dashboard latihan belum ada (scripts\\data-latihan.ps1)")
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            d = Dashboard(dashboard_title="uji__rencana", owners=[admin], slices=list(latihan.slices)[:3],
+                          position_json="{}", json_metadata="{}")
+            db.session.add(d)
+            db.session.commit()
+            try:
+                sidik = lambda: (d.dashboard_title, d.json_metadata, d.position_json, sorted(s.id for s in d.slices))  # noqa: E731
+                awal = sidik()
+                tanya = None
+                try:
+                    rencana.susun([{"op": "tambah_filter", "dashboard": "uji__rencana", "kolom": ""}], admin.username)
+                except rencana.Butuh as e:
+                    tanya = e
+                if tanya is None or not tanya.pilihan:
+                    raise RuntimeError("kolom kosong tidak ditanyakan / tanpa pilihan")
+                kolom = rencana.saran_kolom(d)[0]
+                h = rencana.susun([{"op": "tambah_filter", "dashboard": "uji_rencana", "kolom": kolom},
+                                   {"op": "ganti_judul_dashboard", "dashboard": "uji__rencana", "judul": "uji__rencana2"}],
+                                  admin.username)
+                rencana.simpan(h["id"], admin.username)
+                db.session.expire_all()
+                f = _json.loads(d.json_metadata).get("native_filter_configuration") or []
+                if d.dashboard_title != "uji__rencana2" or not f or not f[0].get("chartsInScope"):
+                    raise RuntimeError("perubahan tidak tersimpan")
+                rencana.urungkan(h["id"], admin.username)
+                db.session.expire_all()
+                if sidik() != awal:
+                    raise RuntimeError("Urungkan tidak mengembalikan persis")
+                return f"filter '{kolom}' + ganti judul tersimpan, lalu diurungkan persis"
+            finally:
+                db.session.delete(d)
+                db.session.commit()
+
+    @uji("Studio", "Dashboard editor Superset dibuka & disimpan di Studio tanpa kehilangan isi (kolom, markdown, ukuran, filter, warna, luar tab)")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from sps_studio import dasbor
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if latihan is None or len(latihan.slices) < 5:
+            raise RuntimeError("dashboard latihan belum ada (scripts\\data-latihan.ps1)")
+        c = list(latihan.slices)[:5]
+        kol = next((k.column_name for k in c[0].datasource.columns if k.column_name in ("kategori", "saluran", "nm_cabang")), None)
+        ch = lambda cid, chart, w, h, induk: {"type": "CHART", "id": cid, "children": [], "parents": induk,  # noqa: E731
+                                              "meta": {"chartId": chart.id, "width": w, "height": h, "sliceName": chart.slice_name,
+                                                       "uuid": str(chart.uuid), "sliceNameOverride": "Judul dari editor"}}
+        isi = ["ROOT_ID", "GRID_ID"]
+        pos = {"DASHBOARD_VERSION_KEY": "v2", "ROOT_ID": {"type": "ROOT", "id": "ROOT_ID", "children": ["GRID_ID"]},
+               "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-a", "ROW-b"], "parents": ["ROOT_ID"]},
+               "HEADER_ID": {"type": "HEADER", "id": "HEADER_ID", "meta": {"text": "uji__ronde"}},
+               "ROW-a": {"type": "ROW", "id": "ROW-a", "children": ["CHART-x", "COLUMN-k"], "parents": isi, "meta": {}},
+               "CHART-x": ch("CHART-x", c[0], 5, 63, [*isi, "ROW-a"]),
+               "COLUMN-k": {"type": "COLUMN", "id": "COLUMN-k", "children": ["CHART-y", "CHART-z"], "parents": [*isi, "ROW-a"],
+                            "meta": {"width": 7, "background": "BACKGROUND_TRANSPARENT"}},
+               "CHART-y": ch("CHART-y", c[1], 7, 30, [*isi, "ROW-a", "COLUMN-k"]),
+               "CHART-z": ch("CHART-z", c[2], 7, 30, [*isi, "ROW-a", "COLUMN-k"]),
+               "ROW-b": {"type": "ROW", "id": "ROW-b", "children": ["MARKDOWN-m"], "parents": isi, "meta": {}},
+               "MARKDOWN-m": {"type": "MARKDOWN", "id": "MARKDOWN-m", "children": [], "parents": [*isi, "ROW-b"],
+                              "meta": {"width": 12, "height": 20, "code": "## Catatan editor"}}}
+        f_editor = {"id": "NATIVE_FILTER-editor1", "name": "Filter editor", "filterType": "filter_select",
+                    "targets": [{"datasetId": c[0].datasource_id, "column": {"name": kol}}], "chartsInScope": [c[0].id],
+                    "scope": {"rootPath": ["ROOT_ID"], "excluded": []}, "controlValues": {"multiSelect": True},
+                    "defaultDataMask": {"filterState": {"value": None}}, "cascadeParentIds": [], "type": "NATIVE_FILTER"}
+        meta0 = {"color_scheme": "supersetColors", "cross_filters_enabled": False, "native_filter_configuration": [f_editor]}
+
+        def ke_payload(b: dict) -> dict:                  # sama dengan simpan() di dasbor.js
+            peta = lambda baris: [[k if k.get("jenis") else {kk: k.get(kk) for kk in ("chart_id", "lebar", "tinggi", "ref")}  # noqa: E731
+                                   for k in row] for row in baris]
+            return {"judul": b["judul"], "keterangan": b["keterangan"], "filter": b["filter"],
+                    "tab": [{"judul": t["judul"], "baris": peta(t["baris"])} for t in b["tab"]] or [{"judul": "", "baris": peta(b["baris"])}]}
+
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            d = Dashboard(dashboard_title="uji__ronde", owners=[admin], slices=c[:3], position_json=_json.dumps(pos),
+                          json_metadata=_json.dumps(meta0))
+            db.session.add(d)
+            db.session.commit()
+            try:
+                if d.id not in {x["id"] for x in dasbor.daftar()}:
+                    raise RuntimeError("dashboard non-Studio tidak muncul di daftar Studio")
+                b = dasbor.buka(d.id)
+                kotak = [k for row in b["baris"] for k in row]
+                kunci = [k for k in kotak if k.get("jenis") == "terkunci"]
+                if len(kunci) != 2 or b["filter_lain"] != ["Filter editor"]:
+                    raise RuntimeError(f"kotak terkunci/filter editor tidak terbaca: {kotak}, {b['filter_lain']}")
+                payload = ke_payload(b)
+                payload["tab"][0]["baris"].append([{"chart_id": c[3].id, "lebar": 6}])       # chart baru ditambahkan di Studio
+                dasbor.simpan(payload, d.id)
+                db.session.expire_all()
+                p2, m2 = _json.loads(d.position_json), _json.loads(d.json_metadata)
+                cx = next(v for v in p2.values() if isinstance(v, dict) and v.get("type") == "CHART" and v["meta"]["chartId"] == c[0].id)
+                salah = []
+                if p2.get("COLUMN-k", {}).get("children") != ["CHART-y", "CHART-z"] or p2["COLUMN-k"]["meta"]["width"] != 7:
+                    salah.append("kolom berisi 2 chart")
+                if p2.get("MARKDOWN-m", {}).get("meta", {}).get("code") != "## Catatan editor":
+                    salah.append("markdown editor")
+                if (cx["meta"]["width"], cx["meta"]["height"], cx["meta"].get("sliceNameOverride")) != (5, 63, "Judul dari editor"):
+                    salah.append(f"ukuran/judul pengganti chart {cx['meta']}")
+                if (m2.get("color_scheme"), m2.get("cross_filters_enabled")) != ("supersetColors", False):
+                    salah.append("skema warna / klik-filter ditimpa")
+                fe = next((f for f in m2["native_filter_configuration"] if f["id"] == "NATIVE_FILTER-editor1"), None)
+                if fe is None or fe.get("controlValues") != {"multiSelect": True}:
+                    salah.append("filter editor hilang/berubah")
+                elif kol and c[3].id not in fe["chartsInScope"] and kol in {k.column_name for k in c[3].datasource.columns}:
+                    salah.append("chart baru tidak ikut filter editor")
+                if sorted(s.id for s in d.slices) != sorted(x.id for x in c[:4]):
+                    salah.append(f"daftar chart dashboard {[s.id for s in d.slices]}")
+                if salah:
+                    raise RuntimeError("hilang/berubah: " + "; ".join(salah))
+
+                # Bertab: baris di luar tab dipertahankan walau tidak tampil di Studio
+                pos_t = {"DASHBOARD_VERSION_KEY": "v2", "ROOT_ID": pos["ROOT_ID"],
+                         "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-luar", "TABS-t"], "parents": ["ROOT_ID"]},
+                         "ROW-luar": {"type": "ROW", "id": "ROW-luar", "children": ["MARKDOWN-l"], "parents": isi, "meta": {}},
+                         "MARKDOWN-l": {"type": "MARKDOWN", "id": "MARKDOWN-l", "children": [], "parents": [*isi, "ROW-luar"],
+                                        "meta": {"width": 12, "height": 10, "code": "di luar tab"}},
+                         "TABS-t": {"type": "TABS", "id": "TABS-t", "children": ["TAB-1", "TAB-2"], "parents": isi, "meta": {}},
+                         "TAB-1": {"type": "TAB", "id": "TAB-1", "children": ["ROW-t1"], "parents": [*isi, "TABS-t"], "meta": {"text": "Satu"}},
+                         "TAB-2": {"type": "TAB", "id": "TAB-2", "children": ["ROW-t2"], "parents": [*isi, "TABS-t"], "meta": {"text": "Dua"}},
+                         "ROW-t1": {"type": "ROW", "id": "ROW-t1", "children": ["CHART-t1"], "parents": [*isi, "TABS-t", "TAB-1"], "meta": {}},
+                         "CHART-t1": ch("CHART-t1", c[0], 6, 50, [*isi, "TABS-t", "TAB-1", "ROW-t1"]),
+                         "ROW-t2": {"type": "ROW", "id": "ROW-t2", "children": ["CHART-t2"], "parents": [*isi, "TABS-t", "TAB-2"], "meta": {}},
+                         "CHART-t2": ch("CHART-t2", c[1], 6, 50, [*isi, "TABS-t", "TAB-2", "ROW-t2"])}
+                d.position_json, d.slices = _json.dumps(pos_t), c[:2]
+                db.session.commit()
+                b = dasbor.buka(d.id)
+                if len(b["tab"]) != 2 or not b["catatan"]:
+                    raise RuntimeError(f"tab/catatan luar tab salah: {len(b['tab'])} tab, {b['catatan']}")
+                dasbor.simpan(ke_payload(b), d.id)
+                db.session.expire_all()
+                p3 = _json.loads(d.position_json)
+                if p3["GRID_ID"]["children"][0] != "ROW-luar" or p3.get("MARKDOWN-l", {}).get("meta", {}).get("code") != "di luar tab":
+                    raise RuntimeError(f"baris di luar tab hilang: {p3['GRID_ID']}")
+                return "kolom, markdown, lebar 5/tinggi 63, judul pengganti, filter & warna editor utuh; chart baru ikut filter; luar tab tetap"
+            finally:
+                db.session.delete(d)
+                db.session.commit()
+
+    @uji("Studio", "Satu editor chart: chart editor lanjutan dibuka sebagai lembar kerja, perubahan di Mode lanjutan terdeteksi, chart AI lewat Studio")
+    def _():
+        import json as _json
+        from superset.models.slice import Slice
+        from sps_ai import alat as A, auto
+        from sps_studio import konversi
+        t = db.session.query(SqlaTable).filter_by(table_name="latihan_penjualan").first()
+        if t is None:
+            raise RuntimeError("dataset latihan_penjualan belum ada")
+        kol = {c.column_name for c in t.columns}
+        if not {"total", "kategori"} <= kol:
+            raise RuntimeError(f"kolom latihan_penjualan berubah: {sorted(kol)}")
+        angka, teks = "total", "kategori"
+        dibuat = []
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            try:
+                # C1: chart pembangun lama (editor lanjutan) -> lembar kerja
+                h = A.buat_chart(t.id, "batang", "uji__lanjutan", [f"SUM({angka})"], [teks],
+                                 [{"kolom": teks, "op": "IN", "nilai": ["x", "y"]}])
+                dibuat.append(h["id"])
+                s = lembar.buka(h["id"])
+                if s.get("tanda") != "batang" or not s.get("dikonversi") or s["kolom"][0]["field"] != teks \
+                        or s["baris"][0] != {"field": angka, "peran": "ukuran", "agg": "SUM"} or s["filter"][0]["op"] != "IN":
+                    raise RuntimeError(f"konversi salah: {s}")
+                if not next(x for x in lembar.daftar() if x["id"] == h["id"])["studio"]:
+                    raise RuntimeError("chart yang bisa dikonversi masih bertanda lanjutan")
+                tt, lb = lembar.dari_dict(s)
+                lembar.simpan(tt, lb, h["id"])                        # disimpan dari Studio = jadi chart Studio
+                db.session.expire_all()
+                c = db.session.query(Slice).get(h["id"])
+                p = _json.loads(c.params)
+                if not p.get("sps_studio") or lembar.buka(c.id).get("catatan"):
+                    raise RuntimeError("setelah disimpan Studio masih dianggap dikonversi/berubah")
+                # C2: diubah di Mode lanjutan -> terdeteksi & dibangun ulang; tidak terwakili -> peringatan basi
+                p["row_limit"] = 77
+                c.params = _json.dumps(p)
+                db.session.commit()
+                s2 = lembar.buka(c.id)
+                if s2.get("batas") != 77 or s2.get("catatan") != lembar.PESAN_BERUBAH:
+                    raise RuntimeError(f"perubahan Mode lanjutan tidak terdeteksi: {s2.get('batas')}, {s2.get('catatan')}")
+                p["metrics"] = [{"expressionType": "SQL", "sqlExpression": f"SUM({angka}) / 2", "label": "x"}]
+                c.params = _json.dumps(p)
+                db.session.commit()
+                if not lembar.buka(c.id).get("basi"):
+                    raise RuntimeError("perubahan yang tidak terwakili tidak diberi peringatan")
+                # Tidak terwakili sama sekali -> tetap di Mode lanjutan
+                p.pop("sps_studio"), p.pop("sps_studio_sidik", None)
+                c.params = _json.dumps(p)
+                db.session.commit()
+                try:
+                    lembar.buka(c.id)
+                    raise RuntimeError("chart dengan metrik SQL bebas dibuka sebagai lembar kerja")
+                except A.InputSalah as e:
+                    if "tidak dibuat di Studio" not in str(e):
+                        raise
+                if konversi.bisa_cepat(c.viz_type, p):
+                    raise RuntimeError("bisa_cepat menerima metrik SQL bebas")
+                # C4: chart jenis dasar dari Asisten AI dibangun dengan pembangun Studio (bisa dibuka di Studio)
+                h2 = auto.buat_satu(t.id, {"jenis": "pie", "judul": "uji__ai", "metrik": [f"SUM({angka})"], "kelompok": [teks],
+                                           "filter": [{"kolom": teks, "op": "==", "nilai": "x"}]})
+                dibuat.append(h2["id"])
+                p2 = _json.loads(db.session.query(Slice).get(h2["id"]).params)
+                if not p2.get("sps_studio") or p2["sps_studio"]["filter"][0]["op"] != "IN":
+                    raise RuntimeError("chart AI tidak lewat pembangun Studio")
+                return f"batang lama -> lembar kerja ({teks} × SUM({angka})); ubahan Mode lanjutan terdeteksi; SQL bebas tetap lanjutan; pie AI = chart Studio"
+            finally:
+                for i in dibuat:
+                    x = db.session.query(Slice).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                db.session.commit()
+
+    @uji("Asisten AI", "Rencana fase 4: ukuran, label kolom, story, hapus chart & dashboard (snapshot .ald) lalu Urungkan")
+    def _():
+        import json as _json
+        from superset.models.dashboard import Dashboard
+        from superset.models.slice import Slice
+        from sps_ai import alat as A, niat, rencana, story
+        t = db.session.query(SqlaTable).filter_by(table_name="latihan_penjualan").first()
+        latihan = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if t is None or latihan is None:
+            raise RuntimeError("data latihan belum ada")
+        u = admin.username
+        jalan = lambda teks: rencana.susun(niat.baca(teks), u)  # noqa: E731
+        sisa = {"chart": [], "dash": [], "story": []}
+        with override_user(admin):
+            from flask import g
+            g.user = admin
+            try:
+                # Ukuran terdefinisi + label kolom
+                h = jalan("tambah ukuran uji__rata = SUM(total) / SUM(jumlah_transaksi) di dataset latihan_penjualan")
+                label_lama = next(c.verbose_name for c in t.columns if c.column_name == "kategori")
+                h2 = jalan("ganti label kolom kategori jadi Kategori Uji di dataset latihan_penjualan")
+                rencana.simpan(h["id"], u)
+                rencana.simpan(h2["id"], u)
+                db.session.expire_all()
+                if "uji__rata" not in {m.metric_name for m in t.metrics} or \
+                        next(c.verbose_name for c in t.columns if c.column_name == "kategori") != "Kategori Uji":
+                    raise RuntimeError("ukuran/label tidak tersimpan")
+                rencana.urungkan(h2["id"], u)
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                if "uji__rata" in {m.metric_name for m in t.metrics} or \
+                        next(c.verbose_name for c in t.columns if c.column_name == "kategori") != label_lama:
+                    raise RuntimeError("ukuran/label tidak diurungkan")
+                # Story
+                h = jalan(f"buat story uji__story dari dashboard {latihan.dashboard_title}")
+                rencana.simpan(h["id"], u)
+                st = next((s for s in story.daftar() if s["judul"] == "uji__story"), None)
+                if st is None:
+                    raise RuntimeError("story tidak dibuat")
+                sisa["story"].append(st["id"])
+                rencana.urungkan(h["id"], u)
+                if any(s["judul"] == "uji__story" for s in story.daftar()):
+                    raise RuntimeError("story tidak diurungkan")
+                sisa["story"].clear()
+                # Hapus chart (dipakai dashboard) -> snapshot .ald -> Urungkan memasang kembali
+                c = A.buat_chart(t.id, "batang", "uji__hapus_chart", ["SUM(total)"], ["kategori"])
+                sisa["chart"].append(c["id"])
+                ch = db.session.query(Slice).get(c["id"])
+                d = Dashboard(dashboard_title="uji__hapus_dash", owners=[admin], slices=[ch], json_metadata="{}",
+                              position_json=_json.dumps({"ROOT_ID": {"type": "ROOT", "id": "ROOT_ID", "children": ["GRID_ID"]},
+                                                         "GRID_ID": {"type": "GRID", "id": "GRID_ID", "children": ["ROW-u"], "parents": ["ROOT_ID"]},
+                                                         "ROW-u": {"type": "ROW", "id": "ROW-u", "children": ["CHART-u"], "parents": ["ROOT_ID", "GRID_ID"]},
+                                                         "CHART-u": {"type": "CHART", "id": "CHART-u", "children": [], "parents": ["ROOT_ID", "GRID_ID", "ROW-u"],
+                                                                     "meta": {"chartId": ch.id, "width": 6, "height": 50}}}))
+                db.session.add(d)
+                db.session.commit()
+                sisa["dash"].append(d.id)
+                uuid_chart, did = str(ch.uuid), d.id
+                h = jalan("hapus chart uji__hapus_chart")
+                j = rencana.simpan(h["id"], u)
+                db.session.expire_all()
+                if db.session.query(Slice).filter(Slice.uuid == uuid_chart).first() is not None or not j.get("unduh"):
+                    raise RuntimeError("chart tidak terhapus / snapshot .ald tidak ada")
+                nama, isi = rencana.unduh(h["id"], u)
+                if not isi.startswith(b"ALDX") or not nama.endswith(".ald"):
+                    raise RuntimeError(f"unduhan bukan berkas .ald: {nama}")
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                baru = db.session.query(Slice).filter(Slice.uuid == uuid_chart).first()
+                d = db.session.query(Dashboard).get(did)
+                if baru is None or baru.id not in [s.id for s in d.slices] or f'"chartId": {baru.id}' not in d.position_json:
+                    raise RuntimeError("chart tidak kembali ke dashboard-nya")
+                sisa["chart"] = [baru.id]
+                # Hapus dashboard -> Urungkan dari .ald
+                uuid_dash = str(d.uuid)
+                h = jalan("hapus dashboard uji__hapus_dash")
+                rencana.simpan(h["id"], u)
+                db.session.expire_all()
+                if db.session.query(Dashboard).filter(Dashboard.uuid == uuid_dash).first() is not None:
+                    raise RuntimeError("dashboard tidak terhapus")
+                rencana.urungkan(h["id"], u)
+                db.session.expire_all()
+                d = db.session.query(Dashboard).filter(Dashboard.uuid == uuid_dash).first()
+                if d is None:
+                    raise RuntimeError("dashboard tidak kembali dari snapshot .ald")
+                sisa["dash"] = [d.id]
+                return "ukuran & label (simpan/urungkan), story, hapus chart (kembali ke dashboard) & hapus dashboard dari .ald"
+            finally:
+                db.session.rollback()
+                for i in sisa["story"]:
+                    story.hapus(i)
+                for i in sisa["dash"]:
+                    x = db.session.query(Dashboard).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                for i in sisa["chart"]:
+                    x = db.session.query(Slice).get(i)
+                    if x is not None:
+                        db.session.delete(x)
+                db.session.commit()
+
+    @uji("Halaman", "Tambah filter langsung di dashboard: kolom per dashboard, pratinjau, Simpan, Urungkan persis")
+    def _():
+        from flask import current_app, g
+        from superset.models.dashboard import Dashboard
+        import sps_filter_global as F
+        d = db.session.query(Dashboard).filter(Dashboard.dashboard_title.like("Latihan: Dashboard Penjualan%")).first()
+        if d is None:
+            raise RuntimeError("dashboard latihan belum ada")
+
+        def panggil(fungsi, *arg, **req):
+            with current_app.test_request_context(**req):
+                g.user = admin
+                r = fungsi(*arg)
+            r, kode = (r if isinstance(r, tuple) else (r, 200))
+            if kode != 200:
+                raise RuntimeError(f"{fungsi.__name__} -> {kode}: {r.get_json()}")
+            return r.get_json()
+
+        with override_user(admin):
+            awal = (d.json_metadata, d.position_json)
+            k = panggil(F.api_kolom_dashboard, path=f"/filter-global/api/kolom-dashboard?dashboard={d.id}")
+            pilih = next((x for x in k["kolom"] if not x["sudah"] and not x["waktu"]), None)
+            if pilih is None or not pilih["chart"]:
+                raise RuntimeError(f"tidak ada kolom yang bisa difilter: {k['kolom'][:3]}")
+            r = panggil(F.api_tambah_filter, path="/filter-global/api/tambah", method="POST",
+                        json={"dashboard": d.id, "kolom": pilih["kolom"]})
+            panggil(F.api_rencana_filter, r["id"], "simpan", path="/x", method="POST")
+            db.session.expire_all()
+            if f'"column": {{"name": "{pilih["kolom"]}"}}' not in d.json_metadata:
+                raise RuntimeError("filter tidak tersimpan di dashboard")
+            if not next(x for x in panggil(F.api_kolom_dashboard, path=f"/x?dashboard={d.id}")["kolom"] if x["kolom"] == pilih["kolom"])["sudah"]:
+                raise RuntimeError("kolom yang baru difilter tidak ditandai 'sudah ada'")
+            panggil(F.api_rencana_filter, r["id"], "urungkan", path="/x", method="POST")
+            db.session.expire_all()
+            if (d.json_metadata, d.position_json) != awal:
+                raise RuntimeError("Urungkan tidak mengembalikan dashboard persis")
+        return f"filter '{pilih['kolom']}' ({pilih['chart']} dari {pilih['total']} chart) tersimpan lalu diurungkan persis"
+
+    @uji("Asisten AI", "Model lokal: token server, model dimuat didahulukan, antrean per server")
+    def _():
+        import time as _t
+        from sps_ai import llm, pengaturan
+        from sps_ai.pengaturan import ModelAI
+        if pengaturan.env_token_lokal("LM Studio") != "AI_LOKAL_LM_STUDIO_TOKEN":
+            raise RuntimeError("nama variabel token lokal salah")
+        m = ModelAI("x", "x", "http://uji-antre:1/v1", "m", "", True, token="t" * 20)
+        if m.kunci != "t" * 20 or m.api_key:
+            raise RuntimeError("token lokal tidak dipakai / model dianggap cloud")
+        with llm.antre(m, _t.monotonic() + 30):
+            try:
+                with llm.antre(m, _t.monotonic() + 11.5):        # menunggu ±1,5 dtk lalu menyerah
+                    raise RuntimeError("antrean tidak mengunci server yang sama")
+            except llm.AntreanPenuh:
+                pass
+        with llm.antre(m, _t.monotonic() + 30):                 # kunci sudah dilepas
+            pass
+        return "token terpisah dari key cloud; permintaan kedua ke server yang sama menunggu giliran"
 
     @uji("Dokumentasi", "Catatan versi untuk VERSI ini ada (dipakai rilis v<VERSI>); tanpa perbandingan merek produk lain")
     def _():

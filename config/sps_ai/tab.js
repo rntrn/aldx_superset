@@ -65,9 +65,17 @@
       <h2>Model lokal (terdeteksi otomatis)</h2>
       <div class="kartu" style="overflow:auto"><table><tr><th>Aplikasi</th><th>Status</th><th>Model yang sudah diunduh</th><th></th></tr>${
         d.lokal.map(x => `<tr><td><b>${esc(x.nama)}</b><div class="ket">port ${esc(x.port)}</div></td>
-          <td>${!x.aktif ? lencana("baru", "belum menyala") : x.model.length ? lencana("siap", "siap") : lencana("berjalan", "menyala, belum ada model")}</td>
-          <td>${x.model.length ? x.model.map(m => `<code>${esc(m)}</code>`).join(" ") : "<span class='ket'>–</span>"}</td>
-          <td>${x.aktif && x.model.length ? "" : langkah(x)}</td></tr>`).join("")}</table></div>
+          <td>${x.butuh_token ? lencana("berjalan", x.token_terisi ? "token ditolak" : "butuh token") : !x.aktif ? lencana("baru", "belum menyala")
+            : x.model.length ? lencana("siap", "siap") : lencana("berjalan", "menyala, belum ada model")}</td>
+          <td>${x.model.length ? x.model.map(m => `<code>${esc(m)}</code>${(x.dimuat || []).includes(m) ? " <span class='ket'>dimuat</span>" : ""}`).join(" ")
+            : x.butuh_token ? `<span class="ket">Server meminta token (mis. LM Studio › Server Settings › Require Authentication).
+              Buat token di <i>Manage Tokens</i> lalu tempel di sini, atau matikan Require Authentication.</span>` : "<span class='ket'>–</span>"}</td>
+          <td>${x.butuh_token || x.token_terisi ? `<form class="aiKey" data-env="${esc(x.env)}" style="display:flex;gap:6px">
+              <input type="text" autocomplete="off" spellcheck="false" placeholder="${x.token_terisi ? "Ganti token…" : "Tempel token server lokal"}"
+                     style="font-family:ui-monospace,Consolas,monospace;-webkit-text-security:disc" aria-label="Token ${esc(x.nama)}">
+              <button class="utama" type="submit">Simpan</button>
+              ${x.token_terisi ? `<button class="kedua" type="button" data-hapus="${esc(x.env)}">Hapus</button>` : ""}</form>`
+            : x.aktif && x.model.length ? "" : langkah(x)}</td></tr>`).join("")}</table></div>
 
       <h2>Cloud gratis <span class="ket">kuota harian</span></h2>
       <div class="kartu" style="overflow:auto">${tabelCloud(d, "gratis")}</div>

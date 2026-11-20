@@ -634,7 +634,19 @@ def ke_superset(t, lembar: Lembar) -> tuple[str, dict]:
         p.update(x_axis=D[0], groupby=D[1:2], metric=M[0], linear_color_scheme=SKEMA_RUNTUN,
                  show_values=lembar.label, normalize_across="heatmap", value_bounds=[None, None],
                  y_axis_format="SMART_NUMBER", sort_x_axis="alpha_asc", sort_y_axis="alpha_asc")
+    p["sps_studio_sidik"] = sidik(p)
     return viz, p
+
+
+SIDIK_ABAIKAN = ("sps_studio", "sps_studio_sidik", "slice_id", "datasource", "viz_type", "dashboards", "url_params",
+                 "extra_form_data", "force", "result_format", "result_type")
+
+
+def sidik(params: dict) -> str:
+    """Sidik params chart saat disimpan Studio. Berbeda saat dibuka lagi = chart diubah di Mode lanjutan (Explore)."""
+    import hashlib
+    isi = {k: v for k, v in params.items() if k not in SIDIK_ABAIKAN}
+    return hashlib.sha1(json.dumps(isi, sort_keys=True, default=str).encode()).hexdigest()[:16]
 
 
 def _kolom_waktu(t, nama: str) -> bool:
@@ -670,6 +682,7 @@ def simpan(t, lembar: Lembar, chart_id: int | None = None) -> dict:
         sumber_id, tabel_ramalan = ramalan.siapkan(t, lembar, chart_id)
         from superset.connectors.sqla.models import SqlaTable
         viz, params = "echarts_timeseries_line", ramalan.params_chart(lembar, db.session.query(SqlaTable).get(sumber_id))
+        params["sps_studio_sidik"] = sidik(params)
         catatan = "Ramalan disimpan di ALDx Engine dan diperbarui otomatis tiap hari."
     elif lembar.analitik.get("anomali"):
         catatan = "Tanda anomali hanya tampil di Studio Visual."
@@ -691,32 +704,67 @@ def simpan(t, lembar: Lembar, chart_id: int | None = None) -> dict:
             "catatan": catatan}
 
 
+PESAN_KONVERSI = ("Chart ini dibuat di editor lanjutan dan dibuka sebagai lembar kerja. Simpan membangun ulang chart "
+                  "dengan pengaturan Studio (format rinci dari Explore bisa berubah); Simpan baru = chart terpisah.")
+PESAN_BERUBAH = "Chart ini diubah di Mode lanjutan; lembar kerja dibangun ulang dari versi terbarunya."
+PESAN_BASI = ("Chart ini diubah di Mode lanjutan dengan pengaturan yang tidak bisa ditampilkan Studio. Yang tampil adalah "
+              "versi Studio terakhir: Simpan akan menimpa perubahan dari Mode lanjutan (pakai Simpan baru agar aman).")
+
+
 def buka(chart_id: int) -> dict:
+    """Chart -> lembar kerja. Chart Studio: spesifikasinya (dibangun ulang bila diubah di Mode lanjutan). Chart lain:
+    dikonversi (sps_studio/konversi.py); yang tidak bisa -> InputSalah 'tidak dibuat di Studio' (dibuka di Explore)."""
     from superset import db, security_manager
     from superset.models.slice import Slice
+
+    from sps_studio import konversi
 
     chart = db.session.query(Slice).get(int(chart_id))
     if chart is None or not security_manager.can_access_chart(chart):
         raise alat.IzinDitolak("Chart tidak ditemukan atau tidak boleh Anda buka.")
-    spec = json.loads(chart.params or "{}").get("sps_studio")
-    if not spec:
-        raise alat.InputSalah("Chart ini tidak dibuat di Studio; buka lewat Explore.")
-    return {**spec, "chart_id": chart.id, "judul": chart.slice_name}
+    params = json.loads(chart.params or "{}")
+    spec = params.get("sps_studio")
+    dasar = {"chart_id": chart.id, "judul": chart.slice_name}
+    if spec:
+        tersimpan = params.get("sps_studio_sidik")
+        if not tersimpan or tersimpan == sidik(params):  # tanpa sidik = disimpan versi lama: anggap utuh
+            return {**spec, **dasar}
+        try:                                       # diubah di Explore: pakai versi terbaru bila terwakili
+            return {**konversi.spec(chart, params), **dasar, "catatan": PESAN_BERUBAH}
+        except konversi.TakBisa:
+            return {**spec, **dasar, "catatan": PESAN_BASI, "basi": True}
+    try:
+        return {**konversi.spec(chart, params), **dasar, "catatan": PESAN_KONVERSI, "dikonversi": True}
+    except konversi.TakBisa as e:
+        raise alat.InputSalah(f"Chart ini tidak dibuat di Studio dan belum bisa dibuka sebagai lembar kerja ({e}); "
+                              "buka lewat Mode lanjutan.") from None
 
 
 def daftar() -> list[dict]:
-    """Lembar kerja Studio yang boleh dibuka user (terbaru dulu)."""
+    """SEMUA chart yang boleh dibuka user (terbaru dulu): Studio Visual = satu tempat membangun & mencari chart.
+
+    studio=True  -> dibuka sebagai lembar kerja (spesifikasi di params.sps_studio)
+    studio=False -> chart dari editor lanjutan / impor / AI jenis dasar: dibuka di Mode lanjutan (Explore)
+    """
     from superset import db, security_manager
     from superset.models.slice import Slice
+    from sps_ai.wawasan import JENIS
+    from sps_studio import konversi
 
-    rows = (db.session.query(Slice).filter(Slice.params.like('%"sps_studio"%'))
-            .order_by(Slice.changed_on.desc()).limit(200).all())
+    rows = db.session.query(Slice).order_by(Slice.changed_on.desc()).limit(400).all()
     hasil = []
     for c in rows:
         if not security_manager.can_access_chart(c):
             continue
-        spec = json.loads(c.params or "{}").get("sps_studio", {})
-        hasil.append({"id": c.id, "judul": c.slice_name, "tanda": spec.get("tanda"),
-                      "dataset_id": spec.get("dataset_id") or c.datasource_id, "spec": spec,
-                      "diubah": c.changed_on.isoformat(sep=" ", timespec="minutes") if c.changed_on else ""})
+        try:
+            params = json.loads(c.params or "{}")
+        except ValueError:
+            params = {}
+        spec = params.get("sps_studio") or {}
+        hasil.append({"id": c.id, "judul": c.slice_name, "tanda": spec.get("tanda") or konversi.VIZ_KE_TANDA.get(c.viz_type),
+                      "studio": bool(spec) or konversi.bisa_cepat(c.viz_type, params),
+                      "jenis": JENIS.get(c.viz_type, c.viz_type), "dataset_id": spec.get("dataset_id") or c.datasource_id,
+                      "spec": spec, "diubah": c.changed_on.isoformat(sep=" ", timespec="minutes") if c.changed_on else ""})
+        if len(hasil) >= 300:
+            break
     return hasil

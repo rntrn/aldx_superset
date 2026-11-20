@@ -143,6 +143,43 @@ yang sudah selesai. Model lokal kecil di CPU tetap lambat untuk permintaan berta
 pecah permintaan. (Mode latar butuh Redis, yang selalu ada di instalasi standar; tanpa Redis panel memakai cara lama
 dengan batas ±5 menit.)
 
+## 2b. Mengubah dashboard & chart lewat Asisten (ALDx Rencana)
+
+`/analis` bisa **mengubah** dashboard dan chart yang sudah ada, bukan hanya membuat yang baru. Alurnya selalu sama:
+**perintah → kartu Rencana perubahan (pratinjau) → Simpan perubahan → (bila perlu) Urungkan.** Tidak ada yang berubah
+sebelum Anda menekan **Simpan perubahan**.
+
+| Contoh perintah | Hasil |
+|---|---|
+| `tambah filter cabang di dashboard Penjualan` | filter pilihan *Cabang* di dashboard itu, otomatis berlaku di semua chart yang datasetnya punya kolom `cabang` (chart lain dicatat di kartu sebagai *tidak berlaku*) |
+| `dari dashboard tes1 buatkan filter yang berlaku di semua chart` | Asisten bertanya *kolom apa?* dan menawarkan kolom yang paling cocok sebagai tombol (satu klik = perintah lengkap) |
+| `pasang filter tanggal di dashboard ini` | filter *Rentang waktu* (dashboard yang sedang dibuka) |
+| `tambah filter rentang nilai di dashboard X` | filter rentang angka (min–maks) |
+| `hapus filter cabang di dashboard X` | filter dihapus |
+| `ganti judul dashboard X menjadi Y` · `ganti nama chart ini jadi Y` | judul baru |
+| `ubah chart X jadi batang` · `jadikan chart ini pie` | jenis chart diganti; chart Studio dibangun ulang dengan pembangun Studio (semua jenis Studio), chart dari editor lanjutan: angka, tabel, pie, batang, garis |
+| `tambahkan chart X ke dashboard Y` · `keluarkan chart X dari dashboard Y` | chart masuk sebagai baris baru di bawah / dikeluarkan (chart-nya tidak dihapus) |
+| `tambah ukuran margin = SUM(laba) / SUM(penjualan) di dataset D` | ukuran terdefinisi baru (rumus diperiksa & diuji ke database dulu; sama dengan **+ Ukuran** di Studio) |
+| `tambah dimensi kelompok = CASE WHEN total >= 1000000 THEN 'Besar' ELSE 'Kecil' END di dataset D` | dimensi (kolom hitung) baru |
+| `ganti label kolom nm_cabang jadi Nama Cabang di dataset D` | label tampilan kolom |
+| `buat story Ringkasan dari dashboard A, B` · `tambahkan dashboard C ke story Ringkasan` · `hapus story Ringkasan` | story baru / langkah baru di akhir / story dihapus (dashboard-nya tidak ikut) |
+| `hapus chart X` · `hapus dashboard Y` | **dihapus**, dengan snapshot `.ald` sebelumnya; **Urungkan** mengimpornya kembali dan memasang chart lagi di dashboard tempatnya semula |
+
+- **Tanpa model AI.** Perintah dengan pola di atas dipahami langsung oleh penerjemah niat (`sps_ai/niat.py`): cepat dan
+  tetap jalan walau model lokal lambat/sibuk. Kalimat bebas lainnya dikerjakan model lewat alat `rencanakan`.
+- **Nama tidak harus persis**: `tes1` cocok dengan *tes 1*. Bila ada beberapa yang cocok, Asisten bertanya dengan tombol
+  (nama kembar dibedakan dengan `#id`).
+- **Hanya pemilik** dashboard/chart (atau Admin) yang bisa menyimpan perubahan.
+- **Unduh .ald (sebelum)** (muncul setelah Simpan): berkas `.ald` berisi kondisi dashboard/chart **sebelum** perubahan,
+  terkunci dengan kunci server, bisa diimpor lagi lewat menu **Berkas .ald / .aldx**. Snapshot di server dihapus otomatis
+  setelah 7 hari, jadi tidak menumpuk.
+- Peran `/data-engineer` juga bisa memakai perintah-perintah ini (terutama ukuran, dimensi, dan label kolom dataset).
+- **Urungkan** mengembalikan objek persis seperti sebelum disimpan. Ditolak bila objek itu sudah diubah lagi di tempat
+  lain sesudahnya (agar tidak menimpa pekerjaan orang). Snapshot disimpan 7 hari (tabel `sps_ai_rencana`); pratinjau
+  yang tidak disimpan kedaluwarsa setelah 24 jam.
+- Setelah disimpan, halaman yang sedang dibuka dimuat ulang otomatis bila itu objek yang diubah. Setiap simpan/urungkan
+  tercatat di jejak audit.
+
 ## 3. Usulan & tombol Terapkan
 
 Peran yang bisa mengubah sesuatu (`/ahli-ui-ux`, `/hw-engineer`) **tidak pernah mengubah sendiri**. Peran itu

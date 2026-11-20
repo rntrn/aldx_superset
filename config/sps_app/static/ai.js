@@ -203,6 +203,79 @@
       `<div class="langkah-ai"><span>${esc(p.saran.length + " " + t("saran chart ditemukan (Asisten AI › Auto Chart)"))}</span></div>` +
       (p.wawasan || []).map(w => `<div class="wawasan-ai">${esc(w)}</div>`).join(""));
     if (p.tipe === "usulan") kartuUsulan(p);
+    if (p.tipe === "rencana") kartuRencana(p);
+    if (p.tipe === "pilihan" && (p.pilihan || []).length) {          // pertanyaan balik: satu klik = perintah lengkap
+      const baris = document.createElement("div");
+      baris.className = "contoh-ai lanjutan-ai";
+      p.pilihan.forEach(x => { const b = document.createElement("button"); b.type = "button"; b.textContent = x; b.onclick = () => kirim(x); baris.appendChild(b); });
+      wadah.appendChild(baris);
+    }
+  }
+
+  // ---------------- Rencana perubahan (sps_ai/rencana.py) ----------------
+  // Belum ada yang berubah sampai "Simpan perubahan"; sesudahnya bisa "Urungkan".
+  const sebaris = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`(.+?)`/g, "<code>$1</code>");
+  function segarkanHalaman(alamat) {
+    try {
+      const l = $("#bingkai").contentWindow.location, kini = l.pathname + l.search;
+      if (alamat && kini.startsWith(alamat)) l.reload();
+    } catch (e) { /* halaman lain origin */ }
+  }
+  function kartuRencana(p) {
+    const d = gelembung("usulan rencana-ai", `<b>${esc(t("Rencana perubahan"))}</b>
+      <ul>${p.baris.map(b => `<li>${sebaris(b)}</li>`).join("")}</ul>
+      ${(p.peringatan || []).map(w => `<div class="lencana-ai blok">${sebaris(w)}</div>`).join("")}
+      <div class="aksi-usulan"></div>`);
+    const aksi = d.querySelector(".aksi-usulan");
+    const tombolBuka = () => p.buka ? `<button type="button" class="tombol" data-buka>${esc(t("Buka"))}</button>` : "";
+    const kirimAksi = async (nama, tombol) => {
+      tombol.disabled = true;
+      try {
+        const r = await kirimJson(`/asisten/api/rencana/${encodeURIComponent(p.id)}/${nama}`, "{}"), j = await bacaJson(r);
+        if (!r.ok) throw new Error(j.error || r.status);
+        return j;
+      } catch (err) {
+        tombol.disabled = false;
+        aksi.querySelector(".galat-ai")?.remove();
+        aksi.insertAdjacentHTML("beforeend", `<div class="galat-ai">${esc(err.message)}</div>`);
+        return null;
+      }
+    };
+    const pasangBuka = () => { const b = aksi.querySelector("[data-buka]"); if (b) b.onclick = () => SPS.buka(p.buka); };
+    const tahapUsulan = () => {
+      aksi.innerHTML = `<button type="button" class="tombol utama" data-simpan>${ik("centang", 16)}${esc(t("Simpan perubahan"))}</button>
+        <button type="button" class="tombol" data-batal>${esc(t("Batal"))}</button>`;
+      aksi.querySelector("[data-simpan]").onclick = async e => {
+        const j = await kirimAksi("simpan", e.currentTarget);
+        if (!j) return;
+        riwayat.push({role: "user", content: "(Pengguna menekan Simpan; perubahan sudah tersimpan.)"});
+        segarkanHalaman(j.buka || p.buka);
+        tahapTersimpan(j);
+      };
+      aksi.querySelector("[data-batal]").onclick = async e => {
+        if (!await kirimAksi("batal", e.currentTarget)) return;
+        d.classList.add("selesai"); aksi.innerHTML = `<small>${esc(t("Dibatalkan, tidak ada yang berubah."))}</small>`;
+      };
+    };
+    // Snapshot .ald SEBELUM perubahan (dihapus otomatis setelah 7 hari): bisa diunduh & diimpor lewat menu Berkas.
+    const tombolUnduh = j => Array.from({length: Math.min(Number(j?.unduh) || 0, 3)}, (_, i) =>
+      `<a class="tombol" href="/asisten/api/rencana/${encodeURIComponent(p.id)}/unduh?i=${i}" download
+          title="${esc(t("Berkas .ald berisi kondisi sebelum perubahan (dihapus otomatis setelah 7 hari)"))}">${ik("simpan", 16)}${esc(t("Unduh .ald (sebelum)"))}</a>`).join("");
+    const tahapTersimpan = j => {
+      d.classList.add("selesai");
+      aksi.innerHTML = `<span class="sukses-ai">${ik("centang", 16)} ${esc(t("Tersimpan di aplikasi."))}</span>
+        ${tombolBuka()}<button type="button" class="tombol" data-urungkan>${esc(t("Urungkan"))}</button>${tombolUnduh(j)}`;
+      pasangBuka();
+      aksi.querySelector("[data-urungkan]").onclick = async e => {
+        const j = await kirimAksi("urungkan", e.currentTarget);
+        if (!j) return;
+        riwayat.push({role: "user", content: "(Pengguna mengurungkan perubahan tadi.)"});
+        segarkanHalaman(j.buka || p.buka);
+        aksi.innerHTML = `<small>${esc(t("Diurungkan, kembali seperti semula."))}</small>${tombolBuka()}`;
+        pasangBuka();
+      };
+    };
+    tahapUsulan();
   }
 
   // ---------------- Sambungkan AI ----------------
@@ -224,15 +297,23 @@
     const kartuLokal = d.lokal.map(x => {
       const p = x.langkah ? x : null;
       const siapPakai = x.aktif && x.model.length;
-      const status = !x.aktif ? `<span class="lencana">${esc(t("belum menyala"))}</span>`
+      const status = x.butuh_token ? `<span class="lencana peringatan">${esc(t(x.token_terisi ? "token ditolak" : "butuh token"))}</span>`
+        : !x.aktif ? `<span class="lencana">${esc(t("belum menyala"))}</span>`
         : x.model.length ? `<span class="lencana ok">${esc(t("siap"))} · ${x.model.length} model</span>`
         : `<span class="lencana peringatan">${esc(t("menyala, belum ada model"))}</span>`;
-      const isi = siapPakai
-        ? `<div class="model-temuan">${x.model.map(m => `<code>${esc(m)}</code>`).join("")}</div>`
+      const formToken = d.boleh_atur ? `<form class="isi-key" data-env="${esc(x.env)}">
+          <input type="password" autocomplete="off" spellcheck="false" placeholder="${esc(t(x.token_terisi ? "Ganti token…" : "Tempel token server lokal"))}" aria-label="Token ${esc(x.nama)}">
+          <button class="tombol utama" type="submit">${esc(t("Simpan"))}</button>
+          ${x.token_terisi ? `<button class="tombol" type="button" data-hapus="${esc(x.env)}">${esc(t("Hapus"))}</button>` : ""}
+        </form>` : "";
+      const isi = x.butuh_token
+        ? `<p class="redup">${esc(t("Server ini meminta token (mis. LM Studio › Server Settings › Require Authentication). Buat token di Manage Tokens lalu tempel di sini, atau matikan Require Authentication."))}</p>${formToken}`
+        : siapPakai
+        ? `<div class="model-temuan">${x.model.map(m => `<code>${esc(m)}${(x.dimuat || []).includes(m) ? ` · ${esc(t("dimuat"))}` : ""}</code>`).join("")}</div>${x.token_terisi ? formToken : ""}`
         : p ? `<ol>${p.langkah.map(l => Array.isArray(l)
             ? `<li>${esc(t(l[0]))}<span class="perintah"><code>${esc(l[1])}</code><button type="button" data-salin="${esc(l[1])}">${esc(t("Salin"))}</button></span></li>`
             : `<li>${esc(t(l))}</li>`).join("")}</ol>` : "";
-      const buka = (!hidup.length && x.nama === "Ollama") || (x.aktif && !x.model.length) || siapPakai;
+      const buka = (!hidup.length && x.nama === "Ollama") || (x.aktif && !x.model.length) || siapPakai || x.butuh_token;
       return `<details class="kartu-sambung" ${buka ? "open" : ""}>
         <summary><b>${esc(x.nama)}</b><small>port ${esc(x.port)}</small>${status}</summary>${isi}
         ${p && !siapPakai ? `<a class="tautan" href="${p.unduh}" target="_blank" rel="noopener">${esc(t("Unduh"))} ${esc(x.nama)} ↗</a>` : ""}</details>`;

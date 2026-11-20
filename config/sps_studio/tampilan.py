@@ -159,6 +159,27 @@ def api_buka_lembar(chart_id: int):
     return jsonify(lembar.buka(chart_id))
 
 
+@bp.route("/api/lembar/<int:chart_id>/hapus", methods=["POST"])
+@_login()
+def api_hapus_lembar(chart_id: int):
+    """Hapus chart (menggantikan hapus di daftar chart Superset): perintah resmi Superset, jadi hanya pemilik/Admin,
+    dan ditolak bila chart masih dipakai laporan terjadwal."""
+    from superset.commands.chart.delete import DeleteChartCommand
+    from superset.commands.chart.exceptions import (ChartDeleteFailedReportsExistError, ChartForbiddenError,
+                                                    ChartNotFoundError)
+    try:
+        DeleteChartCommand([chart_id]).run()
+    except ChartNotFoundError:
+        raise alat.InputSalah("Chart tidak ditemukan.") from None
+    except ChartForbiddenError:
+        raise alat.IzinDitolak("Hanya pemilik chart atau Admin yang boleh menghapusnya.") from None
+    except ChartDeleteFailedReportsExistError:
+        raise alat.InputSalah("Chart masih dipakai Langganan laporan / Peringatan data; hapus jadwalnya dulu.") from None
+    import sps_audit
+    sps_audit.catat("chart", "Hapus chart (Studio)", str(chart_id))
+    return jsonify(ok=True)
+
+
 @bp.route("/api/dashboard")
 @_login()
 def api_daftar_dashboard():

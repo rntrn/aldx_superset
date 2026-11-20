@@ -114,6 +114,22 @@ Catatan:
 - Filter global hanya mempersempit data. Hak akses & RLS tetap berlaku.
 - Filter yang Anda ubah sendiri di dashboard tidak ditimpa sampai dashboard dibuka ulang.
 
+### 2a. Tambah filter langsung di dashboard
+
+Filter global hanya berlaku pada kolom yang **sudah punya filter** di dashboard itu. Pemilik dashboard (atau Admin)
+bisa menambahkannya langsung dari dashboard, tanpa editor maupun Asisten AI:
+
+1. Buka dashboard → tombol **Tambah filter** di kepala dashboard (di samping *Riwayat versi*, layar lebar).
+2. Pilih kolom. Daftar diurutkan dari yang paling cocok, dengan keterangan *N dari M chart* (berapa chart yang datasetnya
+   punya kolom itu). Kolom yang sudah punya filter ditandai *sudah ada*. **Jenis**: Otomatis, Pilihan nilai, Rentang
+   angka, atau Rentang waktu.
+3. **Pratinjau** → mis. *tambah filter Kategori, berlaku di 10 dari 10 chart* (chart lain disebut di peringatan dan
+   dikecualikan otomatis) → **Simpan**.
+4. Dashboard dimuat ulang. Notifikasi di bawah layar punya tombol **Urungkan** untuk membatalkan penambahan itu.
+
+Filter baru langsung dipakai **filter global** (kolom yang sama) dan bisa diatur lebih lanjut di Studio › Susun dashboard
+atau editor dashboard. Di balik layar memakai ALDx Rencana yang sama dengan Asisten AI ([23 §2b](23-asisten-ai-peran-ahli.md#2b-mengubah-dashboard--chart-lewat-asisten-aldx-rencana)).
+
 ### 2b. Telusuri ke dashboard lain (drill-through)
 
 Tombol **Telusuri** (ikon dua kotak berpanah, di kiri corong) tampil saat sebuah dashboard dibuka.
